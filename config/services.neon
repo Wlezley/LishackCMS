@@ -1,10 +1,3 @@
-search:
-    default:
-        in: %appDir%
-        classes:
-            - *Factory
-            - *Facade
-
-
-services:
-    - App\Router\RouterFactory::createRouter
+includes:
+    - %appDir%/../config/core/services.neon
+    - %appDir%/../config/project/services.neon
