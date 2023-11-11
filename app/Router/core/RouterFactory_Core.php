@@ -1,6 +1,6 @@
 <?php
 
-// declare(strict_types=1);
+declare(strict_types=1);
 
 namespace App;
 
@@ -9,7 +9,7 @@ use Nette\Application\Routers\Route;
 use Nette\Application\Routers\RouteList;
 
 
-abstract class CoreRouterFactory
+abstract class RouterFactory_Core
 {
     use Nette\StaticClass;
 
