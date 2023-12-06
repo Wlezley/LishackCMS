@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\AdminModule\Presenters;
+namespace App\Modules\Admin\Presenters;
 
 use Nette;
 use Nette\Application\Responses;
@@ -10,7 +10,7 @@ use Nette\Http;
 use Tracy\ILogger;
 
 
-final class AdminErrorPresenter implements Nette\Application\IPresenter
+final class ErrorPresenter implements Nette\Application\IPresenter
 {
 	use Nette\SmartObject;
 
