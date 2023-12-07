@@ -1,11 +1,10 @@
 <?php
 
-// declare(strict_types=1);
+declare(strict_types=1);
 
 namespace App;
 
 use Nette;
-use Nette\Application\Routers\Route;
 use Nette\Application\Routers\RouteList;
 
 
@@ -26,7 +25,7 @@ abstract class RouterFactory_Core
         // CRON Router
         self::createCronRouter($router);
 
-        // WEBSITE Router
+        // WEBSITE Router (must be last one)
         self::createWebsiteRouter($router);
 
         return $router;

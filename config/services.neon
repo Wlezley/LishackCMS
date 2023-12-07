@@ -1,3 +1,0 @@
-includes:
-    - %appDir%/../config/core/services.neon
-    - %appDir%/../config/project/services.neon

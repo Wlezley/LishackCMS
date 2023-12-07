@@ -1,15 +1,11 @@
 parameters:
-
+    debugMode: 'auto'
+    strictMode: false
 
 application:
     errorPresenter: Error
     mapping:
         *: App\Modules\*\Presenters\*Presenter
-
-        # Admin: App\Modules\Admin\Presenters\*Presenter
-        # Ajax: App\Modules\Ajax\Presenters\*Presenter
-        # Cron: App\Modules\Cron\Presenters\*Presenter
-        # Website: App\Modules\Website\Presenters\*Presenter
 
 database:
     user: %database.user%

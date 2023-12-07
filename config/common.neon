@@ -1,3 +1,0 @@
-includes:
-    - %appDir%/../config/core/common.neon
-    - %appDir%/../config/project/common.neon
