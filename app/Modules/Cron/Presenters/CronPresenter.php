@@ -16,7 +16,7 @@ final class CronPresenter extends Nette\Application\UI\Presenter
 
     public function beforeRender(): void
     {
-        $this->template->setFile(__DIR__ . '/../templates/default.latte');
+        $this->template->setFile(__DIR__ . '/../Templates/default.latte');
 
         if (!isset($this->template->render)) {
             $this->template->render = '';
@@ -25,11 +25,11 @@ final class CronPresenter extends Nette\Application\UI\Presenter
 
     public function actionDefault(): void
     {
-        $this->template->render = 'Default action';
+        $this->template->render = 'Default CRON action';
     }
 
     public function actionPing(): void
     {
-        $this->template->render = 'PONG';
+        $this->template->render = 'CRON PONG';
     }
 }

@@ -41,7 +41,7 @@ abstract class RouterFactory_Core
     public static function createAjaxRouter(RouteList $router): void
     {
         $router->withModule('Ajax')
-            ->addRoute('ajax/<presenter>/<action>[/<id>]', 'Ajax:default')
+            ->addRoute('ajax/<action>[/<id>]', 'Ajax:default')
             ->end();
     }
 
