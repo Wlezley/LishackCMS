@@ -48,7 +48,7 @@ abstract class RouterFactory_Core
     public static function createCronRouter(RouteList $router): void
     {
         $router->withModule('Cron')
-            ->addRoute('cron/<presenter>/<action>[/<id>]', 'Cron:default')
+            ->addRoute('cron/<action>[/<id>]', 'Cron:default')
             ->end();
     }
 
