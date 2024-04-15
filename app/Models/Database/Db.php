@@ -7,14 +7,19 @@ use Nette\Database\Table\Selection;
 
 class Db
 {
-    private Explorer $database;
-
-    public function __construct(Explorer $database)
+    public function __construct(private Explorer $database)
     {
         $this->database = $database;
     }
 
     public function select(string $table, array $columns = ['*']): array
+    {
+        /** @var Selection $query */
+        $query = $this->database->table($table)->select($columns);
+        return $query->fetchAll();
+    }
+
+    public function row(string $table, array $columns = ['*']): array
     {
         /** @var Selection $query */
         $query = $this->database->table($table)->select($columns);
@@ -34,7 +39,7 @@ class Db
 
 // use \Nette\Database\Explorer;
 
-// class Database 
+// class Database
 // {
 //     /** @var Explorer @inject */
 //     public $db;
