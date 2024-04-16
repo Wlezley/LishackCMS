@@ -6,7 +6,7 @@ use App\Models\Db;
 
 class User
 {
-    public const TABLE = 'user';
+    public const TABLE = 'users';
 
     private Db $db;
     public int $user_id;

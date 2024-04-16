@@ -8,24 +8,24 @@ require __DIR__ . '/../vendor/autoload.php';
 $container = App\Bootstrap::boot()
 	->createContainer();
 
-if (!isset($argv[3])) {
+if (!isset($argv[2])) {
 	echo '
 Add new user to database.
 
-Usage: create-user.php <name> <email> <password>
+Usage: create-user.php <name> <password>
 ';
 	exit(1);
 }
 
-[, $name, $email, $password] = $argv;
+[, $username, $password] = $argv;
 
-$manager = $container->getByType(App\Model\UserFacade::class);
+$manager = $container->getByType(App\Models\Authenticator::class);
 
-try {
-	$manager->add($name, $email, $password);
-	echo "User $name was added.\n";
+// try {
+	$manager->addUser($username, $password);
+	echo "User $username was added.\n";
 
-} catch (App\Model\DuplicateNameException $e) {
-	echo "Error: duplicate name.\n";
-	exit(1);
-}
+// } catch (App\Model\DuplicateNameException $e) {
+// 	echo "Error: duplicate name.\n";
+// 	exit(1);
+// }
