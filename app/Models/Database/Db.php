@@ -21,8 +21,10 @@ class Db
 
     public function row(string $table, array $columns = ['*']): array
     {
+        // $this->database->query();
+
         /** @var Selection $query */
-        $query = $this->database->table($table)->select($columns);
+        $query = $this->database->table($table)->select($columns)->limit(1);
         return $query->fetchAll();
     }
 
@@ -32,58 +34,3 @@ class Db
         return $affectedRows;
     }
 }
-
-
-
-
-
-// use \Nette\Database\Explorer;
-
-// class Database
-// {
-//     /** @var Explorer @inject */
-//     public $db;
-
-
-//     public function __construct()
-//     {
-//         //
-//     }
-
-//     // #################################################
-
-//     public function connect()
-//     {
-//         # code...
-//         // $this->db->connect();
-//     }
-
-//     // #################################################
-
-//     public function query()
-//     {
-//         # code...
-//     }
-
-//     public function single()
-//     {
-//         # code...
-//     }
-
-//     public function row()
-//     {
-//         # code...
-//     }
-
-//     // #################################################
-
-//     public function update()
-//     {
-//         # code...
-//     }
-
-//     public function insert()
-//     {
-//         # code...
-//     }
-// }
