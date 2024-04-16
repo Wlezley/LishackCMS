@@ -1,36 +1,53 @@
 <?php
 
-namespace Models;
+namespace App\Models;
 
 use Nette\Database\Explorer;
+use Nette\Database\ResultSet;
+
 use Nette\Database\Table\Selection;
+
 
 class Db
 {
-    public function __construct(private Explorer $database)
+    public function __construct(private Explorer $db)
     {
-        $this->database = $database;
+        $this->db = $db;
     }
 
-    public function select(string $table, array $columns = ['*']): array
+    public function query($query, ...$params): array
     {
-        /** @var Selection $query */
-        $query = $this->database->table($table)->select($columns);
-        return $query->fetchAll();
+        $query = trim($query);
+        $query = preg_replace('!\s+!', ' ', $query); // Replace Multiple Spaces with One Space
+
+        // TODO !!!!!!!
+
+        /** @var ResultSet $result */
+        $result = $this->db->query($query, $params);
+        return $result->fetchAll();
     }
 
-    public function row(string $table, array $columns = ['*']): array
+    public function insert(string $table, array $data): string
     {
-        // $this->database->query();
-
-        /** @var Selection $query */
-        $query = $this->database->table($table)->select($columns)->limit(1);
-        return $query->fetchAll();
+        $this->db->table($table)->insert($data);
+        return $this->db->getInsertId();
     }
 
     public function update(string $table, array $data, array $where): int
     {
-        $affectedRows = $this->database->table($table)->where($where)->update($data);
+        $affectedRows = $this->db->table($table)->where($where)->update($data);
         return $affectedRows;
+    }
+
+    public function select(string $table, array $where, array $columns = ['*'], $limit = null, $offset = null): array
+    {
+        /** @var Selection $query */
+        $query = $this->db->table($table)->where($where)->select($columns)->limit($limit, $offset);
+        return $query->fetchAll();
+    }
+
+    public function row(string $table, array $where, array $columns = ['*']): array
+    {
+        return $this->select($table, $where, $columns, 1, 0);
     }
 }
