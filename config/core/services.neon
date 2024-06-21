@@ -10,4 +10,8 @@ services:
     router: App\RouterFactory::createRouter
     authenticator: App\Models\Authenticator
 
+    # Models
     - App\Models\User
+
+    # ADMIN Components
+    - App\Components\Admin\SignInFormFactory

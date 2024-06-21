@@ -4,26 +4,44 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
-
-use Nette;
-
-use App\Models\Authenticator;
+use App\Components\Admin\SignInFormFactory;
 
 
-
-final class SignPresenter extends Nette\Application\UI\Presenter
+class SignPresenter extends UnsecuredPresenter
 {
-    private $auth;
+    /** @var SignInFormFactory @inject */
+    public $signInForm;
 
-    public function __construct(Authenticator $auth)
+    public function beforeRender()
     {
-        $this->auth = $auth;
+        $this->redrawControl();
     }
 
-    function renderIn(): void
+    public function renderIn()
     {
-        // $this->auth ...
-        // TODO: SignIn FORM
-        // ...
+        if($this->user->isLoggedIn()) {
+            $this->redirect('Admin:default');
+        }
+    }
+
+    public function actionOut(): void
+    {
+        $this->user->logout(true);
+        $this->redirect('Sign:in');
+    }
+
+    protected function createComponentSignInForm()
+    {
+        $form = $this->signInForm->create();
+
+        $form->onSuccess[] = function () {
+            $this->redirect('Admin:default');
+        };
+
+        $form->onError[] = function () {
+            $this->flashMessage('Nesprávné přihlašovací údaje', 'danger'); // TODO: Získat chybovku z exception?
+        };
+
+        return $form;
     }
 }

@@ -34,6 +34,8 @@ abstract class RouterFactory_Core
     public static function createAdminRouter(RouteList $router): void
     {
         $router->withModule('Admin')
+            ->addRoute('admin/login', 'Sign:in')
+            ->addRoute('admin/logout', 'Sign:out')
             ->addRoute('admin/<presenter>/[<action>]', 'Admin:default')
             ->end();
     }

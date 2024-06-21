@@ -1,0 +1,24 @@
+<div class="sidebar">
+    <div class="sidebar-header">
+        <a href="{link Admin:}">
+        <img src="{$baseUrl}/img/logo.png" class="logo" alt="logo" title="logo" style="display: block; margin: 15px auto; max-width: 100%;">
+        </a>
+    </div>
+    <div class="list-group sidebar-list" id="mainmenu">
+        <!-- TEST -->
+        <a href="{link Admin:}" n:class="list-group-item, $presenter->name =='Files' ? active"><i class="sidebar-icons fa fa-folder"></i>test</a>
+        <a href="{link Admin:}" n:class="list-group-item, $presenter->name =='Files' ? a-ctive"><i class="sidebar-icons fa fa-star"></i>test</a>
+        <a href="{link Admin:}" n:class="list-group-item, $presenter->name =='Files' ? a-ctive"><i class="sidebar-icons fa fa-share-alt"></i>test</a>
+        <a href="{link Admin:}" n:class="list-group-item, $presenter->name =='Files' ? a-ctive"><i class="sidebar-icons fa fa-share-alt"></i>test</a>
+        <a href="{link Admin:}" n:class="list-group-item, $presenter->name =='Files' ? a-ctive"><i class="sidebar-icons fa fa-link"></i>test</a>
+
+        <!-- PERMISSIONS -->
+        <a href="{link Admin:}" n:class="list-group-item, $presenter->name =='Permissions' ? active"><i class="sidebar-icons fa fa-users"></i>Oprávnění uživatelů</a>
+
+        <!-- SETTINGS -->
+        <a href="{link Admin:}" n:class="list-group-item, $presenter->name =='Settings' ? active"><i class="sidebar-icons fa fa-cloud"></i>Nastavení</a>
+
+        <!-- LOGOUT -->
+        <a href="{link Sign:out}" class="list-group-item"><i class="sidebar-icons fa fa-sign-out-alt"></i>ODHLÁSIT</a>
+    </div>
+</div>
