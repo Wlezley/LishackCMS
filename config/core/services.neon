@@ -9,3 +9,5 @@ search:
 services:
     router: App\RouterFactory::createRouter
     authenticator: App\Models\Authenticator
+
+    - App\Models\User

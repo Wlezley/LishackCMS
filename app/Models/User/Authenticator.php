@@ -7,8 +7,8 @@ namespace App\Models;
 use Nette;
 
 use Nette\Database\Explorer;
-use Nette\Security\Passwords;
 use Nette\Security\AuthenticationException;
+use Nette\Security\Passwords;
 use Nette\Security\SimpleIdentity;
 
 
@@ -38,14 +38,5 @@ class Authenticator implements Nette\Security\Authenticator
         unset($user['password']);
 
         return new SimpleIdentity($user['id'], $user['role'], $user);
-    }
-
-    public function addUser(string $username, string $password, string $role = 'user'): void
-    {
-        $this->db->table(User::TABLE)->insert([
-            'name' => $username,
-            'password' => $this->passwords->hash($password),
-            'role'	   => $role
-        ]);
     }
 }
