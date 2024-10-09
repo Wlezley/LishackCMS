@@ -15,7 +15,7 @@ use Nette\Utils\Validators;
 
 class User
 {
-    public const TABLE = 'users';
+    public const TABLE_NAME = 'users';
 
     /** @var Nette\Database\Explorer */
     protected $db;
@@ -42,7 +42,7 @@ class User
             $this->user_id = $user_id;
         }
 
-        $selection = $this->db->table(User::TABLE)->where([
+        $selection = $this->db->table(self::TABLE_NAME)->where([
             'id' => $this->user_id,
             'enabled' => 1,
             'deleted' => 0
@@ -79,11 +79,11 @@ class User
             throw new AuthenticationException('Password is empty.');
         }
 
-        if ($this->db->table(User::TABLE)->select('id')->where(['name' => $username])->count() > 0) {
+        if ($this->db->table(self::TABLE_NAME)->select('id')->where(['name' => $username])->count() > 0) {
             throw new AuthenticationException('Duplicate user name.');
         }
 
-        $this->db->table(User::TABLE)->insert([
+        $this->db->table(self::TABLE_NAME)->insert([
             'name' => $username,
             'password' => $this->passwords->hash($password),
             // 'email' => NULL,
@@ -102,7 +102,7 @@ class User
             throw new AuthenticationException('User name is empty.');
         }
 
-        $selection = $this->db->table(User::TABLE)->select('id')->where([
+        $selection = $this->db->table(self::TABLE_NAME)->select('id')->where([
             'name' => $username
         ]);
 
@@ -128,7 +128,7 @@ class User
             throw new AuthenticationException('User name is empty.');
         }
 
-        $selection = $this->db->table(User::TABLE)->select('id')->where([
+        $selection = $this->db->table(self::TABLE_NAME)->select('id')->where([
             'name' => $username
         ]);
 
@@ -153,7 +153,7 @@ class User
             throw new AuthenticationException('User name is empty.');
         }
 
-        $selection = $this->db->table(User::TABLE)->select('id')->where([
+        $selection = $this->db->table(self::TABLE_NAME)->select('id')->where([
             'name' => $username
         ]);
 
@@ -180,11 +180,11 @@ class User
             throw new AuthenticationException('User new name is empty.');
         }
 
-        if ($this->db->table(User::TABLE)->select('id')->where(['name' => $newName])->count() > 0) {
+        if ($this->db->table(self::TABLE_NAME)->select('id')->where(['name' => $newName])->count() > 0) {
             throw new AuthenticationException("Duplicate user name '$newName'.");
         }
 
-        $selection = $this->db->table(User::TABLE)->select('id')->where([
+        $selection = $this->db->table(self::TABLE_NAME)->select('id')->where([
             'name' => $oldName
         ]);
 
@@ -203,7 +203,7 @@ class User
             throw new AuthenticationException('User name is empty.');
         }
 
-        $selection = $this->db->table(User::TABLE)->select('id')->where([
+        $selection = $this->db->table(self::TABLE_NAME)->select('id')->where([
             'name' => $username,
             'enabled' => 1,
             'deleted' => 0
