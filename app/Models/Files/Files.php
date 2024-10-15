@@ -18,6 +18,9 @@ class Files
     Write file
     Data sotrage structure (directory tree)
     Database catalog
+
+    TODO from 09-10-2024:
+    Rozdělit na hlavní třídu Storage a potomky StorageFiles, StorageDatabase, atd. (např. StorageGdrive, StorageAWS, StorageOneDrive)
     */
 
 }
