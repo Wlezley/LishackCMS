@@ -9,6 +9,6 @@ class AdminPresenter extends SecuredPresenter
 {
     public function renderDefault()
     {
-        $this->template->user = $this->user->identity->data;
+        $this->template->userData = $this->user->identity->data;
     }
 }
