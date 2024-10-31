@@ -19,7 +19,8 @@
 		"nette/utils": "^4.0",
 		"latte/latte": "^3.0",
 		"tracy/tracy": "^2.9",
-		"nesbot/carbon": "^3.8"
+		"nesbot/carbon": "^3.8",
+		"robmorgan/phinx": "^0.16.5"
 	},
 	"require-dev": {
 		"nette/tester": "^2.4",
