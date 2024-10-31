@@ -1,5 +1,5 @@
 /config/local.neon
-/vendor/*
+/vendor/
 /**/temp/*
 /**/log/*
 /**/node_modules/*

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 $container = App\Bootstrap::boot()->createContainer();
-$config = $container->getParameter('database');
+$dbConfig = $container->getParameter('database');
 
 return
 [
@@ -16,30 +16,12 @@ return
         'default_environment' => 'production',
         'production' => [
             'adapter' => 'mysql',
-            'host' => $config['host'],
-            'name' => $config['name'],
-            'user' => $config['user'],
-            'pass' => $config['password'],
-            'port' => '3306',
+            'host' => $dbConfig['host'],
+            'name' => $dbConfig['name'],
+            'user' => $dbConfig['user'],
+            'pass' => $dbConfig['password'],
+            'port' => $dbConfig['port'],
             'charset' => 'utf8',
-        // ],
-        // 'development' => [
-        //     'adapter' => 'mysql',
-        //     'host' => 'localhost',
-        //     'name' => 'development_db',
-        //     'user' => 'root',
-        //     'pass' => '',
-        //     'port' => '3306',
-        //     'charset' => 'utf8',
-        // ],
-        // 'testing' => [
-        //     'adapter' => 'mysql',
-        //     'host' => 'localhost',
-        //     'name' => 'testing_db',
-        //     'user' => 'root',
-        //     'pass' => '',
-        //     'port' => '3306',
-        //     'charset' => 'utf8',
         ]
     ],
     'version_order' => 'creation'

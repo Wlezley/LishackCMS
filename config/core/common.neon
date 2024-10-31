@@ -10,14 +10,26 @@ application:
 database:
     user: %database.user%
     password: %database.password%
-    dsn: "mysql:host=%database.host%;dbname=%database.name%"
+    dsn: "mysql:host=%database.host%;port=%database.port%;dbname=%database.name%"
     options:
         lazy: true
-
 
 session:
     expiration: 14 days
 
+http:
+    headers:
+        X-Powered-By: off
+
+tracy:
+    # email:
+    # fromEmail:
+    logSeverity: E_ERROR
+    maxLength: 150
+    maxDepth: 10
+    dumpTheme: 'dark'
+    showLocation: true
+    strictMode: false
 
 di:
     export:
