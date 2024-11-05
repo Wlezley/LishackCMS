@@ -11,15 +11,11 @@ class Config extends BaseModel
 {
     public const TABLE_NAME = 'cms_config';
 
-    private array $data = [];
-
     public function __construct(Explorer $db)
     {
         parent::__construct($db);
 
         $this->load();
-
-        return $this->data;
     }
 
     public function load(): void
@@ -33,20 +29,14 @@ class Config extends BaseModel
         }
     }
 
-    public function reload(): void
-    {
-        $this->data = [];
-        $this->load();
-    }
-
-    public function update($param): void
+    public function update(iterable $param): void
     {
         foreach ($param as $name => $value) {
-            $this->setValueByName($name, $value);
+            $this->setValue($name, $value);
         }
     }
 
-    public function setValueByName(string $name, string $value): void
+    public function setValue(string $name, string $value): void
     {
         $selection = $this->db->table(self::TABLE_NAME)->where([
             'name' => $name
@@ -71,7 +61,7 @@ class Config extends BaseModel
         return $this->data;
     }
 
-    public function getValueByName(string $name): string
+    public function getValue(string $name): string
     {
         if (!empty($this->data[$name])) {
             return $this->data[$name];

@@ -14,8 +14,16 @@ class BaseModel
 
     protected Explorer $db;
 
+    protected array $data = [];
+
     public function __construct(Explorer $db)
     {
         $this->db = $db;
+    }
+
+    public function reload(): void
+    {
+        $this->data = [];
+        $this->load();
     }
 }
