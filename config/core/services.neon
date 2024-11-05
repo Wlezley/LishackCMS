@@ -11,6 +11,7 @@ services:
     authenticator: App\Models\Authenticator
 
     # Models
+    - App\Models\Config
     - App\Models\User
 
     # ADMIN Components
