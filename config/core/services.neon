@@ -22,3 +22,13 @@ services:
 
     # ADMIN Components
     - App\Components\Admin\SignInFormFactory
+
+    # WEBSITE Components
+    # - App\Components\Carousel
+    # - App\Components\ContactForm
+    # - App\Components\FileList
+    # - App\Components\HeroBanner
+    # - App\Components\Menu
+    # - App\Components\Pagination
+    # - App\Components\TabList
+    # - App\Components\TimeLine
