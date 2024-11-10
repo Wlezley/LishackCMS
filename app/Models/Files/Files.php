@@ -2,27 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Models;
+namespace App\Models;
 
-class Files
+class Files extends BaseModel
 {
-    public function __construct()
-    {
-    }
-
-
-    /*
-    TODO LIST:
-    ----------
-    Read file
-    Write file
-    Data sotrage structure (directory tree)
-    Database catalog
-
-    TODO from 09-10-2024:
-    Rozdělit na hlavní třídu Storage a potomky StorageFiles, StorageDatabase, atd. (např. StorageGdrive, StorageAWS, StorageOneDrive)
-    */
-
+    // TODO ...
+    // public function __construct()
+    // {
+    // }
 }
 
 

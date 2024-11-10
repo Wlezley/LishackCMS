@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use Nette;
 use Nette\SmartObject;
 use Nette\Database\Explorer;
 

@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Models;
+namespace App\Models;
 
-class Upload
+class Upload extends BaseModel
 {
-    public function __construct()
-    {
-    }
+    // TODO ...
+    // public function __construct()
+    // {
+    // }
 }
