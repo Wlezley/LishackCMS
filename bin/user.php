@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 
 declare(strict_types=1);
@@ -144,5 +145,5 @@ Available comannds:
                                         Default roles: user, redactor, manager, admin, ...
 
 ';
-        exit(1);
+        exit(0);
 }

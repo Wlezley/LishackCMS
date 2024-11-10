@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 
 declare(strict_types=1);
@@ -48,5 +49,5 @@ Available comannds:
     --cleanup                           Cleanup Nette cache
 
 ';
-        exit(1);
+        exit(0);
 }
