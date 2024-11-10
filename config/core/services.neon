@@ -11,7 +11,12 @@ services:
     authenticator: App\Models\Authenticator
 
     # Models
+    - App\Models\BaseModel
     - App\Models\Config
+    - App\Models\Files
+    - App\Models\Gallery
+    - App\Models\Images
+    - App\Models\Upload
     - App\Models\User
 
     # ADMIN Components
