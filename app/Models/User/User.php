@@ -6,7 +6,6 @@ namespace App\Models;
 
 use Nette;
 
-// use App\Models\Db;
 use Nette\Database\Explorer;
 use Nette\Security\AuthenticationException;
 use Nette\Security\Passwords;
