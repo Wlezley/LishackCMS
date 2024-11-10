@@ -16,6 +16,7 @@ services:
     - App\Models\Files
     - App\Models\Gallery
     - App\Models\Images
+    - App\Models\Menu
     - App\Models\Upload
     - App\Models\UrlGenerator
     - App\Models\User
