@@ -17,6 +17,7 @@ services:
     - App\Models\Gallery
     - App\Models\Images
     - App\Models\Upload
+    - App\Models\UrlGenerator
     - App\Models\User
 
     # ADMIN Components
