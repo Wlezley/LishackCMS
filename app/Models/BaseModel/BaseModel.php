@@ -11,14 +11,10 @@ class BaseModel
 {
     use SmartObject;
 
-    protected Explorer $db;
-
     protected array $data = [];
 
-    public function __construct(Explorer $db)
+    public function __construct(protected Explorer $db)
     {
-        $this->db = $db;
-
         $this->load();
     }
 

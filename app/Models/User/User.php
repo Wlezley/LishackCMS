@@ -16,20 +16,10 @@ class User
 {
     public const TABLE_NAME = 'users';
 
-    /** @var Nette\Database\Explorer */
-    protected $db;
-
-    /** @var Passwords */
-    private $passwords;
-
-    public int $user_id;
     private array $data;
 
-    public function __construct(Explorer $db, Passwords $passwords, int $user_id = null)
+    public function __construct(protected Explorer $db, private Passwords $passwords, public ?int $user_id = null)
     {
-        $this->db = $db;
-        $this->passwords = $passwords;
-
         if ($user_id) {
             $this->load($user_id);
         }
