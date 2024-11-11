@@ -11,6 +11,7 @@ final class CronPresenter extends Nette\Application\UI\Presenter
 {
     public function __construct()
     {
+        set_time_limit(1200);
         Debugger::$showBar = false;
     }
 
@@ -26,10 +27,14 @@ final class CronPresenter extends Nette\Application\UI\Presenter
     public function actionDefault(): void
     {
         $this->template->render = 'Default CRON action';
+
+        // $this->terminate();
     }
 
     public function actionPing(): void
     {
         $this->template->render = 'CRON PONG';
+
+        // $this->terminate();
     }
 }
