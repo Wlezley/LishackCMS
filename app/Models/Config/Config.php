@@ -4,28 +4,17 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use Nette;
-use Nette\Database\Explorer;
-
 class Config extends BaseModel
 {
     public const TABLE_NAME = 'cms_config';
 
-    public function __construct(Explorer $db)
-    {
-        parent::__construct($db);
-
-        $this->load();
-    }
-
     public function load(): void
     {
-        $selection = $this->db->table(self::TABLE_NAME);
-        $result = $selection->fetchAll();
+        $result = $this->db->table(self::TABLE_NAME)
+            ->fetchAll();
 
         foreach ($result as $row) {
-            $item = $row->toArray();
-            $this->data[$item['name']] = $item['value'];
+            $this->data[$row->category][$row->name] = $row->value;
         }
     }
 
@@ -56,17 +45,23 @@ class Config extends BaseModel
         }
     }
 
-    public function getValues(): array
-    {
-        return $this->data;
-    }
-
     public function getValue(string $name): string
     {
-        if (!empty($this->data[$name])) {
-            return $this->data[$name];
-        } else {
-            return '';
-        }
+        return call_user_func_array('array_merge', array_values($this->data))[$name] ?? '';
+    }
+
+    public function getValues(): array
+    {
+        return call_user_func_array('array_merge', array_values($this->data));
+    }
+
+    public function getValueByCategory(string $category, string $name): string
+    {
+        return $this->data[$category][$name] ?? '';
+    }
+
+    public function getValuesByCategory(string $category): array
+    {
+        return $this->data[$category] ?? [];
     }
 }

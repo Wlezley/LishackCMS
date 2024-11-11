@@ -18,6 +18,12 @@ class BaseModel
     public function __construct(Explorer $db)
     {
         $this->db = $db;
+
+        $this->load();
+    }
+
+    public function load(): void
+    {
     }
 
     public function reload(): void
