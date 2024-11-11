@@ -8,8 +8,7 @@ class Menu extends BaseModel
 {
     public const TABLE_NAME = 'menu';
 
-    // Načtení celého stromu menu
-    public function getMenuTree(): array
+    public function load(): void
     {
         $result = $this->db->table(self::TABLE_NAME)
             ->order('lft')
@@ -44,10 +43,18 @@ class Menu extends BaseModel
             }
         }
 
-        return $menuTree;
+        $this->data = $menuTree;
     }
 
-    // Přidání nové položky do menu
+    public function getMenuTree(bool $forceReload = false): array
+    {
+        if (empty($this->data) || $forceReload) {
+            $this->load();
+        }
+
+        return $this->data;
+    }
+
     public function addMenuItem(string $title, int $parentId = NULL): int
     {
         if ($parentId === NULL) {
