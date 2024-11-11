@@ -54,7 +54,7 @@ class Menu extends BaseModel
         return $this->data;
     }
 
-    public function addMenuItem(string $title, int $parentId = NULL): int
+    public function addMenuItem(string $title, ?int $parentId = NULL): int
     {
         if ($parentId === NULL) {
             $parentId = 1;
@@ -73,7 +73,7 @@ class Menu extends BaseModel
 
         $result = $this->db->table(self::TABLE_NAME)->insert([
             'title' => $title,
-            'parent_id' => (int)$parentId,
+            'parent_id' => $parentId,
             'lft' => $left,
             'rgt' => $left + 1,
             'depth' => $depth,
