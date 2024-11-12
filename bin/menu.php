@@ -5,6 +5,8 @@ declare(strict_types=1);
 
 require __DIR__ . '/../vendor/autoload.php';
 
+define('DEFAULT_LANG', '');
+
 $argcOffset = 2;
 $commandList = [
     '--create' => 1,
