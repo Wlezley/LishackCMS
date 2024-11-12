@@ -8,6 +8,8 @@ class Menu extends BaseModel
 {
     public const TABLE_NAME = 'menu';
 
+    private UrlGenerator $urlGenerator;
+
     public function load(): void
     {
         $result = $this->db->table(self::TABLE_NAME)
@@ -101,5 +103,15 @@ class Menu extends BaseModel
         $this->db->query('DELETE FROM ' . self::TABLE_NAME . ' WHERE lft BETWEEN ? AND ?', $left, $right);
         $this->db->query('UPDATE ' . self::TABLE_NAME . ' SET rgt = rgt - ? WHERE rgt > ?', $width, $right);
         $this->db->query('UPDATE ' . self::TABLE_NAME . ' SET lft = lft - ? WHERE lft > ?', $width, $right);
+    }
+
+    public function setUrlGenerator(UrlGenerator $urlGenerator): void
+    {
+        $this->urlGenerator = $urlGenerator;
+    }
+
+    public function getUrlGenerator(): UrlGenerator
+    {
+        return $this->urlGenerator;
     }
 }

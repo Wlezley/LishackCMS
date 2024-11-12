@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use Nette;
-
 use Nette\Database\Explorer;
 use Nette\Security\AuthenticationException;
 use Nette\Security\Passwords;
 use Nette\Utils\Validators;
-
 
 class User
 {
