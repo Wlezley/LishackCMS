@@ -16,6 +16,9 @@ services:
     - App\Models\Files
     - App\Models\Gallery
     - App\Models\Images
+    - App\Models\Installer
+    - Phinx\Console\PhinxApplication
+    - Phinx\Wrapper\TextWrapper(@Phinx\Console\PhinxApplication)
     - App\Models\Menu
     - App\Models\Upload
     - App\Models\UrlGenerator
