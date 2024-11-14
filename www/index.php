@@ -40,14 +40,19 @@ define('DEBUG', Debugger::$productionMode === Debugger::Development);
 define('PROJECT_SETTINGS', $container->getParameters());
 
 // Installer trigger
-$installer = $container->getByType(\App\Models\Installer::class);
-$httpRequest = $container->getByType(\Nette\Http\Request::class);
-$baseUrl = $httpRequest->getUrl()->getBaseUrl();
-$absUrl = $httpRequest->getUrl()->getAbsoluteUrl();
+if (DEBUG) {
+    $installer = $container->getByType(\App\Models\Installer::class);
 
-if (DEBUG && !$installer->isInstalled() && !str_starts_with($absUrl, $baseUrl . 'install/')) {
-    header('Location: ' . $baseUrl . 'install/', true, 302);
-    exit;
+    if (!$installer->isInstalled()) {
+        $httpRequest = $container->getByType(\Nette\Http\Request::class);
+        $baseUrl = $httpRequest->getUrl()->getBaseUrl();
+        $absUrl = $httpRequest->getUrl()->getAbsoluteUrl();
+
+        if (!str_starts_with($absUrl, $baseUrl . 'install/')) {
+            header('Location: ' . $baseUrl . 'install/', true, 302);
+            exit;
+        }
+    }
 }
 
 $application = $container->getByType(Nette\Application\Application::class);
