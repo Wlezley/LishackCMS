@@ -5,47 +5,47 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Nette;
-
 use Nette\Database\Explorer;
+use Nette\Http\Session;
 use Nette\Security\AuthenticationException;
 use Nette\Security\Passwords;
 use Nette\Security\SimpleIdentity;
 
-
 class Authenticator implements Nette\Security\Authenticator
 {
-    /** @var Nette\Database\Explorer */
-    protected $db;
-
-    // /** @var Nette\Http\Request */
-    // private $request;
-
-    // /** @var Nette\Http\Session */
-    // private $session;
-
-    /** @var Nette\Security\Passwords */
-    private $passwords;
-
-    public function __construct(Explorer $db, Passwords $passwords)
+    public function __construct(protected Explorer $db, private Session $session, private Passwords $passwords)
     {
-        $this->db = $db;
-        // $this->request = $request;
-        // $this->session = $session;
-        $this->passwords = $passwords;
     }
 
     public function authenticate(string $username, string $password): SimpleIdentity
     {
-        $row = $this->db->table(User::TABLE_NAME)->where('name', $username)->fetch();
+        $result = $this->db->table(User::TABLE_NAME)->where([
+                'name' => $username,
+                'deleted' => 0,
+                'enabled' => 1,
+            ])->limit(1);
+        $row = $result->fetch();
 
         if (!($row && $this->passwords->verify($password, $row->password))) {
             throw new AuthenticationException('Invalid credentials.', self::InvalidCredential);
         }
 
-        $user = $row->toArray();
-        unset($user['password']);
+        $this->session->regenerateId();
+        $sessionId = $this->session->getId();
 
-        // TODO: Session handler ?
+        $user = [
+            'id' => $row->id,
+            'name' => $row->name,
+            'email' => $row->email,
+            'role' => $row->role,
+            'full_name' => $row->full_name,
+            'session_id' => $sessionId,
+            'deleted' => $row->deleted,
+            'enabled' => $row->enabled,
+            'last_login' => Explorer::literal('NOW()'), // or Carbon::now()
+        ];
+
+        $result->update($user);
 
         return new SimpleIdentity($user['id'], $user['role'], $user);
     }
