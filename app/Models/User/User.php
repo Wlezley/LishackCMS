@@ -14,35 +14,131 @@ class User
     public const TABLE_NAME = 'users';
 
     private array $data;
+    private bool $isLoaded;
 
-    public function __construct(protected Explorer $db, private Passwords $passwords, public ?int $user_id = null)
+    public function __construct(protected Explorer $db, private Passwords $passwords, public ?int $id = null)
     {
-        if ($user_id) {
-            $this->load($user_id);
+        $this->isLoaded = false;
+
+        if ($id !== null) {
+            $this->load($id);
         }
     }
 
-    public function load(int $user_id = null): void
+    public function load(?int $id = null): void
     {
-        if ($user_id) {
-            $this->user_id = $user_id;
+        if ($id !== null) {
+            $this->id = $id;
         }
 
-        $selection = $this->db->table(self::TABLE_NAME)->where([
-            'id' => $this->user_id,
-            'enabled' => 1,
-            'deleted' => 0
-        ]);
-
-        if ($selection->count() > 1) {
-            throw new AuthenticationException("There are duplicate user ID:$this->user_id.");
+        if ($this->id === null) {
+            $this->isLoaded = false;
+            return;
         }
+
+        $selection = $this->db->table(self::TABLE_NAME)->where(['id' => $this->id]);
 
         if ($selection->count() == 0) {
-            throw new AuthenticationException("User ID:$this->user_id not found.");
+            throw new AuthenticationException("User ID: $this->id not found.");
         }
 
         $this->data = $selection->fetch()->toArray();
+        $this->isLoaded = true;
+    }
+
+    public function create(string $name, string $password, string $role = 'user', string $email = '', string $full_name = ''): void
+    {
+        if (Validators::isNone($name)) {
+            throw new AuthenticationException('User name is empty.');
+        }
+
+        if (Validators::isNone($password)) {
+            throw new AuthenticationException('Password is empty.');
+        }
+
+        if (!Validators::isNone($email) && Validators::isEmail($email)) {
+            throw new AuthenticationException('Password is empty.');
+        }
+
+        if ($this->db->table(self::TABLE_NAME)->select('id')->where(['name' => $name])->count() > 0) {
+            throw new AuthenticationException('Duplicate user name.');
+        }
+
+        $this->db->table(self::TABLE_NAME)->insert([
+            'name' => $name,
+            'password' => $this->passwords->hash($password),
+            'email' => $email,
+            'role' => $role,
+            'full_name' => $full_name
+        ]);
+    }
+
+    private function updateColumn(string|array $condition, string $column, mixed $value): void
+    {
+        if (Validators::isNone($column)) {
+            throw new AuthenticationException('Column name is empty.');
+        }
+
+        $selection = $this->db->table(self::TABLE_NAME)->select('id')->where($condition);
+
+        if ($selection->count() == 0) {
+            throw new AuthenticationException('User not found.');
+        }
+
+        $selection->update([$column => $value]);
+    }
+
+    public function delete(string $name): void
+    {
+        if (Validators::isNone($name)) {
+            throw new AuthenticationException('User name is empty.');
+        }
+
+        $this->updateColumn(['name' => $name], 'deleted', 1);
+
+        // $this->logout();
+    }
+
+    public function disable(string $name): void
+    {
+        if (Validators::isNone($name)) {
+            throw new AuthenticationException('User name is empty.');
+        }
+
+        $this->updateColumn(['name' => $name], 'enabled', 0);
+
+        // $this->logout();
+    }
+
+    public function enable(string $name): void
+    {
+        if (Validators::isNone($name)) {
+            throw new AuthenticationException('User name is empty.');
+        }
+
+        $this->updateColumn(['name' => $name], 'enabled', 1);
+    }
+
+    public function rename(string $oldName, string $newName): void
+    {
+        if (Validators::isNone($oldName)) {
+            throw new AuthenticationException('Old user name is empty.');
+        }
+
+        if (Validators::isNone($newName)) {
+            throw new AuthenticationException('New user name is empty.');
+        }
+
+        $this->updateColumn(['name' => $oldName], 'name', $newName);
+    }
+
+    public function setRole(string $name, string $role) : void
+    {
+        if (Validators::isNone($name)) {
+            throw new AuthenticationException('User name is empty.');
+        }
+
+        $this->updateColumn(['name' => $name], 'role', $role);
     }
 
     public function getData(): array
@@ -53,158 +149,5 @@ class User
     public function getSession(): array
     {
         return $this->data['session_id'];
-    }
-
-    public function createUser(string $username, string $password, string $role = 'user'): void
-    {
-        if (Validators::isNone($username)) {
-            throw new AuthenticationException('User name is empty.');
-        }
-
-        if (Validators::isNone($password)) {
-            throw new AuthenticationException('Password is empty.');
-        }
-
-        if ($this->db->table(self::TABLE_NAME)->select('id')->where(['name' => $username])->count() > 0) {
-            throw new AuthenticationException('Duplicate user name.');
-        }
-
-        $this->db->table(self::TABLE_NAME)->insert([
-            'name' => $username,
-            'password' => $this->passwords->hash($password),
-            // 'email' => NULL,
-            'role' => $role,
-            // 'full_name' => NULL,
-            // 'session_id' => NULL,
-            // 'deleted' => 0,
-            // 'enabled' => 1,
-        ]);
-    }
-
-    // TODO: for "delete" and "disable" command also remove sessions to force logout posible already logged acounts?
-    public function deleteUser(string $username): void
-    {
-        if (Validators::isNone($username)) {
-            throw new AuthenticationException('User name is empty.');
-        }
-
-        $selection = $this->db->table(self::TABLE_NAME)->select('id')->where([
-            'name' => $username
-        ]);
-
-        if ($selection->count() > 1) {
-            throw new AuthenticationException("Unable to delete account. There are duplicate user name '$username'.");
-        }
-
-        if ($selection->count() == 0) {
-            throw new AuthenticationException("User '$username' not found.");
-        }
-
-        $selection->update([
-            'deleted' => 1
-        ]);
-
-        // $this->logout();
-    }
-
-    // TODO: for "delete" and "disable" command also remove sessions to force logout posible already logged acounts?
-    public function disableUser(string $username): void
-    {
-        if (Validators::isNone($username)) {
-            throw new AuthenticationException('User name is empty.');
-        }
-
-        $selection = $this->db->table(self::TABLE_NAME)->select('id')->where([
-            'name' => $username
-        ]);
-
-        if ($selection->count() > 1) {
-            throw new AuthenticationException("Unable to disable account. There are duplicate user name '$username'.");
-        }
-
-        if ($selection->count() == 0) {
-            throw new AuthenticationException("User '$username' not found.");
-        }
-
-        $selection->update([
-            'enabled' => 0
-        ]);
-
-        // $this->logout();
-    }
-
-    public function enableUser(string $username): void
-    {
-        if (Validators::isNone($username)) {
-            throw new AuthenticationException('User name is empty.');
-        }
-
-        $selection = $this->db->table(self::TABLE_NAME)->select('id')->where([
-            'name' => $username
-        ]);
-
-        if ($selection->count() > 1) {
-            throw new AuthenticationException("Unable to enable account. There are duplicate user name '$username'.");
-        }
-
-        if ($selection->count() == 0) {
-            throw new AuthenticationException("User '$username' not found.");
-        }
-
-        $selection->update([
-            'enabled' => 1
-        ]);
-    }
-
-    public function renameUser(string $oldName, string $newName): void
-    {
-        if (Validators::isNone($oldName)) {
-            throw new AuthenticationException('User old name is empty.');
-        }
-
-        if (Validators::isNone($newName)) {
-            throw new AuthenticationException('User new name is empty.');
-        }
-
-        if ($this->db->table(self::TABLE_NAME)->select('id')->where(['name' => $newName])->count() > 0) {
-            throw new AuthenticationException("Duplicate user name '$newName'.");
-        }
-
-        $selection = $this->db->table(self::TABLE_NAME)->select('id')->where([
-            'name' => $oldName
-        ]);
-
-        if ($selection->count() == 0) {
-            throw new AuthenticationException("User '$oldName' not found.");
-        }
-
-        $selection->update([
-            'name' => $newName
-        ]);
-    }
-
-    function setUserRole($username, $role) : void
-    {
-        if (Validators::isNone($username)) {
-            throw new AuthenticationException('User name is empty.');
-        }
-
-        $selection = $this->db->table(self::TABLE_NAME)->select('id')->where([
-            'name' => $username,
-            'enabled' => 1,
-            'deleted' => 0
-        ]);
-
-        if ($selection->count() > 1) {
-            throw new AuthenticationException("Unable to change role. There are duplicate user name '$username'.");
-        }
-
-        if ($selection->count() == 0) {
-            throw new AuthenticationException("User '$username' not found, or is disabled and/or marked as pending deletion.");
-        }
-
-        $selection->update([
-            'role' => $role
-        ]);
     }
 }

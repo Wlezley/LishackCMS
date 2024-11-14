@@ -34,7 +34,7 @@ switch ($command) {
         $password = $argv[3];
 
         try {
-            $manager->createUser($username, $password);
+            $manager->create($username, $password);
             echo "User '$username' was added.\n";
         } catch (Nette\Security\AuthenticationException $e) {
             echo "Error: " . $e->getMessage() . "\n";
@@ -51,7 +51,7 @@ switch ($command) {
         $username = $argv[2];
 
         try {
-            $manager->deleteUser($username);
+            $manager->delete($username);
             echo "User '$username' was marked as deleted.\n";
         } catch (Nette\Security\AuthenticationException $e) {
             echo "Error: " . $e->getMessage() . "\n";
@@ -68,7 +68,7 @@ switch ($command) {
         $username = $argv[2];
 
         try {
-            $manager->disableUser($username);
+            $manager->disable($username);
             echo "User '$username' was disabled.\n";
         } catch (Nette\Security\AuthenticationException $e) {
             echo "Error: " . $e->getMessage() . "\n";
@@ -85,7 +85,7 @@ switch ($command) {
         $username = $argv[2];
 
         try {
-            $manager->enableUser($username);
+            $manager->enable($username);
             echo "User '$username' was enabled.\n";
         } catch (Nette\Security\AuthenticationException $e) {
             echo "Error: " . $e->getMessage() . "\n";
@@ -103,7 +103,7 @@ switch ($command) {
         $newName = $argv[3];
 
         try {
-            $manager->renameUser($oldName, $newName);
+            $manager->rename($oldName, $newName);
             echo "User '$oldName' was renamed to '$newName'.\n";
         } catch (Nette\Security\AuthenticationException $e) {
             echo "Error: " . $e->getMessage() . "\n";
@@ -121,7 +121,7 @@ switch ($command) {
         $role = $argv[3];
 
         try {
-            $manager->setUserRole($username, $role);
+            $manager->setRole($username, $role);
             echo "The role of user '$username' has been changed to '$role'.\n";
         } catch (Nette\Security\AuthenticationException $e) {
             echo "Error: " . $e->getMessage() . "\n";
