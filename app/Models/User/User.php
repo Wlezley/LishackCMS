@@ -13,29 +13,20 @@ class User
 {
     public const TABLE_NAME = 'users';
 
+    private int $id;
     private array $data;
     private bool $isLoaded;
 
-    public function __construct(protected Explorer $db, private Passwords $passwords, public ?int $id = null)
+    public function __construct(protected Explorer $db, private Passwords $passwords)
     {
+        $this->id = null;
+        $this->data = [];
         $this->isLoaded = false;
-
-        if ($id !== null) {
-            $this->load($id);
-        }
     }
 
-    public function load(?int $id = null): void
+    public function load(int $id): void
     {
-        if ($id !== null) {
-            $this->id = $id;
-        }
-
-        if ($this->id === null) {
-            $this->isLoaded = false;
-            return;
-        }
-
+        $this->id = $id;
         $selection = $this->db->table(self::TABLE_NAME)->where(['id' => $this->id]);
 
         if ($selection->count() == 0) {
@@ -132,7 +123,7 @@ class User
         $this->updateColumn(['name' => $oldName], 'name', $newName);
     }
 
-    public function setRole(string $name, string $role) : void
+    public function setRole(string $name, string $role): void
     {
         if (Validators::isNone($name)) {
             throw new AuthenticationException('User name is empty.');
@@ -146,8 +137,12 @@ class User
         return $this->data;
     }
 
-    public function getSession(): array
+    public function getSession(): ?string
     {
-        return $this->data['session_id'];
+        if ($this->isLoaded) {
+            return $this->data['session_id'];
+        }
+
+        return null;
     }
 }
