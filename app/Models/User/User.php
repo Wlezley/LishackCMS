@@ -139,7 +139,7 @@ class User
 
     public function getSession(): ?string
     {
-        if ($this->isLoaded) {
+        if ($this->isLoaded && isset($this->data['session_id'])) {
             return $this->data['session_id'];
         }
 
