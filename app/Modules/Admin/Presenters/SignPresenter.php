@@ -19,7 +19,7 @@ class SignPresenter extends UnsecuredPresenter
 
     public function renderIn()
     {
-        if($this->user->isLoggedIn()) {
+        if ($this->user->isLoggedIn()) {
             $this->redirect('Admin:default');
         }
     }
@@ -39,7 +39,7 @@ class SignPresenter extends UnsecuredPresenter
         };
 
         $form->onError[] = function () {
-            $this->flashMessage('Nesprávné přihlašovací údaje', 'danger'); // TODO: Získat chybovku z exception?
+            $this->flashMessage('Nesprávné přihlašovací údaje', 'danger');
         };
 
         return $form;

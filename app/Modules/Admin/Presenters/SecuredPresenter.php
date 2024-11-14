@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
-
 class SecuredPresenter extends _BasePresenter
 {
     public function startup(): void
@@ -13,6 +12,18 @@ class SecuredPresenter extends _BasePresenter
 
         if (!$this->user->isLoggedIn() && $this->presenter->getName() !== "Admin:Sign") {
             $this->redirect("Sign:in");
+        }
+
+        if ($this->user->isLoggedIn()) {
+            $userData = $this->db->table(\App\Models\User::TABLE_NAME)->select('deleted, enabled')->where([
+                'id' => $this->user->getId()
+            ])->fetch();
+
+            if (!$userData || $userData->deleted == 1 || $userData->enabled != 1) {
+                $this->user->logout();
+                $this->flashMessage('Uživatel byl odhlášen', 'danger');
+                $this->redirect("Sign:in");
+            }
         }
     }
 }

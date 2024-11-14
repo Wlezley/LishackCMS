@@ -86,8 +86,6 @@ class User
         }
 
         $this->updateColumn(['name' => $name], 'deleted', 1);
-
-        // $this->logout();
     }
 
     public function disable(string $name): void
@@ -97,8 +95,6 @@ class User
         }
 
         $this->updateColumn(['name' => $name], 'enabled', 0);
-
-        // $this->logout();
     }
 
     public function enable(string $name): void
