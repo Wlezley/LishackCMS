@@ -107,6 +107,7 @@ a.sidebar-link {
 .sidebar-link:hover,
 .sidebar-link.active {
     background-color: rgba(var(--bs-primary-rgb),var(--bs-bg-opacity)) !important;
+    color: rgba(var(--bs-white-rgb),var(--bs-bg-opacity)) !important;
 }
 
 .content {

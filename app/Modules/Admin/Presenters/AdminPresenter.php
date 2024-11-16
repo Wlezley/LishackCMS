@@ -12,6 +12,5 @@ class AdminPresenter extends _SecuredPresenter
         $this->flashMessage('Flash message test', 'info');
 
         $this->template->title = 'Přehled';
-        $this->template->userData = $this->user->identity->data;
     }
 }

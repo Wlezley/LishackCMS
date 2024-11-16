@@ -11,7 +11,7 @@
 
             {* DASHBOARD *}
             <li class="sidebar-item">
-                <a n:href="Admin:" class="sidebar-link">
+                <a n:href="Admin:" n:class="sidebar-link, $presenter->name =='Admin:Admin' ? active">
                     <i class="fa-solid fa-sliders pe-2"></i>
                     Přehled
                 </a>
@@ -19,60 +19,61 @@
 
             {* ARTICLES *}
             <li class="sidebar-item">
-                <a n:href="Article:" class="sidebar-link collapsed bg-primary" data-bs-toggle="collapse" data-bs-target="#articles"
+                <a n:href="Article:" n:class="'sidebar-link collapsed', $presenter->name =='Admin:Article' ? active" data-bs-toggle="collapse" data-bs-target="#articles"
                     aria-expanded="false" aria-controls="articles">
                     <i class="fa-regular fa-file-lines pe-2"></i>
                     Články
                 </a>
-                <ul id="articles" class="sidebar-dropdown list-unstyled collapse ps-4 pb-2 show">
+                <ul id="articles" n:class="'sidebar-dropdown list-unstyled collapse ps-4 pb-2', $presenter->name =='Admin:Article' ? show">
                     <li class="sidebar-item">
-                        <a n:href="Article:" class="sidebar-link">Přehled článků</a>
+                        <a n:href="Article:" n:class="sidebar-link, ($presenter->name =='Admin:Article' && $presenter->action == 'default') ? active">Přehled článků</a>
                     </li>
                     <li class="sidebar-item">
-                        <a n:href="Article:create" class="sidebar-link">Vytvořit článek</a>
+                        <a n:href="Article:create" n:class="sidebar-link, ($presenter->name =='Admin:Article' && $presenter->action == 'create') ? active">Vytvořit článek</a>
                     </li>
                 </ul>
             </li>
 
             {* DATA *}
             <li class="sidebar-item">
-                <a n:href="Data:" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#database"
+                <a n:href="Data:" n:class="'sidebar-link collapsed', $presenter->name =='Admin:Data' ? active" data-bs-toggle="collapse" data-bs-target="#database"
                     aria-expanded="false" aria-controls="database">
                     <i class="fa-solid fa-database pe-2"></i>
                     Data
                 </a>
-                <ul id="database" class="sidebar-dropdown list-unstyled collapse ps-4 pb-2">
+                <ul id="database" n:class="'sidebar-dropdown list-unstyled collapse ps-4 pb-2', $presenter->name =='Admin:Data' ? show">
                     <li class="sidebar-item">
-                        <a n:href="Data:" class="sidebar-link">Datové kontejnery</a>
+                        <a n:href="Data:" n:class="sidebar-link, ($presenter->name =='Admin:Data' && $presenter->action == 'default') ? active">Datové kontejnery</a>
                     </li>
                     <li class="sidebar-item">
-                        <a n:href="Data:create" class="sidebar-link">Vytvořit kontejner</a>
+                        <a n:href="Data:create" n:class="sidebar-link, ($presenter->name =='Admin:Data' && $presenter->action == 'create') ? active">Vytvořit kontejner</a>
                     </li>
                 </ul>
             </li>
 
             {* USEER SETTINGS *}
             <li class="sidebar-item">
-                <a n:href="User:" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#users"
+                <a n:href="User:" n:class="'sidebar-link collapsed', $presenter->name =='Admin:User' ? active" data-bs-toggle="collapse" data-bs-target="#users"
                     aria-expanded="false" aria-controls="users">
                     <i class="fa-regular fa-user pe-2"></i>
                     Uživatelské účty
                 </a>
-                <ul id="users" class="sidebar-dropdown list-unstyled collapse ps-4 pb-2">
+                <ul id="users" n:class="'sidebar-dropdown list-unstyled collapse ps-4 pb-2', $presenter->name =='Admin:User' ? show">
                     <li class="sidebar-item">
-                        <a n:href="User:default" class="sidebar-link">Seznam uživatelů</a>
+                        <a n:href="User:" n:class="sidebar-link, ($presenter->name =='Admin:User' && $presenter->action == 'default') ? active">Seznam uživatelů</a>
                     </li>
                     <li class="sidebar-item">
-                        <a n:href="User:create" class="sidebar-link">Nový uživatel</a>
+                        <a n:href="User:create" n:class="sidebar-link, ($presenter->name =='Admin:User' && $presenter->action == 'create') ? active">Nový uživatel</a>
                     </li>
                 </ul>
             </li>
 
+            {* TOOLS *}
             <li class="sidebar-header">
                 Nástroje webu
             </li>
-            <li class="sidebar-item bg-success">
-                <a href="{$baseUrl}" class="sidebar-link" target="_blank">
+            <li class="sidebar-item">
+                <a href="{$baseUrl}" class="sidebar-link text-success" target="_blank">
                     <i class="fa-solid fa-up-right-from-square pe-2"></i>
                     Zobrazit web
                 </a>
@@ -83,13 +84,13 @@
                 Uživatel <strong class="text-warning">{$userData[full_name]}</strong>
             </li>
             <li class="sidebar-item">
-                <a n:href="Admin:" class="sidebar-link">
+                <a n:href="User:edit $userData[id]" class="sidebar-link">
                     <i class="fa-solid fa-cog pe-2"></i>
                     Nastavení
                 </a>
             </li>
-            <li class="sidebar-item bg-danger">
-                <a n:href="Sign:out" class="sidebar-link">
+            <li class="sidebar-item">
+                <a n:href="Sign:out" class="sidebar-link text-danger">
                     <i class="fa-solid fa-right-from-bracket pe-2"></i>
                     Odhlášení
                 </a>

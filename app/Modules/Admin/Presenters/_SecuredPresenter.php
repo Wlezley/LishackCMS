@@ -26,4 +26,11 @@ class _SecuredPresenter extends _BasePresenter
             }
         }
     }
+
+    public function afterRender(): void
+    {
+        parent::afterRender();
+
+        $this->template->userData = $this->user->identity->data;
+    }
 }
