@@ -10,7 +10,7 @@ class UserPresenter extends _SecuredPresenter
     public function renderDefault()
     {
         $this->template->title = 'Seznam uživatelů';
-        $this->template->userData = $this->user->identity->data;
+        $this->template->userList = [];
     }
 
     public function renderCreate()
