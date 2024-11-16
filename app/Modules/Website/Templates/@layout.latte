@@ -22,11 +22,15 @@
 <body class="bg-dark text-white">
     <div n:foreach="$flashes as $flash" n:class="flash, $flash->type">{$flash->message}</div>
 
-    {control menu}
+    <main>
+        {control menu}
 
-    {include content}
+        {include content}
 
-    {control adminButton}
+        {control adminButton}
+    </main>
+
+    {include 'layout/footer.latte'}
 
     {block scripts}
     <script src="https://nette.github.io/resources/js/3/netteForms.min.js"></script>

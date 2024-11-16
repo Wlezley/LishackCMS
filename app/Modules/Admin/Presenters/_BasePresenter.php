@@ -17,6 +17,6 @@ class _BasePresenter extends Nette\Application\UI\Presenter
     {
         parent::afterRender();
 
-        $this->template->VERSION = '0.1a';
+        $this->template->VERSION = VERSION;
     }
 }

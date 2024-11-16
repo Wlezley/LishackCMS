@@ -1,24 +1,99 @@
-<div class="sidebar">
-    <div class="sidebar-header">
-        <a href="{link Admin:}">
-        <img src="{$baseUrl}/img/logo.png" class="logo" alt="logo" title="logo" style="display: block; margin: 15px auto; max-width: 100%;">
-        </a>
+<aside id="sidebar" class="border-end border-secondary">
+    <div class="h-100">
+        <div class="sidebar-logo text-center border-bottom border-secondary pt-3 pb-2" style="height: 3.5em">
+            <a n:href="Admin:">Lishack 🦊 CMS</a>
+        </div>
+
+        <ul class="sidebar-nav">
+            <li class="sidebar-header">
+                Správa webu
+            </li>
+
+            {* DASHBOARD *}
+            <li class="sidebar-item">
+                <a n:href="Admin:" class="sidebar-link">
+                    <i class="fa-solid fa-sliders pe-2"></i>
+                    Přehled
+                </a>
+            </li>
+
+            {* ARTICLES *}
+            <li class="sidebar-item">
+                <a href="#" class="sidebar-link collapsed bg-primary" data-bs-toggle="collapse" data-bs-target="#articles"
+                    aria-expanded="false" aria-controls="articles">
+                    <i class="fa-regular fa-file-lines pe-2"></i>
+                    Články
+                </a>
+                <ul id="articles" class="sidebar-dropdown list-unstyled collapse ps-4 pb-2 show">
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link">Přehled článků</a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link">Vytvořit článek</a>
+                    </li>
+                </ul>
+            </li>
+
+            {* DATA *}
+            <li class="sidebar-item">
+                <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#database"
+                    aria-expanded="false" aria-controls="database">
+                    <i class="fa-solid fa-database pe-2"></i>
+                    Data
+                </a>
+                <ul id="database" class="sidebar-dropdown list-unstyled collapse ps-4 pb-2">
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link">Datové kontejnery</a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link">Nastavení komponent</a>
+                    </li>
+                </ul>
+            </li>
+
+            {* USEER SETTINGS *}
+            <li class="sidebar-item">
+                <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#users"
+                    aria-expanded="false" aria-controls="users">
+                    <i class="fa-regular fa-user pe-2"></i>
+                    Uživatelské účty
+                </a>
+                <ul id="users" class="sidebar-dropdown list-unstyled collapse ps-4 pb-2">
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link">Seznam uživatelů</a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link">Nový uživatel</a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="sidebar-header">
+                Nástroje webu
+            </li>
+            <li class="sidebar-item bg-success">
+                <a href="{$baseUrl}" class="sidebar-link" target="_blank">
+                    <i class="fa-solid fa-up-right-from-square pe-2"></i>
+                    Zobrazit web
+                </a>
+            </li>
+
+            {* LOGGED USER *}
+            <li class="sidebar-header">
+                Uživatel <strong class="text-warning">{$userData[full_name]}</strong>
+            </li>
+            <li class="sidebar-item">
+                <a n:href="Admin:" class="sidebar-link">
+                    <i class="fa-solid fa-cog pe-2"></i>
+                    Nastavení
+                </a>
+            </li>
+            <li class="sidebar-item bg-danger">
+                <a n:href="Sign:out" class="sidebar-link">
+                    <i class="fa-solid fa-right-from-bracket pe-2"></i>
+                    Odhlášení
+                </a>
+            </li>
+        </ul>
     </div>
-    <div class="list-group sidebar-list" id="mainmenu">
-        <!-- TEST -->
-        <a href="{link Admin:}" n:class="list-group-item, $presenter->name =='Files' ? active"><i class="sidebar-icons fa fa-folder"></i>test</a>
-        <a href="{link Admin:}" n:class="list-group-item, $presenter->name =='Files' ? a-ctive"><i class="sidebar-icons fa fa-star"></i>test</a>
-        <a href="{link Admin:}" n:class="list-group-item, $presenter->name =='Files' ? a-ctive"><i class="sidebar-icons fa fa-share-alt"></i>test</a>
-        <a href="{link Admin:}" n:class="list-group-item, $presenter->name =='Files' ? a-ctive"><i class="sidebar-icons fa fa-share-alt"></i>test</a>
-        <a href="{link Admin:}" n:class="list-group-item, $presenter->name =='Files' ? a-ctive"><i class="sidebar-icons fa fa-link"></i>test</a>
-
-        <!-- PERMISSIONS -->
-        <a href="{link Admin:}" n:class="list-group-item, $presenter->name =='Permissions' ? active"><i class="sidebar-icons fa fa-users"></i>Oprávnění uživatelů</a>
-
-        <!-- SETTINGS -->
-        <a href="{link Admin:}" n:class="list-group-item, $presenter->name =='Settings' ? active"><i class="sidebar-icons fa fa-cloud"></i>Nastavení</a>
-
-        <!-- LOGOUT -->
-        <a href="{link Sign:out}" class="list-group-item"><i class="sidebar-icons fa fa-sign-out-alt"></i>ODHLÁSIT</a>
-    </div>
-</div>
+</aside>

@@ -6,7 +6,6 @@ namespace App\Modules\Admin\Presenters;
 
 use App\Components\Admin\SignInFormFactory;
 
-
 class SignPresenter extends UnsecuredPresenter
 {
     /** @var SignInFormFactory @inject */
@@ -19,6 +18,8 @@ class SignPresenter extends UnsecuredPresenter
 
     public function renderIn()
     {
+        $this->template->title = "Admin Login";
+
         if ($this->user->isLoggedIn()) {
             $this->redirect('Admin:default');
         }

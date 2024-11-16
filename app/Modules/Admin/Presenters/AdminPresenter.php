@@ -9,6 +9,9 @@ class AdminPresenter extends SecuredPresenter
 {
     public function renderDefault()
     {
+        $this->flashMessage('Flash message test', 'info');
+
+        $this->template->title = 'Přehled';
         $this->template->userData = $this->user->identity->data;
     }
 }

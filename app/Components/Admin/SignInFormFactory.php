@@ -11,12 +11,8 @@ use Nette\Application\UI\Form;
 
 class SignInFormFactory
 {
-    /** @var User */
-    protected $user;
-
-    public function __construct(User $user)
+    public function __construct(protected User $user)
     {
-        $this->user = $user;
     }
 
     public function create()
@@ -31,7 +27,9 @@ class SignInFormFactory
             ->setHtmlAttribute('placeholder', 'Heslo')
             ->setRequired();
 
-        $form->addSubmit('send', 'Přihlásit se');
+        $form->addCheckbox('remember');
+
+        $form->addSubmit('login', 'Přihlásit se');
 
         $form->onSuccess[] = [$this, 'process'];
 
@@ -42,8 +40,15 @@ class SignInFormFactory
     {
         try {
             $this->user->login($values->username, $values->password);
-            // $this->user->setExpiration('+6 hours');
-            $this->user->setExpiration(null);
+
+            // bdump(ini_get('session.gc_maxlifetime') / 60 / 60 / 24);
+
+            if ($values->remember) {
+                $this->user->setExpiration('7 days');
+            } else {
+                $this->user->setExpiration('1 hour');
+            }
+
         } catch(Nette\Security\AuthenticationException $e) {
             $form->addError($e->getMessage());
             bdump($e, "error");

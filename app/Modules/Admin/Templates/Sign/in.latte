@@ -1,57 +1,34 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Lishack 🦊 CMS ({$VERSION})</title>
-    <meta charset="UTF-8">
-    <meta name="author" content="Wlezley Lishack, wlezley@lishack.cz"/>
-    <meta name="robots" content="noindex, nofollow"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" type="image/x-icon" href="{$baseUrl}/favicon.ico">
-    <style>
-        html { font: normal 18px/1.3 Georgia, "New York CE", utopia, serif; color: #666; -webkit-text-stroke: 1px rgba(0,0,0,0); overflow-y: scroll; }
-        body { background: #151515; color: #333; margin: 2em auto; padding: 0 .5em; max-width: 600px; min-width: 320px; }
+{block content}
 
-        a { color: #006aeb; padding: 3px 1px; }
-        a:hover, a:active, a:focus { background-color: #006aeb; text-decoration: none; color: white; }
+<div class="container">
+    <div class="mx-auto" style="max-width: 600px;">
 
-        #banner { background: #6ae; border: 1px solid #000; border-radius: 12px 12px 0 0; }
-
-        h1 { font: inherit; color: black; font-size: 50px; line-height: 121px; margin: 0; padding-left: 4%; background: url({$baseUrl}/img/logo2.png) no-repeat 95%; background-size: 208px auto; text-shadow: 1px 1px 0 rgba(0, 0, 0, .9); }
-        @media (max-width: 600px) {
-            h1 { background: none; font-size: 40px; }
-        }
-
-        #content { background: #404050; border: 1px solid #000; border-radius: 0 0 12px 12px; padding: 1.25em 4%; overflow: hidden; }
-
-        h2 { font: inherit; padding: 1.2em 0; margin: 0; }
-
-        img { border: none; float: right; margin: 0 0 1em 3em; }
-    </style>
-</head>
-<body>
-    <div id="banner">
-        <h1>Lishack 🦊 CMS ({$VERSION})</h1>
-    </div>
-
-    <div class="sign-in-wrap">
-        <div class="sign-in-block">
-            <div id="content">
-                {include '../layout/alerts.latte'}
-
-                {form signInForm}
-                    <div class="form-group">
-                        {input username}
-                        {*input username, autofocus => true*}
-                    </div>
-                    <div class="form-group">
-                        {input password}
-                    </div>
-
-                    {input send, class => 'btn-primary'}
-                {/form}
-            </div>
+        <div class="text-center bg-primary rounded-top mt-5 pt-3 pb-2">
+            <h1 class="title">Lishack 🦊 CMS ({$VERSION})</h1>
         </div>
-    </div>
-</body>
 
-</html>
+        <div class="text-start border border-primary rounded-bottom p-4 mt-0">
+            {include '../layout/alerts.latte'}
+
+            {form signInForm, class => 'row'}
+                <div class="mb-3 col-12">
+                    {label username, class => 'form-label' /}
+                    {input username, class => 'form-control', autofocus => true}
+                </div>
+                <div class="mb-3 col-12">
+                    {label password, class => 'form-label' /}
+                    {input password, class => 'form-control'}
+                </div>
+                <div class="mb-3 col-12">
+                    <input n:name="remember" type="checkbox" class="form-check-input me-2 p-2">
+                    <label n:name="remember" class="form-check-label">Zapamatovat přihlášení na 7 dní</label>
+                </div>
+                <div clss="mb-0">
+                    <button n:name="login" type="submit" class="btn btn-primary btn-lg float-end">Přihlásit se</button>
+                    {* <input n:name="login" class="btn btn-primary btn-lg float-end"> *}
+                </div>
+            {/form}
+        </div>
+
+    </div>
+</div>
