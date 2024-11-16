@@ -104,6 +104,10 @@ a.sidebar-link {
     transition: all .2s ease-out;
 }
 
+.sidebar-link:hover {
+    background-color: rgba(var(--bs-primary-rgb),var(--bs-bg-opacity)) !important;
+}
+
 .content {
     flex: 1;
     max-width: 100vw;
