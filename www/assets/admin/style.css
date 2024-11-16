@@ -104,7 +104,8 @@ a.sidebar-link {
     transition: all .2s ease-out;
 }
 
-.sidebar-link:hover {
+.sidebar-link:hover,
+.sidebar-link.active {
     background-color: rgba(var(--bs-primary-rgb),var(--bs-bg-opacity)) !important;
 }
 
