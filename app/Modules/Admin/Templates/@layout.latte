@@ -21,14 +21,14 @@
                 {include 'layout/sidebar.latte'}
 
                 <div class="main">
-                    <nav class="navbar navbar-expand px-3 border-bottom border-secondary">
-                        <button class="btn" type="button" data-bs-theme="dark">
-                            <span class="navbar-toggler-icon"></span>
-                        </button>
-                    </nav>
+                    <main class="content pb-3 fullsize" id="content">
+                        <nav class="navbar navbar-expand px-3 bg-dark border-bottom border-secondary fixed-top fullsize" id="menu-switch">
+                            <button class="btn" type="button" data-bs-theme="dark">
+                                <span class="navbar-toggler-icon"></span>
+                            </button>
+                        </nav>
 
-                    <main class="content py-3">
-                        <div class="container-fluid">
+                        <div class="container-fluid mt-2 mb-5">
                             <div class="bg-secondary">
                                 <div class="px-3">
                                     <h1 class="pt-3 mb-4 border-bottom border-warning text-warning">{ifset $title}{$title|stripHtml}{else}Lishack CMS{/ifset}</h1>
