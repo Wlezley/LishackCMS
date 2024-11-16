@@ -12,7 +12,6 @@ class _BasePresenter extends Nette\Application\UI\Presenter
     /** @var Nette\Database\Explorer @inject */
     public $db;
 
-
     public function afterRender(): void
     {
         parent::afterRender();

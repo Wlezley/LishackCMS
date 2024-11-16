@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
-class SecuredPresenter extends _BasePresenter
+class _SecuredPresenter extends _BasePresenter
 {
     public function startup(): void
     {

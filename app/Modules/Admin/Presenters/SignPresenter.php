@@ -6,7 +6,7 @@ namespace App\Modules\Admin\Presenters;
 
 use App\Components\Admin\SignInFormFactory;
 
-class SignPresenter extends UnsecuredPresenter
+class SignPresenter extends _UnsecuredPresenter
 {
     /** @var SignInFormFactory @inject */
     public $signInForm;
