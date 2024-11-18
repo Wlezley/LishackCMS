@@ -9,7 +9,7 @@ use Nette\Security\AuthenticationException;
 use Nette\Security\Passwords;
 use Nette\Utils\Validators;
 
-class User
+class UserManager
 {
     public const TABLE_NAME = 'users';
 

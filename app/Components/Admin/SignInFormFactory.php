@@ -51,7 +51,6 @@ class SignInFormFactory
 
         } catch(Nette\Security\AuthenticationException $e) {
             $form->addError($e->getMessage());
-            bdump($e, "error");
         }
     }
 }

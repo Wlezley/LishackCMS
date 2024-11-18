@@ -11,7 +11,6 @@ use App\Models\Menu;
 use Nette;
 use Nette\Application\UI\Presenter;
 
-
 abstract class BasePresenter extends Presenter
 {
     /** @var Nette\Database\Explorer @inject */

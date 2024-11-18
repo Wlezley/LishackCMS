@@ -19,7 +19,7 @@ class Authenticator implements Nette\Security\Authenticator
 
     public function authenticate(string $username, string $password): SimpleIdentity
     {
-        $result = $this->db->table(User::TABLE_NAME)->where([
+        $result = $this->db->table(UserManager::TABLE_NAME)->where([
                 'name' => $username,
                 'deleted' => 0,
                 'enabled' => 1,

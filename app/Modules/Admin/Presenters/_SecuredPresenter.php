@@ -15,7 +15,7 @@ class _SecuredPresenter extends _BasePresenter
         }
 
         if ($this->user->isLoggedIn()) {
-            $userData = $this->db->table(\App\Models\User::TABLE_NAME)->select('deleted, enabled')->where([
+            $userData = $this->db->table(\App\Models\UserManager::TABLE_NAME)->select('deleted, enabled')->where([
                 'id' => $this->user->getId()
             ])->fetch();
 

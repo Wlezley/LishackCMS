@@ -20,7 +20,7 @@ services:
     - App\Models\Menu
     - App\Models\Upload
     - App\Models\UrlGenerator
-    - App\Models\User
+    - App\Models\UserManager
 
     # Vendor
     - Phinx\Console\PhinxApplication
