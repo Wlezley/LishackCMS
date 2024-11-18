@@ -22,6 +22,7 @@ define('DEFAULT_PAGE', 'home');
 define('ROOT_DIR', '../');
 define('ROOT_DIR_ABSOLUTE', __DIR__ . '/' . ROOT_DIR);
 define('APP_DIR', ROOT_DIR . 'app/');
+define('ASSETS_DIR', __DIR__ . '/assets/');
 define('FILE_CACHE_DIR', ROOT_DIR . 'temp/cache/');
 
 $configurator = App\Bootstrap::boot();
