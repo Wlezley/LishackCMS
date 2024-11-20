@@ -30,7 +30,8 @@
         "robmorgan/phinx": "^0.16.5",
         "codeception/codeception": "^5.1",
         "codeception/module-phpbrowser": "*",
-        "codeception/module-asserts": "*"
+        "codeception/module-asserts": "*",
+        "ublaboo/datagrid": "^6.10"
     },
     "require-dev": {
         "nette/tester": "^2.4",
