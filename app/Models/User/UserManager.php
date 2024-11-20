@@ -13,7 +13,7 @@ class UserManager
 {
     public const TABLE_NAME = 'users';
 
-    private int $id;
+    private ?int $id;
     private array $data;
     private bool $isLoaded;
 
@@ -48,7 +48,7 @@ class UserManager
         }
 
         if (!Validators::isNone($email) && Validators::isEmail($email)) {
-            throw new AuthenticationException('Password is empty.');
+            throw new AuthenticationException('Invalid email format.');
         }
 
         if ($this->db->table(self::TABLE_NAME)->select('id')->where(['name' => $name])->count() > 0) {

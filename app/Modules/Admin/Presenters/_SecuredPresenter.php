@@ -4,14 +4,19 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
+use App\Components\Admin\IUserFormFactory;
+
 class _SecuredPresenter extends _BasePresenter
 {
+    /** @var IUserFormFactory @inject */
+    public $userForm;
+
     public function startup(): void
     {
         parent::startup();
 
-        if (!$this->user->isLoggedIn() && $this->presenter->getName() !== "Admin:Sign") {
-            $this->redirect("Sign:in");
+        if (!$this->user->isLoggedIn() && $this->presenter->getName() !== 'Admin:Sign') {
+            $this->redirect('Sign:in');
         }
 
         if ($this->user->isLoggedIn()) {
@@ -22,7 +27,7 @@ class _SecuredPresenter extends _BasePresenter
             if (!$userData || $userData->deleted == 1 || $userData->enabled != 1) {
                 $this->user->logout();
                 $this->flashMessage('Uživatel byl odhlášen', 'danger');
-                $this->redirect("Sign:in");
+                $this->redirect('Sign:in');
             }
         }
     }
@@ -32,5 +37,18 @@ class _SecuredPresenter extends _BasePresenter
         parent::afterRender();
 
         $this->template->userData = $this->user->identity->data;
+    }
+
+    protected function createComponentUserForm(): \App\Components\Admin\UserForm
+    {
+        $form = $this->userForm->create();
+        $form->setCmsConfig($this->cmsConfig);
+        $form->setParam($this->getHttpRequest()->getPost('param'));
+
+        // $form->onSuccess[] = function (): void {
+        //     $this->redirect('this#form', $this->getParameters());
+        // };
+
+        return $form;
     }
 }

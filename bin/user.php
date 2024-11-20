@@ -21,7 +21,7 @@ if (isset($argv[1]) && in_array($argv[1], array_keys($commandList))) {
 }
 
 $container = App\Bootstrap::boot()->createContainer();
-$manager = $container->getByType(App\Models\User::class);
+$manager = $container->getByType(App\Models\UserManager::class);
 
 switch ($command) {
     case '--create':

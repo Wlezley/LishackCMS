@@ -25,3 +25,6 @@ services:
     # Vendor
     - Phinx\Console\PhinxApplication
     - Phinx\Wrapper\TextWrapper(@Phinx\Console\PhinxApplication)
+
+    # Forms
+    - App\Components\Admin\UserForm

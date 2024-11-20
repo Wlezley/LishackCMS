@@ -1,0 +1,30 @@
+{form form}
+    <div class="row">
+        <div class="col-4 mx-auto">
+            <div class="row">
+                <div class="mb-3 col-12">
+                    {label username, class => 'form-label' /}
+                    {input username, class => 'form-control'}
+                </div>
+                <div class="mb-3 col-12">
+                    {label full_name, class => 'form-label' /}
+                    {input full_name, class => 'form-control'}
+                </div>
+                <div class="mb-3 col-12">
+                    {label password, class => 'form-label' /}
+                    {input password, class => 'form-control'}
+                </div>
+                <div class="mb-3 col-12">
+                    {label password2, class => 'form-label' /}
+                    {input password2, class => 'form-control'}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class=" my-3 col-12">
+                    <button n:name="save" type="submit" class="btn btn-primary btn-lg float-end">Uložit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{/form}
