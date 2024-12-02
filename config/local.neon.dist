@@ -5,3 +5,10 @@ parameters:
         name: ""
         user: ""
         password: ""
+
+    smsgate:
+        url: https://api.smsbrana.cz/smsconnect/http.php
+        login: ""
+        password: ""
+        sender_id: 0
+        secured_login: true
