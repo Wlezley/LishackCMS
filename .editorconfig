@@ -9,3 +9,18 @@ indent_size = 4
 charset = utf-8
 trim_trailing_whitespace = true
 insert_final_newline = true
+
+[*.js]
+indent_style = space
+indent_size = 2
+
+[*.{json,yml}]
+indent_style = space
+indent_size = 2
+
+[*.{less,css}]
+indent_style = space
+indent_size = 4
+
+[*.txt]
+end_of_line = crlf
