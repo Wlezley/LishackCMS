@@ -36,11 +36,11 @@ class _BasePresenter extends Nette\Application\UI\Presenter
         $this->template->DEFAULT_LANG_ADMIN = DEFAULT_LANG;
 
         // Assets version
-        if (file_exists(ASSETS_DIR . "admin/script.js")) {
-            $this->template->js_version = filemtime(ASSETS_DIR . "admin/script.js");
+        if (file_exists(ASSETS_DIR . 'admin/dist/scripts.min.js')) {
+            $this->template->js_version = filemtime(ASSETS_DIR . 'admin/dist/scripts.min.js');
         }
-        if (file_exists(ASSETS_DIR . "admin/style.css")) {
-            $this->template->css_version = filemtime(ASSETS_DIR . "admin/style.css");
+        if (file_exists(ASSETS_DIR . 'admin/dist/styles.css')) {
+            $this->template->css_version = filemtime(ASSETS_DIR . 'admin/dist/styles.css');
         }
     }
 }
