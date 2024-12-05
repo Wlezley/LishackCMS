@@ -117,6 +117,14 @@ abstract class BasePresenter extends Presenter
         $this->template->social_description = $this->social_description;
         $this->template->social_image = $this->social_image;
 
+        // Assets version
+        if (file_exists(ASSETS_DIR . "website/dist/scripts.min.js")) {
+            $this->template->js_version = filemtime(ASSETS_DIR . "website/dist/scripts.min.js");
+        }
+        if (file_exists(ASSETS_DIR . "website/dist/styles-main.css")) {
+            $this->template->css_version = filemtime(ASSETS_DIR . "website/dist/styles-main.css");
+        }
+
         bdump($this->template->getParameters(), 'TEMPLATE PARAMS');
 
         // TODO: Ajax
