@@ -7,25 +7,15 @@ namespace App\Modules\Website\Presenters;
 use App\Components\IAdminButtonFactory;
 use App\Components\IMenuFactory;
 use App\Models\Config;
+use App\Models\Helpers\AssetsVersion;
 use App\Models\Menu;
 use Nette;
 use Nette\Application\UI\Presenter;
+use Nette\Database\Explorer;
 
 abstract class BasePresenter extends Presenter
 {
-    /** @var Nette\Database\Explorer @inject */
-    public $db;
-
-    /** @var Config @inject */
-    public $config;
-
-    /** @var Menu @inject */
-    public $menu;
-
-    /** @var Nette\Http\UrlScript */
-    protected $url;
-
-    // ########### COMPONENTS ###########
+    protected Nette\Http\UrlScript $url;
 
     /** @var IAdminButtonFactory @inject */
     public $adminBarFactory;
@@ -33,18 +23,13 @@ abstract class BasePresenter extends Presenter
     /** @var IMenuFactory @inject */
     public $menuFactory;
 
-    // ########### PARAMS ###########
-
     protected array $cmsConfig = [];
-
     protected string $baseUrl;
     protected string $currentUrl;
     protected string $adminUrl;
-
     protected string $lang = '';
     protected string $page = '';
     protected string $title = '';
-
     protected string $seo_robots = '';
     protected string $seo_description = '';
     protected string $seo_canonical = '';
@@ -52,19 +37,16 @@ abstract class BasePresenter extends Presenter
     protected string $social_description = '';
     protected string $social_image = '';
 
-    /**
-     * @throws Nette\Application\AbortException
-     */
+    public function __construct(
+        protected Explorer $db,
+        protected Config $config,
+        protected Menu $menu,
+        private AssetsVersion $assetsVersion
+    ) {}
+
     public function startup(): void
     {
         parent::startup();
-
-        // DEBUG ONLY ...
-        // $session = $this->getSession('app');
-        // bdump($session, 'SESSION');
-        // bdump($this->user->isLoggedIn(), 'USER');
-        // $menuTree = $this->menu->getMenuTree()[0]['items'];
-        // bdump($menuTree, 'MENU TREE');
 
         // CMS config
         $this->cmsConfig = $this->config->getValues();
@@ -89,9 +71,6 @@ abstract class BasePresenter extends Presenter
         $this->social_image = 'social_image';
     }
 
-    /**
-     * Setup template variables
-     */
     public function afterRender(): void
     {
         parent::afterRender();
@@ -105,6 +84,7 @@ abstract class BasePresenter extends Presenter
 
         // Page settings
         $this->template->lang = $this->lang;
+        $this->template->html_lang = ($this->lang == 'cz' ? 'cs' : $this->lang);
         $this->template->default_lang = DEFAULT_LANG;
         $this->template->page = $this->page;
         $this->template->title = $this->title;
@@ -118,19 +98,19 @@ abstract class BasePresenter extends Presenter
         $this->template->social_image = $this->social_image;
 
         // Assets version
-        if (file_exists(ASSETS_DIR . 'website/dist/scripts.min.js')) {
-            $this->template->js_version = filemtime(ASSETS_DIR . 'website/dist/scripts.min.js');
-        }
-        if (file_exists(ASSETS_DIR . 'website/dist/styles-main.css')) {
-            $this->template->css_version = filemtime(ASSETS_DIR . 'website/dist/styles-main.css');
-        }
+        $this->assetsVersion
+            ->setTemplate($this->template)
+            ->setBasePath(ASSETS_DIR)
+            ->addFile('website/dist/scripts.min.js', 'js_version')
+            ->addFile('website/dist/styles-main.css', 'css_version')
+            ->addFile('website/dist/styles-print.css', 'css_version_print');
 
         bdump($this->template->getParameters(), 'TEMPLATE PARAMS');
 
-        // TODO: Ajax
-        // if ($this->isAjax() && !$this->isControlInvalid()) {
-        //     $this->redrawControl();
-        // }
+        // Ajax
+        if ($this->isAjax() && !$this->isControlInvalid()) {
+            $this->redrawControl();
+        }
     }
 
     protected function createComponentAdminButton(): \App\Components\AdminButton

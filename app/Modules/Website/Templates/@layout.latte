@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{if $lang=='cz'}cs{else}{$lang}{/if}">
+<html lang="{$html_lang}">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -16,6 +16,9 @@
     <link rel="shortcut icon" type="image/x-icon" href="{$baseUrl}/favicon.ico">
     <link rel="canonical" href="{$seo_canonical}">
     <link rel="stylesheet" href="{$baseUrl}/assets/website/dist/styles-main.css?v{$css_version}">
+    <script type="text/javascript">
+        var baseUrl = {$baseUrl};
+    </script>
 </head>
 
 <body class="bg-dark text-white">

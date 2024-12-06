@@ -15,6 +15,7 @@ services:
     - App\Models\Config
     - App\Models\Files
     - App\Models\Gallery
+    - App\Models\Helpers\AssetsVersion
     - App\Models\Images
     - App\Models\Installer
     - App\Models\Menu

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="{$HTML_LANG}">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -10,6 +10,12 @@
     <link rel="shortcut icon" type="image/x-icon" href="{$baseUrl}/favicon.ico">
     <link rel="stylesheet" href="{$baseUrl}/assets/admin/dist/styles.css?v{$css_version}">
     <link rel="stylesheet" href="{$baseUrl}/assets/tinymce-bundle/dist/styles.css?v{$css_version_tinymce}">
+    <script type="text/javascript">
+        var baseUrl = {$baseUrl};
+        var adminUrl = {$baseUrl . '/admin'}
+        var editorLang = {$DEFAULT_LANG_TINYMCE};
+        var editorAssetsVersion = {$css_version_tinymce};
+    </script>
 </head>
 
 <body class="bg-dark text-white h-100">
@@ -52,7 +58,7 @@
 
     {block scripts}
         <script src="{$baseUrl}/assets/admin/dist/scripts.min.js?v{$js_version}"></script>
-        <script src="{$baseUrl}/assets/tinymce-bundle/dist/scripts.min.js?v{$js_version_tinymce}"></script>
+        <script async src="{$baseUrl}/assets/tinymce-bundle/dist/scripts.min.js?v{$js_version_tinymce}"></script>
     {/block}
 </body>
 </html>
