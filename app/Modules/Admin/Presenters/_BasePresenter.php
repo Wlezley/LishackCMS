@@ -42,5 +42,11 @@ class _BasePresenter extends Nette\Application\UI\Presenter
         if (file_exists(ASSETS_DIR . 'admin/dist/styles.css')) {
             $this->template->css_version = filemtime(ASSETS_DIR . 'admin/dist/styles.css');
         }
+        if (file_exists(ASSETS_DIR . 'tinymce-bundle/dist/scripts.min.js')) {
+            $this->template->js_version_tinymce = filemtime(ASSETS_DIR . 'tinymce-bundle/dist/scripts.min.js');
+        }
+        if (file_exists(ASSETS_DIR . 'tinymce-bundle/dist/styles.css')) {
+            $this->template->css_version_tinymce = filemtime(ASSETS_DIR . 'tinymce-bundle/dist/styles.css');
+        }
     }
 }

@@ -5,20 +5,18 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
   mode: 'production',
-  // mode: 'development',
-  // devtool: 'inline-source-map',
   performance: {
     hints: false,
     // maxEntrypointSize: 512000,
     // maxAssetSize: 512000
   },
   entry: {
-    'scripts': './www/assets/admin/js/main.js',
-    'styles': './www/assets/admin/scss/main.scss',
+    'scripts': './www/assets/tinymce-bundle/js/main.js',
+    'styles': './www/assets/tinymce-bundle/scss/main.scss'
   },
   output: {
     filename: '[name].min.js',
-    path: path.resolve(__dirname, 'www/assets/admin/dist'),
+    path: path.resolve(__dirname, 'www/assets/tinymce-bundle/dist')
   },
   module: {
     rules: [
