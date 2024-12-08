@@ -24,5 +24,8 @@ return
             'charset' => 'utf8',
         ]
     ],
-    'version_order' => 'creation'
+    'version_order' => 'creation',
+    'templates' => [
+        'style' => 'up_down'
+    ]
 ];
