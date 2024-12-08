@@ -1,17 +1,72 @@
-Lishack CMS
-===========
+Lishack CMS 🦊
+==============
+
+*Content management system (CMS) based on Nette Framework 3.2*
 
 Requirements
 ------------
 
-- Web Project for Nette 3.1 requires PHP 8.0
+- PHP 8.2
+- MySQL 8.4 LTS or MariaDB >= 11.4 LTS
+- Composer >= 2.5.1
+- Node.js >= 22.12 LTS
 
 Installation
 ------------
 
-The best way to install Web Project is using Composer. If you don't have Composer yet,
-download it following [the instructions](https://doc.nette.org/composer). Then use command:
+1) Download and install Composer by following the [official instructions](https://getcomposer.org/download/).
 
-	composer install
+2) Install dependencies using Composer:
 
-Make directories `temp/` and `log/` writable.
+    *development environment*
+
+	   $ composer install
+
+    *production environment*
+
+        $ composer install --no-dev
+
+3) Make directories `temp/` and `log/` writable.
+
+4) Copy the distributed configuration file `./config/local.neon.dist` to `./config/local.neon` and set up a database connection (`host`, `port`, `name`, `user`, `password`), etc...
+
+5) Download and install [Node.js](https://nodejs.org/en/download)
+
+6) Now you can install the modules and build the frontend:
+
+        $ npm install
+        $ npm run build
+        $ npm run build:admin
+        $ npm run build:tinymce
+
+NPM command list
+-----------------
+
+- *Build **Website** assets:*
+
+       $ build
+
+- *Build **Website** assets in **DEV** mode (with `--watch`):*
+
+       $ build:dev
+
+- *Build **Admin** assets:*
+
+       $ build:admin
+
+- *Build **Admin** assets in **DEV** mode (with `--watch`):*
+
+       $ build:admin:dev
+
+- *Build **TinyMCE** bundle assets:*
+
+       $ build:tinymce
+
+- *Build **TinyMCE** bundle assets in **DEV** mode (with `--watch`):*
+
+       $ build:tinymce:dev
+
+Why?
+----
+
+I was bored and that's why I started developing this CMS. I know it's not ideal, but I see it as practicing my skills and experience. Maybe it will be useful to someone. :D
