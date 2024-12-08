@@ -20,25 +20,25 @@ class SmsGate
         private string $apiURL,
         private string $login,
         private string $password,
-        private int $sender_id,
-        private bool $secured_login,
+        private int $senderID,
+        private bool $securedLogin,
         private Explorer $db
-    ) { }
+    ) {}
 
-    public function sendSMS(string $phone_number, string $message, int $user_id = self::SYSTEM_USER_ID): void
+    public function sendSMS(string $phoneNumber, string $message, int $userID = self::SYSTEM_USER_ID): void
     {
         $credentials = [];
 
-        if ($this->secured_login === false) {
+        if ($this->securedLogin === false) {
             $credentials = $this->getBasicCredentials();
         } else {
             $credentials = $this->getSecuredCredentials();
         }
 
         $params = array_merge($credentials, [
-            'sender_id' => $this->sender_id,
+            'sender_id' => $this->senderID,
             'action' => 'send_sms',
-            'number' => $phone_number,
+            'number' => $phoneNumber,
             'message' => $message,
         ]);
 
@@ -56,15 +56,15 @@ class SmsGate
             throw new Exception('Error processing request', 1);
         }
 
-        $this->logSMS($phone_number, $message, $response, $user_id);
-
         $responseData = json_decode(json_encode(simplexml_load_string($response)), TRUE);
         $errorCode = $responseData['err'];
 
+        $this->logSMS($phoneNumber, $message, $errorCode, $userID);
+
         if (DEBUG === true) {
             bdump([
-                'query' => $this->secured_login ? $query : 'HIDDEN',
-                'request' => $this->secured_login ? $request : 'HIDDEN',
+                'query' => $this->securedLogin ? $query : 'HIDDEN',
+                'request' => $this->securedLogin ? $request : 'HIDDEN',
                 'response' => $responseData,
             ], 'SMS GATE');
         }
@@ -97,13 +97,13 @@ class SmsGate
         ];
     }
 
-    private function logSMS(string $phone_number, string $message, string|false $response, int $user_id = self::SYSTEM_USER_ID): void
+    private function logSMS(string $phoneNumber, string $message, ?int $errorCode, int $userID = self::SYSTEM_USER_ID): void
     {
         $this->db->table(self::TABLE_NAME)->insert([
-            'user_id' => $user_id,
-            'phone_number' => $phone_number,
+            'user_id' => $userID,
+            'phone_number' => $phoneNumber,
             'message' => $message,
-            'response' => $response // Todo: using just error code (int)
+            'error_code' => $errorCode
         ]);
     }
 }
