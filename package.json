@@ -52,8 +52,10 @@
   },
   "scripts": {
     "build": "webpack --config webpack.prod.js --env build=prod",
-    "build:dev": "webpack --config webpack.dev.js --env build=dev",
+    "build:dev": "webpack --watch --config webpack.dev.js --env build=dev",
     "build:admin": "webpack --config webpack.admin.js",
-    "build:tinymce": "webpack --config webpack.tinymce.js"
+    "build:admin:dev": "webpack --watch --config webpack.admin.js --mode development",
+    "build:tinymce": "webpack --config webpack.tinymce.js",
+    "build:tinymce:dev": "webpack --watch --config webpack.tinymce.js --mode development"
   }
 }
