@@ -7,6 +7,7 @@ import contentUiCss from '!!raw-loader!tinymce/skins/ui/tinymce-5-dark/content.m
 
 tinymce.init({
   license_key: 'gpl',
+  promotion: false,
   skin: false,
   content_css: false,
   content_style: [contentCss, contentUiCss].join('\n'),
