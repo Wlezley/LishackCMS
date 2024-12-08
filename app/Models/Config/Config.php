@@ -4,21 +4,29 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Nette\Database\Table\ActiveRow;
+
+// #[AllowDynamicProperties]
 class Config extends BaseModel
 {
     public const TABLE_NAME = 'cms_config';
+
+    /** @var array<string, array<string, mixed>> $data */
+    protected mixed $data = [];
 
     public function load(): void
     {
         $result = $this->db->table(self::TABLE_NAME)
             ->fetchAll();
 
+        /** @var ActiveRow $row */
         foreach ($result as $row) {
-            $this->data[$row->category][$row->name] = $row->value;
+            $this->data[$row['category']][$row['name']] = $row['value'];
         }
     }
 
-    public function update(iterable $param): void
+    /** @param array<string, string> $param */
+    public function update(array $param): void
     {
         foreach ($param as $name => $value) {
             $this->setValue($name, $value);
@@ -50,6 +58,7 @@ class Config extends BaseModel
         return call_user_func_array('array_merge', array_values($this->data))[$name] ?? '';
     }
 
+    /** @return array<string, string> $param */
     public function getValues(): array
     {
         return call_user_func_array('array_merge', array_values($this->data));
@@ -57,11 +66,12 @@ class Config extends BaseModel
 
     public function getValueByCategory(string $category, string $name): string
     {
-        return $this->data[$category][$name] ?? '';
+        return $this->data[$category][$name] ?: '';
     }
 
+    /** @return array<string, string> $param */
     public function getValuesByCategory(string $category): array
     {
-        return $this->data[$category] ?? [];
+        return $this->data[$category] ?: [];
     }
 }

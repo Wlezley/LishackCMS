@@ -4,7 +4,7 @@ namespace App\Components;
 
 class AdminButton extends BaseControl
 {
-    protected $adminUrl;
+    protected string $adminUrl;
 
     public function render(): void
     {

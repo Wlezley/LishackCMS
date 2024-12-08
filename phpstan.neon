@@ -1,0 +1,35 @@
+parameters:
+    level: 6
+    inferPrivatePropertyTypeFromConstructor: true
+    reportUnmatchedIgnoredErrors: false
+    phpVersion: 80200 # PHP 8.2
+
+    paths:
+        - app
+        - bin
+        - db
+        - www/index.php
+
+    excludePaths:
+        - config
+        - tests
+        - vendor
+
+    bootstrapFiles:
+        - app/phpstan-bootstrap.php
+
+    ignoreErrors:
+        -
+            messages:
+                - '#^Cannot call method getParameters\(\) on Nette\\Application\\UI\\Template\|stdClass\.$#'
+                - '#^Cannot call method setParameters\(\) on Nette\\Application\\UI\\Template\|stdClass\.$#'
+            identifier: method.nonObject
+
+        -
+            message: '#^Parameter \#1 \$template of method App\\Models\\Helpers\\AssetsVersion\:\:setTemplate\(\) expects Nette\\Bridges\\ApplicationLatte\\Template, Nette\\Application\\UI\\Template\|stdClass given\.$#'
+            identifier: argument.type
+
+
+# NOTE: This feature requires the phpstan/phpstan-baseline extension. Use the command 'phpstan analyse --generate-baseline' to generate the baseline file.
+# baseline:
+#     path: phpstan-baseline.neon

@@ -9,8 +9,9 @@ use App\Models\Helpers\AssetsVersion;
 use Nette;
 use Nette\Database\Explorer;
 
-class _BasePresenter extends Nette\Application\UI\Presenter
+class BasePresenter extends Nette\Application\UI\Presenter
 {
+    /** @var array<string, string> $cmsConfig */
     protected array $cmsConfig = [];
 
     public function __construct(
@@ -34,10 +35,10 @@ class _BasePresenter extends Nette\Application\UI\Presenter
         // CMS config
         $this->template->setParameters($this->cmsConfig);
         $this->template->VERSION = VERSION;
-        $this->template->HTML_LANG = (DEFAULT_LANG == 'cz' ? 'cs' : DEFAULT_LANG);
+        $this->template->HTML_LANG = (DEFAULT_LANG == 'cz' ? 'cs' : DEFAULT_LANG); // @phpstan-ignore equal.alwaysTrue
         $this->template->DEFAULT_LANG = DEFAULT_LANG;
         $this->template->DEFAULT_LANG_ADMIN = DEFAULT_LANG;
-        $this->template->DEFAULT_LANG_TINYMCE = (DEFAULT_LANG == 'cz' ? 'cs' : DEFAULT_LANG);
+        $this->template->DEFAULT_LANG_TINYMCE = (DEFAULT_LANG == 'cz' ? 'cs' : DEFAULT_LANG); // @phpstan-ignore equal.alwaysTrue
 
         // Assets version
         $this->assetsVersion

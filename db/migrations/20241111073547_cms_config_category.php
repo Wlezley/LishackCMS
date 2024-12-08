@@ -6,7 +6,7 @@ use Phinx\Migration\AbstractMigration;
 
 final class CmsConfigCategory extends AbstractMigration
 {
-    public function up()
+    public function up(): void
     {
         $this->execute("
             ALTER TABLE `cms_config`
@@ -14,7 +14,7 @@ final class CmsConfigCategory extends AbstractMigration
         ");
     }
 
-    public function down()
+    public function down(): void
     {
     }
 }

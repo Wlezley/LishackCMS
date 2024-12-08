@@ -6,7 +6,7 @@ use Phinx\Migration\AbstractMigration;
 
 final class SmsGateLog extends AbstractMigration
 {
-    public function up()
+    public function up(): void
     {
         $this->execute("
             CREATE TABLE `log_sms` (
@@ -23,7 +23,7 @@ final class SmsGateLog extends AbstractMigration
         ");
     }
 
-    public function down()
+    public function down(): void
     {
         $this->execute("DROP TABLE `log_sms`;");
     }

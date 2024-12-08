@@ -23,7 +23,9 @@ abstract class BasePresenter extends Presenter
     /** @var IMenuFactory @inject */
     public $menuFactory;
 
+    /** @var array<string, string> $cmsConfig */
     protected array $cmsConfig = [];
+
     protected string $baseUrl;
     protected string $currentUrl;
     protected string $adminUrl;
@@ -42,7 +44,7 @@ abstract class BasePresenter extends Presenter
         protected Config $config,
         protected Menu $menu,
         private AssetsVersion $assetsVersion
-    ) {}
+    ) { }
 
     public function startup(): void
     {

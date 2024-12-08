@@ -6,7 +6,7 @@ use Phinx\Migration\AbstractMigration;
 
 final class BasicCmsConfig extends AbstractMigration
 {
-    public function up()
+    public function up(): void
     {
         $this->execute("
             INSERT INTO `cms_config` (`name`, `category`, `value`) VALUES
@@ -23,7 +23,7 @@ final class BasicCmsConfig extends AbstractMigration
         ");
     }
 
-    public function down()
+    public function down(): void
     {
         $this->execute("TRUNCATE TABLE `cms_config`;");
     }

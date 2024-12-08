@@ -5,18 +5,19 @@ declare(strict_types=1);
 namespace App\Modules\Admin\Presenters;
 
 use App\Components\Admin\SignInFormFactory;
+use Nette\Application\UI\Form;
 
-class SignPresenter extends _UnsecuredPresenter
+class SignPresenter extends UnsecuredPresenter
 {
     /** @var SignInFormFactory @inject */
     public $signInForm;
 
-    public function beforeRender()
+    public function beforeRender(): void
     {
         $this->redrawControl();
     }
 
-    public function renderIn()
+    public function renderIn(): void
     {
         $this->template->title = "Admin Login";
 
@@ -31,7 +32,7 @@ class SignPresenter extends _UnsecuredPresenter
         $this->redirect('Sign:in');
     }
 
-    protected function createComponentSignInForm()
+    protected function createComponentSignInForm(): Form
     {
         $form = $this->signInForm->create();
 

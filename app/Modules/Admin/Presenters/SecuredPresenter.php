@@ -6,7 +6,7 @@ namespace App\Modules\Admin\Presenters;
 
 use App\Components\Admin\IUserFormFactory;
 
-class _SecuredPresenter extends _BasePresenter
+class SecuredPresenter extends BasePresenter
 {
     /** @var IUserFormFactory @inject */
     public $userForm;
@@ -24,7 +24,7 @@ class _SecuredPresenter extends _BasePresenter
                 'id' => $this->user->getId()
             ])->fetch();
 
-            if (!$userData || $userData->deleted == 1 || $userData->enabled != 1) {
+            if (!$userData || $userData['deleted'] == 1 || $userData['enabled'] != 1) {
                 $this->user->logout();
                 $this->flashMessage('Uživatel byl odhlášen', 'danger');
                 $this->redirect('Sign:in');
@@ -36,7 +36,7 @@ class _SecuredPresenter extends _BasePresenter
     {
         parent::afterRender();
 
-        $this->template->userData = $this->user->identity->data;
+        $this->template->userData = $this->user->identity->getData();
     }
 
     protected function createComponentUserForm(): \App\Components\Admin\UserForm

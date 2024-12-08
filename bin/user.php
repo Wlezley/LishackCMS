@@ -15,6 +15,8 @@ $commandList = [
     '--set-role' => 2,
 ];
 
+$command = '';
+$argcRequired = 0;
 if (isset($argv[1]) && in_array($argv[1], array_keys($commandList))) {
     $command = $argv[1];
     $argcRequired = $commandList[$command] + $argcOffset;

@@ -11,9 +11,7 @@ class BaseModel
 {
     use SmartObject;
 
-    // protected UrlGenerator $urlGenerator;
-
-    protected array $data = [];
+    protected mixed $data = [];
 
     protected string $lang;
 
@@ -43,14 +41,4 @@ class BaseModel
     {
         return $this->lang;
     }
-
-    // public function setUrlGenerator(UrlGenerator $urlGenerator): void
-    // {
-    //     $this->urlGenerator = $urlGenerator;
-    // }
-
-    // public function getUrlGenerator(): UrlGenerator
-    // {
-    //     return $this->urlGenerator;
-    // }
 }

@@ -13,8 +13,10 @@ class UserManager
 {
     public const TABLE_NAME = 'users';
 
-    private ?int $id;
+    /** @var array<string, string> $data */
     private array $data;
+
+    private ?int $id;
     private bool $isLoaded;
 
     public function __construct(protected Explorer $db, private Passwords $passwords)
@@ -64,6 +66,11 @@ class UserManager
         ]);
     }
 
+    /**
+     * @param string|array<string, string> $condition
+     * @param string $column
+     * @param mixed $value
+     */
     private function updateColumn(string|array $condition, string $column, mixed $value): void
     {
         if (Validators::isNone($column)) {
@@ -128,6 +135,7 @@ class UserManager
         $this->updateColumn(['name' => $name], 'role', $role);
     }
 
+    /** @return array<string, string> */
     public function getData(): array
     {
         return $this->data;

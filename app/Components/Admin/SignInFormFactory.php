@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace App\Components\Admin;
 
-use Nette;
 use Nette\Security\User;
 use Nette\Application\UI\Form;
-
 
 class SignInFormFactory
 {
@@ -15,7 +13,7 @@ class SignInFormFactory
     {
     }
 
-    public function create()
+    public function create(): Form
     {
         $form = new Form();
 
@@ -36,12 +34,11 @@ class SignInFormFactory
         return $form;
     }
 
-    public function process(Form $form, $values)
+    /** @param \Nette\Utils\ArrayHash<mixed> $values */
+    public function process(Form $form, \Nette\Utils\ArrayHash $values): void
     {
         try {
             $this->user->login($values->username, $values->password);
-
-            // bdump(ini_get('session.gc_maxlifetime') / 60 / 60 / 24);
 
             if ($values->remember) {
                 $this->user->setExpiration('7 days');
@@ -49,7 +46,7 @@ class SignInFormFactory
                 $this->user->setExpiration('1 hour');
             }
 
-        } catch(Nette\Security\AuthenticationException $e) {
+        } catch(\Nette\Security\AuthenticationException $e) {
             $form->addError($e->getMessage());
         }
     }

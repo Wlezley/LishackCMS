@@ -8,6 +8,9 @@ class Menu extends BaseModel
 {
     public const TABLE_NAME = 'menu';
 
+    /** @var list<array> $data */
+    protected mixed $data = [];
+
     private UrlGenerator $urlGenerator;
 
     public function load(): void
@@ -20,18 +23,10 @@ class Menu extends BaseModel
         $stack = [];
 
         foreach ($result as $node) {
-            $item = [
-                'id' => $node->id,
-                'depth' => $node->depth,
-                'name' => $node->name,
-                'name_url' => $node->name_url,
-                'title' => $node->title,
-                'description' => $node->description,
-                'body' => $node->body,
-                'items' => []
-            ];
+            $item = $node->toArray();
+            $item['items'] = [];
 
-            while (!empty($stack) && end($stack)['depth'] >= $node->depth) {
+            while (!empty($stack) && end($stack)['depth'] >= $item['depth']) {
                 array_pop($stack);
             }
 
@@ -48,6 +43,7 @@ class Menu extends BaseModel
         $this->data = $menuTree;
     }
 
+    /** @return list<array> */
     public function getMenuTree(bool $forceReload = false): array
     {
         if (empty($this->data) || $forceReload) {
@@ -68,8 +64,8 @@ class Menu extends BaseModel
             throw new \Exception("Parent '$parentId' not found.");
         }
 
-        $left = $parentNode->rgt;
-        $depth = $parentNode->depth + 1;
+        $left = $parentNode['rgt'];
+        $depth = $parentNode['depth'] + 1;
 
         $this->db->query('UPDATE menu SET rgt = rgt + 2 WHERE rgt >= ?', $left);
         $this->db->query('UPDATE menu SET lft = lft + 2 WHERE lft > ?', $left);
@@ -82,6 +78,7 @@ class Menu extends BaseModel
             'depth' => $depth,
         ]);
 
+        // @phpstan-ignore property.nonObject
         return $result->id;
     }
 
@@ -96,8 +93,8 @@ class Menu extends BaseModel
             throw new \Exception("Menu item '$id' not found.");
         }
 
-        $left = $node->lft;
-        $right = $node->rgt;
+        $left = $node['lft'];
+        $right = $node['rgt'];
         $width = $right - $left + 1;
 
         $this->db->query('DELETE FROM ' . self::TABLE_NAME . ' WHERE lft BETWEEN ? AND ?', $left, $right);

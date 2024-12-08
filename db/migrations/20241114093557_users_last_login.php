@@ -6,7 +6,7 @@ use Phinx\Migration\AbstractMigration;
 
 final class UsersLastLogin extends AbstractMigration
 {
-    public function up()
+    public function up(): void
     {
         $this->execute("
             ALTER TABLE `users`
@@ -16,7 +16,7 @@ final class UsersLastLogin extends AbstractMigration
         ");
     }
 
-    public function down()
+    public function down(): void
     {
         $this->execute("
             ALTER TABLE `users`

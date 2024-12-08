@@ -6,23 +6,21 @@ namespace App\Components\Admin;
 
 use App\Components\BaseControl;
 use App\Models\UserManager;
-use Nette\Security\User;
 use Nette\Application\UI\Form;
-
 
 class UserForm extends BaseControl
 {
+    /** @var array<string, string> $userData */
     private array $userData;
 
-    // /** @var callback */
-    // public array $onSuccess = [];
-
-    public function __construct(protected User $user, protected UserManager $userManager)
-    {
+    public function __construct(
+        protected \Nette\Security\User $user,
+        protected UserManager $userManager
+    ) {
         $this->userData = [];
     }
 
-    public function createComponentForm()
+    public function createComponentForm(): Form
     {
         $form = new Form();
 
@@ -57,7 +55,8 @@ class UserForm extends BaseControl
         return $form;
     }
 
-    public function process(Form $form, $values)
+    /** @param \Nette\Utils\ArrayHash<mixed> $values */
+    public function process(Form $form, \Nette\Utils\ArrayHash $values): void
     {
         try {
             $id = 1;

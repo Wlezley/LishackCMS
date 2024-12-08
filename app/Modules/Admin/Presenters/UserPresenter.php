@@ -7,26 +7,26 @@ namespace App\Modules\Admin\Presenters;
 use App\Models\UserManager;
 use Ublaboo\DataGrid\DataGrid;
 
-class UserPresenter extends _SecuredPresenter
+class UserPresenter extends SecuredPresenter
 {
-    public function renderDefault()
+    public function renderDefault(): void
     {
         $this->template->title = 'Seznam uživatelů';
         $this->template->userList = [];
     }
 
-    public function renderCreate()
+    public function renderCreate(): void
     {
         $this->template->title = 'Vytvoření nového uživatele';
     }
 
-    public function renderEdit(int $id = 0)
+    public function renderEdit(int $id = 0): void
     {
         $this->template->title = "Editace uživatele ID: $id";
         $this->template->userId = $id;
     }
 
-    public function actionDelete(int $id)
+    public function actionDelete(int $id): void
     {
         $this->flashMessage("Uživatel ID: $id byl odstraněn.", 'info');
         $this->redirect('User:');

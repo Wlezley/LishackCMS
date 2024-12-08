@@ -6,7 +6,7 @@ use Phinx\Migration\AbstractMigration;
 
 final class TableUsers extends AbstractMigration
 {
-    public function up()
+    public function up(): void
     {
         $this->execute("
             CREATE TABLE IF NOT EXISTS `users` (
@@ -27,7 +27,7 @@ final class TableUsers extends AbstractMigration
         ");
     }
 
-    public function down()
+    public function down(): void
     {
     }
 }

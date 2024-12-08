@@ -74,6 +74,7 @@ class SmsGate
         }
     }
 
+    /** @return array<string, string> $param */
     private function getBasicCredentials(): array
     {
         return [
@@ -82,6 +83,7 @@ class SmsGate
         ];
     }
 
+    /** @return array<string, string> $param */
     private function getSecuredCredentials(): array
     {
         $time = Carbon::now()->addMinute()->format('Ymd\THis');

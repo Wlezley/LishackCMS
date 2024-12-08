@@ -6,7 +6,7 @@ use Phinx\Migration\AbstractMigration;
 
 final class MenuSystem extends AbstractMigration
 {
-    public function up()
+    public function up(): void
     {
         $this->execute("
             CREATE TABLE `menu` (
@@ -31,7 +31,7 @@ final class MenuSystem extends AbstractMigration
         ");
     }
 
-    public function down()
+    public function down(): void
     {
     }
 }

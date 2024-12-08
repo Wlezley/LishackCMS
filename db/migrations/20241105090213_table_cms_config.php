@@ -6,7 +6,7 @@ use Phinx\Migration\AbstractMigration;
 
 final class TableCmsConfig extends AbstractMigration
 {
-    public function up()
+    public function up(): void
     {
         $this->execute("
             CREATE TABLE `cms_config` (
@@ -19,7 +19,7 @@ final class TableCmsConfig extends AbstractMigration
         ");
     }
 
-    public function down()
+    public function down(): void
     {
     }
 }
