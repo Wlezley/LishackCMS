@@ -1,8 +1,9 @@
 /config/local.neon
+/node_modules/
 /vendor/
-/**/temp/*
+/www/assets/**/dist/*
 /**/log/*
-/**/node_modules/*
+/**/temp/*
 
 !.gitignore
 !.htaccess

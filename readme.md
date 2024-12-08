@@ -35,36 +35,50 @@ Installation
 6) Now you can install the modules and build the frontend:
 
         $ npm install
-        $ npm run build
-        $ npm run build:admin
-        $ npm run build:tinymce
+        $ npm run build:all
 
 NPM command list
 -----------------
 
 - *Build **Website** assets:*
 
-       $ build
+       $ npm run build
 
 - *Build **Website** assets in **DEV** mode (with `--watch`):*
 
-       $ build:dev
+       $ npm run build:dev
 
 - *Build **Admin** assets:*
 
-       $ build:admin
+       $ npm run build:admin
 
 - *Build **Admin** assets in **DEV** mode (with `--watch`):*
 
-       $ build:admin:dev
+       $ npm run build:admin:dev
 
 - *Build **TinyMCE** bundle assets:*
 
-       $ build:tinymce
+       $ npm run build:tinymce
 
 - *Build **TinyMCE** bundle assets in **DEV** mode (with `--watch`):*
 
-       $ build:tinymce:dev
+       $ npm run build:tinymce:dev
+
+- *Build **ALL** assets:*
+
+       $ npm run build:all
+
+- *Build **ALL** assets in **DEV** mode:*
+
+       $ npm run build:all:dev
+
+- *Delete ALL `dist` folders:*
+
+       $ npm run drop:dist
+
+- *Delete `temp/cache` folder:*
+
+       $ npm run drop:cache
 
 Why?
 ----

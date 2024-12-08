@@ -14,11 +14,12 @@ module.exports = {
   },
   entry: {
     'scripts': './www/assets/admin/js/main.js',
-    'styles': './www/assets/admin/scss/main.scss',
+    'styles': './www/assets/admin/scss/main.scss'
   },
   output: {
     filename: '[name].min.js',
     path: path.resolve(__dirname, 'www/assets/admin/dist'),
+    clean: true
   },
   module: {
     rules: [

@@ -9,16 +9,17 @@ module.exports = {
   performance: {
     hints: false,
     // maxEntrypointSize: 512000,
-    // maxAssetSize: 512000
+    // maxAssetSize: 512000,
   },
   entry: {
     'scripts': './www/assets/website/js/main.js',
     'styles-main': './www/assets/website/scss/main.scss',
-    'styles-print': './www/assets/website/scss/print.scss',
+    'styles-print': './www/assets/website/scss/print.scss'
   },
   output: {
     filename: '[name].min.js',
     path: path.resolve(__dirname, 'www/assets/website/dist'),
+    clean: true
   },
   module: {
     rules: [

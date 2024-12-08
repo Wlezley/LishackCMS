@@ -12,11 +12,12 @@ module.exports = {
   },
   entry: {
     'scripts': './www/assets/tinymce-bundle/js/main.js',
-    'styles': './www/assets/tinymce-bundle/scss/main.scss'
+    'styles': './www/assets/tinymce-bundle/scss/main.scss',
   },
   output: {
     filename: '[name].min.js',
-    path: path.resolve(__dirname, 'www/assets/tinymce-bundle/dist')
+    path: path.resolve(__dirname, 'www/assets/tinymce-bundle/dist'),
+    clean: true
   },
   module: {
     rules: [
