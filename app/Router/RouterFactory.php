@@ -7,8 +7,7 @@ namespace App;
 use Nette;
 use Nette\Application\Routers\RouteList;
 
-
-abstract class RouterFactory_Core
+class RouterFactory
 {
     use Nette\StaticClass;
 
@@ -16,16 +15,9 @@ abstract class RouterFactory_Core
     {
         $router = new RouteList;
 
-        // ADMIN Router
         self::createAdminRouter($router);
-
-        // AJAX Router
         self::createAjaxRouter($router);
-
-        // CRON Router
         self::createCronRouter($router);
-
-        // WEBSITE Router (must be last one)
         self::createWebsiteRouter($router);
 
         return $router;
