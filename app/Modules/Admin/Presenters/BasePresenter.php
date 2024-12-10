@@ -9,16 +9,22 @@ use App\Models\Helpers\AssetsVersion;
 use Nette;
 use Nette\Database\Explorer;
 
-class BasePresenter extends Nette\Application\UI\Presenter
+abstract class BasePresenter extends Nette\Application\UI\Presenter
 {
-    /** @var array<string, string> $cmsConfig */
+    /** @var Explorer @inject */
+    public $db;
+
+    /** @var Config @inject */
+    public $config;
+
+    /** @var array<string,string> $cmsConfig */
     protected array $cmsConfig = [];
 
-    public function __construct(
-        protected Explorer $db,
-        protected Config $config,
-        private AssetsVersion $assetsVersion
-    ) {}
+    // public function __construct(
+    //     protected Explorer $db,
+    //     protected Config $config,
+    //     private AssetsVersion $assetsVersion
+    // ) {}
 
     public function startup(): void
     {
@@ -41,8 +47,8 @@ class BasePresenter extends Nette\Application\UI\Presenter
         $this->template->DEFAULT_LANG_TINYMCE = (DEFAULT_LANG == 'cz' ? 'cs' : DEFAULT_LANG); // @phpstan-ignore equal.alwaysTrue
 
         // Assets version
-        $this->assetsVersion
-            ->setTemplate($this->template)
+        $assetsVersion = new AssetsVersion();
+        $assetsVersion->setTemplate($this->template)
             ->setBasePath(ASSETS_DIR)
             ->addFile('admin/dist/scripts.min.js', 'js_version')
             ->addFile('admin/dist/styles.css', 'css_version')

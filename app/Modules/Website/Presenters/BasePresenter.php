@@ -10,12 +10,17 @@ use App\Models\Config;
 use App\Models\Helpers\AssetsVersion;
 use App\Models\Menu;
 use Nette;
-use Nette\Application\UI\Presenter;
 use Nette\Database\Explorer;
 
-abstract class BasePresenter extends Presenter
+abstract class BasePresenter extends Nette\Application\UI\Presenter
 {
     protected Nette\Http\UrlScript $url;
+
+    /** @var Explorer @inject */
+    public $db;
+
+    /** @var Config @inject */
+    public $config;
 
     /** @var IAdminButtonFactory @inject */
     public $adminBarFactory;
@@ -23,7 +28,7 @@ abstract class BasePresenter extends Presenter
     /** @var IMenuFactory @inject */
     public $menuFactory;
 
-    /** @var array<string, string> $cmsConfig */
+    /** @var array<string,string> $cmsConfig */
     protected array $cmsConfig = [];
 
     protected string $baseUrl;
@@ -39,12 +44,12 @@ abstract class BasePresenter extends Presenter
     protected string $social_description = '';
     protected string $social_image = '';
 
-    public function __construct(
-        protected Explorer $db,
-        protected Config $config,
-        protected Menu $menu,
-        private AssetsVersion $assetsVersion
-    ) { }
+    // public function __construct(
+    //     protected Explorer $db,
+    //     protected Config $config,
+    //     protected Menu $menu,
+    //     private AssetsVersion $assetsVersion
+    // ) { }
 
     public function startup(): void
     {
@@ -100,8 +105,8 @@ abstract class BasePresenter extends Presenter
         $this->template->social_image = $this->social_image;
 
         // Assets version
-        $this->assetsVersion
-            ->setTemplate($this->template)
+        $assetsVersion = new AssetsVersion();
+        $assetsVersion->setTemplate($this->template)
             ->setBasePath(ASSETS_DIR)
             ->addFile('website/dist/scripts.min.js', 'js_version')
             ->addFile('website/dist/styles-main.css', 'css_version')
