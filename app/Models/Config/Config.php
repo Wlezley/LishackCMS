@@ -6,7 +6,6 @@ namespace App\Models;
 
 use Nette\Database\Table\ActiveRow;
 
-// #[AllowDynamicProperties]
 class Config extends BaseModel
 {
     public const TABLE_NAME = 'cms_config';

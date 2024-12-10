@@ -1,6 +1,6 @@
-<aside id="sidebar" class="border-end border-secondary fixed-top">
+<aside class="sidebar border-end border-secondary fixed-top">
     <div class="h-100">
-        <div class="sidebar-logo text-center border-bottom border-secondary pt-3 pb-2" style="height: 3.5em">
+        <div class="sidebar-logo text-center border-bottom border-secondary pt-3" style="height: 3.5em">
             <a n:href="Admin:">Lishack 🦊 CMS</a>
         </div>
 
@@ -11,62 +11,132 @@
 
             {* DASHBOARD *}
             <li class="sidebar-item">
-                <a n:href="Admin:" n:class="sidebar-link, $presenter->isLinkCurrent('Admin:') ? active">
-                    <i class="fa-solid fa-sliders pe-2"></i>
+                <a n:href="Admin:" n:class="sidebar-link, $activeMenu == 'HOME' ? active">
+                    <i class="fa-solid fa-sliders"></i>
                     Přehled
                 </a>
             </li>
 
             {* ARTICLES *}
             <li class="sidebar-item">
-                <a n:href="Article:" n:class="'sidebar-link collapsed', $presenter->isLinkCurrent('Article:*') ? active" data-bs-toggle="collapse" data-bs-target="#articles"
-                    aria-expanded="false" aria-controls="articles">
-                    <i class="fa-regular fa-file-lines pe-2"></i>
+                <a n:href="Article:" n:class="'sidebar-link collapsed', $activeMenu == 'ARTICLE' ? active" data-bs-toggle="collapse" data-bs-target="#sidebar-articles" aria-expanded="false" aria-controls="sidebar-articles">
+                    <i class="fa-regular fa-file-lines"></i>
                     Články
                 </a>
-                <ul id="articles" n:class="'sidebar-dropdown list-unstyled collapse ps-4 pb-2', $presenter->isLinkCurrent('Article:*') ? show">
+                <ul id="sidebar-articles" n:class="'sidebar-dropdown list-unstyled collapse', $activeMenu == 'ARTICLE' ? show">
                     <li class="sidebar-item">
-                        <a n:href="Article:" n:class="sidebar-link, $presenter->isLinkCurrent('Article:default') ? active">Přehled článků</a>
+                        <a n:href="Article:" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('Article:default') ? active">
+                            <i class="fa-solid fa-list"></i>
+                            Přehled článků
+                        </a>
                     </li>
                     <li class="sidebar-item">
-                        <a n:href="Article:create" n:class="sidebar-link, $presenter->isLinkCurrent('Article:create') ? active">Vytvořit článek</a>
+                        <a n:href="Article:create" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('Article:create') ? active">
+                            <i class="fa-solid fa-plus"></i>
+                            Nový článek
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            {* MENU *}
+            <li class="sidebar-item">
+                <a n:href="Menu:" n:class="'sidebar-link collapsed', $activeMenu == 'MENU' ? active" data-bs-toggle="collapse" data-bs-target="#sidebar-user-settings" aria-expanded="false" aria-controls="sidebar-user-settings">
+                    <i class="fa-solid fa-table-list"></i>
+                    Menu
+                </a>
+                <ul id="sidebar-user-settings" n:class="'sidebar-dropdown list-unstyled collapse', $activeMenu == 'MENU' ? show">
+                    <li class="sidebar-item">
+                        <a n:href="Menu:" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('Menu:default') ? active">
+                            <i class="fa-solid fa-list"></i>
+                            Položky menu
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a n:href="Menu:create" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('Menu:create') ? active">
+                            <i class="fa-solid fa-plus"></i>
+                            Nové menu
+                        </a>
                     </li>
                 </ul>
             </li>
 
             {* DATA *}
             <li class="sidebar-item">
-                <a n:href="Data:" n:class="'sidebar-link collapsed', $presenter->isLinkCurrent('Data:*') ? active" data-bs-toggle="collapse" data-bs-target="#database"
-                    aria-expanded="false" aria-controls="database">
-                    <i class="fa-solid fa-database pe-2"></i>
+                <a n:href="Data:" n:class="'sidebar-link collapsed', $activeMenu == 'DATA' ? active" data-bs-toggle="collapse" data-bs-target="#sidebar-database" aria-expanded="false" aria-controls="sidebar-database">
+                    <i class="fa-solid fa-database"></i>
                     Data
                 </a>
-                <ul id="database" n:class="'sidebar-dropdown list-unstyled collapse ps-4 pb-2', $presenter->isLinkCurrent('Data:*') ? show">
+                <ul id="sidebar-database" n:class="'sidebar-dropdown list-unstyled collapse', $activeMenu == 'DATA' ? show">
                     <li class="sidebar-item">
-                        <a n:href="Data:" n:class="sidebar-link, $presenter->isLinkCurrent('Data:default') ? active">Datové kontejnery</a>
+                        <a n:href="Data:" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('Data:default') ? active">
+                            <i class="fa-solid fa-cubes"></i>
+                            Datové kontejnery
+                        </a>
                     </li>
                     <li class="sidebar-item">
-                        <a n:href="Data:create" n:class="sidebar-link, $presenter->isLinkCurrent('Data:create') ? active">Vytvořit kontejner</a>
+                        <a n:href="Data:create" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('Data:create') ? active">
+                            <i class="fa-solid fa-plus"></i>
+                            Nový kontejner
+                        </a>
                     </li>
                 </ul>
             </li>
 
-            {* USEER SETTINGS *}
+            {* CMS CONFIG *}
             <li class="sidebar-item">
-                <a n:href="User:" n:class="'sidebar-link collapsed', $presenter->isLinkCurrent('User:*') ? active" data-bs-toggle="collapse" data-bs-target="#users"
-                    aria-expanded="false" aria-controls="users">
-                    <i class="fa-regular fa-user pe-2"></i>
-                    Uživatelské účty
+                <a n:href="Config:" n:class="'sidebar-link collapsed', $activeMenu == 'CONFIG' ? active" data-bs-toggle="collapse" data-bs-target="#sidebar-cms-config" aria-expanded="false" aria-controls="sidebar-cms-config">
+                    <i class="fa-solid fa-cog"></i>
+                    Nastavení
                 </a>
-                <ul id="users" n:class="'sidebar-dropdown list-unstyled collapse ps-4 pb-2', $presenter->isLinkCurrent('User:*') ? show">
+                <ul id="sidebar-cms-config" n:class="'sidebar-dropdown list-unstyled collapse', $activeMenu == 'CONFIG' ? show">
                     <li class="sidebar-item">
-                        <a n:href="User:" n:class="sidebar-link, $presenter->isLinkCurrent('User:default') ? active">Seznam uživatelů</a>
+                        <a n:href="User:" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('User:*') ? active">
+                            <i class="fa-solid fa-user-group"></i>
+                            Uživatelské účty
+                        </a>
                     </li>
                     <li class="sidebar-item">
-                        <a n:href="User:create" n:class="sidebar-link, $presenter->isLinkCurrent('User:create') ? active">Nový uživatel</a>
+                        <a n:href="Strings:" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('Strings:*') ? active">
+                            <i class="fa-solid fa-font"></i>
+                            Textové definice
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a n:href="Email:" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('Email:*') ? active">
+                            <i class="fa-solid fa-at"></i>
+                            E-mail
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a n:href="Website:" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('Website:*') ? active">
+                            <i class="fa-solid fa-globe"></i>
+                            Website
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a n:href="Seo:" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('Seo:*') ? active">
+                            <i class="fa-solid fa-arrow-trend-up"></i>
+                            SEO
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a n:href="Redirect:" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('Redirect:*') ? active">
+                            <i class="fa-solid fa-arrows-split-up-and-left"></i>
+                            {* <i class="fa-solid fa-arrows-turn-to-dots"></i> *}
+                            Přesměrování
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a n:href="Debug:" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('Debug:*') ? active">
+                            <i class="fa-solid fa-bug-slash"></i>
+                            Ladění
+                        </a>
                     </li>
                 </ul>
             </li>
+
+            <li><hr class="text-secondary mt-2 mb-0"></li>
 
             {* TOOLS *}
             <li class="sidebar-header">
@@ -74,10 +144,12 @@
             </li>
             <li class="sidebar-item">
                 <a href="{$baseUrl}" class="sidebar-link text-success" target="_blank">
-                    <i class="fa-solid fa-up-right-from-square pe-2"></i>
+                    <i class="fa-solid fa-up-right-from-square"></i>
                     Zobrazit web
                 </a>
             </li>
+
+            <li><hr class="text-secondary mt-2 mb-0"></li>
 
             {* LOGGED USER *}
             <li class="sidebar-header">
@@ -85,13 +157,13 @@
             </li>
             <li class="sidebar-item">
                 <a n:href="User:edit $userData[id]" class="sidebar-link">
-                    <i class="fa-solid fa-cog pe-2"></i>
-                    Nastavení
+                    <i class="fa-solid fa-cog"></i>
+                    Můj profil
                 </a>
             </li>
             <li class="sidebar-item">
                 <a n:href="Sign:out" class="sidebar-link text-danger">
-                    <i class="fa-solid fa-right-from-bracket pe-2"></i>
+                    <i class="fa-solid fa-right-from-bracket"></i>
                     Odhlášení
                 </a>
             </li>

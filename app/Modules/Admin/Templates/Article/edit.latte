@@ -3,10 +3,13 @@
     <div class="col">
         <p>TODO: Formulář pro editaci článků</p>
 
-        <a n:href="Article:delete $articleId" class="btn btn-primary">Delete test</a>
+        <textarea class="tinymce d-none">Hello, World!</textarea>
 
         <hr class="my-3">
 
-        <textarea class="tinymce d-none">Hello, World!</textarea>
+        <a n:href="Article:delete $articleId" class="btn btn-primary">
+            <i class="fa-solid fa-eraser pe-2"></i>
+            Delete (ID {$articleId})
+        </a>
     </div>
 </div>

@@ -7,18 +7,25 @@ namespace App\Modules\Admin\Presenters;
 use App\Models\Config;
 use App\Models\Helpers\AssetsVersion;
 use Nette;
+use Nette\Application\Helpers;
 use Nette\Database\Explorer;
 
-class BasePresenter extends Nette\Application\UI\Presenter
+abstract class BasePresenter extends Nette\Application\UI\Presenter
 {
-    /** @var array<string, string> $cmsConfig */
+    /** @var Explorer @inject */
+    public $db;
+
+    /** @var Config @inject */
+    public $config;
+
+    /** @var array<string,string> $cmsConfig */
     protected array $cmsConfig = [];
 
-    public function __construct(
-        protected Explorer $db,
-        protected Config $config,
-        private AssetsVersion $assetsVersion
-    ) {}
+    // public function __construct(
+    //     protected Explorer $db,
+    //     protected Config $config,
+    //     private AssetsVersion $assetsVersion
+    // ) {}
 
     public function startup(): void
     {
@@ -41,12 +48,43 @@ class BasePresenter extends Nette\Application\UI\Presenter
         $this->template->DEFAULT_LANG_TINYMCE = (DEFAULT_LANG == 'cz' ? 'cs' : DEFAULT_LANG); // @phpstan-ignore equal.alwaysTrue
 
         // Assets version
-        $this->assetsVersion
-            ->setTemplate($this->template)
+        $assetsVersion = new AssetsVersion();
+        $assetsVersion->setTemplate($this->template)
             ->setBasePath(ASSETS_DIR)
             ->addFile('admin/dist/scripts.min.js', 'js_version')
             ->addFile('admin/dist/styles.css', 'css_version')
             ->addFile('tinymce-bundle/dist/scripts.min.js', 'js_version_tinymce')
             ->addFile('tinymce-bundle/dist/styles.css', 'css_version_tinymce');
+
+        // Sidebar
+        $this->template->activeMenu = $this->getPresenterCategory();
+
+        bdump($this->template->getParameters(), 'TEMPLATE PARAMS');
+    }
+
+    protected function getPresenterCategory(): string
+    {
+        $key = Helpers::splitName($this->getName())[1];
+
+        $list = [
+            'Admin' => 'HOME',
+            'Article' => 'ARTICLE',
+            'Menu' => 'MENU',
+            'Data' => 'DATA',
+            'Config' => 'CONFIG',
+            'User' => 'CONFIG',
+            'Strings' => 'CONFIG',
+            'Email' => 'CONFIG',
+            'Website' => 'CONFIG',
+            'Seo' => 'CONFIG',
+            'Redirect' => 'CONFIG',
+            'Debug' => 'CONFIG',
+        ];
+
+        if (isset($list[$key])) {
+            return $list[$key];
+        }
+
+        return '';
     }
 }

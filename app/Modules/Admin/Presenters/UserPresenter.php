@@ -11,7 +11,7 @@ class UserPresenter extends SecuredPresenter
 {
     public function renderDefault(): void
     {
-        $this->template->title = 'Seznam uživatelů';
+        $this->template->title = 'Uživatelské účty';
         $this->template->userList = [];
     }
 
