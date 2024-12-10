@@ -7,6 +7,7 @@ namespace App\Modules\Admin\Presenters;
 use App\Models\Config;
 use App\Models\Helpers\AssetsVersion;
 use Nette;
+use Nette\Application\Helpers;
 use Nette\Database\Explorer;
 
 abstract class BasePresenter extends Nette\Application\UI\Presenter
@@ -54,5 +55,36 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
             ->addFile('admin/dist/styles.css', 'css_version')
             ->addFile('tinymce-bundle/dist/scripts.min.js', 'js_version_tinymce')
             ->addFile('tinymce-bundle/dist/styles.css', 'css_version_tinymce');
+
+        // Sidebar
+        $this->template->activeMenu = $this->getPresenterCategory();
+
+        bdump($this->template->getParameters(), 'TEMPLATE PARAMS');
+    }
+
+    protected function getPresenterCategory(): string
+    {
+        $key = Helpers::splitName($this->getName())[1];
+
+        $list = [
+            'Admin' => 'HOME',
+            'Article' => 'ARTICLE',
+            'Menu' => 'MENU',
+            'Data' => 'DATA',
+            'Config' => 'CONFIG',
+            'User' => 'CONFIG',
+            'Strings' => 'CONFIG',
+            'Email' => 'CONFIG',
+            'Website' => 'CONFIG',
+            'Seo' => 'CONFIG',
+            'Redirect' => 'CONFIG',
+            'Debug' => 'CONFIG',
+        ];
+
+        if (isset($list[$key])) {
+            return $list[$key];
+        }
+
+        return '';
     }
 }

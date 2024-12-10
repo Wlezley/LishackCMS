@@ -26,7 +26,7 @@ li {
     list-style: none;
 }
 
-/* Layout skeleton */
+/* Layout */
 
 .wrapper {
     align-items: stretch;
@@ -42,3 +42,21 @@ li {
     overflow: hidden;
     transition: all 0.35s ease-in-out;
 }
+
+.content {
+    flex: 1;
+    max-width: 100vw;
+    width: 100vw;
+    margin-left: 264px;
+    margin-top: 4em;
+
+    @media (min-width:768px) {
+        width: auto;
+    }
+}
+
+// @media (min-width:768px) {
+//     .content {
+//         width: auto;
+//     }
+// }
