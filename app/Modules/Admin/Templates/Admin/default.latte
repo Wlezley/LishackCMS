@@ -1,39 +1,15 @@
 {block content}
-<div class="row">
-    <div class="col">
-        <p>ID: {$userData[id]}</p>
-        <p>User name: {$userData[name]}</p>
-        <p>Role: {$userData[role]}</p>
-        <p>E-mail: {$userData[email]}</p>
-        <p>Full name: {$userData[full_name]}</p>
-        <p>Session ID: {$userData[session_id]}</p>
-        <p>Deleted: {$userData[deleted] ? 'Yes' : 'No'}</p>
-        <p>Enabled: {$userData[enabled] ? 'Yes' : 'No'}</p>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col">
-        <p>ID: {$userData[id]}</p>
-        <p>User name: {$userData[name]}</p>
-        <p>Role: {$userData[role]}</p>
-        <p>E-mail: {$userData[email]}</p>
-        <p>Full name: {$userData[full_name]}</p>
-        <p>Session ID: {$userData[session_id]}</p>
-        <p>Deleted: {$userData[deleted] ? 'Yes' : 'No'}</p>
-        <p>Enabled: {$userData[enabled] ? 'Yes' : 'No'}</p>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col">
-        <p>ID: {$userData[id]}</p>
-        <p>User name: {$userData[name]}</p>
-        <p>Role: {$userData[role]}</p>
-        <p>E-mail: {$userData[email]}</p>
-        <p>Full name: {$userData[full_name]}</p>
-        <p>Session ID: {$userData[session_id]}</p>
-        <p>Deleted: {$userData[deleted] ? 'Yes' : 'No'}</p>
-        <p>Enabled: {$userData[enabled] ? 'Yes' : 'No'}</p>
+<div class="bg-light bg-gradient text-black p-4">
+    <div class="row">
+        <div class="col">
+            <p><strong>ID:</strong> {$userData[id]}</p>
+            <p><strong>User name:</strong> {$userData[name]}</p>
+            <p><strong>Role:</strong> {$userData[role]}</p>
+            <p><strong>E-mail:</strong> {$userData[email]}</p>
+            <p><strong>Full name:</strong> {$userData[full_name]}</p>
+            <p><strong>Session ID:</strong> {$userData[session_id]}</p>
+            <p><strong>Deleted:</strong> {$userData[deleted] ? 'Yes' : 'No'}</p>
+            <p class="mb-0"><strong>Enabled:</strong> {$userData[enabled] ? 'Yes' : 'No'}</p>
+        </div>
     </div>
 </div>
