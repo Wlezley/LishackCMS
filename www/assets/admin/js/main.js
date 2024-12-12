@@ -7,3 +7,6 @@ import './components/forms.js';
 import './components/recaptcha.js';
 import './components/sidebar.js';
 import './components/codemirror.js';
+
+// Component Exports
+export { MenuSettings } from './components/menu.sortable-tree.js'

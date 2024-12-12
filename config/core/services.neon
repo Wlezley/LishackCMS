@@ -10,7 +10,6 @@ services:
     authenticator: App\Models\Authenticator
 
     # Models
-    - App\Models\BaseModel
     - App\Models\Config
     - App\Models\Files
     - App\Models\Gallery

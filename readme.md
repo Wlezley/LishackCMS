@@ -20,7 +20,7 @@ Installation
 
     *development environment*
 
-	   $ composer install
+	    $ composer install
 
     *production environment*
 
