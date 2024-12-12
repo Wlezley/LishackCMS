@@ -81,7 +81,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
             'Debug' => 'CONFIG',
         ];
 
-        if (isset($list[$key])) {
+        if (array_key_exists($key, $list)) {
             return $list[$key];
         }
 

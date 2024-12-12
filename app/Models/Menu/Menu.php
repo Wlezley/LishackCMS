@@ -11,8 +11,6 @@ class Menu extends BaseModel
     /** @var list<array> $data */
     protected mixed $data = [];
 
-    private UrlGenerator $urlGenerator;
-
     public function load(): void
     {
         $result = $this->db->table(self::TABLE_NAME)
@@ -51,6 +49,16 @@ class Menu extends BaseModel
         }
 
         return $this->data;
+    }
+
+    /** @return list<array> */
+    public function getSortableTree(bool $forceReload = false): array
+    {
+        if (empty($this->data) || $forceReload) {
+            $this->load();
+        }
+
+        return $this->formatForSortableTree($this->data);
     }
 
     public function addMenuItem(string $title, ?int $parentId = NULL): int
@@ -102,13 +110,32 @@ class Menu extends BaseModel
         $this->db->query('UPDATE ' . self::TABLE_NAME . ' SET lft = lft - ? WHERE lft > ?', $width, $right);
     }
 
-    public function setUrlGenerator(UrlGenerator $urlGenerator): void
+    /**
+     * @param list<array> $items
+     * @return list<array>
+     */
+    private function formatForSortableTree(array $items, string $url = ''): array
     {
-        $this->urlGenerator = $urlGenerator;
-    }
+        $urlPrefix = '/'; // HOME_URL;
+        $formatted = [];
 
-    public function getUrlGenerator(): UrlGenerator
-    {
-        return $this->urlGenerator;
+        foreach ($items as $item) {
+            $nameUrl = $item['name_url'] ? $url . $item['name_url'] . '/' : '';
+            $formatted[] = [
+                'data' => [
+                    'id' => $item['id'],
+                    'name' => $item['name'],
+                    'name_url' => $urlPrefix . $nameUrl,
+                    'title' => $item['title'],
+                    'lft' => $item['lft'],
+                    'rgt' => $item['rgt'],
+                    'depth' => $item['depth'],
+                    'hidden' => $item['hidden'],
+                ],
+                'nodes' => $item['items'] ? $this->formatForSortableTree($item['items'], $nameUrl) : [],
+            ];
+        }
+
+        return $formatted;
     }
 }

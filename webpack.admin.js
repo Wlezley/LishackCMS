@@ -19,7 +19,9 @@ module.exports = {
   output: {
     filename: '[name].min.js',
     path: path.resolve(__dirname, 'www/assets/admin/dist'),
-    clean: true
+    clean: true,
+    library: 'LishackCMS',
+    libraryTarget: 'umd',
   },
   module: {
     rules: [
@@ -59,6 +61,13 @@ module.exports = {
             }
           }
         ],
+      },
+      {
+        test: /\.js?$/i,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+        }
       }
     ]
   },

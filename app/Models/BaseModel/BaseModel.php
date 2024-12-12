@@ -7,9 +7,11 @@ namespace App\Models;
 use Nette\SmartObject;
 use Nette\Database\Explorer;
 
-class BaseModel
+abstract class BaseModel
 {
     use SmartObject;
+
+    private UrlGenerator $urlGenerator;
 
     protected mixed $data = [];
 
@@ -40,5 +42,15 @@ class BaseModel
     public function getLang(): string
     {
         return $this->lang;
+    }
+
+    public function setUrlGenerator(UrlGenerator $urlGenerator): void
+    {
+        $this->urlGenerator = $urlGenerator;
+    }
+
+    public function getUrlGenerator(): UrlGenerator
+    {
+        return $this->urlGenerator;
     }
 }
