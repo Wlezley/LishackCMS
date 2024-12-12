@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
-use App\Models\Menu;
+use App\Models\MenuManager;
 
 class MenuPresenter extends SecuredPresenter
 {
     public function __construct(
-        private Menu $menuManager
+        private MenuManager $menuManager
     ) {}
 
     public function renderDefault(): void

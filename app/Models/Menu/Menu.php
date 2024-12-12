@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-class Menu extends BaseModel
+class MenuManager extends BaseModel
 {
     public const TABLE_NAME = 'menu';
 

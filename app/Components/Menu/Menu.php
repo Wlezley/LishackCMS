@@ -2,19 +2,20 @@
 
 namespace App\Components;
 
+use App\Models\MenuManager;
 use App\Models\UrlGenerator;
 
 class Menu extends BaseControl
 {
-    public function __construct(protected \App\Models\Menu $menu, UrlGenerator $urlGenerator)
+    public function __construct(protected MenuManager $menuManager, UrlGenerator $urlGenerator)
     {
-        $this->menu->setUrlGenerator($urlGenerator);
-        $this->menu->setLang($this->lang);
+        $this->menuManager->setUrlGenerator($urlGenerator);
+        $this->menuManager->setLang($this->lang);
     }
 
     public function render(string $template = "Menu"): void
     {
-        $this->template->menu = $this->menu->getMenuTree()[0]['items'];
+        $this->template->menu = $this->menuManager->getMenuTree()[0]['items'];
         $this->template->lang = $this->lang;
 
         $this->template->setFile(__DIR__ . '/' . $template . '.latte');

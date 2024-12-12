@@ -16,7 +16,7 @@ services:
     - App\Models\Helpers\AssetsVersion
     - App\Models\Images
     - App\Models\Installer
-    - App\Models\Menu
+    - App\Models\MenuManager
     - App\Models\SmsGate(%smsgate.url%, %smsgate.login%, %smsgate.password%, %smsgate.sender_id%, %smsgate.secured_login%)
     - App\Models\Upload
     - App\Models\UrlGenerator
