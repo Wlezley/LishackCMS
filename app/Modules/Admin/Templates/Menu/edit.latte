@@ -5,9 +5,9 @@
 
         <hr class="my-3">
 
-        <a n:href="Menu:delete $menuId" class="btn btn-primary">
+        <a n:href="Menu:delete $menuItem['id']" class="btn btn-danger" title="Smazat" aria-label="Smazat" onclick="return confirm('Opravdu chete smazat položku {$menuItem['name']} (ID: {$menuItem['id']})?')">
             <i class="fa-solid fa-eraser pe-2"></i>
-            Delete (ID {$menuId})
+            Smazat (ID {$menuItem['id']})
         </a>
     </div>
 </div>

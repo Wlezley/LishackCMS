@@ -26,8 +26,10 @@ class MenuPresenter extends SecuredPresenter
 
     public function renderEdit(int $id = 0): void
     {
-        $this->template->title = "Editace menu ID: $id";
-        $this->template->menuId = $id;
+        $menuItem = $this->menuManager->get($id);
+
+        $this->template->title = "Editace menu $id: " . $menuItem['name'];
+        $this->template->menuItem = $menuItem;
     }
 
     public function actionDelete(int $id): void

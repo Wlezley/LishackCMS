@@ -25,6 +25,15 @@ class MenuManager extends BaseModel
         $this->data = ArrayHelper::resultToArray($result);
     }
 
+    /** @return array<string,mixed> */
+    public function get(int $id): array
+    {
+        $result = $this->db->table(self::TABLE_NAME)
+            ->get($id);
+
+        return $result->toArray();
+    }
+
     /** @param array<string,string|int|null> $data */
     public function create(array $data): int
     {
