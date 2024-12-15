@@ -20,8 +20,6 @@ abstract class BaseModel
     public function __construct(protected Explorer $db)
     {
         $this->lang = DEFAULT_LANG;
-
-        $this->load();
     }
 
     public function load(): void

@@ -11,7 +11,6 @@ $argcOffset = 2;
 $commandList = [
     '--create' => 1,
     '--delete' => 1,
-    // '--move' => 2,
     '--list' => 0,
 ];
 
@@ -28,16 +27,19 @@ $manager = $container->getByType(App\Models\MenuManager::class);
 switch ($command) {
     case '--create':
         if ($argc < $argcRequired) {
-            echo 'Usage: menu.php --create <title> [<parent_id>]';
+            echo 'Usage: menu.php --create <name> [<parent_id>]';
             exit(1);
         }
 
-        $title = $argv[2];
-        $parentId = $argv[3] ? (int)$argv[3] : NULL;
+        $name = $argv[2];
+        $parentID = $argv[3] ? (int)$argv[3] : NULL;
 
         try {
-            $id = $manager->addMenuItem($title, $parentId);
-            echo "Menu '$title' was added [ID: $id].\n";
+            $id = $manager->create([
+                'name' => $name,
+                'parent_id' => $parentID
+            ]);
+            echo "Menu '$name' was added [ID: $id].\n";
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage() . "\n";
             exit(1);
@@ -53,32 +55,13 @@ switch ($command) {
         $id = (int)$argv[2];
 
         try {
-            $manager->removeMenuItem($id);
-            echo "Menu item '$id' was removed (recursive).\n";
+            $manager->delete($id);
+            echo "Menu item '$id' was removed.\n";
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage() . "\n";
             exit(1);
         }
         break;
-
-    // case '--move':
-    //     if ($argc != $argcRequired) {
-    //         echo 'Usage: menu.php --move <id> <new_parent_id>';
-    //         exit(1);
-    //     }
-
-    //     $id = (int)$argv[2];
-    //     $newParentId = $argv[3] ? (int)$argv[3] : NULL;
-
-    //     try {
-    //         $manager->moveMenuItem($id, $newParentId);
-    //         $manager->reorderMenuTree();
-    //         echo "Menu item '$id' was moved to '$newParentId' (recursive).\n";
-    //     } catch (\Exception $e) {
-    //         echo "Error: " . $e->getMessage() . "\n";
-    //         exit(1);
-    //     }
-    //     break;
 
     case '--list':
         if ($argc != $argcRequired) {
@@ -87,7 +70,7 @@ switch ($command) {
         }
 
         try {
-            $menuList = $manager->getMenuTree();
+            $menuList = $manager->getTree();
             print_r($menuList);
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage() . "\n";
@@ -102,7 +85,7 @@ switch ($command) {
 Usage: menu.php <command> [...]
 
 Available comannds:
-    --create <title> [<parent_id>]      Create new menu item
+    --create <name> [<parent_id>]       Create new menu item
     --delete <id>                       Delete menu item
     --list                              Show menu list
 

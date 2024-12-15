@@ -15,7 +15,7 @@ class Menu extends BaseControl
 
     public function render(string $template = "Menu"): void
     {
-        $this->template->menu = $this->menuManager->getMenuTree()[0]['items'];
+        $this->template->menu = $this->menuManager->getTree()[0]['items'];
         $this->template->lang = $this->lang;
 
         $this->template->setFile(__DIR__ . '/' . $template . '.latte');

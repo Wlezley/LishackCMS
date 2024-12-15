@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
+use App\Models\MenuException;
 use App\Models\MenuManager;
+use Tracy\Debugger;
 
 class MenuPresenter extends SecuredPresenter
 {
@@ -30,7 +32,13 @@ class MenuPresenter extends SecuredPresenter
 
     public function actionDelete(int $id): void
     {
-        $this->flashMessage("Menu ID: $id bylo odstraněno (včetně vnořených položek).", 'info');
+        if ($this->user->isInRole('admin')) {
+            $this->menuManager->delete($id);
+            $this->flashMessage("Menu ID: $id bylo odstraněno.", 'info');
+        } else {
+            $this->flashMessage('K odstranění položky nemáte oprávnění.', 'danger');
+        }
+
         $this->redirect('Menu:');
     }
 
@@ -40,8 +48,9 @@ class MenuPresenter extends SecuredPresenter
             $this->redirect('this');
         }
 
-        $nodes = $this->menuManager->getSortableTree();
-        $this->sendJson(['nodes' => $nodes]);
+        $this->sendJson([
+            'nodes' => $this->menuManager->getSortableTree()
+        ]);
     }
 
     public function handleSave(): void
@@ -51,21 +60,22 @@ class MenuPresenter extends SecuredPresenter
         }
 
         $data = $this->getHttpRequest()->getPost();
-        bdump($data, "DATA TO SAVE");
 
-        $status = 'error';
-        $message = 'Unhandled error';
-
-        if (is_array($data)) {
-            // TODO: Save data ($this->menuManager->...)
-
-            $status = 'success';
-            $message = 'Menu saved successfully';
-        } else {
-            $status = 'error';
-            $message = 'Invalid menu structure';
+        try {
+            $this->menuManager->updatePosition($data);
+        } catch (MenuException $e) {
+            $this->sendJson([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+                'debug' => Debugger::$productionMode === Debugger::Development,
+            ]);
         }
 
-        $this->sendJson(['status' => $status, 'message' => $message, 'debug' => !DEBUG]);
+        $this->sendJson([
+            'status' => 'success',
+            'message' => 'Menu saved successfully',
+            'nodes' => $this->menuManager->getSortableTree(),
+            'debug' => Debugger::$productionMode === Debugger::Development,
+        ]);
     }
 }
