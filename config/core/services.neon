@@ -13,7 +13,9 @@ services:
     - App\Models\Config
     - App\Models\Files
     - App\Models\Gallery
+    - App\Models\Helpers\ArrayHelper
     - App\Models\Helpers\AssetsVersion
+    - App\Models\Helpers\StringHelper
     - App\Models\Images
     - App\Models\Installer
     - App\Models\MenuManager
