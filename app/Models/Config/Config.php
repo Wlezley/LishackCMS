@@ -10,7 +10,7 @@ class Config extends BaseModel
 {
     public const TABLE_NAME = 'cms_config';
 
-    /** @var array<string, array<string, mixed>> $data */
+    /** @var array<string,array<string,mixed>> $data */
     protected mixed $data = [];
 
     public function load(): void
@@ -24,7 +24,7 @@ class Config extends BaseModel
         }
     }
 
-    /** @param array<string, string> $param */
+    /** @param array<string,string> $param */
     public function update(array $param): void
     {
         foreach ($param as $name => $value) {
@@ -54,23 +54,39 @@ class Config extends BaseModel
 
     public function getValue(string $name): string
     {
+        if (empty($this->data)) {
+            $this->load();
+        }
+
         return call_user_func_array('array_merge', array_values($this->data))[$name] ?? '';
     }
 
-    /** @return array<string, string> $param */
+    /** @return array<string,string> $param */
     public function getValues(): array
     {
+        if (empty($this->data)) {
+            $this->load();
+        }
+
         return call_user_func_array('array_merge', array_values($this->data));
     }
 
     public function getValueByCategory(string $category, string $name): string
     {
+        if (empty($this->data)) {
+            $this->load();
+        }
+
         return $this->data[$category][$name] ?: '';
     }
 
-    /** @return array<string, string> $param */
+    /** @return array<string,string> $param */
     public function getValuesByCategory(string $category): array
     {
+        if (empty($this->data)) {
+            $this->load();
+        }
+
         return $this->data[$category] ?: [];
     }
 }
