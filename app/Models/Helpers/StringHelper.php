@@ -20,11 +20,10 @@ class StringHelper
 
     public static function assertWebalized(string $value, string $label = 'variable'): void
     {
-        if (self::isWebalized($value)) {
+        if (!self::isWebalized($value)) {
             throw new \InvalidArgumentException("The $label must be in a valid webalized format.");
         }
     }
-
 
     public static function slugize(string $value): string
     {
@@ -38,11 +37,10 @@ class StringHelper
 
     public static function assertSlug(string $value, string $label = 'variable'): void
     {
-        if (self::isSlug($value)) {
+        if (!self::isSlug($value)) {
             throw new \InvalidArgumentException("The $label must be in a valid slug format.");
         }
     }
-
 
     public static function isJson(string $value): bool
     {
