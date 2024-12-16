@@ -31,7 +31,7 @@
         "codeception/codeception": "^5.1",
         "codeception/module-phpbrowser": "*",
         "codeception/module-asserts": "*",
-        "ublaboo/datagrid": "^6.10"
+        "ublaboo/datagrid": "^7.x-dev"
     },
     "require-dev": {
         "nette/tester": "^2.5",
@@ -46,7 +46,7 @@
     "minimum-stability": "stable",
     "config": {
         "allow-plugins": {
-            "symfony/thanks": true
+            "symfony/thanks": false
         }
     }
 }
