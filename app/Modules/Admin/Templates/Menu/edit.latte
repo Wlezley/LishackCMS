@@ -1,13 +1,46 @@
 {block content}
-<div class="row">
-    <div class="col">
-        <p>TODO: Formulář pro editaci menu</p>
 
-        <hr class="my-3">
+{if $item}
+    <div class="row">
+        <div class="col">
+            <h2 class="border-bottom border-light text-light mb-3">{$item[name]} (ID: {$item[id]})</h2>
 
-        <a n:href="Menu:delete $menuItem['id']" class="btn btn-danger" title="Smazat" aria-label="Smazat" onclick="return confirm('Opravdu chete smazat položku {$menuItem['name']} (ID: {$menuItem['id']})?')">
-            <i class="fa-solid fa-eraser pe-2"></i>
-            Smazat (ID {$menuItem['id']})
-        </a>
+            {* {control menuEditForm, $item} *}
+
+            <div>
+                <p><strong>ID:</strong> {$item[id]}</p>
+                <p><strong>Název:</strong> {$item[name]}</p>
+                <p><strong>Název v URL:</strong> {$item[name_url]}</p>
+                <p><strong>Zařazení:</strong> {$item[parent_id]}</p>
+                <p><strong>Pořadí:</strong> {$item[position]}</p>
+                <p><strong>Titulek:</strong> {$item[title]}</p>
+                <p><strong>Popis:</strong> {$item[description]}</p>
+                <p><strong>Anotační text:</strong> {$item[body]}</p>
+                <p class="mb-0"><strong>Skrýt:</strong> {$item[hidden] ? 'Ano' : 'Ne'}</p>
+            </div>
+
+            <hr class="my-3">
+
+            <div class="d-flex justify-content-end gap-3">
+                <a n:href="Menu:create" class="btn btn-primary" title="Uložit" aria-label="Uložit">
+                    <i class="fa-solid fa-save pe-2"></i>
+                    Uložit
+                </a>
+                <a n:href="Menu:delete $item['id']" class="btn btn-danger" title="Smazat" aria-label="Smazat" onclick="return confirm('Opravdu chete smazat položku {$item['name']} (ID: {$item['id']})?')">
+                    <i class="fa-solid fa-eraser pe-2"></i>
+                    Smazat
+                </a>
+            </div>
+        </div>
     </div>
-</div>
+{else}
+    <div class="row">
+        <div class="col">
+            <p class="fst-italic">Položka menu nebyla nalezena.</p>
+            <a n:href="Menu:" class="btn btn-primary" title="Zpět na seznam položek" aria-label="Zpět na seznam položek">
+                <i class="fa-solid fa-arrow-left pe-2"></i>
+                Zpět
+            </a>
+        </div>
+    </div>
+{/if}

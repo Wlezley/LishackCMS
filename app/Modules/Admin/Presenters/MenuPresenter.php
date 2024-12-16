@@ -26,10 +26,16 @@ class MenuPresenter extends SecuredPresenter
 
     public function renderEdit(int $id = 0): void
     {
-        $menuItem = $this->menuManager->get($id);
+        try {
+            $item = $this->menuManager->get($id);
 
-        $this->template->title = "Editace menu $id: " . $menuItem['name'];
-        $this->template->menuItem = $menuItem;
+            $this->template->title = 'Editace menu';
+            // $this->template->title = "Editace menu ID: $id";
+            $this->template->item = $item;
+        } catch (MenuException $e) {
+            $this->template->title = 'Editace menu';
+            $this->flashMessage('Chyba: ' . $e->getMessage(), 'danger');
+        }
     }
 
     public function actionDelete(int $id): void
@@ -38,7 +44,7 @@ class MenuPresenter extends SecuredPresenter
             $this->menuManager->delete($id);
             $this->flashMessage("Menu ID: $id bylo odstraněno.", 'info');
         } else {
-            $this->flashMessage('K odstranění položky nemáte oprávnění.', 'danger');
+            $this->flashMessage('K odstranění menu nemáte oprávnění.', 'danger');
         }
 
         $this->redirect('Menu:');

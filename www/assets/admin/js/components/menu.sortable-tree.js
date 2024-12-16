@@ -46,25 +46,30 @@ export class MenuSettings {
       disableSorting: false,
       initCollapseLevel: 2,
       renderLabel: (data) => {
-        return `
-        <span data-menuid="${data.id}" class="pe-1">
-          <span><i class="fa-solid fa-arrows-up-down-left-right text-black-50 pe-2"></i> [${data.id}] ${data.name} <i class="text-black-50 text-tiny fst-italic ms-2">(${data.name_url})</i></span>
-          <span>
+        const editButton = `
             <a href="${adminUrl}/menu/edit?id=${data.id}" class="btn btn-primary" title="Upravit" aria-label="Upravit">
               <i class="fa-solid fa-pencil"></i>
-            </a>` + (userRole == 'admin' ? `
+            </a>`;
+        const deleteButton = `
             <a href="${adminUrl}/menu/delete?id=${data.id}" class="btn btn-danger" title="Smazat" aria-label="Smazat" onclick="return confirm('Opravdu chete smazat položku ${data.name}?')">
               <i class="fa-solid fa-eraser"></i>
-            </a>` : ``) + `
+            </a>`;
+        const urlPath = data.id != 1 ? `<i id="st__menu-${data.id}" class="text-black-50 text-tiny fst-italic ms-2">(${data.name_url})</i>` : ``;
+        return `
+        <span class="pe-1" data-menu-id="${data.id}" data-menu-url="${data.name_url}">
+          <span><i class="fa-solid fa-arrows-up-down-left-right text-black-50 pe-2"></i> [${data.id}] ${data.name} ${urlPath}</span>
+          <span>
+            ` + (data.id != 1 && userRole == 'admin' ? editButton : ``) + `
+            ` + (data.id != 1 && userRole == 'admin' ? deleteButton : ``) + `
           </span>
         </span>
         `;
       },
       onChange: ({ nodes, movedNode, srcParentNode, targetParentNode }) => {
-        const elementList = document.querySelectorAll("[data-menuid]");
+        const elementList = document.querySelectorAll("[data-menu-id]");
         const orderList = [];
         for (const [index, element] of elementList.entries()) {
-          orderList.push(element.dataset.menuid);
+          orderList.push(element.dataset.menuId);
         }
         const data = {
           node_id: movedNode.data.id,
