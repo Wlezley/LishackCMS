@@ -17,36 +17,40 @@ class Authenticator implements \Nette\Security\Authenticator
     {
     }
 
-    public function authenticate(string $username, string $password): SimpleIdentity
+    public function authenticate(string $username, #[\SensitiveParameter] string $password): SimpleIdentity
     {
-        $result = $this->db->table(UserManager::TABLE_NAME)->where([
-                'name' => $username,
-                'deleted' => 0,
-                'enabled' => 1,
-            ])->limit(1);
-        $row = $result->fetch();
+        $user = $this->db->table(UserManager::TABLE_NAME)
+            ->where(['name' => $username, 'deleted' => 0, 'enabled' => 1])
+            ->limit(1)
+            ->fetch();
 
-        if (!($row && $this->passwords->verify($password, $row['password']))) {
+        if (!($user && $this->passwords->verify($password, $user['password']))) {
             throw new AuthenticationException('Invalid credentials.', self::InvalidCredential);
+        } elseif ($this->passwords->needsRehash($user['password'])) {
+            $user->update(['password' => $this->passwords->hash($password)]);
         }
 
         $this->session->regenerateId();
         $sessionId = $this->session->getId();
+        $lastLogin = Carbon::now();
 
-        $user = [
-            'id' => $row['id'],
-            'name' => $row['name'],
-            'email' => $row['email'],
-            'role' => $row['role'],
-            'full_name' => $row['full_name'],
+        $user->update([
             'session_id' => $sessionId,
-            'deleted' => $row['deleted'],
-            'enabled' => $row['enabled'],
-            'last_login' => Carbon::now()
+            'last_login' => $lastLogin
+        ]);
+
+        $data = [
+            'id' => $user['id'],
+            'name' => $user['name'],
+            'email' => $user['email'],
+            'role' => $user['role'],
+            'full_name' => $user['full_name'],
+            'session_id' => $sessionId,
+            'deleted' => $user['deleted'],
+            'enabled' => $user['enabled'],
+            'last_login' => $lastLogin
         ];
 
-        $result->update($user);
-
-        return new SimpleIdentity($user['id'], $user['role'], $user);
+        return new SimpleIdentity($user['id'], $user['role'], $data);
     }
 }
