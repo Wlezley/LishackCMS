@@ -16,9 +16,15 @@ class UserRole
 
     public int $level;
 
-    /** @param string|int $value */
-    public function __construct(string|int $value)
+    /**
+     * @param \Nette\Security\User|string|int $value
+     */
+    public function __construct(\Nette\Security\User|string|int $value)
     {
+        if ($value instanceof \Nette\Security\User) {
+            $value = $value->getRoles()[0];
+        }
+
         if (is_string($value)) {
             self::assertRoleName($value);
             $this->level = array_keys(self::USER_ROLES, $value)[0];
@@ -28,23 +34,87 @@ class UserRole
         }
     }
 
+    public function __toString(): string
+    {
+        return self::USER_ROLES[$this->level];
+    }
+
+    /**
+     * @return int Role level
+     */
     public function getLevel(): int
     {
         return $this->level;
     }
 
+    /**
+     * @return string Role name
+     */
     public function getName(): string
     {
         return self::USER_ROLES[$this->level];
+    }
+
+    /**
+     * @param bool $includeEquals Includes own role in the list
+     * @return array<int,string> List of roles below (lower level)
+     */
+    public function getLowerList(bool $includeEquals = false): array
+    {
+        $roleList = [];
+
+        if ($includeEquals) {
+            $roleList[$this->level] = self::USER_ROLES[$this->level];
+        }
+
+        foreach (self::USER_ROLES as $roleID => $roleName) {
+            if ($roleID < $this->level) {
+                $roleList[$roleID] = $roleName;
+            }
+        }
+
+        return $roleList;
+    }
+
+    /**
+     * @param bool $includeEquals Includes own role in the list
+     * @return array<int,string> List of roles above (higher level)
+     */
+    public function getHigherList(bool $includeEquals = false): array
+    {
+        $roleList = [];
+
+        if ($includeEquals) {
+            $roleList[$this->level] = self::USER_ROLES[$this->level];
+        }
+
+        foreach (self::USER_ROLES as $roleID => $roleName) {
+            if ($roleID > $this->level) {
+                $roleList[$roleID] = $roleName;
+            }
+        }
+
+        return $roleList;
     }
 
     // ##########################################
     // ###             COMPARSION             ###
     // ##########################################
 
-    public function isEquals(string|int $role): bool
+    public function is(string|int $role): bool
     {
         return $this == new UserRole($role);
+    }
+
+    public function isNot(string|int $role): bool
+    {
+        return $this != new UserRole($role);
+    }
+
+    /** @param array<string|int> $roles */
+    public function isInArray(array $roles): bool
+    {
+        return in_array($this, $roles);
     }
 
     public function isGreaterThan(string|int $role): bool
@@ -67,13 +137,22 @@ class UserRole
         return $this <= new UserRole($role);
     }
 
-    public static function compare(string|int $left, string $operator, string|int $right): bool
+    public static function compare(\Nette\Security\User|string|int $left, string $operator, \Nette\Security\User|string|int $right): bool
     {
+        if ($left instanceof \Nette\Security\User) {
+            $left = $left->getRoles()[0];
+        }
+
+        if ($right instanceof \Nette\Security\User) {
+            $right = $right->getRoles()[0];
+        }
+
         $a = new UserRole($left);
         $b = new UserRole($right);
 
         switch ($operator) {
             case '==': return $a == $b;
+            case '!=': return $a != $b;
             case '>' : return $a >  $b;
             case '>=': return $a >= $b;
             case '<' : return $a <  $b;
