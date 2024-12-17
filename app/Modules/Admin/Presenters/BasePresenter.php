@@ -6,11 +6,10 @@ namespace App\Modules\Admin\Presenters;
 
 use App\Models\Config;
 use App\Models\Helpers\AssetsVersion;
-use Nette;
 use Nette\Application\Helpers;
 use Nette\Database\Explorer;
 
-abstract class BasePresenter extends Nette\Application\UI\Presenter
+abstract class BasePresenter extends \Nette\Application\UI\Presenter
 {
     /** @var Explorer @inject */
     public $db;
@@ -20,12 +19,6 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
     /** @var array<string,string> $cmsConfig */
     protected array $cmsConfig = [];
-
-    // public function __construct(
-    //     protected Explorer $db,
-    //     protected Config $config,
-    //     private AssetsVersion $assetsVersion
-    // ) {}
 
     public function startup(): void
     {
@@ -64,9 +57,9 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
     protected function getPresenterCategory(): string
     {
-        $key = Helpers::splitName($this->getName())[1];
+        $presenterName = Helpers::splitName($this->getName())[1];
 
-        $list = [
+        $categoryList = [
             'Admin' => 'HOME',
             'Article' => 'ARTICLE',
             'Menu' => 'MENU',
@@ -81,8 +74,8 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
             'Debug' => 'CONFIG',
         ];
 
-        if (array_key_exists($key, $list)) {
-            return $list[$key];
+        if (array_key_exists($presenterName, $categoryList)) {
+            return $categoryList[$presenterName];
         }
 
         return '';

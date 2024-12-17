@@ -23,7 +23,7 @@ class MenuValidator
     ];
 
     // ##########################################
-    // ###             VALIDATORS             ###
+    // ###             VALIDATION             ###
     // ##########################################
 
     /** @return array<string,string|int|null> */

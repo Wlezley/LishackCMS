@@ -26,14 +26,14 @@ class MenuPresenter extends SecuredPresenter
 
     public function renderEdit(int $id = 0): void
     {
+        $this->template->title = 'Editace menu';
+
         try {
             $item = $this->menuManager->get($id);
 
-            $this->template->title = 'Editace menu';
-            // $this->template->title = "Editace menu ID: $id";
+            $this->template->title .= " ID: $id";
             $this->template->item = $item;
         } catch (MenuException $e) {
-            $this->template->title = 'Editace menu';
             $this->flashMessage('Chyba: ' . $e->getMessage(), 'danger');
         }
     }
