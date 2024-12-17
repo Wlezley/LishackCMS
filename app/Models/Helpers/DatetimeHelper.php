@@ -15,19 +15,17 @@ class DatetimeHelper
      * 2. A `DateTime` object is created from the string to confirm it represents a valid date and time.
      *
      * @param string $datetime The input string to validate.
+     * @param bool $regexCheck Use a regex pattern to roughly match DATETIME format. Defaults to false.
+     *
      * @return bool True if the input is a valid MySQL DATETIME, false otherwise.
      */
-    public static function isValidMySQLDatetime(string $datetime): bool
+    public static function isValidMySQLDatetime(string $datetime, bool $regexCheck = false): bool
     {
-        // Use a regex pattern to roughly match DATETIME format
-        if (!is_string($datetime) || !preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $datetime)) {
+        if ($regexCheck && !preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $datetime)) {
             return false;
         }
 
-        // Check if the format matches MySQL DATETIME (YYYY-MM-DD HH:MM:SS)
         $dateTimeObject = \DateTime::createFromFormat('Y-m-d H:i:s', $datetime);
-
-        // Ensure that the object is valid and the input matches exactly
         return $dateTimeObject !== false && $dateTimeObject->format('Y-m-d H:i:s') === $datetime;
     }
 
