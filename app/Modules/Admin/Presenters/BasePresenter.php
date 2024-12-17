@@ -53,6 +53,11 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
         $this->template->activeMenu = $this->getPresenterCategory();
 
         bdump($this->template->getParameters(), 'TEMPLATE PARAMS');
+
+        // Ajax
+        if ($this->isAjax() && !$this->isControlInvalid()) {
+            $this->redrawControl();
+        }
     }
 
     protected function getPresenterCategory(): string

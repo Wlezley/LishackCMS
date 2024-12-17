@@ -22,7 +22,7 @@
 <body class="bg-dark text-white h-100">
     <main>
         {if $user->isLoggedin()}
-            <div class="wrapper">
+            <div n:snippet="content" class="wrapper">
                 {include 'layout/sidebar.latte'}
 
                 <div class="main">
