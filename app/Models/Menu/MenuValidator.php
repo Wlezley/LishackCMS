@@ -22,15 +22,24 @@ class MenuValidator
         'hidden'
     ];
 
-    // ##########################################
-    // ###             VALIDATION             ###
-    // ##########################################
-
-    /** @return array<string,string|int|null> */
+    /**
+     * Builds a structured array of menu data with default values.
+     *
+     * @param string $name The name of the menu item
+     * @param int $parentID The parent menu item's ID (default: 1)
+     * @param int $position The position in the menu order (default: 0)
+     * @param string|null $nameURL The URL-friendly name (default: generated from $name)
+     * @param string|null $title The title of the menu item
+     * @param string|null $description A brief description of the menu item
+     * @param string|null $body The content/body of the menu item
+     * @param bool $hidden Whether the menu item is hidden (default: false)
+     *
+     * @return array<string,string|int|null> An associative array containing menu data
+     */
     public static function buildData(string $name, int $parentID = 1, int $position = 0, ?string $nameURL = null, ?string $title = null, ?string $description = null, ?string $body = null, bool $hidden = false): array
     {
         return [
-            // 'id' => $id,
+            // 'id' => $id, // ID is not included in the built data
             'parent_id' => $parentID,
             'position' => $position,
             'name' => $name,
@@ -43,8 +52,10 @@ class MenuValidator
     }
 
     /**
-     * @param array<string,string|int|null> $data
-     * @return array<string,string|int|null>
+     * Prepares menu data by normalizing and ensuring all required fields have valid values.
+     *
+     * @param array<string,string|int|null> $data The raw menu data array.
+     * @return array<string,string|int|null> The prepared menu data array.
      */
     public static function prepareData(array $data): array
     {
@@ -52,7 +63,7 @@ class MenuValidator
         $nameURL = $data['name_url'] ?? (!empty($name) ? StringHelper::webalize($name) : '');
 
         return [
-            // 'id' => $data['id'] ?? null,
+            // 'id' => $data['id'] ?? null, // ID is not included in the prepared data
             'parent_id' => $data['parent_id'] ?? 1,
             'position' => $data['position'] ?? 0,
             'name' => $name,
@@ -64,7 +75,12 @@ class MenuValidator
         ];
     }
 
-    /** @param array<string,string|int|null> $data */
+    /**
+     * Validates menu data against expected formats and constraints.
+     *
+     * @param array<string,string|int|null> $data The data to validate
+     * @throws \InvalidArgumentException If any validation rule fails
+     */
     public static function validateData(array $data): void
     {
         ArrayHelper::assertExtraKeys(self::COLUMNS, $data, 'MenuData');

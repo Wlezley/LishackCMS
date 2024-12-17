@@ -9,8 +9,12 @@ use Nette\Database\Table\ActiveRow;
 class ArrayHelper
 {
     /**
-     * @param array<ActiveRow> $result
-     * @return array<int,array<string,string|int|null>>
+     * Converts an array of `ActiveRow` objects into an associative array.
+     *
+     * Keys are taken from the 'id' field of each row.
+     *
+     * @param array<ActiveRow> $result Array of `ActiveRow` objects.
+     * @return array<int,array<string,string|int|null>> Associative array of row data.
      */
     public static function resultToArray(array $result): array
     {
@@ -23,15 +27,25 @@ class ArrayHelper
     }
 
     /**
-     * @param array<string> $keys
-     * @return array<string>
+     * Finds keys that are missing from the given data.
+     *
+     * @param array<string> $keys Required keys.
+     * @param mixed $data Data to check.
+     * @return array<string> Missing keys.
      */
     public static function getMissingKeys(array $keys, mixed $data): array
     {
         return array_keys(array_diff_key(array_flip($keys), $data));
     }
 
-    /** @param array<string> $keys */
+    /**
+     * Asserts that all required keys are present in the given data.
+     *
+     * @param array<string> $keys Required keys.
+     * @param mixed $data Data to validate.
+     * @param string $label Label for the error message. Defaults to 'given'.
+     * @throws \InvalidArgumentException If any keys are missing.
+     */
     public static function assertMissingKeys(array $keys, mixed $data, string $label = 'given'): void
     {
         $missingKeys = self::getMissingKeys($keys, $data);
@@ -41,15 +55,25 @@ class ArrayHelper
     }
 
     /**
-     * @param array<string> $keys
-     * @return array<string>
+     * Finds keys that are not expected in the given data.
+     *
+     * @param array<string> $keys Allowed keys.
+     * @param mixed $data Data to check.
+     * @return array<string> Extra keys.
      */
     public static function getExtraKeys(array $keys, mixed $data): array
     {
         return array_keys(array_diff_key($data, array_flip($keys)));
     }
 
-    /** @param array<string> $keys */
+    /**
+     * Asserts that no extra keys are present in the given data.
+     *
+     * @param array<string> $keys Allowed keys.
+     * @param mixed $data Data to validate.
+     * @param string $label Label for the error message. Defaults to 'given'.
+     * @throws \InvalidArgumentException If any extra keys are found.
+     */
     public static function assertExtraKeys(array $keys, mixed $data, string $label = 'given'): void
     {
         $extraKeys = self::getExtraKeys($keys, $data);

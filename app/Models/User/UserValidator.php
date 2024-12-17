@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Helpers\ArrayHelper;
-// use Carbon\Carbon;
+use App\Models\Helpers\DatetimeHelper;
 use Nette\Security\Passwords;
 use Nette\Utils\Validators;
 
@@ -25,15 +25,23 @@ class UserValidator
         'last_login'
     ];
 
-    // ##########################################
-    // ###             VALIDATION             ###
-    // ##########################################
-
-    /** @return array<string,string|int|null> */
-    public static function buildData(string $name, #[\SensitiveParameter] string $password, string $role = 'user', string $email = null, string $fullName = null, bool $enabled = true, bool $deleted = false): array
+    /**
+     * Builds a structured array of user data with default values.
+     *
+     * @param string $name The username.
+     * @param string $password The user password (plaintext, hashed externally if needed).
+     * @param string $role The user role. Defaults to 'user'.
+     * @param string|null $email The user's email address.
+     * @param string|null $fullName The user's full name. Defaults to the username if null.
+     * @param bool $enabled Whether the user is enabled. Defaults to true.
+     * @param bool $deleted Whether the user is marked as deleted. Defaults to false.
+     *
+     * @return array<string,string|int|null> An associative array containing user data.
+     */
+    public static function buildData(string $name, #[\SensitiveParameter] string $password, string $role = 'user', ?string $email = null, ?string $fullName = null, bool $enabled = true, bool $deleted = false): array
     {
         return [
-            // 'id' => $id,
+            // 'id' => $id, // ID is not included in the built data
             'name' => $name,
             'password' => $password,
             'email' => $email,
@@ -48,15 +56,21 @@ class UserValidator
     }
 
     /**
-     * @param array<string,string|int|null> $data
-     * @return array<string,string|int|null>
+     * Prepares user data for storage or further processing.
+     *
+     * Ensures consistency in the user data format, including hashing passwords
+     * if required and normalizing boolean-like fields (`deleted`, `enabled`) to integers.
+     *
+     * @param array<string,string|int|null> $data The raw user data array.
+     * @param bool $createPasswordHash Whether to hash the password. Defaults to true.
+     * @return array<string,string|int|null> The prepared user data array.
      */
     public static function prepareData(array $data, bool $createPasswordHash = true): array
     {
         $name = $data['name'] ?? '';
         $password = $data['password'] ?? '';
 
-        if ($createPasswordHash) {
+        if ($createPasswordHash && !empty($password)) {
             $password = (new Passwords(PASSWORD_BCRYPT, ['cost' => 12]))->hash($password);
         }
 
@@ -68,12 +82,8 @@ class UserValidator
             $data['enabled'] = (int)$data['enabled'];
         }
 
-        // if (isset($data['created']) && empty($data['created'])) {
-        //     $data['created'] = Carbon::now()->format('Y-m-d H:i:s');
-        // }
-
         return [
-            // 'id' => $data['id'] ?? null,
+            // 'id' => $data['id'] ?? null, // ID is not included in the prepared data
             'name' => $name,
             'password' => $password,
             'email' => $data['email'] ?? null,
@@ -87,7 +97,12 @@ class UserValidator
         ];
     }
 
-    /** @param array<string,string|int|null> $data */
+    /**
+     * Validates user data against expected formats and constraints.
+     *
+     * @param array<string,string|int|null> $data The user data array to validate.
+     * @throws \InvalidArgumentException If validation fails for any field.
+     */
     public static function validateData(array $data): void
     {
         ArrayHelper::assertExtraKeys(self::COLUMNS, $data, 'UserData');
@@ -124,10 +139,10 @@ class UserValidator
 
         // TODO: DateValidator (?)
         // if (isset($data['created'])) {
-        //     Validators::assert($data['created'], 'date', 'Created');
+        //     DatetimeHelper::assertMySQLDatetime($data['created'], 'Created');
         // }
         // if (isset($data['last_login'])) {
-        //     Validators::assert($data['last_login'], 'date', 'Last Login');
+        //     DatetimeHelper::assertMySQLDatetime($data['last_login'], 'Last Login');
         // }
     }
 }
