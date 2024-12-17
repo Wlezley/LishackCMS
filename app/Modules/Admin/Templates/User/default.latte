@@ -1,21 +1,104 @@
 {block content}
+
+<style>
+    .fa-sort,
+    .hidden,
+    /* .datagrid-column-header-additions, */
+    .col-per-page {
+        display: none;
+    }
+
+    #snippet-userList-tbody {
+        vertical-align: middle;
+    }
+
+    .col-id {
+        min-width: 35px;
+    }
+
+    .col-last_login {
+        width: 160px;
+        min-width: 160px;
+        /* white-space: nowrap; */
+    }
+
+    .col-action {
+        width: 100px;
+        min-width: 100px;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    #deleteConfirmModal {
+        z-index: 10000;
+    }
+
+    .dropdown-menu {
+        --bs-dropdown-color: #dee2e6;
+        --bs-dropdown-bg: #343a40;
+        --bs-dropdown-border-color: var(--bs-border-color-translucent);
+        --bs-dropdown-box-shadow: ;
+        --bs-dropdown-link-color: #dee2e6;
+        --bs-dropdown-link-hover-color: #fff;
+        --bs-dropdown-divider-bg: var(--bs-border-color-translucent);
+        --bs-dropdown-link-hover-bg: rgba(255, 255, 255, 0.15);
+        --bs-dropdown-link-active-color: #fff;
+        --bs-dropdown-link-active-bg: #0d6efd;
+        --bs-dropdown-link-disabled-color: #adb5bd;
+        --bs-dropdown-header-color: #adb5bd;
+    }
+</style>
+
 <div class="row">
     <div class="col">
         {control userList}
 
         <hr class="my-3">
 
-        <a n:href="User:edit 123" class="btn btn-primary">
-            <i class="fa-solid fa-pencil pe-2"></i>
-            Edit
-        </a>
-        <a n:href="User:delete 123" class="btn btn-primary ms-3">
-            <i class="fa-solid fa-eraser pe-2"></i>
-            Delete
-        </a>
-        <a n:href="User:create" class="btn btn-primary ms-3">
-            <i class="fa-solid fa-plus pe-2"></i>
-            Create
-        </a>
+        <div class="d-flex justify-content-end gap-3">
+            <a n:href="Menu:create" class="btn btn-primary" title="Přidat" aria-label="Přidat">
+                <i class="fa-solid fa-plus pe-2"></i>
+                Přidat
+            </a>
+        </div>
+
+        {* <!-- Button trigger modal -->
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal">
+            Launch demo modal
+        </button> *}
+
+        <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered text-dark">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteConfirmModalLabel">Potvrzení smazání</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zavřít"></button>
+                    </div>
+                    <div class="modal-body">
+                        ...
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zrušit</button>
+                        <button type="button" class="btn btn-danger" data-modal-action="delete">Smazat</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
     </div>
 </div>
+
+<script n:syntax="off">
+    var deleteConfirmModal = document.getElementById('deleteConfirmModal');
+    deleteConfirmModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget; // Button that triggered the modal
+        var menuItem = JSON.parse(button.getAttribute('data-datagrid-confirm'));
+        // var modalTitle = deleteConfirmModal.querySelector('.modal-title');
+        var modalBody = deleteConfirmModal.querySelector('.modal-body');
+        // var modalFooter = deleteConfirmModal.querySelector('.modal-footer');
+
+        modalBody.innerHTML = 'Opravdu chete smazat uživatele <strong>' + menuItem.full_name + '</strong>? <br />';
+        modalBody.innerHTML += '<span class="fst-italic text-secondary text-tiny">(Login: ' + menuItem.name + ', ID: ' + menuItem.id + ')</span>';
+    });
+</script>

@@ -5,12 +5,12 @@ declare(strict_types=1);
 
 require __DIR__ . '/../vendor/autoload.php';
 
+define('DEFAULT_LANG', '');
+
 $argcOffset = 2;
 $commandList = [
     '--create' => 2,
     '--delete' => 1,
-    '--disable' => 1,
-    '--enable' => 1,
     '--rename' => 2,
     '--set-role' => 2,
 ];
@@ -32,13 +32,16 @@ switch ($command) {
             exit(1);
         }
 
-        $username = $argv[2];
-        $password = $argv[3];
+        $username = (string)$argv[2];
+        $password = (string)$argv[3];
 
         try {
-            $manager->create($username, $password);
-            echo "User '$username' was added.\n";
-        } catch (Nette\Security\AuthenticationException $e) {
+            $id = $manager->create([
+                'name' => $username,
+                'password' => $password
+            ]);
+            echo "User '$username' was added [ID: $id].\n";
+        } catch (\Exception $e) {
             echo "Error: " . $e->getMessage() . "\n";
             exit(1);
         }
@@ -46,50 +49,16 @@ switch ($command) {
 
     case '--delete':
         if ($argc != $argcRequired) {
-            echo 'Usage: user.php --delete <username>';
+            echo 'Usage: user.php --delete <id>';
             exit(1);
         }
 
-        $username = $argv[2];
+        $id = (int)$argv[2];
 
         try {
-            $manager->delete($username);
-            echo "User '$username' was marked as deleted.\n";
-        } catch (Nette\Security\AuthenticationException $e) {
-            echo "Error: " . $e->getMessage() . "\n";
-            exit(1);
-        }
-        break;
-
-    case '--disable':
-        if ($argc != $argcRequired) {
-            echo 'Usage: user.php --disable <username>';
-            exit(1);
-        }
-
-        $username = $argv[2];
-
-        try {
-            $manager->disable($username);
-            echo "User '$username' was disabled.\n";
-        } catch (Nette\Security\AuthenticationException $e) {
-            echo "Error: " . $e->getMessage() . "\n";
-            exit(1);
-        }
-        break;
-
-    case '--enable':
-        if ($argc != $argcRequired) {
-            echo 'Usage: user.php --enable <username>';
-            exit(1);
-        }
-
-        $username = $argv[2];
-
-        try {
-            $manager->enable($username);
-            echo "User '$username' was enabled.\n";
-        } catch (Nette\Security\AuthenticationException $e) {
+            $manager->setDeleted($id, true);
+            echo "User ID '$id' was marked as deleted.\n";
+        } catch (\Exception $e) {
             echo "Error: " . $e->getMessage() . "\n";
             exit(1);
         }
@@ -97,17 +66,17 @@ switch ($command) {
 
     case '--rename':
         if ($argc != $argcRequired) {
-            echo 'Usage: user.php --rename <old-name> <new-name>';
+            echo 'Usage: user.php --rename <id> <new-name>';
             exit(1);
         }
 
-        $oldName = $argv[2];
-        $newName = $argv[3];
+        $id = (int)$argv[2];
+        $newName = (string)$argv[3];
 
         try {
-            $manager->rename($oldName, $newName);
-            echo "User '$oldName' was renamed to '$newName'.\n";
-        } catch (Nette\Security\AuthenticationException $e) {
+            $manager->rename($id, $newName);
+            echo "User ID '$id' was renamed to '$newName'.\n";
+        } catch (\Exception $e) {
             echo "Error: " . $e->getMessage() . "\n";
             exit(1);
         }
@@ -115,17 +84,17 @@ switch ($command) {
 
     case '--set-role':
         if ($argc != $argcRequired) {
-            echo 'Usage: user.php --set-role <old-name> <new-name>';
+            echo 'Usage: user.php --set-role <id> <role>';
             exit(1);
         }
 
-        $username = $argv[2];
-        $role = $argv[3];
+        $id = (int)$argv[2];
+        $role = (string)$argv[3];
 
         try {
-            $manager->setRole($username, $role);
-            echo "The role of user '$username' has been changed to '$role'.\n";
-        } catch (Nette\Security\AuthenticationException $e) {
+            $manager->setRole($id, $role);
+            echo "The role of user ID '$id' has been changed to '$role'.\n";
+        } catch (\Exception $e) {
             echo "Error: " . $e->getMessage() . "\n";
             exit(1);
         }
@@ -139,12 +108,10 @@ Usage: user.php <command> [...]
 
 Available comannds:
     --create <username> <password>      Create new user account
-    --delete <username>                 Delete user account
-    --disable <username>                Disable user account login
-    --enable <username>                 Enable user account login
-    --rename <old-name> <new-name>      Rename user account
-    --set-role <username> <role>        Set role for user account
-                                        Default roles: user, redactor, manager, admin, ...
+    --delete <id>                       Delete user account
+    --rename <id> <new-name>            Rename user account
+    --set-role <id> <role>              Set role for user account
+                                        Default roles: guest, user, redactor, manager, admin, ...
 
 ';
         exit(0);

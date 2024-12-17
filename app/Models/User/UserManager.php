@@ -4,149 +4,122 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use Nette\Database\Explorer;
-use Nette\Security\AuthenticationException;
+use App\Models\Helpers\ArrayHelper;
+use App\Models\UserException;
 use Nette\Security\Passwords;
 use Nette\Utils\Validators;
 
-class UserManager
+class UserManager extends BaseModel
 {
     public const TABLE_NAME = 'users';
 
-    /** @var array<string, string> $data */
-    private array $data;
+    /** @var array<int,array<string,string|int|null>> $userList */
+    protected mixed $userList = [];
 
-    private ?int $id;
-    private bool $isLoaded;
-
-    public function __construct(protected Explorer $db, private Passwords $passwords)
+    public function loadList(): void
     {
-        $this->id = null;
-        $this->data = [];
-        $this->isLoaded = false;
+        $result = $this->db->table(self::TABLE_NAME)
+            ->fetchAll();
+
+        $this->userList = ArrayHelper::resultToArray($result);
     }
 
-    public function load(int $id): void
+    /** @return array<int,array<string,string|int|null>> */
+    public function getList(bool $forceReload = false): array
     {
-        $this->id = $id;
-        $selection = $this->db->table(self::TABLE_NAME)->where(['id' => $this->id]);
-
-        if ($selection->count() == 0) {
-            throw new AuthenticationException("User ID: $this->id not found.");
+        if (empty($this->userList) || $forceReload) {
+            $this->load();
         }
 
-        $this->data = $selection->fetch()->toArray();
-        $this->isLoaded = true;
+        return $this->userList;
     }
 
-    public function create(string $name, string $password, string $role = 'user', string $email = '', string $full_name = ''): void
+    /** @return array<string,mixed> */
+    public function get(int $id): array
     {
-        if (Validators::isNone($name)) {
-            throw new AuthenticationException('User name is empty.');
+        $result = $this->db->table(self::TABLE_NAME)
+            ->get($id);
+
+        if (!$result) {
+            throw new UserException("User ID: '$id' not found.");
         }
 
-        if (Validators::isNone($password)) {
-            throw new AuthenticationException('Password is empty.');
-        }
-
-        if (!Validators::isNone($email) && Validators::isEmail($email)) {
-            throw new AuthenticationException('Invalid email format.');
-        }
-
-        if ($this->db->table(self::TABLE_NAME)->select('id')->where(['name' => $name])->count() > 0) {
-            throw new AuthenticationException('Duplicate user name.');
-        }
-
-        $this->db->table(self::TABLE_NAME)->insert([
-            'name' => $name,
-            'password' => $this->passwords->hash($password),
-            'email' => $email,
-            'role' => $role,
-            'full_name' => $full_name
-        ]);
+        return $result->toArray();
     }
 
-    /**
-     * @param string|array<string, string> $condition
-     * @param string $column
-     * @param mixed $value
-     */
-    private function updateColumn(string|array $condition, string $column, mixed $value): void
+    /** @param array<string,string|int|null> $data */
+    public function create(array $data): int
     {
-        if (Validators::isNone($column)) {
-            throw new AuthenticationException('Column name is empty.');
+        if (Validators::isNone($data['name'])) {
+            throw new UserException('User name is empty.');
+        }
+        if (Validators::isNone($data['password'])) {
+            throw new UserException('Password is empty.');
+        }
+        if (isset($data['email']) && !Validators::isEmail($data['email'])) {
+            throw new UserException('Invalid email format.');
+        }
+        if ($this->db->table(self::TABLE_NAME)->select('id')->where(['name' => $data['name']])->count() > 0) {
+            throw new UserException('Duplicate user name.');
         }
 
-        $selection = $this->db->table(self::TABLE_NAME)->select('id')->where($condition);
+        $data = UserValidator::prepareData($data);
+        UserValidator::validateData($data);
 
-        if ($selection->count() == 0) {
-            throw new AuthenticationException('User not found.');
-        }
+        $id = $this->db->table(self::TABLE_NAME)
+            ->insert($data);
 
-        $selection->update([$column => $value]);
+        // @phpstan-ignore property.nonObject
+        return $id->id;
     }
 
-    public function delete(string $name): void
+    /** @param array<string,string|int|null> $data */
+    public function update(int $id, array $data): bool
     {
-        if (Validators::isNone($name)) {
-            throw new AuthenticationException('User name is empty.');
+        if ($id == 1) {
+            throw new UserException('The main administrator account cannot be directly edited.');
         }
 
-        $this->updateColumn(['name' => $name], 'deleted', 1);
+        UserValidator::validateData($data);
+
+        $user = $this->db->table(self::TABLE_NAME)
+            ->get($id);
+
+        if (!$user) {
+            throw new UserException("User ID '$id' not found.");
+        }
+
+        $result = $user->update($data);
+
+        if ($result && isset($this->userList[$id])) {
+            $this->userList[$id] = array_merge($this->userList[$id], $data);
+        }
+
+        return $result;
     }
 
-    public function disable(string $name): void
+    public function setEnabled(int $id, bool $enabled): bool
     {
-        if (Validators::isNone($name)) {
-            throw new AuthenticationException('User name is empty.');
-        }
-
-        $this->updateColumn(['name' => $name], 'enabled', 0);
+        return $this->update($id, ['enabled' => (int)$enabled]);
     }
 
-    public function enable(string $name): void
+    public function setDeleted(int $id, bool $deleted): bool
     {
-        if (Validators::isNone($name)) {
-            throw new AuthenticationException('User name is empty.');
-        }
-
-        $this->updateColumn(['name' => $name], 'enabled', 1);
+        return $this->update($id, ['deleted' => (int)$deleted]);
     }
 
-    public function rename(string $oldName, string $newName): void
+    public function rename(int $id, string $newName): bool
     {
-        if (Validators::isNone($oldName)) {
-            throw new AuthenticationException('Old user name is empty.');
-        }
-
-        if (Validators::isNone($newName)) {
-            throw new AuthenticationException('New user name is empty.');
-        }
-
-        $this->updateColumn(['name' => $oldName], 'name', $newName);
+        return $this->update($id, ['name' => $newName]);
     }
 
-    public function setRole(string $name, string $role): void
+    public function setPassword(int $id, #[\SensitiveParameter] string $password): bool
     {
-        if (Validators::isNone($name)) {
-            throw new AuthenticationException('User name is empty.');
-        }
-
-        $this->updateColumn(['name' => $name], 'role', $role);
+        return $this->update($id, ['password' => (new Passwords(PASSWORD_BCRYPT, ['cost' => 12]))->hash($password)]);
     }
 
-    /** @return array<string, string> */
-    public function getData(): array
+    public function setRole(int $id, string $role): bool
     {
-        return $this->data;
-    }
-
-    public function getSession(): ?string
-    {
-        if ($this->isLoaded && isset($this->data['session_id'])) {
-            return $this->data['session_id'];
-        }
-
-        return null;
+        return $this->update($id, ['role' => $role]);
     }
 }

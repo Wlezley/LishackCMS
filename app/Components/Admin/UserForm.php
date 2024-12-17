@@ -10,7 +10,7 @@ use Nette\Application\UI\Form;
 
 class UserForm extends BaseControl
 {
-    /** @var array<string, string> $userData */
+    /** @var array<string,string> $userData */
     private array $userData;
 
     public function __construct(
@@ -59,9 +59,8 @@ class UserForm extends BaseControl
     public function process(Form $form, \Nette\Utils\ArrayHash $values): void
     {
         try {
-            $id = 1;
-            $this->userManager->load($id);
-            $this->userData = $this->userManager->getData();
+            $id = 1; // DEBUG ???
+            $this->userData = $this->userManager->get($id);
 
             bdump($this->userData);
             bdump($values);
@@ -76,8 +75,7 @@ class UserForm extends BaseControl
     {
         if ($id !== null) {
             try {
-                $this->userManager->load($id);
-                $this->userData = $this->userManager->getData();
+                $this->userData = $this->userManager->get($id);
                 $this->template->userData = $this->userData;
             } catch(\Exception $e) {
                 bdump($e, "error");
