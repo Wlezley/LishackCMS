@@ -16,6 +16,10 @@ class SecuredPresenter extends BasePresenter
         parent::startup();
 
         if (!$this->user->isLoggedIn() && $this->presenter->getName() !== 'Admin:Sign') {
+            if ($this->isAjax()) {
+                $this->flashMessage('Přístup odepřen: Uživatel se odhlásil', 'danger');
+            }
+
             $this->redirect('Sign:in');
         }
 
