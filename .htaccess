@@ -1,21 +1,4 @@
-# Display PHP errors - .htaccess
-#php_flag display_errors on
-#php_value error_reporting 6143
-###################################
-
-Order Deny,Allow
-
-# local host
-Allow from 127.0.0.0/24
-
-# local net
-Allow from 192.168.0.0/21
-
-# zbytek sveta
-Deny from All
-
-
 RewriteEngine On
-#RewriteBase /
+# RewriteBase /
 RewriteRule ^$ www/ [L]
 RewriteRule (.*) www/$1 [L]
