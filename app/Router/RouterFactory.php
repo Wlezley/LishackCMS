@@ -49,7 +49,14 @@ class RouterFactory
     public static function createWebsiteRouter(RouteList $router): void
     {
         $router->withModule('Website')
-            ->addRoute('<presenter>/<action>[/<id>]', 'Website:default')
+            // ->addRoute('robots.txt', 'Robots:default')
+            // ->addRoute('sitemap.xml', 'Sitemap:default')
+            ->addRoute('[[<categoryUrl [0-9a-zA-Z_\-\/]+>/]<articleUrl>/]', [
+                'presenter' => 'Article',
+                'action' => 'detail',
+                'categoryUrl' => null,
+                'articleUrl' => null,
+            ])
             ->end();
     }
 }
