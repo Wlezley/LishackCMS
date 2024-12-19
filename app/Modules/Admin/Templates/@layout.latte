@@ -35,14 +35,13 @@
 
                         <div class="container-fluid mt-2 mb-5">
                             <div class="bg-secondary">
-                                <div class="px-3">
-                                    <h1 class="pt-3 mb-4 border-bottom border-warning text-warning">{ifset $title}{$title|stripHtml}{else}Lishack CMS{/ifset}</h1>
+                                <div class="p-3">
+                                    <h1 class="mb-4 border-bottom border-warning text-warning">{ifset $title}{$title|stripHtml}{else}Lishack CMS{/ifset}</h1>
 
                                     {include 'layout/alerts.latte'}
 
-                                    <div class="pb-4">
-                                        {include content}
-                                    </div>
+                                    {include content}
+
                                 </div>
                             </div>
                         </div>

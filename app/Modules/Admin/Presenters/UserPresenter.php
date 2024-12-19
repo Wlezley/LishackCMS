@@ -7,7 +7,7 @@ namespace App\Modules\Admin\Presenters;
 use App\Models\UserException;
 use App\Models\UserManager;
 use App\Models\UserRole;
-use Contributte\Datagrid\Column\Action\Confirmation\CallbackConfirmation;
+use Contributte\Datagrid\Column\Action\Confirmation;
 use Contributte\Datagrid\Datagrid;
 use Nette\Utils\Json;
 
@@ -50,10 +50,12 @@ class UserPresenter extends SecuredPresenter
         }
     }
 
+    // NON-AJAX DELETE
     public function actionDelete(int $id): void
     {
+        // TODO: Conditions from setDeleted_Callback()
         if ($this->user->isInRole('admin')) {
-            // $this->userManager->delete($id); // temporary bypass delete function...
+            $this->userManager->setDeleted($id, true);
             $this->flashMessage("Uživatel ID: $id byl odstraněn.", 'info');
         } else {
             $this->flashMessage('K odstranění uživatele nemáte oprávnění.', 'danger');
@@ -90,8 +92,8 @@ class UserPresenter extends SecuredPresenter
 
         // Datagrid settings
         $grid->setDefaultSort(['id' => 'ASC']);
-        $grid->setDefaultPerPage(20);
-        $grid->setItemsPerPageList([20], false);
+        $grid->setDefaultPerPage(25);
+        $grid->setItemsPerPageList([25, 50, 100], true);
         $grid->allowRowsInlineEdit(function() { return false; });
 
         // ID
@@ -110,9 +112,9 @@ class UserPresenter extends SecuredPresenter
             ->setAlign('start');
 
         // E-MAIL
-        // $grid->addColumnText('email', 'E-mail')
-        //     ->setSortable()
-        //     ->setAlign('end');
+        $grid->addColumnText('email', 'E-mail')
+            ->setSortable()
+            ->setAlign('start');
 
 
         // USER ROLE ---->>
@@ -192,7 +194,7 @@ class UserPresenter extends SecuredPresenter
             ->setIcon('eraser')
             ->setDataAttribute('bs-toggle', 'modal')
             ->setDataAttribute('bs-target', '#deleteConfirmModal')
-            ->setConfirmation(new CallbackConfirmation([$this, 'encodeData_Callback']));
+            ->setConfirmation(new Confirmation\CallbackConfirmation([$this, 'encodeData_Callback']));
 
         // Actions callback
         $grid->allowRowsAction(':edit', [$this, 'allowActionEdit_Callback']);
@@ -296,7 +298,7 @@ class UserPresenter extends SecuredPresenter
     {
         if ($this->isAjax()) {
             $userData = $this->userManager->get((int)$id);
-            $actionName = $enabled ? 'povolit' : 'zakázat';
+            $actionName = $enabled === '1' ? 'povolit' : 'zakázat';
 
             if ($userData['enabled'] == $enabled) {
                 return; // No change was made...
@@ -318,7 +320,7 @@ class UserPresenter extends SecuredPresenter
     {
         if ($this->isAjax()) {
             $userData = $this->userManager->get((int)$id);
-            $actionName = $deleted ? 'smazat' : 'obnovit';
+            $actionName = $deleted === '1' ? 'smazat' : 'obnovit';
 
             if ($userData['deleted'] == $deleted) {
                 return; // No change was made...

@@ -44,6 +44,7 @@ export class MenuSettings {
       stateId: this.selector,
       lockRootLevel: true,
       disableSorting: false,
+      // disableSorting: (userRole !== 'admin'), // Example: Disable sorting based on user role.
       initCollapseLevel: 2,
       renderLabel: (data) => {
         const editButton = `

@@ -20,15 +20,25 @@
 
             <hr class="my-3">
 
-            <div class="d-flex justify-content-end gap-3">
-                <a n:href="User:create" class="btn btn-primary" title="Uložit" aria-label="Uložit">
-                    <i class="fa-solid fa-save pe-2"></i>
-                    Uložit
-                </a>
-                <a n:href="User:delete $item['id']" class="btn btn-danger" title="Smazat" aria-label="Smazat" onclick="return confirm('Opravdu chete smazat uživatele {$item['name']} (ID: {$item['id']})?')">
-                    <i class="fa-solid fa-eraser pe-2"></i>
-                    Smazat
-                </a>
+            <div class="d-flex bd-highlight gap-3">
+                <div class="me-auto">
+                    <a n:href="User:" class="btn btn-primary" title="Zpět na seznam uživatelů" aria-label="Zpět na seznam uživatelů">
+                        <i class="fa-solid fa-arrow-left pe-2"></i>
+                        Zpět
+                    </a>
+                </div>
+                <div class="">
+                    <a n:href="User:create" class="btn btn-primary" title="Uložit" aria-label="Uložit">
+                        <i class="fa-solid fa-save pe-2"></i>
+                        Uložit
+                    </a>
+                </div>
+                <div class="">
+                    <a n:href="User:delete $item['id']" class="btn btn-danger" title="Smazat" aria-label="Smazat" onclick="return confirm('Opravdu chete smazat uživatele {$item['name']} (ID: {$item['id']})?')">
+                        <i class="fa-solid fa-eraser pe-2"></i>
+                        Smazat
+                    </a>
+                </div>
             </div>
         </div>
     </div>

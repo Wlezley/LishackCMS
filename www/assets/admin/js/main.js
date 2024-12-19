@@ -9,4 +9,8 @@ import './components/sidebar.js';
 import './components/codemirror.js';
 
 // Component Exports
-export { MenuSettings } from './components/menu.sortable-tree.js'
+export { MenuSettings } from './components/menu.sortable-tree.js';
+
+
+// Just some debugging stuff, can be commented out or deleted
+export { default as naja } from 'naja';
