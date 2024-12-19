@@ -7,9 +7,10 @@ namespace App\Modules\Admin\Presenters;
 use App\Models\UserException;
 use App\Models\UserManager;
 use App\Models\UserRole;
-use Contributte\Datagrid\Column\Action\Confirmation;
+// use Contributte\Datagrid\Column\Action\Confirmation;
 use Contributte\Datagrid\Datagrid;
 use Nette\Utils\Json;
+use Ublaboo\DataGrid\Column\Action\Confirmation\CallbackConfirmation;
 
 class UserPresenter extends SecuredPresenter
 {
@@ -68,7 +69,6 @@ class UserPresenter extends SecuredPresenter
     public function handleDelete(): void
     {
         if (!$this->isAjax()) {
-            bdump('NOT AJAX');
             $this->redirect('this');
         }
 
@@ -214,7 +214,7 @@ class UserPresenter extends SecuredPresenter
             ->setIcon('eraser')
             ->setDataAttribute('bs-toggle', 'modal')
             ->setDataAttribute('bs-target', '#deleteConfirmModal')
-            ->setConfirmation(new Confirmation\CallbackConfirmation([$this, 'encodeData_Callback']));
+            ->setConfirmation(new CallbackConfirmation([$this, 'encodeData_Callback']));
 
         // Actions callback
         $grid->allowRowsAction(':edit', [$this, 'allowActionEdit_Callback']);
