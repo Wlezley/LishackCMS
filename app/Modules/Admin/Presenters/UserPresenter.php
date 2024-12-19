@@ -64,6 +64,26 @@ class UserPresenter extends SecuredPresenter
         $this->redirect('User:');
     }
 
+    // AJAX DELETE
+    public function handleDelete(): void
+    {
+        if (!$this->isAjax()) {
+            bdump('NOT AJAX');
+            $this->redirect('this');
+        }
+
+        $data = $this->getHttpRequest()->getPost();
+
+        try {
+            $this->setDeleted_Callback($data['id'], '1');
+        } catch (UserException $e) {
+            $this->sendJson([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
     // ##########################################
     // ###              DATAGRID              ###
     // ##########################################
@@ -258,15 +278,23 @@ class UserPresenter extends SecuredPresenter
 
     public function encodeData_Callback(object $item): string
     {
-        return Json::encode([
+        $data = Json::encode([
             'id' => $item->id,
             'name' => $item->name,
             'full_name' => $item->full_name,
             'email' => $item->email,
             'role' => $item->role,
             'deleted' => $item->deleted,
-            'enabled' => $item->enabled
+            'enabled' => $item->enabled,
+            'messages' => [
+                'delete' => [
+                    'title' => 'Potvrzení o smazání',
+                    'msg' => 'Opravdu chcete uživatele <strong>' . $item->name . '</strong> smazat?'
+                ]
+            ]
         ]);
+
+        return $data;
     }
 
     // TODO: TRANSLATIONS !!!

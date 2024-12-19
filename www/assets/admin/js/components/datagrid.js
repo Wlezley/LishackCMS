@@ -1,5 +1,6 @@
 import naja from 'naja';
 import Nette from 'nette-forms';
+import { Modal } from 'bootstrap';
 
 
 // SOURCE: https://cdn.jsdelivr.net/npm/ublaboo-datagrid@6.9.1/assets/datagrid.js
@@ -116,15 +117,48 @@ if (typeof naja !== "undefined") {
   throw new Error("Include Naja.js or nette.ajax for datagrids to work!")
 }
 
-// CONFIRMATION PROCESS ---->>
 var datagridFitlerMultiSelect, datagridGroupActionMultiSelect, datagridShiftGroupSelection, datagridSortable, datagridSortableTree, getEventDomPath,
   indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
+// BOOTSTRAP MODAL CONFIRMATION HANDLER ---->>
+function myBsModal(trigger) {
+  var data = JSON.parse(trigger.dataset.datagridConfirm);
+  var modalWindow = document.querySelector(trigger.dataset.bsTarget);
+
+  // Action Button (cloneNode prevents the creation of duplicate events)
+  var oldActionButton = modalWindow.querySelector('[data-modal-action]');
+  var actionButton = oldActionButton.cloneNode(true);
+  oldActionButton.parentNode.replaceChild(actionButton, oldActionButton);
+
+  var actionName = actionButton.getAttribute('data-modal-action'); // Action name
+  var bsModal = Modal.getOrCreateInstance(modalWindow); // Instance of Bootstrap Modal
+
+  // Modal content (todo: add 'undefined' condition?)
+  modalWindow.querySelector('.modal-body').innerHTML =  data.messages[actionName].msg;
+  modalWindow.querySelector('.modal-title').textContent =  data.messages[actionName].title;
+
+  // Action button click event with Naja request
+  actionButton.addEventListener('click', function(event) {
+    bsModal.hide();
+    naja.makeRequest('POST', '?do=' + actionName, data).then(response => {
+      if (response && response.status === 'error') {
+        console.error('[Modal] Error: ' + response.message, data);
+      }
+    });
+  });
+};
+// <<--- BOOTSTRAP MODAL CONFIRMATION HANDLER
+
 $(document).on('click', '[data-datagrid-confirm]:not(.ajax)', function(e) {
-  if (!confirm($(e.target).closest('a').attr('data-datagrid-confirm'))) {
-    e.stopPropagation();
-    return e.preventDefault();
-  }
+  // Original code
+  // if (!confirm($(e.target).closest('a').attr('data-datagrid-confirm'))) {
+  //   e.stopPropagation();
+  //   return e.preventDefault();
+  // }
+
+  // Custom bootstrap modal
+  myBsModal(e.currentTarget);
+  return false;
 });
 
 if (typeof naja !== "undefined") {
@@ -154,7 +188,6 @@ if (typeof naja !== "undefined") {
     }
   });
 }
-// <<---- CONFIRMATION PROCESS
 
 $(document).on('change', 'select[data-autosubmit-per-page]', function() {
   var button;

@@ -17,38 +17,25 @@
                 MODAL DEBUG
             </button>
         </div>
-
-        <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered text-dark">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="deleteConfirmModalLabel">Potvrzení smazání</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zavřít"></button>
-                    </div>
-                    <div class="modal-body">
-                        ...
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zrušit</button>
-                        <button type="button" class="btn btn-danger" data-modal-action="delete">Smazat</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
     </div>
 </div>
 
-<script n:syntax="off">
-    var deleteConfirmModal = document.getElementById('deleteConfirmModal');
-    deleteConfirmModal.addEventListener('show.bs.modal', function (event) {
-        var button = event.relatedTarget; // Button that triggered the modal
-        var menuItem = JSON.parse(button.getAttribute('data-datagrid-confirm'));
-        // var modalTitle = deleteConfirmModal.querySelector('.modal-title');
-        var modalBody = deleteConfirmModal.querySelector('.modal-body');
-        // var modalFooter = deleteConfirmModal.querySelector('.modal-footer');
-
-        modalBody.innerHTML = 'Opravdu chete smazat uživatele <strong>' + menuItem.full_name + '</strong>? <br />';
-        modalBody.innerHTML += '<span class="fst-italic text-secondary text-tiny">(Login: ' + menuItem.name + ', ID: ' + menuItem.id + ')</span>';
-    });
-</script>
+{define modals}
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered text-dark">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteConfirmModalLabel"><!-- MODAL TITLE --></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zavřít"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- MODAL CONTENT -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zrušit</button>
+                    <button type="submit" class="btn btn-danger" data-modal-action="delete">Smazat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{/define}
