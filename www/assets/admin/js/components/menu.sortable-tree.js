@@ -47,14 +47,28 @@ export class MenuSettings {
       // disableSorting: (userRole !== 'admin'), // Example: Disable sorting based on user role.
       initCollapseLevel: 2,
       renderLabel: (data) => {
+        var dataParsed = {
+          id: data.id,
+          name: data.name,
+          name_url: data.name_url,
+          url: data.url,
+          hidden: data.hidden,
+          messages: {
+            delete: {
+              title: 'Potvrzení o smazání',
+              msg: 'Opravdu chcete menu <strong>' + data.name + '</strong> smazat?'
+            }
+          }
+        };
         const editButton = `
-            <a href="${adminUrl}/menu/edit?id=${data.id}" class="btn btn-primary" title="Upravit" aria-label="Upravit">
-              <i class="fa-solid fa-pencil"></i>
-            </a>`;
+          <a href="${adminUrl}/menu/edit?id=${data.id}" class="btn btn-primary" title="Upravit" aria-label="Upravit">
+            <i class="fa-solid fa-pencil"></i>
+          </a>`;
         const deleteButton = `
-            <a href="${adminUrl}/menu/delete?id=${data.id}" class="btn btn-danger" title="Smazat" aria-label="Smazat" onclick="return confirm('Opravdu chete smazat položku ${data.name}?')">
-              <i class="fa-solid fa-eraser"></i>
-            </a>`;
+          <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteMenuConfirmModal" data-json='` + JSON.stringify(dataParsed) + `'>
+            <i class="fa-solid fa-eraser"></i>
+          </button>`;
+        // TODO: Complete path
         const urlPath = data.id != 1 ? `<i id="st__menu-${data.id}" class="text-black-50 text-tiny fst-italic ms-2">(${data.name_url})</i>` : ``;
         return `
         <span class="pe-1" data-menu-id="${data.id}" data-menu-url="${data.name_url}">
@@ -104,5 +118,17 @@ export class MenuSettings {
         console.error('[MenuSettings] Error: ' + response.message, data);
       }
     });
+  }
+
+  removeFromList(menuId) {
+    console.log('Menu SortableTree -> removeFromList() ID', menuId); // DEBUG ONLY !!!
+
+    var elementList = this.element.querySelectorAll(".sortable-tree__node");
+    for (const el of elementList) {
+      var inner = el.querySelector("[data-menu-id]");
+      if (inner !== 'undefined' && inner.dataset.menuId == menuId) {
+        el.remove();
+      }
+    }
   }
 }

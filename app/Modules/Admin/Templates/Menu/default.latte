@@ -3,7 +3,10 @@
 <div class="row">
     <div class="col">
         <h2 class="border-bottom border-light text-light mb-3">Řazení menu</h2>
-        <div id="menu-sortable-tree" class="sortable-tree"></div>
+
+        <div id="menu-sortable-tree" class="sortable-tree">
+            <!-- SORTABLE TREE -->
+        </div>
 
         <hr class="my-3">
 
@@ -12,6 +15,9 @@
                 <i class="fa-solid fa-plus pe-2"></i>
                 Přidat
             </a>
+            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#deleteMenuConfirmModal">
+                MODAL DEBUG
+            </button>
         </div>
     </div>
 </div>
@@ -20,5 +26,35 @@
     document.addEventListener('DOMContentLoaded', () => {
         const menuSettings = new LishackCMS.MenuSettings('#menu-sortable-tree', 'sortable-tree');
         menuSettings.load();
+
+        /* LishackCMS.naja.snippetHandler.addEventListener('afterUpdate', (event) => {
+            if (event.detail.snippet.id === 'snippet--content') {
+                const menuSettings = new LishackCMS.MenuSettings('#menu-sortable-tree', 'sortable-tree');
+                menuSettings.load();
+            }
+        }); */
+
+        const menuDeleteModal = new LishackCMS.AdminModal('#deleteMenuConfirmModal', 'data-json');
+        menuDeleteModal.init(menuSettings);
     });
 </script>
+
+{define modals}
+    <div class="modal fade" id="deleteMenuConfirmModal" tabindex="-1" aria-labelledby="deleteMenuConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered text-dark">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteMenuConfirmModalLabel"><!-- MODAL TITLE --></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zavřít"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- MODAL CONTENT -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zrušit</button>
+                    <button type="submit" class="btn btn-danger" data-modal-action="delete">Smazat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{/define}

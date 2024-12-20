@@ -41,13 +41,45 @@ class MenuPresenter extends SecuredPresenter
     public function actionDelete(int $id): void
     {
         if ($this->user->isInRole('admin')) {
-            $this->menuManager->delete($id);
-            $this->flashMessage("Menu ID: $id bylo odstraněno.", 'info');
+            // $this->menuManager->delete($id);
+            $this->flashMessage("(OLD) Menu ID: $id bylo odstraněno.", 'info');
         } else {
-            $this->flashMessage('K odstranění menu nemáte oprávnění.', 'danger');
+            $this->flashMessage('(OLD) K odstranění menu nemáte oprávnění.', 'danger');
         }
 
         $this->redirect('Menu:');
+    }
+
+    // ##########################################
+    // ###                AJAX                ###
+    // ##########################################
+
+    public function handleDelete(): void
+    {
+        if (!$this->isAjax()) {
+            $this->redirect('this');
+        }
+
+        $data = $this->getHttpRequest()->getPost();
+
+        try {
+            // $this->menuManager->delete($data['id']); // Bypass (temp.)
+        } catch (MenuException $e) {
+            $this->sendJson([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ]);
+        }
+
+        $this->sendJson([
+            'status' => 'success',
+            'message' => 'Menu item deleted successfully',
+            'id' => $data['id'],
+            'call' => 'removeFromList',
+            'debug' => Debugger::$productionMode === Debugger::Development,
+        ]);
+
+        // $this->redrawControl();
     }
 
     public function handleLoad(): void

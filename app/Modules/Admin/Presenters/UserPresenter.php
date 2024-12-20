@@ -213,7 +213,7 @@ class UserPresenter extends SecuredPresenter
             ->setClass('btn btn-xs btn-danger')
             ->setIcon('eraser')
             ->setDataAttribute('bs-toggle', 'modal')
-            ->setDataAttribute('bs-target', '#deleteConfirmModal')
+            ->setDataAttribute('bs-target', '#deleteUserConfirmModal')
             ->setConfirmation(new CallbackConfirmation([$this, 'encodeData_Callback']));
 
         // Actions callback
