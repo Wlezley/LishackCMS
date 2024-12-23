@@ -19,7 +19,7 @@ final class InstallPresenter extends Presenter
         parent::beforeRender();
 
         if ($this->installer->isInstalled()) {
-            $this->redirect('Website:default');
+            $this->redirect('Article:detail');
         }
 
         $this->layout = 'systemLayout';
