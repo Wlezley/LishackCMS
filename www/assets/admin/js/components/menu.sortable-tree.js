@@ -53,11 +53,9 @@ export class MenuSettings {
           name_url: data.name_url,
           url: data.url,
           hidden: data.hidden,
-          messages: {
-            delete: {
+          modal: {
               title: 'Potvrzení o smazání',
-              msg: 'Opravdu chcete menu <strong>' + data.name + '</strong> smazat?'
-            }
+              body: 'Opravdu chcete menu <strong>' + data.name + '</strong> smazat?'
           }
         };
         const editButton = `

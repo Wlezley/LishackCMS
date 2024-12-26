@@ -6,6 +6,7 @@ namespace App\Modules\Admin\Presenters;
 
 use App\Models\MenuException;
 use App\Models\MenuManager;
+use Nette\Utils\Json;
 use Tracy\Debugger;
 
 class MenuPresenter extends SecuredPresenter
@@ -33,6 +34,19 @@ class MenuPresenter extends SecuredPresenter
 
             $this->template->title .= " ID: $id";
             $this->template->item = $item;
+
+            $this->template->jsonData = Json::encode([
+                'id' => $item['id'],
+                'name' => $item['name'],
+                'modal' => [
+                    'title' => 'Potvrzení o smazání',
+                    'body' => 'Opravdu chcete menu <strong>' . $item['name'] . '</strong> smazat?'
+                ],
+            ]);
+
+            $this->template->tree = $this->menuManager->getTree();
+            bdump($this->template->tree, "MENU TREE");
+
         } catch (MenuException $e) {
             $this->flashMessage('Chyba: ' . $e->getMessage(), 'danger');
         }
@@ -40,11 +54,12 @@ class MenuPresenter extends SecuredPresenter
 
     public function actionDelete(int $id): void
     {
+        // TODO: Unify roles, create an ACL system...
         if ($this->user->isInRole('admin')) {
-            // $this->menuManager->delete($id);
-            $this->flashMessage("(OLD) Menu ID: $id bylo odstraněno.", 'info');
+            // $this->menuManager->delete($id); // Bypass (temp.)
+            $this->flashMessage("Menu ID: $id bylo odstraněno.", 'info');
         } else {
-            $this->flashMessage('(OLD) K odstranění menu nemáte oprávnění.', 'danger');
+            $this->flashMessage('K odstranění menu nemáte oprávnění.', 'danger');
         }
 
         $this->redirect('Menu:');

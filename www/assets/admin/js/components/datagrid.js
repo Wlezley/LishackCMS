@@ -134,8 +134,8 @@ function myBsModal(trigger) {
   var bsModal = Modal.getOrCreateInstance(modalWindow); // Instance of Bootstrap Modal
 
   // Modal content (todo: add 'undefined' condition?)
-  modalWindow.querySelector('.modal-body').innerHTML =  data.messages[actionName].msg;
-  modalWindow.querySelector('.modal-title').textContent =  data.messages[actionName].title;
+  modalWindow.querySelector('.modal-title').textContent =  data.modal.title;
+  modalWindow.querySelector('.modal-body').innerHTML =  data.modal.body;
 
   // Action button click event with Naja request
   actionButton.addEventListener('click', function(event) {

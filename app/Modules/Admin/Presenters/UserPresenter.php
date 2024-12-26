@@ -46,15 +46,24 @@ class UserPresenter extends SecuredPresenter
 
             $this->template->title .= " ID: $id";
             $this->template->item = $item;
+
+            $this->template->jsonData = Json::encode([
+                'id' => $item['id'],
+                'name' => $item['name'],
+                'modal' => [
+                    'title' => 'Potvrzení o smazání',
+                    'body' => 'Opravdu chcete uživatele <strong>' . $item['name'] . '</strong> smazat?'
+                ],
+            ]);
         } catch (UserException $e) {
             $this->flashMessage('Chyba: ' . $e->getMessage(), 'danger');
         }
     }
 
-    // NON-AJAX DELETE
     public function actionDelete(int $id): void
     {
         // TODO: Conditions from setDeleted_Callback()
+        // TODO: Unify roles, create an ACL system...
         if ($this->user->isInRole('admin')) {
             $this->userManager->setDeleted($id, true);
             $this->flashMessage("Uživatel ID: $id byl odstraněn.", 'info');
@@ -65,7 +74,10 @@ class UserPresenter extends SecuredPresenter
         $this->redirect('User:');
     }
 
-    // AJAX DELETE
+    // ##########################################
+    // ###                AJAX                ###
+    // ##########################################
+
     public function handleDelete(): void
     {
         if (!$this->isAjax()) {
@@ -83,6 +95,22 @@ class UserPresenter extends SecuredPresenter
             ]);
         }
     }
+
+    // public function handleLoad(): void
+    // {
+    //     if (!$this->isAjax()) {
+    //         $this->redirect('this');
+    //     }
+    //     $this->redrawControl();
+    // }
+
+    // public function handleSave(): void
+    // {
+    //     if (!$this->isAjax()) {
+    //         $this->redirect('this');
+    //     }
+    //     $this->redrawControl();
+    // }
 
     // ##########################################
     // ###              DATAGRID              ###
@@ -286,11 +314,9 @@ class UserPresenter extends SecuredPresenter
             'role' => $item->role,
             'deleted' => $item->deleted,
             'enabled' => $item->enabled,
-            'messages' => [
-                'delete' => [
-                    'title' => 'Potvrzení o smazání',
-                    'msg' => 'Opravdu chcete uživatele <strong>' . $item->name . '</strong> smazat?'
-                ]
+            'modal' => [
+                'title' => 'Potvrzení o smazání',
+                'body' => 'Opravdu chcete uživatele <strong>' . $item->name . '</strong> smazat?'
             ]
         ]);
 

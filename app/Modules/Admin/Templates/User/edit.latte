@@ -27,18 +27,14 @@
                         Zpět
                     </a>
                 </div>
-                <div class="">
-                    <a n:href="User:create" class="btn btn-primary" title="Uložit" aria-label="Uložit">
-                        <i class="fa-solid fa-save pe-2"></i>
-                        Uložit
-                    </a>
-                </div>
-                <div class="">
-                    <a n:href="User:delete $item['id']" class="btn btn-danger" title="Smazat" aria-label="Smazat" onclick="return confirm('Opravdu chete smazat uživatele {$item['name']} (ID: {$item['id']})?')">
-                        <i class="fa-solid fa-eraser pe-2"></i>
-                        Smazat
-                    </a>
-                </div>
+                <a n:href="User:create" class="btn btn-primary" title="Uložit" aria-label="Uložit">
+                    <i class="fa-solid fa-save pe-2"></i>
+                    Uložit
+                </a>
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteUserConfirmModal" data-json="{$jsonData}">
+                    <i class="fa-solid fa-eraser pe-2"></i>
+                    Smazat
+                </button>
             </div>
         </div>
     </div>
@@ -53,3 +49,30 @@
         </div>
     </div>
 {/if}
+
+<script n:syntax="off">
+    document.addEventListener('DOMContentLoaded', () => {
+        const userDeleteModal = new LishackCMS.AdminModal('#deleteUserConfirmModal', 'data-json');
+        userDeleteModal.initStatic();
+    });
+</script>
+
+{define modals}
+    <div class="modal fade" id="deleteUserConfirmModal" tabindex="-1" aria-labelledby="deleteUserConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered text-dark">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteUserConfirmModalLabel"><!-- MODAL TITLE --></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zavřít"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- MODAL CONTENT -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zrušit</button>
+                    <a n:href="User:delete $item['id']" class="btn btn-danger" title="Smazat" aria-label="Smazat">Smazat</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{/define}

@@ -7,7 +7,7 @@ export class AdminModal {
     this.modalWindow = document.querySelector(modalSelector);
     this.bootstrapModal = new Modal(this.modalWindow);
     this.dataSelector = dataSelector;
-    this.handle; // = function(params) {};
+    this.handle;
   }
 
   init(handle) {
@@ -34,11 +34,13 @@ export class AdminModal {
       const bsModal = Modal.getOrCreateInstance(this.modalWindow); // Instance of Bootstrap Modal
 
       // Modal Content
-      if (data.messages[actionName].title !== 'undefined') {
-        modalTitle.textContent = data.messages[actionName].title;
-      }
-      if (data.messages[actionName].msg !== 'undefined') {
-        modalBody.innerHTML = data.messages[actionName].msg;
+      if (data.modal) {
+        if (data.modal.title !== 'undefined') {
+          modalTitle.textContent = data.modal.title;
+        }
+        if (data.modal.body !== 'undefined') {
+          modalBody.innerHTML = data.modal.body;
+        }
       }
 
       // Action button click event with Naja request
@@ -48,15 +50,37 @@ export class AdminModal {
           if (response && response.status === 'error') {
             console.error('[Modal] Error: ' + response.message, data);
           } else {
-
-            // TODO: Check if handle is instance of class or function, etc...
             if (handle && response.call) {
+              // Call the handle Class.function()
               this.handle[response.call](response.id);
             }
           }
         });
       }.bind(this));
+    }.bind(this));
+  }
 
+  initStatic() {
+    this.modalWindow.addEventListener('show.bs.modal', function (event) {
+      const sourceButton = event.relatedTarget;
+
+      if (this.dataSelector) {
+        const data = JSON.parse(sourceButton.getAttribute(this.dataSelector));
+
+        console.log('MODAL DATA', data);
+
+        // Modal Content
+        if (data && data.modal) {
+          if (data.modal.title !== 'undefined') {
+            const modalTitle = this.modalWindow.querySelector('.modal-title');
+            modalTitle.textContent = data.modal.title;
+          }
+          if (data.modal.body !== 'undefined') {
+            const modalBody = this.modalWindow.querySelector('.modal-body');
+            modalBody.innerHTML = data.modal.body;
+          }
+        }
+      }
     }.bind(this));
   }
 }

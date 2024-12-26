@@ -27,13 +27,6 @@
         const menuSettings = new LishackCMS.MenuSettings('#menu-sortable-tree', 'sortable-tree');
         menuSettings.load();
 
-        /* LishackCMS.naja.snippetHandler.addEventListener('afterUpdate', (event) => {
-            if (event.detail.snippet.id === 'snippet--content') {
-                const menuSettings = new LishackCMS.MenuSettings('#menu-sortable-tree', 'sortable-tree');
-                menuSettings.load();
-            }
-        }); */
-
         const menuDeleteModal = new LishackCMS.AdminModal('#deleteMenuConfirmModal', 'data-json');
         menuDeleteModal.init(menuSettings);
     });
