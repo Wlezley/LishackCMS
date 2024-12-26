@@ -6,7 +6,6 @@ namespace App\Modules\Admin\Presenters;
 
 use App\Models\UserException;
 use App\Models\UserManager;
-use App\Models\UserRole;
 // use Contributte\Datagrid\Column\Action\Confirmation;
 use Contributte\Datagrid\Datagrid;
 use Nette\Utils\Json;
@@ -14,18 +13,9 @@ use Ublaboo\DataGrid\Column\Action\Confirmation\CallbackConfirmation;
 
 class UserPresenter extends SecuredPresenter
 {
-    private UserRole $userRole;
-
     public function __construct(
         private UserManager $userManager
     ) {}
-
-    public function startup(): void
-    {
-        parent::startup();
-
-        $this->userRole = new UserRole($this->user);
-    }
 
     public function renderDefault(): void
     {

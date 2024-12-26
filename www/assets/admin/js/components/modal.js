@@ -19,7 +19,7 @@ export class AdminModal {
       const sourceButton = event.relatedTarget;
       const data = JSON.parse(sourceButton.getAttribute(this.dataSelector));
 
-      console.log('MODAL DATA', data);
+      console.debug('MODAL DATA', data);
 
       // Modal Elements
       const modalTitle = this.modalWindow.querySelector('.modal-title');
@@ -67,7 +67,7 @@ export class AdminModal {
       if (this.dataSelector) {
         const data = JSON.parse(sourceButton.getAttribute(this.dataSelector));
 
-        console.log('MODAL DATA', data);
+        console.debug('MODAL DATA', data);
 
         // Modal Content
         if (data && data.modal) {

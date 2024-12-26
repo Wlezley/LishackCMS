@@ -7,7 +7,6 @@ namespace App\Modules\Admin\Presenters;
 use App\Models\MenuException;
 use App\Models\MenuManager;
 use Nette\Utils\Json;
-use Tracy\Debugger;
 
 class MenuPresenter extends SecuredPresenter
 {
@@ -18,6 +17,7 @@ class MenuPresenter extends SecuredPresenter
     public function renderDefault(): void
     {
         $this->template->title = 'Menu';
+        $this->template->sortable = $this->userHavePermissionsTo('move'); // or 'sort' ???
     }
 
     public function renderCreate(): void
@@ -44,6 +44,9 @@ class MenuPresenter extends SecuredPresenter
                 ],
             ]);
 
+            $this->template->editable = $this->userHavePermissionsTo('edit');
+
+            // TODO: Test render for the "Menu Parent" tree <select> elem.
             $this->template->tree = $this->menuManager->getTree();
             bdump($this->template->tree, "MENU TREE");
 
@@ -54,8 +57,7 @@ class MenuPresenter extends SecuredPresenter
 
     public function actionDelete(int $id): void
     {
-        // TODO: Unify roles, create an ACL system...
-        if ($this->user->isInRole('admin')) {
+        if ($this->userHavePermissionsTo('delete')) {
             // $this->menuManager->delete($id); // Bypass (temp.)
             $this->flashMessage("Menu ID: $id bylo odstraněno.", 'info');
         } else {
@@ -78,7 +80,16 @@ class MenuPresenter extends SecuredPresenter
         $data = $this->getHttpRequest()->getPost();
 
         try {
-            // $this->menuManager->delete($data['id']); // Bypass (temp.)
+            if ($this->userHavePermissionsTo('delete')) {
+                // $this->menuManager->delete($data['id']); // Bypass (temp.)
+                $this->flashMessage("Menu ID: " . $data['id'] . " bylo odstraněno.", 'info');
+            } else {
+                $this->flashMessage('K odstranění menu nemáte oprávnění.', 'danger');
+                $this->sendJson([
+                    'status' => 'error',
+                    'message' => 'Insufficient user permissions.',
+                ]);
+            }
         } catch (MenuException $e) {
             $this->sendJson([
                 'status' => 'error',
@@ -91,7 +102,6 @@ class MenuPresenter extends SecuredPresenter
             'message' => 'Menu item deleted successfully',
             'id' => $data['id'],
             'call' => 'removeFromList',
-            'debug' => Debugger::$productionMode === Debugger::Development,
         ]);
 
         // $this->redrawControl();
@@ -108,7 +118,7 @@ class MenuPresenter extends SecuredPresenter
         ]);
     }
 
-    public function handleSave(): void
+    public function handleUpdatePosition(): void
     {
         if (!$this->isAjax()) {
             $this->redirect('this');
@@ -117,20 +127,45 @@ class MenuPresenter extends SecuredPresenter
         $data = $this->getHttpRequest()->getPost();
 
         try {
-            $this->menuManager->updatePosition($data);
+            if ($this->userHavePermissionsTo('move')) {
+                $this->menuManager->updatePosition($data);
+            } else {
+                $this->flashMessage('K přesunutí menu nemáte oprávnění.', 'danger');
+                $this->sendJson([
+                    'status' => 'error',
+                    'message' => 'Insufficient user permissions.',
+                ]);
+            }
+
         } catch (MenuException $e) {
             $this->sendJson([
                 'status' => 'error',
                 'message' => $e->getMessage(),
-                'debug' => Debugger::$productionMode === Debugger::Development,
             ]);
         }
 
         $this->sendJson([
             'status' => 'success',
-            'message' => 'Menu saved successfully',
+            'message' => 'Menu position successfully updated',
             'nodes' => $this->menuManager->getSortableTree(),
-            'debug' => Debugger::$productionMode === Debugger::Development,
         ]);
+    }
+
+    // TODO: Unify roles, create an ACL system...
+    private function userHavePermissionsTo(string $action): bool
+    {
+        switch ($action) {
+            case 'edit':
+                return $this->userRole->isInArray(['manager', 'admin']);
+
+            case 'move':
+            case 'sort':
+                return $this->userRole->isInArray(['manager', 'admin']);
+
+            case 'delete':
+                return $this->userRole->isInArray(['manager', 'admin']);
+        }
+
+        return false;
     }
 }

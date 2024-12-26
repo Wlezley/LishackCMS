@@ -2,10 +2,11 @@ import naja from 'naja';
 import SortableTree, { SortableTreeNodeData } from 'sortable-tree';
 
 export class MenuSettings {
-  constructor(selector, style = 'sortable-tree') {
+  constructor(selector, style = 'sortable-tree', sortable = false) {
     this.selector = selector;
     this.element = document.querySelector(this.selector);
     this.style = style;
+    this.sortable = sortable;
     this.nodes = [];
   }
 
@@ -43,8 +44,7 @@ export class MenuSettings {
       },
       stateId: this.selector,
       lockRootLevel: true,
-      disableSorting: false,
-      // disableSorting: (userRole !== 'admin'), // Example: Disable sorting based on user role.
+      disableSorting: (this.sortable !== true),
       initCollapseLevel: 2,
       renderLabel: (data) => {
         var dataParsed = {
@@ -90,7 +90,7 @@ export class MenuSettings {
           target_id: targetParentNode.data.id,
           order_list: orderList,
         };
-        this.save(data);
+        this.updatePosition(data);
       },
       // confirm: (moved, parentNode) => {
       //   return true;
@@ -101,14 +101,11 @@ export class MenuSettings {
     });
   }
 
-  save(data) {
-    naja.makeRequest('POST', '?do=save', data).then(response => {
+  updatePosition(data) {
+    naja.makeRequest('POST', '?do=updatePosition', data).then(response => {
       if (response.status === 'success') {
-        if (response.debug === true) {
-          console.log('[MenuSettings]: ' + response.message);
-        }
-        if (response.nodes === undefined || response.nodes.length === 0) {
-          console.error('[MenuSettings] Error: Unable to reload nodes');
+        if (response.nodes == null || response.nodes.length === 0) {
+          console.error('[MenuSettings] Error: Unable to reload nodes (no data)');
         } else {
           this.nodes = response.nodes;
         }
@@ -119,12 +116,21 @@ export class MenuSettings {
   }
 
   removeFromList(menuId) {
-    console.log('Menu SortableTree -> removeFromList() ID', menuId); // DEBUG ONLY !!!
+    console.debug('Menu SortableTree -> removeFromList() ID', menuId);
 
     var elementList = this.element.querySelectorAll(".sortable-tree__node");
     for (const el of elementList) {
       var inner = el.querySelector("[data-menu-id]");
-      if (inner !== 'undefined' && inner.dataset.menuId == menuId) {
+      if (inner != null && inner.dataset.menuId == menuId) {
+
+        // TODO: Move child nodes up (recursively)
+        // var childrens = inner.querySelectorAll('.sortable-tree__subnode');
+        // console.log(childrens);
+
+        // if (childrens.count > 0 ) {
+        //   console.log(childrens.count);
+        // }
+
         el.remove();
       }
     }
