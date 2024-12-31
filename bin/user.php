@@ -5,7 +5,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/../vendor/autoload.php';
 
-define('DEFAULT_LANG', '');
+const DEFAULT_LANG = "";
 
 $argcOffset = 2;
 $commandList = [
@@ -15,10 +15,9 @@ $commandList = [
     '--set-role' => 2,
 ];
 
-$command = '';
+$command = $argv[1] ?? '';
 $argcRequired = 0;
-if (isset($argv[1]) && in_array($argv[1], array_keys($commandList))) {
-    $command = $argv[1];
+if (!empty($command) && in_array($command, array_keys($commandList))) {
     $argcRequired = $commandList[$command] + $argcOffset;
 }
 
@@ -42,7 +41,7 @@ switch ($command) {
             ]);
             echo "User '$username' was added [ID: $id].\n";
         } catch (\Exception $e) {
-            echo "Error: " . $e->getMessage() . "\n";
+            printf("Error: %s\n", $e->getMessage());
             exit(1);
         }
         break;
@@ -59,7 +58,7 @@ switch ($command) {
             $manager->setDeleted($id, true);
             echo "User ID '$id' was marked as deleted.\n";
         } catch (\Exception $e) {
-            echo "Error: " . $e->getMessage() . "\n";
+            printf("Error: %s\n", $e->getMessage());
             exit(1);
         }
         break;
@@ -77,7 +76,7 @@ switch ($command) {
             $manager->rename($id, $newName);
             echo "User ID '$id' was renamed to '$newName'.\n";
         } catch (\Exception $e) {
-            echo "Error: " . $e->getMessage() . "\n";
+            printf("Error: %s\n", $e->getMessage());
             exit(1);
         }
         break;
@@ -95,24 +94,23 @@ switch ($command) {
             $manager->setRole($id, $role);
             echo "The role of user ID '$id' has been changed to '$role'.\n";
         } catch (\Exception $e) {
-            echo "Error: " . $e->getMessage() . "\n";
+            printf("Error: %s\n", $e->getMessage());
             exit(1);
         }
         break;
 
     default:
-        echo '
-=== LISHACK CMS :: USER MANAGER ===
+        echo <<< 'TEXT'
+        === LISHACK CMS :: USER MANAGER ===
 
-Usage: user.php <command> [...]
+        Usage: user.php <command> [...]
 
-Available comannds:
-    --create <username> <password>      Create new user account
-    --delete <id>                       Delete user account
-    --rename <id> <new-name>            Rename user account
-    --set-role <id> <role>              Set role for user account
+        Available comannds:
+            --create <username> <password>      Create new user account
+            --delete <id>                       Delete user account
+            --rename <id> <new-name>            Rename user account
+            --set-role <id> <role>              Set role for user account
                                         Default roles: guest, user, redactor, manager, admin, ...
-
-';
+        TEXT, "\n";
         exit(0);
 }

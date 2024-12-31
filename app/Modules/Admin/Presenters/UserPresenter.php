@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
-use App\Models\UserException;
-use App\Models\UserManager;
+use App\Models\{UserException, UserManager};
 // use Contributte\Datagrid\Column\Action\Confirmation;
 use Contributte\Datagrid\Datagrid;
 use Nette\Utils\Json;
@@ -134,25 +133,30 @@ class UserPresenter extends SecuredPresenter
         $grid->setItemsPerPageList([25, 50, 100], true);
         $grid->allowRowsInlineEdit(function() { return false; });
 
-        // ID
-        $grid->addColumnText('id', 'ID')
-            ->setSortable()
-            ->setAlign('center');
-
-        // NAME
-        $grid->addColumnText('name', 'Jméno')
-            ->setSortable()
-            ->setAlign('start');
-
-        // FULL NAME
-        $grid->addColumnText('full_name', 'Celé jméno')
-            ->setSortable()
-            ->setAlign('start');
-
-        // E-MAIL
-        $grid->addColumnText('email', 'E-mail')
-            ->setSortable()
-            ->setAlign('start');
+        $columns = [
+            'id' => [
+                'label' => 'ID',
+                'align' => 'center'
+            ],
+            'name' => [
+                'label' => 'Jméno',
+                'align' => 'start'
+            ],
+            'full_name' => [
+                'label' => 'Celé jméno',
+                'align' => 'start'
+            ],
+            'email' => [
+                'label' => 'E-mail',
+                'align' => 'start'
+            ]
+        ];
+        foreach ($columns as $columnKey => $columnConfig) {
+            $grid->addColumnText($columnKey, $columnConfig['label'])
+                ->setSortable()
+                ->setAlign($columnConfig['align']);
+        }
+        
 
 
         // USER ROLE ---->>
@@ -247,20 +251,23 @@ class UserPresenter extends SecuredPresenter
 
     public function allowActionEdit_Callback(object $item): bool
     {
-        // Unable to edit SUPERADMIN
-        if ($item->id == 1) {
+        $unableToEditSuperadmin = $item->id == 1;
+        if ($unableToEditSuperadmin) {
             return false;
         }
-        // SUPERADMIN can edit all
-        if ($this->user->getId() === 1) {
+
+        $userCanEdit = $this->user->getId() === 1;
+        if ($userCanEdit) {
             return true;
         }
-        // User can edit himself
-        if ($this->user->getId() == $item->id) {
+
+        $userCanEditHimself = $this->user->getId() == $item->id;
+        if ($userCanEditHimself) {
             return true;
         }
-        // User cannot edit other users in the same or higher role
-        if ($this->userRole->isLessOrEqualsThan($item->role)) {
+
+        $userHasInsufficientPermissions = $this->userRole->isLessOrEqualsThan($item->role);
+        if ($userHasInsufficientPermissions) {
             return false;
         }
 
@@ -270,24 +277,29 @@ class UserPresenter extends SecuredPresenter
 
     public function allowActionDelete_Callback(object $item): bool
     {
-        // Unable to delete SUPERADMIN
-        if ($item->id == 1) {
+        $superAdminCantBeDeleted = $item->id == 1;
+        if ($superAdminCantBeDeleted) {
             return false;
         }
-        // SUPERADMIN can delete (almost) all
-        if ($this->user->getId() === 1) {
+
+        $isSuperAdmin = $this->user->getId() === 1;
+        if ($isSuperAdmin) {
             return true;
         }
-        // User cannot delete himself
-        if ($this->user->getId() == $item->id) {
+
+        $isDeletingOwnAccount = $this->user->getId() == $item->id;
+        if ($isDeletingOwnAccount) {
             return false;
         }
-        // User cannot delete other users in the same or higher role
-        if ($this->userRole->isLessOrEqualsThan($item->role)) {
+
+        $userHasInsufficientPermissions = $this->userRole->isLessOrEqualsThan($item->role);
+        if ($userHasInsufficientPermissions) {
             return false;
         }
-        // Only administrators and moderators can delete users
-        if ($this->userRole->isInArray(['manager', 'admin'])) {
+
+        static $rolesWhitelist = ['manager', 'admin'];
+        $hasRequiredRole = $this->userRole->isInArray($rolesWhitelist);
+        if ($hasRequiredRole) {
             return true;
         }
 
@@ -306,7 +318,7 @@ class UserPresenter extends SecuredPresenter
             'enabled' => $item->enabled,
             'modal' => [
                 'title' => 'Potvrzení o smazání',
-                'body' => 'Opravdu chcete uživatele <strong>' . $item->name . '</strong> smazat?'
+                'body' => sprintf('Opravdu chcete uživatele <strong>%s</strong> smazat?',  $item->name)
             ]
         ]);
 

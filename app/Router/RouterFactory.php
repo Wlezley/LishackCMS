@@ -13,7 +13,7 @@ class RouterFactory
 
     public static function createRouter(): RouteList
     {
-        $router = new RouteList;
+        $router = new RouteList();
 
         self::createAdminRouter($router);
         self::createApiRouter($router);
