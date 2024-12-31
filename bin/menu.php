@@ -5,7 +5,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/../vendor/autoload.php';
 
-define('DEFAULT_LANG', '');
+const DEFAULT_LANG = "";
 
 $argcOffset = 2;
 $commandList = [
@@ -14,10 +14,9 @@ $commandList = [
     '--list' => 0,
 ];
 
-$command = '';
+$command = $argv[1] ?? '';
 $argcRequired = 0;
-if (isset($argv[1]) && in_array($argv[1], array_keys($commandList))) {
-    $command = $argv[1];
+if (!empty($command) && in_array($command, array_keys($commandList))) {
     $argcRequired = $commandList[$command] + $argcOffset;
 }
 
@@ -32,7 +31,7 @@ switch ($command) {
         }
 
         $name = $argv[2];
-        $parentID = $argv[3] ? (int)$argv[3] : NULL;
+        $parentID = (int)($argv[3] ?? 0);
 
         try {
             $id = $manager->create([
@@ -41,7 +40,7 @@ switch ($command) {
             ]);
             echo "Menu '$name' was added [ID: $id].\n";
         } catch (\Exception $e) {
-            echo "Error: " . $e->getMessage() . "\n";
+            printf("Error: %s\n", $e->getMessage());
             exit(1);
         }
         break;
@@ -58,7 +57,7 @@ switch ($command) {
             $manager->delete($id);
             echo "Menu item '$id' was removed.\n";
         } catch (\Exception $e) {
-            echo "Error: " . $e->getMessage() . "\n";
+            printf("Error: %s\n", $e->getMessage());
             exit(1);
         }
         break;
@@ -73,22 +72,21 @@ switch ($command) {
             $menuList = $manager->getTree();
             print_r($menuList);
         } catch (\Exception $e) {
-            echo "Error: " . $e->getMessage() . "\n";
+            printf("Error: %s\n", $e->getMessage());
             exit(1);
         }
         break;
 
     default:
-        echo '
-=== LISHACK CMS :: MENU MANAGER ===
+        echo <<< 'TEXT'
+        === LISHACK CMS :: MENU MANAGER ===
 
-Usage: menu.php <command> [...]
+        Usage: menu.php <command> [...]
 
-Available comannds:
-    --create <name> [<parent_id>]       Create new menu item
-    --delete <id>                       Delete menu item
-    --list                              Show menu list
-
-';
+        Available commands:
+            --create <name> [<parent_id>]       Create new menu item
+            --delete <id>                       Delete menu item
+            --list                              Show menu list
+        TEXT, "\n";
         exit(0);
 }

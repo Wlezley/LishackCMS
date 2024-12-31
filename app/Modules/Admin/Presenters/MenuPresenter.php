@@ -40,7 +40,7 @@ class MenuPresenter extends SecuredPresenter
                 'name' => $item['name'],
                 'modal' => [
                     'title' => 'Potvrzení o smazání',
-                    'body' => 'Opravdu chcete menu <strong>' . $item['name'] . '</strong> smazat?'
+                    'body' => sprintf('Opravdu chcete menu <strong>%s</strong> smazat?', $item['name'])
                 ],
             ]);
 

@@ -36,11 +36,11 @@ class SignPresenter extends UnsecuredPresenter
     {
         $form = $this->signInForm->create();
 
-        $form->onSuccess[] = function () {
+        $form->onSuccess[] = function (): void {
             $this->redirect('Admin:default');
         };
 
-        $form->onError[] = function () {
+        $form->onError[] = function (): void {
             $this->flashMessage('Nesprávné přihlašovací údaje', 'danger');
         };
 

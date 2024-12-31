@@ -15,19 +15,23 @@ class Bootstrap
         $appDir = __DIR__ . '/..';
 
         //$configurator->setDebugMode('secret@23.75.345.200'); // enable for your remote IP
-        $configurator->enableTracy($appDir . '/log');
+        $configurator->enableTracy("$appDir/log");
         // error_reporting(E_ERROR);
 
         $configurator->setTimeZone('Europe/Prague');
-        $configurator->setTempDirectory($appDir . '/temp');
+        $configurator->setTempDirectory("$appDir/temp");
 
         $configurator->createRobotLoader()
             ->addDirectory(__DIR__)
             ->register();
 
-        $configurator->addConfig($appDir . '/config/project/common.neon');
-        $configurator->addConfig($appDir . '/config/project/services.neon');
-        $configurator->addConfig($appDir . '/config/local.neon');
+        foreach ([
+            '/config/project/common.neon',
+            '/config/project/services.neon',
+            '/config/local.neon'
+        ] as $path) {
+            $configurator->addConfig($appDir . $path);
+        }
 
         return $configurator;
     }

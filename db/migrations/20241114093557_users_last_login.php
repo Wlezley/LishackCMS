@@ -8,21 +8,23 @@ final class UsersLastLogin extends AbstractMigration
 {
     public function up(): void
     {
-        $this->execute("
-            ALTER TABLE `users`
-                ADD COLUMN `created` DATETIME NULL DEFAULT NOW() AFTER `enabled`,
-                ADD COLUMN `last_login` DATETIME NULL DEFAULT NULL AFTER `created`,
-                ADD UNIQUE INDEX `name` (`name`);
-        ");
+        static $sql = <<< SQL
+        ALTER TABLE `users`
+            ADD COLUMN `created` DATETIME NULL DEFAULT NOW() AFTER `enabled`,
+            ADD COLUMN `last_login` DATETIME NULL DEFAULT NULL AFTER `created`,
+            ADD UNIQUE INDEX `name` (`name`);
+        SQL;
+        $this->execute($sql);
     }
 
     public function down(): void
     {
-        $this->execute("
-            ALTER TABLE `users`
-                DROP COLUMN `created`,
-                DROP COLUMN `last_login`,
-                DROP INDEX `name`;
-        ");
+        static $sql = <<< SQL
+        ALTER TABLE `users`
+            DROP COLUMN `created`,
+            DROP COLUMN `last_login`,
+            DROP INDEX `name`;
+        SQL;
+        $this->execute($sql);
     }
 }
