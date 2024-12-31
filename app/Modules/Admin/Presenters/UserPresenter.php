@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
-use App\Models\{UserException, UserManager};
+use App\Models\{
+    UserException,
+    UserManager
+};
 // use Contributte\Datagrid\Column\Action\Confirmation;
 use Contributte\Datagrid\Datagrid;
 use Nette\Utils\Json;
