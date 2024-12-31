@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Modules\Ajax\Presenters;
+namespace App\Modules\Api\Presenters;
 
 use Nette;
 use Tracy\Debugger;
 
-final class AjaxPresenter extends Nette\Application\UI\Presenter
+final class ApiPresenter extends Nette\Application\UI\Presenter
 {
     public function __construct()
     {
@@ -25,11 +25,11 @@ final class AjaxPresenter extends Nette\Application\UI\Presenter
 
     public function actionDefault(): void
     {
-        $this->template->render = 'Default AJAX action';
+        $this->template->render = 'Default API action';
     }
 
     public function actionPing(): void
     {
-        $this->template->render = 'AJAX PONG';
+        $this->template->render = 'API PONG';
     }
 }

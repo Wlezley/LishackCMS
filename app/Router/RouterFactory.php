@@ -16,7 +16,7 @@ class RouterFactory
         $router = new RouteList;
 
         self::createAdminRouter($router);
-        self::createAjaxRouter($router);
+        self::createApiRouter($router);
         self::createCronRouter($router);
         self::createWebsiteRouter($router);
 
@@ -32,10 +32,10 @@ class RouterFactory
             ->end();
     }
 
-    public static function createAjaxRouter(RouteList $router): void
+    public static function createApiRouter(RouteList $router): void
     {
-        $router->withModule('Ajax')
-            ->addRoute('ajax/<action>[/<id>]', 'Ajax:default')
+        $router->withModule('Api')
+            ->addRoute('api/<action>[/<id>]', 'Api:default')
             ->end();
     }
 

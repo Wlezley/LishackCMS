@@ -217,7 +217,7 @@ class UserRole
         $l = new UserRole($left);
         $r = new UserRole($right);
 
-        return match ($operator) {
+        return match ($operator) { // Thanks to KsaRuu
             '=='        => $l == $r,
             '!=', '<>'  => $l != $r,
             '>'         => $l >  $r,
