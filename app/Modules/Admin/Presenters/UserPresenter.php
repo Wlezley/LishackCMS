@@ -142,24 +142,20 @@ class UserPresenter extends SecuredPresenter
                 'align' => 'center'
             ],
             'name' => [
-                'label' => 'Jméno',
-                'align' => 'start'
+                'label' => 'Jméno'
             ],
             'full_name' => [
-                'label' => 'Celé jméno',
-                'align' => 'start'
+                'label' => 'Celé jméno'
             ],
             'email' => [
-                'label' => 'E-mail',
-                'align' => 'start'
+                'label' => 'E-mail'
             ]
         ];
         foreach ($columns as $columnKey => $columnConfig) {
             $grid->addColumnText($columnKey, $columnConfig['label'])
                 ->setSortable()
-                ->setAlign($columnConfig['align']);
+                ->setAlign($columnConfig['align'] ?? 'start');
         }
-        
 
 
         // USER ROLE ---->>
@@ -311,7 +307,7 @@ class UserPresenter extends SecuredPresenter
 
     public function encodeData_Callback(object $item): string
     {
-        $data = Json::encode([
+        return Json::encode([
             'id' => $item->id,
             'name' => $item->name,
             'full_name' => $item->full_name,
@@ -324,8 +320,6 @@ class UserPresenter extends SecuredPresenter
                 'body' => sprintf('Opravdu chcete uživatele <strong>%s</strong> smazat?',  $item->name)
             ]
         ]);
-
-        return $data;
     }
 
     // TODO: TRANSLATIONS !!!
