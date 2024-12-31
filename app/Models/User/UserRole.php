@@ -217,24 +217,15 @@ class UserRole
         $l = new UserRole($left);
         $r = new UserRole($right);
 
-        switch ($operator) {
-            case '==':
-                return $l == $r;
-            case '!=':
-                return $l != $r;
-            case '>':
-                return $l >  $r;
-            case '>=':
-                return $l >= $r;
-            case '<':
-                return $l <  $r;
-            case '<=':
-                return $l <= $r;
-            case '<>':
-                return $l <> $r;
-            default:
-                throw new \InvalidArgumentException('Unsupported comparison operator.');
-        }
+        return match ($operator) {
+            '=='        => $l == $r,
+            '!=', '<>'  => $l != $r,
+            '>'         => $l >  $r,
+            '>='        => $l >= $r,
+            '<'         => $l <  $r,
+            '<='        => $l <= $r,
+            default     => throw new \InvalidArgumentException("Unsupported comparison operator '$operator'."),
+        };
     }
 
     // ##########################################
