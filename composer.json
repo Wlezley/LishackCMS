@@ -26,7 +26,7 @@
         "nette/utils": "^4.0",
         "latte/latte": "^3.0",
         "tracy/tracy": "^2.10",
-        "nesbot/carbon": "^3.8.4",
+        "nesbot/carbon": "^3.8",
         "robmorgan/phinx": "^0.16.5",
         "codeception/codeception": "^5.1",
         "codeception/module-phpbrowser": "*",
@@ -47,6 +47,9 @@
     "config": {
         "allow-plugins": {
             "symfony/thanks": false
+        },
+        "platform": {
+            "php": "8.2"
         }
     }
 }
