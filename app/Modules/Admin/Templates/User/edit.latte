@@ -5,9 +5,9 @@
         <div class="col">
             <h2 class="border-bottom border-light text-light mb-3">{$item[full_name]} (Login: {$item[name]}, ID: {$item[id]})</h2>
 
-            {* TODO: {control userEditForm, $item} *}
+            {control userForm, $item[id]}
 
-            <div>
+            {* <div>
                 <p><strong>ID:</strong> {$item[id]}</p>
                 <p><strong>Login:</strong> {$item[name]}</p>
                 <p><strong>Role:</strong> {$item[role]}</p>
@@ -16,7 +16,7 @@
                 <p><strong>Session ID:</strong> {$item[session_id]}</p>
                 <p><strong>Smazaný účet:</strong> {$item[deleted] ? 'Ano' : 'Ne'}</p>
                 <p class="mb-0"><strong>Povolené přihlášení:</strong> {$item[enabled] ? 'Ano' : 'Ne'}</p>
-            </div>
+            </div> *}
 
             <hr class="my-3">
 

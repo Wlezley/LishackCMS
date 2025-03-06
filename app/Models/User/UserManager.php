@@ -56,7 +56,7 @@ class UserManager extends BaseModel
         if (Validators::isNone($data['password'])) {
             throw new UserException('Password is empty.');
         }
-        if (isset($data['email']) && !Validators::isEmail($data['email'])) {
+        if (!empty($data['email']) && !Validators::isEmail($data['email'])) {
             throw new UserException('Invalid email format.');
         }
         if ($this->db->table(self::TABLE_NAME)->select('id')->where(['name' => $data['name']])->count() > 0) {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Components;
 
 use Nette\Application\UI\Control;
@@ -8,7 +10,7 @@ class BaseControl extends Control
 {
     protected string $lang = DEFAULT_LANG;
 
-    /** @var array<string, string> $cmsConfig */
+    /** @var array<string,string> $cmsConfig */
     protected array $cmsConfig = [];
 
     /** @var null|array<string, string> $param */

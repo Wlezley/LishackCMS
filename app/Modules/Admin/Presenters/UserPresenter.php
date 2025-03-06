@@ -120,7 +120,7 @@ class UserPresenter extends SecuredPresenter
             $grid->setDataSource($this->db->table(UserManager::TABLE_NAME)->select('*'));
         } else {
             $deletedFilter = $columnDeleted_allowed ? ['0', '1'] : '0';
-            $enabledFilter = $columnDeleted_allowed ? ['1', '0'] : '1';
+            $enabledFilter = $columnEnabled_allowed ? ['1', '0'] : '1';
             $grid->setDataSource($this->db->table(UserManager::TABLE_NAME)->select('*')->where([
                 'role' => $editableRoles,
                 'deleted' => $deletedFilter,
@@ -380,5 +380,52 @@ class UserPresenter extends SecuredPresenter
 
             $this->redrawControl();
         }
+    }
+
+    // ##########################################
+    // ###             COMPONENTS             ###
+    // ##########################################
+
+
+    protected function createComponentUserForm(): \App\Components\Admin\UserForm
+    {
+        $form = $this->userForm->create();
+        // $form->setCmsConfig($this->cmsConfig);
+        // $form->setParam($this->getHttpRequest()->getPost('param'));
+        // $form->setUserManager($this->userManager);
+
+        $form->onSuccess[] = function (\Nette\Utils\ArrayHash $values): void {
+            if (isset($values['id'])) {
+                try {
+                    $id = $values['id'];
+                    unset($values['id']);
+
+                    $this->userManager->update((int)$id, (array)$values);
+                    $this->flashMessage('Uživatel byl upraven', 'info');
+                    // $this->redirect('this');
+                } catch(UserException $e) {
+                    $this->flashMessage($e->getMessage(), 'danger');
+                } catch (\InvalidArgumentException $e) {
+                    $this->flashMessage($e->getMessage(), 'danger');
+                }
+            } else {
+                try {
+                    $userID = $this->userManager->create((array)$values);
+                    $this->flashMessage("Uživatel byl vytvořen (ID: $userID).", 'info');
+                    $this->redirect('User:default');
+                } catch(UserException $e) {
+                    $this->flashMessage($e->getMessage(), 'danger');
+                    // $this->redirect('this#form', $form->getParameters());
+                }
+            }
+        };
+
+        $form->onError[] = function (string $message): void {
+            bdump($message, 'ON ERROR MSG');
+            $this->flashMessage($message, 'danger');
+            // $this->redirect('this#form', $form->getParameters());
+        };
+
+        return $form;
     }
 }

@@ -47,17 +47,4 @@ class SecuredPresenter extends BasePresenter
 
         $this->template->userData = $this->user->identity->getData();
     }
-
-    protected function createComponentUserForm(): \App\Components\Admin\UserForm
-    {
-        $form = $this->userForm->create();
-        $form->setCmsConfig($this->cmsConfig);
-        $form->setParam($this->getHttpRequest()->getPost('param'));
-
-        // $form->onSuccess[] = function (): void {
-        //     $this->redirect('this#form', $this->getParameters());
-        // };
-
-        return $form;
-    }
 }

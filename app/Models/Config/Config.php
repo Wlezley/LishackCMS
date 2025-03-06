@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Nette\Database\Table\ActiveRow;
+use App\Models\Helpers\ArrayHelper;
+use App\Models\ConfigException;
 
 class Config extends BaseModel
 {
@@ -24,69 +26,69 @@ class Config extends BaseModel
         }
     }
 
-    /** @param array<string,string> $param */
-    public function update(array $param): void
-    {
-        foreach ($param as $name => $value) {
-            $this->setValue($name, $value);
-        }
-    }
+    // /** @param array<string,string> $param */
+    // public function update(array $param): void
+    // {
+    //     foreach ($param as $name => $value) {
+    //         $this->setValue($name, $value);
+    //     }
+    // }
 
-    public function setValue(string $name, string $value): void
-    {
-        $selection = $this->db->table(self::TABLE_NAME)->where([
-            'name' => $name
-        ]);
+    // public function setValue(string $name, string $value): void
+    // {
+    //     $selection = $this->db->table(self::TABLE_NAME)->where([
+    //         'name' => $name
+    //     ]);
 
-        if ($selection->count() > 0) {
-            $this->db->table(self::TABLE_NAME)->where([
-                'name' => $name
-            ])->update([
-                'value' => $value
-            ]);
-        } else {
-            $this->db->table(self::TABLE_NAME)->insert([
-                'name' => $name,
-                'value' => $value
-            ]);
-        }
-    }
+    //     if ($selection->count() > 0) {
+    //         $this->db->table(self::TABLE_NAME)->where([
+    //             'name' => $name
+    //         ])->update([
+    //             'value' => $value
+    //         ]);
+    //     } else {
+    //         $this->db->table(self::TABLE_NAME)->insert([
+    //             'name' => $name,
+    //             'value' => $value
+    //         ]);
+    //     }
+    // }
 
-    public function getValue(string $name): string
-    {
-        if (empty($this->data)) {
-            $this->load();
-        }
+    // public function getValue(string $name): string
+    // {
+    //     if (empty($this->data)) {
+    //         $this->load();
+    //     }
 
-        return call_user_func_array('array_merge', array_values($this->data))[$name] ?? '';
-    }
+    //     return call_user_func_array('array_merge', array_values($this->data))[$name] ?? '';
+    // }
 
     /** @return array<string,string> $param */
-    public function getValues(): array
+    public function getValues(bool $reload = false): array
     {
-        if (empty($this->data)) {
+        if (empty($this->data) || $reload) {
             $this->load();
         }
 
         return call_user_func_array('array_merge', array_values($this->data));
     }
 
-    public function getValueByCategory(string $category, string $name): string
-    {
-        if (empty($this->data)) {
-            $this->load();
-        }
+    // public function getValueByCategory(string $category, string $name): string
+    // {
+    //     if (empty($this->data)) {
+    //         $this->load();
+    //     }
 
-        return $this->data[$category][$name] ?: '';
-    }
+    //     return $this->data[$category][$name] ?: '';
+    // }
 
-    /** @return array<string,string> $param */
-    public function getValuesByCategory(string $category): array
-    {
-        if (empty($this->data)) {
-            $this->load();
-        }
+    // /** @return array<string,string> $param */
+    // public function getValuesByCategory(string $category): array
+    // {
+    //     if (empty($this->data)) {
+    //         $this->load();
+    //     }
 
-        return $this->data[$category] ?: [];
-    }
+    //     return $this->data[$category] ?: [];
+    // }
 }

@@ -116,7 +116,7 @@ class UserValidator
         if (isset($data['password'])) {
             Validators::assert($data['password'], 'string:1..255', 'Password');
         }
-        if (isset($data['email'])) {
+        if (isset($data['email']) && !empty($data['email'])) {
             Validators::assert($data['email'], 'string:1..255', 'E-mail');
             Validators::assert($data['email'], 'email', 'E-mail');
         }

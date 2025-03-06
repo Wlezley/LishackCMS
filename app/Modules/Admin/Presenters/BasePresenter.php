@@ -52,7 +52,7 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
         // Sidebar
         $this->template->activeMenu = $this->getPresenterCategory();
 
-        bdump($this->template->getParameters(), 'TEMPLATE PARAMS');
+        // bdump($this->template->getParameters(), 'TEMPLATE PARAMS');
 
         // Ajax
         if ($this->isAjax() && !$this->isControlInvalid()) {
