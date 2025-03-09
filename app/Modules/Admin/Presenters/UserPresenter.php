@@ -6,10 +6,8 @@ namespace App\Modules\Admin\Presenters;
 
 use App\Models\UserException;
 use App\Models\UserManager;
-// use Contributte\Datagrid\Column\Action\Confirmation;
 use Contributte\Datagrid\Datagrid;
 use Nette\Utils\Json;
-use Ublaboo\DataGrid\Column\Action\Confirmation\CallbackConfirmation;
 
 class UserPresenter extends SecuredPresenter
 {
@@ -45,7 +43,7 @@ class UserPresenter extends SecuredPresenter
                     'body' => 'Opravdu chcete uživatele <strong>' . $item['name'] . '</strong> smazat?'
                 ],
             ]);
-        } catch (UserException $e) {
+        } catch (\Exception $e) {
             $this->flashMessage('Chyba: ' . $e->getMessage(), 'danger');
         }
     }
@@ -227,12 +225,14 @@ class UserPresenter extends SecuredPresenter
             ->setIcon('pencil');
 
         // ACTION DELETE
+        // $deleteActionCallback = new \Ublaboo\DataGrid\Column\Action\Confirmation\CallbackConfirmation([$this, 'encodeData_Callback']); // Deprecated (?)
+        $deleteActionCallback = new \Contributte\Datagrid\Column\Action\Confirmation\CallbackConfirmation([$this, 'encodeData_Callback']);
         $grid->addAction(':delete', '')
             ->setClass('btn btn-xs btn-danger')
             ->setIcon('eraser')
             ->setDataAttribute('bs-toggle', 'modal')
             ->setDataAttribute('bs-target', '#deleteUserConfirmModal')
-            ->setConfirmation(new CallbackConfirmation([$this, 'encodeData_Callback']));
+            ->setConfirmation($deleteActionCallback);
 
         // Actions callback
         $grid->allowRowsAction(':edit', [$this, 'allowActionEdit_Callback']);
@@ -391,11 +391,14 @@ class UserPresenter extends SecuredPresenter
     {
         $form = $this->userForm->create();
         // $form->setCmsConfig($this->cmsConfig);
-        // $form->setParam($this->getHttpRequest()->getPost('param'));
+        $form->setParam($this->getHttpRequest()->getPost('param'));
         // $form->setUserManager($this->userManager);
 
-        $form->onSuccess[] = function (\Nette\Utils\ArrayHash $values): void {
+        $form->onSuccess = function(\Nette\Utils\ArrayHash $values): void {
+            bdump($values, 'ON SUCCESS VALUES');
+
             if (isset($values['id'])) {
+                bdump('EDIT', "STATUS");
                 try {
                     $id = $values['id'];
                     unset($values['id']);
@@ -409,6 +412,7 @@ class UserPresenter extends SecuredPresenter
                     $this->flashMessage($e->getMessage(), 'danger');
                 }
             } else {
+                bdump('CREATE', "STATUS");
                 try {
                     $userID = $this->userManager->create((array)$values);
                     $this->flashMessage("Uživatel byl vytvořen (ID: $userID).", 'info');
@@ -420,7 +424,7 @@ class UserPresenter extends SecuredPresenter
             }
         };
 
-        $form->onError[] = function (string $message): void {
+        $form->onError = function(string $message): void {
             bdump($message, 'ON ERROR MSG');
             $this->flashMessage($message, 'danger');
             // $this->redirect('this#form', $form->getParameters());

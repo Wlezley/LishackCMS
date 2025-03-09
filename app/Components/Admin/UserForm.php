@@ -7,17 +7,18 @@ namespace App\Components\Admin;
 use App\Components\BaseControl;
 use App\Models\UserManager;
 use Nette\Application\UI\Form;
+use Nette\Bridges\ApplicationLatte\TemplateFactory;
 
 class UserForm extends BaseControl
 {
-    /** @var null|array<string,string> $param */
-    protected ?array $param = [];
+    // /** @var null|array<string,string> $param */
+    // protected ?array $param = [];
 
-    /** @var array<callable(\Nette\Utils\ArrayHash<mixed>): void> */
-    public array $onSuccess = [];
+    /** @var callable(\Nette\Utils\ArrayHash<mixed>): void */
+    public $onSuccess;
 
-    /** @var array<callable(string): void> */
-    public array $onError = [];
+    /** @var callable(string): void */
+    public $onError;
 
     public function __construct(
         protected \Nette\Security\User $user,
@@ -44,6 +45,8 @@ class UserForm extends BaseControl
             unset($param['password']);
         }
 
+        bdump($param, "FORM PARAM");
+
         $form = new Form();
 
         $form->setHtmlAttribute('autocomplete', 'off');
@@ -59,7 +62,8 @@ class UserForm extends BaseControl
 
         $form->addText('full_name', 'Celé jméno')
             ->setHtmlAttribute('placeholder', 'Celé jméno')
-            ->setValue($param['full_name']);
+            ->setValue($param['full_name'])
+            ->setRequired();
 
         $form->addEmail('email', 'E-mail')
             ->setHtmlAttribute('placeholder', 'E-mail')
@@ -91,31 +95,33 @@ class UserForm extends BaseControl
     /** @param \Nette\Utils\ArrayHash<mixed> $values */
     public function process(Form $form, \Nette\Utils\ArrayHash $values): void
     {
-        if ($values['password'] === $values['password2']) {
-            $this->onSuccess[] = [$values];
-            // $this->onSuccess[] = [$this, $values];
+        $isEdit = isset($values['id']);
+
+        bdump('SENT', "STATUS");
+
+        if ($isEdit || $values['password'] === $values['password2']) {
+            call_user_func($this->onSuccess, $values);
         } else {
-            $this->onError[]= ['Hesla se neshodují.'];
-            // $this->onError[]= [$this, 'Hesla se neshodují.'];
+            call_user_func($this->onError, 'Hesla se neshodují.');
         }
 
         // try {
         //     if ($values['password'] === $values['password2']) {
         //         $userID = $this->userManager->create((array)$values);
         //         if ($userID > 1) {
-        //             $this->onSuccess($this, $userID);
+        //             call_user_func($this->onSuccess, $userID);
 
         //             // $this->flashMessage("Uživatel byl vytvořen (ID: $userID).", 'info');
         //             // $this->redirect('User:default');
         //         }
         //     } else {
-        //         $this->onError($this, 'Hesla se neshodují.');
+        //         call_user_func($this->onError, 'Hesla se neshodují.');
 
         //         // $this->flashMessage('Hesla se neshodují...', 'danger');
         //     }
         // } catch(\Exception $e) {
         //     bdump($e);
-        //     // $this->onError($this, $e->getMessage());
+        //     // call_user_func($this->onError, $e->getMessage());
         //     // $this->flashMessage($e->getMessage(), 'danger');
         // }
     }
@@ -126,7 +132,7 @@ class UserForm extends BaseControl
             try {
                 $this->param = $this->userManager->get($id);
             } catch(\Exception $e) {
-                // $this->flashMessage($e->getMessage(), 'danger'); // Tohle nebude fungovat
+                call_user_func($this->onError, $e->getMessage());
             }
         }
 
