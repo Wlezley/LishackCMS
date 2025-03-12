@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Helpers\ArrayHelper;
+use App\Models\Helpers\BoolHelper;
 use App\Models\Helpers\DatetimeHelper;
 use Nette\Security\Passwords;
 use Nette\Utils\Validators;
@@ -74,27 +75,29 @@ class UserValidator
             $password = (new Passwords(PASSWORD_BCRYPT, ['cost' => 12]))->hash($password);
         }
 
-        if (is_string($data['deleted'])) {
-            $data['deleted'] = (int)$data['deleted'];
-        }
-
-        if (is_string($data['enabled'])) {
-            $data['enabled'] = (int)$data['enabled'];
-        }
-
-        return [
+        $preparedData = [
             // 'id' => $data['id'] ?? null, // ID is not included in the prepared data
             'name' => $name,
-            'password' => $password,
+            // 'password' => $password,
             'email' => $data['email'] ?? null,
             'role' => $data['role'] ?? 'user',
             'full_name' => $data['full_name'] ?? $name,
             // 'session_id' => $data['session_id'] ?? null,
-            'deleted' => in_array($data['deleted'], [0, 1], true) ? $data['deleted'] : 0,
-            'enabled' => in_array($data['enabled'], [0, 1], true) ? $data['enabled'] : 1,
+            'deleted' => BoolHelper::is_bool($data['deleted']) ? (int)BoolHelper::is_enabled($data['deleted']) : 0,
+            'enabled' => BoolHelper::is_bool($data['enabled']) ? (int)BoolHelper::is_enabled($data['enabled']) : 1,
             // 'created' => $data['created'] ?? Carbon::now()->format('Y-m-d H:i:s'),
             // 'last_login' => $data['last_login'] ?? null,
         ];
+
+        if (!empty($data['id'])) {
+            $preparedData['id'] = $data['id'];
+        }
+
+        if (!empty($password)) {
+            $preparedData['password'] = $password;
+        }
+
+        return $preparedData;
     }
 
     /**
@@ -113,7 +116,7 @@ class UserValidator
         if (isset($data['name'])) {
             Validators::assert($data['name'], 'string:1..50', 'User Name');
         }
-        if (isset($data['password'])) {
+        if (!empty($data['password'])) {
             Validators::assert($data['password'], 'string:1..255', 'Password');
         }
         if (isset($data['email']) && !empty($data['email'])) {
@@ -130,10 +133,10 @@ class UserValidator
         if (isset($data['session_id'])) {
             Validators::assert($data['session_id'], 'string:1..150', 'Session ID');
         }
-        if (isset($data['deleted']) && !in_array($data['deleted'], [0, 1], true)) {
-            throw new \InvalidArgumentException('Deleted value must be either "0" or "1".');
+        if (isset($data['deleted']) && !BoolHelper::is_bool($data['deleted'])) {
+            throw new \InvalidArgumentException('Deleted value must be type of bool or either "0" or "1".');
         }
-        if (isset($data['enabled']) && !in_array($data['enabled'], [0, 1], true)) {
+        if (isset($data['enabled']) && !BoolHelper::is_bool($data['enabled'])) {
             throw new \InvalidArgumentException('Enabled value must be either "0" or "1".');
         }
 
