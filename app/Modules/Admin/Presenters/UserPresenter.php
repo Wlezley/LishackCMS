@@ -390,29 +390,39 @@ class UserPresenter extends SecuredPresenter
     protected function createComponentUserForm(): \App\Components\Admin\UserForm
     {
         $form = $this->userForm->create();
-        // $form->setCmsConfig($this->cmsConfig);
-        $form->setParam($this->getHttpRequest()->getPost('param'));
-        // $form->setUserManager($this->userManager);
+        $id = $this->getParameter('id');
 
-        $form->onSuccess = function(\Nette\Utils\ArrayHash $values): void {
+        if ($id) {
+            try {
+                $userData = $this->userManager->get((int) $id);
+                $form->setParam($userData);
+                $form->setOrigin($form::OriginEdit);
+            } catch (\Exception $e) {
+                $this->flashMessage('Chyba při načítání uživatele: ' . $e->getMessage(), 'danger');
+            }
+        } else {
+            $form->setParam($this->getHttpRequest()->getPost('param'));
+            $form->setOrigin($form::OriginCreate);
+        }
+
+
+        $form->onSuccess = function(\Nette\Utils\ArrayHash|array $values): void {
             bdump($values, 'ON SUCCESS VALUES');
 
             if (isset($values['id'])) {
-                bdump('EDIT', "STATUS");
                 try {
                     $id = $values['id'];
                     unset($values['id']);
 
                     $this->userManager->update((int)$id, (array)$values);
                     $this->flashMessage('Uživatel byl upraven', 'info');
-                    // $this->redirect('this');
+                    $this->redirect('User:default');
                 } catch(UserException $e) {
                     $this->flashMessage($e->getMessage(), 'danger');
                 } catch (\InvalidArgumentException $e) {
                     $this->flashMessage($e->getMessage(), 'danger');
                 }
             } else {
-                bdump('CREATE', "STATUS");
                 try {
                     $userID = $this->userManager->create((array)$values);
                     $this->flashMessage("Uživatel byl vytvořen (ID: $userID).", 'info');

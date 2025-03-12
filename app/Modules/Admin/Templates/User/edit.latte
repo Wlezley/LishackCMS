@@ -7,17 +7,6 @@
 
             {control userForm, $item[id]}
 
-            {* <div>
-                <p><strong>ID:</strong> {$item[id]}</p>
-                <p><strong>Login:</strong> {$item[name]}</p>
-                <p><strong>Role:</strong> {$item[role]}</p>
-                <p><strong>E-mail:</strong> {$item[email]}</p>
-                <p><strong>Celé jméno:</strong> {$item[full_name]}</p>
-                <p><strong>Session ID:</strong> {$item[session_id]}</p>
-                <p><strong>Smazaný účet:</strong> {$item[deleted] ? 'Ano' : 'Ne'}</p>
-                <p class="mb-0"><strong>Povolené přihlášení:</strong> {$item[enabled] ? 'Ano' : 'Ne'}</p>
-            </div> *}
-
             <hr class="my-3">
 
             <div class="d-flex bd-highlight gap-3">
@@ -27,14 +16,15 @@
                         Zpět
                     </a>
                 </div>
-                <a n:href="User:create" class="btn btn-primary" title="Uložit" aria-label="Uložit">
+                {* TODO: COPY BUTTON (?) *}
+                {* <a n:href="User:create" class="btn btn-primary" title="Uložit" aria-label="Uložit">
                     <i class="fa-solid fa-save pe-2"></i>
                     Uložit
                 </a>
                 <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteUserConfirmModal" data-json="{$jsonData}">
                     <i class="fa-solid fa-eraser pe-2"></i>
                     Smazat
-                </button>
+                </button> *}
             </div>
         </div>
     </div>

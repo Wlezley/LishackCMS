@@ -29,15 +29,22 @@
                     </div>
                 </div>
                 <div class="mb-3 col-12">
-                    {label password, class => 'form-label' /}
-                    {input password, class => 'form-control'}
+                    <div class="form-check form-switch">
+                        <input n:name="change_password" class="form-check-input" type="checkbox" data-bs-toggle="collapse" data-bs-target="#changePassword" aria-expanded="false" aria-controls="changePassword">
+                        <label n:name="change_password" class="form-check-label">Změnit heslo</label>
+                    </div>
                 </div>
-                <div class="mb-3 col-12">
-                    {label password2, class => 'form-label' /}
-                    {input password2, class => 'form-control'}
+                <div class="collapse" id="changePassword">
+                    <div class="mb-3 col-12">
+                        {label password, class => 'form-label' /}
+                        {input password, class => 'form-control'}
+                    </div>
+                    <div class="mb-3 col-12">
+                        {label password2, class => 'form-label' /}
+                        {input password2, class => 'form-control'}
+                    </div>
                 </div>
             </div>
-
             <div class="row">
                 <div class=" my-3 col-12">
                     <button n:name="save" type="submit" class="btn btn-primary btn-lg float-end">Uložit</button>

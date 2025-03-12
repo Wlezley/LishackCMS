@@ -1,0 +1,47 @@
+{* {include '../@alerts.latte'} *}
+
+{form form}
+    <div class="row">
+        <div class="col-4 mx-auto">
+            <div class="row">
+                <div class="mb-3 col-12">
+                    {label name, class => 'form-label' /}
+                    {input name, class => 'form-control'}
+                </div>
+                <div class="mb-3 col-12">
+                    {label full_name, class => 'form-label' /}
+                    {input full_name, class => 'form-control'}
+                </div>
+                <div class="mb-3 col-12">
+                    {label email, class => 'form-label' /}
+                    {input email, class => 'form-control'}
+                </div>
+                <div class="mb-3 col-12">
+                    <div class="form-check form-switch">
+                        <input n:name="deleted" class="form-check-input" type="checkbox">
+                        <label n:name="deleted" class="form-check-label">Smazaný uživatel</label>
+                    </div>
+                </div>
+                <div class="mb-3 col-12">
+                    <div class="form-check form-switch">
+                        <input n:name="enabled" class="form-check-input" type="checkbox">
+                        <label n:name="enabled" class="form-check-label">Povolený uživatel (smí se přihlásit)</label>
+                    </div>
+                </div>
+                <div class="mb-3 col-12">
+                    {label password, class => 'form-label' /}
+                    {input password, class => 'form-control'}
+                </div>
+                <div class="mb-3 col-12">
+                    {label password2, class => 'form-label' /}
+                    {input password2, class => 'form-control'}
+                </div>
+            </div>
+            <div class="row">
+                <div class=" my-3 col-12">
+                    <button n:name="save" type="submit" class="btn btn-primary btn-lg float-end">Uložit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{/form}

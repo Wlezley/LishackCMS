@@ -6,15 +6,17 @@ namespace App\Components\Admin;
 
 use App\Components\BaseControl;
 use App\Models\UserManager;
+use App\Models\UserValidator;
 use Nette\Application\UI\Form;
-use Nette\Bridges\ApplicationLatte\TemplateFactory;
 
 class UserForm extends BaseControl
 {
-    // /** @var null|array<string,string> $param */
-    // protected ?array $param = [];
+    public const OriginCreate = 'Create';
+    public const OriginEdit = 'Edit';
 
-    /** @var callable(\Nette\Utils\ArrayHash<mixed>): void */
+    protected string $origin;
+
+    /** @var callable(\Nette\Utils\ArrayHash<mixed>|array<mixed>): void */
     public $onSuccess;
 
     /** @var callable(string): void */
@@ -30,7 +32,6 @@ class UserForm extends BaseControl
     public function createComponentForm(): Form
     {
         $param = $this->param;
-        $isEdit = false;
 
         if (empty($param)) {
             $param = [
@@ -41,11 +42,14 @@ class UserForm extends BaseControl
                 'enabled' => true,
             ];
         } else {
-            $isEdit = true;
             unset($param['password']);
+            unset($param['password2']);
         }
 
         bdump($param, "FORM PARAM");
+
+        $this->validateOrigin($this->origin);
+
 
         $form = new Form();
 
@@ -54,6 +58,8 @@ class UserForm extends BaseControl
         if (isset($param['id'])) {
             $form->addHidden('id', $param['id']);
         }
+
+        $form->addHidden('origin', $this->origin);
 
         $form->addText('name', 'Přihlašovací jméno')
             ->setHtmlAttribute('placeholder', 'Přihlašovací jméno')
@@ -75,74 +81,115 @@ class UserForm extends BaseControl
         $form->addCheckbox('enabled', 'Aktivní uživatel')
             ->setValue($param['enabled']);
 
+        if ($this->origin === self::OriginEdit) {
+            $form->addCheckbox('change_password', 'Změnit heslo')
+                ->setValue(false);
+        }
+
         $form->addPassword('password', 'Heslo')
             ->setHtmlAttribute('placeholder', 'Heslo')
             ->setHtmlAttribute('autocomplete', 'new-password')
-            ->setRequired(!$isEdit);
+            ->setRequired($this->origin === self::OriginCreate);
 
         $form->addPassword('password2', 'Heslo znovu')
             ->setHtmlAttribute('placeholder', 'Heslo znovu')
             ->setHtmlAttribute('autocomplete', 'new-password')
-            ->setRequired(!$isEdit);
+            ->setRequired($this->origin === self::OriginCreate);
 
-        $form->addSubmit('save', $isEdit ? 'Uložit' : 'Vytvořit');
+        $form->addSubmit('save', $this->origin === self::OriginEdit ? 'Uložit' : 'Vytvořit');
 
-        $form->onSuccess[] = [$this, 'process'];
+        $form->onSuccess[] = [$this, 'process' . $this->origin];
 
         return $form;
     }
 
     /** @param \Nette\Utils\ArrayHash<mixed> $values */
-    public function process(Form $form, \Nette\Utils\ArrayHash $values): void
+    public function processCreate(Form $form, \Nette\Utils\ArrayHash $values): void
     {
-        $isEdit = isset($values['id']);
+        bdump($values, 'FORM SUBMITTED VALUES (CR)');
 
-        bdump('SENT', "STATUS");
-
-        if ($isEdit || $values['password'] === $values['password2']) {
-            call_user_func($this->onSuccess, $values);
-        } else {
-            call_user_func($this->onError, 'Hesla se neshodují.');
+        try {
+            $this->validateOrigin($values['origin']);
+        } catch (\Exception $e) {
+            call_user_func($this->onError, $e->getMessage());
         }
 
-        // try {
-        //     if ($values['password'] === $values['password2']) {
-        //         $userID = $this->userManager->create((array)$values);
-        //         if ($userID > 1) {
-        //             call_user_func($this->onSuccess, $userID);
+        if (empty($values['password'])) {
+            call_user_func($this->onError, 'Vyplňte heslo.');
+            return;
+        } elseif ($values['password'] !== $values['password2']) {
+            call_user_func($this->onError, 'Hesla se neshodují.');
+            return;
+        }
 
-        //             // $this->flashMessage("Uživatel byl vytvořen (ID: $userID).", 'info');
-        //             // $this->redirect('User:default');
-        //         }
-        //     } else {
-        //         call_user_func($this->onError, 'Hesla se neshodují.');
+        $formatedValues = UserValidator::prepareData((array)$values, false);
+        bdump($formatedValues, 'FORM FORMATED VALUES (CR)');
+        call_user_func($this->onSuccess, $formatedValues);
+    }
 
-        //         // $this->flashMessage('Hesla se neshodují...', 'danger');
-        //     }
-        // } catch(\Exception $e) {
-        //     bdump($e);
-        //     // call_user_func($this->onError, $e->getMessage());
-        //     // $this->flashMessage($e->getMessage(), 'danger');
-        // }
+    /** @param \Nette\Utils\ArrayHash<mixed> $values */
+    public function processEdit(Form $form, \Nette\Utils\ArrayHash $values): void
+    {
+        bdump($values, 'FORM SUBMITTED VALUES (ED)');
+
+        try {
+            $this->validateOrigin($values['origin']);
+        } catch (\Exception $e) {
+            call_user_func($this->onError, $e->getMessage());
+        }
+
+        if ($values['change_password'] && $values['password'] !== $values['password2']) {
+            call_user_func($this->onError, 'Hesla se neshodují.');
+            return;
+        }
+
+        $formatedValues = UserValidator::prepareData((array)$values, false);
+        // $formatedValues['id'] = $values['id'];
+        bdump($formatedValues, 'FORM FORMATED VALUES (ED)');
+        call_user_func($this->onSuccess, $formatedValues);
     }
 
     public function render(int|string|null $id = null): void
     {
-        if ($id !== null) {
-            try {
-                $this->param = $this->userManager->get($id);
-            } catch(\Exception $e) {
-                call_user_func($this->onError, $e->getMessage());
+        try {
+            $this->validateOrigin($this->origin);
+
+            if ($this->origin === self::OriginEdit) {
+                if (empty($id)) {
+                    throw new \Exception('User ID is missing.');
+                }
+
+                $this->param = $this->userManager->get((int) $id);
             }
+        } catch(\Exception $e) {
+            call_user_func($this->onError, $e->getMessage());
         }
 
-        $this->template->setFile(__DIR__ . '/UserForm.latte');
+        $this->template->setFile(__DIR__ . '/UserForm' . $this->origin . '.latte');
         $this->template->render();
     }
 
     public function setUserManager(UserManager $userManager): void
     {
         $this->userManager = $userManager;
+    }
+
+    public function setOrigin(string $origin): void
+    {
+        $this->validateOrigin($origin);
+        $this->origin = $origin;
+    }
+
+    private function validateOrigin(string $origin): void
+    {
+        if (empty($origin)) {
+            throw new \Exception('Form origin is missing.');
+        } elseif (!in_array($origin, [
+            self::OriginCreate,
+            self::OriginEdit
+        ], true)) {
+            throw new \Exception('Form origin is incorrect.');
+        }
     }
 }
 
