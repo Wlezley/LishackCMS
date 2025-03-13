@@ -25,7 +25,7 @@ class UserPresenter extends SecuredPresenter
         $this->template->title = 'Vytvoření nového uživatele';
     }
 
-    public function renderEdit(int $id = 0): void
+    public function renderEdit(int $id): void
     {
         $this->template->title = 'Editace uživatele';
 
@@ -83,22 +83,6 @@ class UserPresenter extends SecuredPresenter
             ]);
         }
     }
-
-    // public function handleLoad(): void
-    // {
-    //     if (!$this->isAjax()) {
-    //         $this->redirect('this');
-    //     }
-    //     $this->redrawControl();
-    // }
-
-    // public function handleSave(): void
-    // {
-    //     if (!$this->isAjax()) {
-    //         $this->redirect('this');
-    //     }
-    //     $this->redrawControl();
-    // }
 
     // ##########################################
     // ###              DATAGRID              ###
@@ -398,46 +382,23 @@ class UserPresenter extends SecuredPresenter
                 $form->setParam($userData);
                 $form->setOrigin($form::OriginEdit);
             } catch (\Exception $e) {
-                $this->flashMessage('Chyba při načítání uživatele: ' . $e->getMessage(), 'danger');
+                $this->flashMessage('Chyba při čtení dat uživatele: ' . $e->getMessage(), 'danger');
             }
         } else {
             $form->setParam($this->getHttpRequest()->getPost('param'));
             $form->setOrigin($form::OriginCreate);
         }
 
-
-        $form->onSuccess = function(\Nette\Utils\ArrayHash|array $values): void {
-            bdump($values, 'ON SUCCESS VALUES');
-
-            if (isset($values['id'])) {
-                try {
-                    $id = $values['id'];
-                    unset($values['id']);
-
-                    $this->userManager->update((int)$id, (array)$values);
-                    $this->flashMessage('Uživatel byl upraven', 'info');
-                    $this->redirect('User:default');
-                } catch(UserException $e) {
-                    $this->flashMessage($e->getMessage(), 'danger');
-                } catch (\InvalidArgumentException $e) {
-                    $this->flashMessage($e->getMessage(), 'danger');
-                }
-            } else {
-                try {
-                    $userID = $this->userManager->create((array)$values);
-                    $this->flashMessage("Uživatel byl vytvořen (ID: $userID).", 'info');
-                    $this->redirect('User:default');
-                } catch(UserException $e) {
-                    $this->flashMessage($e->getMessage(), 'danger');
-                    // $this->redirect('this#form', $form->getParameters());
-                }
-            }
+        $form->onSuccess = function(string $message): void {
+            bdump($message, 'ON SUCCESS MSG');
+            $this->flashMessage($message, 'info');
+            $this->redirect('User:default');
         };
 
         $form->onError = function(string $message): void {
             bdump($message, 'ON ERROR MSG');
             $this->flashMessage($message, 'danger');
-            // $this->redirect('this#form', $form->getParameters());
+            // $this->redirect('this');
         };
 
         return $form;

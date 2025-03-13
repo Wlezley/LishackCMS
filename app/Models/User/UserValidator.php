@@ -89,10 +89,6 @@ class UserValidator
             // 'last_login' => $data['last_login'] ?? null,
         ];
 
-        if (!empty($data['id'])) {
-            $preparedData['id'] = $data['id'];
-        }
-
         if (!empty($password)) {
             $preparedData['password'] = $password;
         }
