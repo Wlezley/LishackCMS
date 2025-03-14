@@ -27,13 +27,19 @@ class SecuredPresenter extends BasePresenter
         }
 
         if ($this->user->isLoggedIn()) {
-            $userData = $this->db->table(\App\Models\UserManager::TABLE_NAME)->select('deleted, enabled')->where([
+            $userData = $this->db->table(\App\Models\UserManager::TABLE_NAME)->select('deleted, enabled, role')->where([
                 'id' => $this->user->getId()
             ])->fetch();
 
             if (!$userData || $userData['deleted'] == 1 || $userData['enabled'] != 1) {
-                $this->user->logout();
+                $this->user->logout(true);
                 $this->flashMessage('Uživatel byl odhlášen', 'danger');
+                $this->redirect('Sign:in');
+            }
+
+            if ($this->user->getIdentity()->getData()['role'] !== $userData['role']) {
+                $this->user->logout(true);
+                $this->flashMessage('Uživatel byl odhlášen: Změna role', 'danger');
                 $this->redirect('Sign:in');
             }
         }
