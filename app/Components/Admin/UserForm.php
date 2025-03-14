@@ -7,6 +7,7 @@ namespace App\Components\Admin;
 use App\Components\BaseControl;
 use App\Models\UserException;
 use App\Models\UserManager;
+use App\Models\UserRole;
 use App\Models\UserValidator;
 use Nette\Application\UI\Form;
 
@@ -15,7 +16,9 @@ class UserForm extends BaseControl
     public const OriginCreate = 'Create';
     public const OriginEdit = 'Edit';
 
-    protected string $origin;
+    private string $origin;
+
+    private UserRole $editorRole;
 
     /** @var callable(string): void */
     public $onSuccess;
@@ -28,6 +31,7 @@ class UserForm extends BaseControl
         protected UserManager $userManager
     ) {
         $this->param = [];
+        $this->editorRole = new UserRole($user);
     }
 
     public function createComponentForm(): Form
@@ -39,12 +43,18 @@ class UserForm extends BaseControl
                 'name' => '',
                 'full_name' => '',
                 'email' => '',
+                'role' => 'user',
                 'deleted' => false,
                 'enabled' => true,
             ];
         } else {
             unset($param['password']);
             unset($param['password2']);
+        }
+
+        $readOnly = false;
+        if ($this->origin === self::OriginEdit) {
+            $readOnly = $this->isReadOnly($param['id'], $param['role']);
         }
 
         $form = new Form();
@@ -57,26 +67,40 @@ class UserForm extends BaseControl
 
         $form->addText('name', 'Přihlašovací jméno')
             ->setHtmlAttribute('placeholder', 'Přihlašovací jméno')
+            ->setHtmlAttribute('autocomplete', 'off')
+            ->setHtmlAttribute('readonly', $readOnly)
             ->setValue($param['name'])
             ->setRequired();
 
         $form->addText('full_name', 'Celé jméno')
             ->setHtmlAttribute('placeholder', 'Celé jméno')
+            ->setHtmlAttribute('autocomplete', 'off')
+            ->setHtmlAttribute('readonly', $readOnly)
             ->setValue($param['full_name'])
             ->setRequired();
 
         $form->addEmail('email', 'E-mail')
             ->setHtmlAttribute('placeholder', 'E-mail')
+            ->setHtmlAttribute('autocomplete', 'off')
+            ->setHtmlAttribute('readonly', $readOnly)
             ->setValue($param['email']);
 
+        $form->addSelect('role', 'Oprávnění', $this->getRoleSelectList($param['role']))
+            ->setValue($param['role'])
+            ->setDisabled($this->readOnlyRole($param['role']))
+            ->setRequired();
+
         $form->addCheckbox('deleted', 'Smazáno')
+            ->setDisabled($readOnly)
             ->setValue($param['deleted']);
 
         $form->addCheckbox('enabled', 'Aktivní uživatel')
+            ->setDisabled($readOnly)
             ->setValue($param['enabled']);
 
         if ($this->origin === self::OriginEdit) {
             $form->addCheckbox('change_password', 'Změnit heslo')
+                ->setDisabled($readOnly)
                 ->setValue(false);
         }
 
@@ -108,6 +132,11 @@ class UserForm extends BaseControl
             return;
         }
 
+        if ($this->editorRole->isLessOrEqualsThan($values['role'])) {
+            call_user_func($this->onError, 'Uživateli nelze přidelit vyšší nebo stejnou roli, než je ta vaše.');
+            return;
+        }
+
         try {
             $userID = $this->userManager->create((array)$values);
             call_user_func($this->onSuccess, "Uživatel byl vytvořen (ID: $userID).");
@@ -125,6 +154,17 @@ class UserForm extends BaseControl
                 return;
             }
         }
+
+        // TODO: Check user permissions for role settings, check if not READ-ONLY, etc...
+
+        // if ($this->isReadOnly($values['id'], $values['role'])) {
+        //     call_user_func($this->onError, 'Nemáte dostatečná oprávnění pro editaci tohoto uživatele.');
+        //     return;
+        // }
+        // if ($this->editorRole->isLessOrEqualsThan($values['role'])) {
+        //     call_user_func($this->onError, 'Uživateli nelze přidelit vyšší nebo stejnou roli, než je ta vaše.');
+        //     return;
+        // }
 
         try {
             $userData = UserValidator::prepareData((array)$values);
@@ -146,6 +186,7 @@ class UserForm extends BaseControl
                 }
 
                 $this->param = $this->userManager->get((int) $id);
+                $this->template->readOnly = $this->isReadOnly($id, $this->param['role']);
             }
         } catch(\Exception $e) {
             call_user_func($this->onError, $e->getMessage());
@@ -158,5 +199,46 @@ class UserForm extends BaseControl
     public function setOrigin(string $origin): void
     {
         $this->origin = $origin;
+    }
+
+    private function isReadOnly(int|string $targetId, string $targetRole): bool
+    {
+        if ($this->user->getId() == $targetId) {
+            return false;
+        }
+
+        return $this->editorRole->isLessOrEqualsThan($targetRole);
+    }
+
+    private function readOnlyRole(?string $targetRole): bool
+    {
+        if (isset($targetRole) && $this->editorRole->isLessOrEqualsThan($targetRole)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function getRoleSelectList(?string $targetRole): array
+    {
+        // TODO: Move to Translator
+        $USER_ROLES_SELECT = [
+            'guest' => 'Host',
+            'user' => 'Uživatel',
+            'redactor' => 'Redaktor',
+            'manager' => 'Moderátor',
+            'admin' => 'Správce'
+        ];
+
+        if ($this->origin === self::OriginEdit && $this->editorRole->isLessOrEqualsThan($targetRole)) {
+            return [$targetRole => $USER_ROLES_SELECT[$targetRole]];
+        } else {
+            $roleListSelect = [];
+
+            foreach ($this->editorRole->getLowerList() as $roleName) {
+                $roleListSelect[$roleName] = $USER_ROLES_SELECT[$roleName];
+            }
+            return $roleListSelect;
+        }
     }
 }
