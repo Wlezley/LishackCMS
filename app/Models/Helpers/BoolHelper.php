@@ -17,9 +17,9 @@ class BoolHelper
      */
     public static function is_enabled(mixed $variable): bool|null
     {
-        if (in_array($variable, [1, '1', 'on', 'yes', 'enabled', true], true)) {
+        if (in_array($variable, [1, '1', 'on', 'yes', 'enabled', 'true', true], true)) {
             return true;
-        } elseif (in_array($variable, [0, '0', 'off', 'no', 'disabled', false], true)) {
+        } elseif (in_array($variable, [0, '0', 'off', 'no', 'disabled', 'false', false], true)) {
             return false;
         } else {
             return null;
