@@ -78,14 +78,14 @@ class UserRole
     {
         $roleList = [];
 
-        if ($includeEquals) {
-            $roleList[$this->level] = self::USER_ROLES[$this->level];
-        }
-
         foreach (self::USER_ROLES as $roleID => $roleName) {
             if ($roleID < $this->level) {
                 $roleList[$roleID] = $roleName;
             }
+        }
+
+        if ($includeEquals) {
+            $roleList[$this->level] = self::USER_ROLES[$this->level];
         }
 
         return $roleList;
