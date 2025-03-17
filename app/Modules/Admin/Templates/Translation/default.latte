@@ -1,13 +1,16 @@
 {block content}
 <div class="row">
     <div class="col">
-        <p>TEST:</p>
-        <p>{$_('lishack-cms')}</p>
 
-        {* <form n:name="searchForm">
-            <input type="text" name="search" value="{$search}" placeholder="Hledat překlady">
-            <button type="submit">Hledat</button>
-        </form> *}
+        <form class="row g-3 float-end" name="searchForm">
+            <div class="col-auto">
+                <label for="search" class="visually-hidden">Hledat překlady</label>
+                <input type="text" class="form-control" id="search" name="search" value="{$search}" placeholder="Hledat překlady">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary mb-3">Hledat</button>
+            </div>
+        </form>
 
         <table class="table table-responsive table-striped table-hover table-dark">
             <thead>
@@ -30,58 +33,13 @@
             </tbody>
         </table>
 
-        {* COMPLEX PAGINATION TEST *}
-        <nav aria-label="Pagination">
-            <ul class="pagination justify-content-center">
-                {if $page > 1}
-                    <li class="page-item">
-                        <a class="page-link" n:href="this, page => $page - 1, search => $search">« Předchozí</a>
-                    </li>
-                {/if}
-
-                {var $start = max(1, $page - 2)}
-                {var $end = min($totalPages, $page + 2)}
-
-                {if $start > 1}
-                    <li class="page-item"><a class="page-link" n:href="this, page => 1, search => $search">1</a></li>
-                    {if $start > 2}
-                        <li class="page-item disabled"><span class="page-link">...</span></li>
-                    {/if}
-                {/if}
-
-                {for $i = $start; $i <= $end; $i++}
-                    <li class="page-item {if $i === $page}active{/if}">
-                        <a class="page-link" n:href="this, page => $i, search => $search">{$i}</a>
-                    </li>
-                {/for}
-
-                {if $end < $totalPages}
-                    {if $end < $totalPages - 1}
-                        <li class="page-item disabled"><span class="page-link">...</span></li>
-                    {/if}
-                    <li class="page-item">
-                        <a class="page-link" n:href="this, page => $totalPages, search => $search">{$totalPages}</a>
-                    </li>
-                {/if}
-
-                {if $page < $totalPages}
-                    <li class="page-item">
-                        <a class="page-link" n:href="this, page => $page + 1, search => $search">Další »</a>
-                    </li>
-                {/if}
-            </ul>
-        </nav>
+        {control pagination}
 
         <div class="datagrid-mt-fix">
             <hr class="my-3">
         </div>
 
         <div>
-            {* SIMPLE PAGINATION TEST *}
-            <a n:if="$page > 1" n:href="this, page => $page - 1, search => $search" class="btn btn-primary">Předchozí</a>
-            Stránka {$page} z {$totalPages}
-            <a n:if="$page < $totalPages" n:href="this, page => $page + 1, search => $search" class="btn btn-primary">Další</a>
-
             <a n:href="Translation:create" class="btn btn-primary float-end" title="Přidat" aria-label="Přidat">
                 <i class="fa-solid fa-plus pe-2"></i>
                 Přidat

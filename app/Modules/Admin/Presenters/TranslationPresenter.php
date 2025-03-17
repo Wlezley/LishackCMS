@@ -8,10 +8,8 @@ class TranslationPresenter extends SecuredPresenter
 {
     public function renderDefault(int $page = 1, ?string $lang = null, ?string $search = null): void
     {
-        $this->template->title = 'Jazykový překlad';
-
         $lang = $lang ?? DEFAULT_LANG;
-        $limit = 5;
+        $limit = 10;
         $offset = ($page - 1) * $limit;
 
         $this->template->translations = $this->translationManager->getList(
@@ -21,13 +19,12 @@ class TranslationPresenter extends SecuredPresenter
             $search
         );
 
-        $totalCount = $this->translationManager->getCount($lang, $search);
-        $totalPages = (int) ceil($totalCount / $limit);
+        $totalItems = $this->translationManager->getCount($lang, $search);
+        $this->setPagination($limit, $totalItems);
 
-        $this->template->page = $page;
+        $this->template->title = "Jazykový překlad [$lang]";
+        $this->template->totalItems = $totalItems;
         $this->template->search = $search;
-        $this->template->totalCount = $totalCount;
-        $this->template->totalPages = $totalPages;
     }
 
     public function renderCreate(): void
