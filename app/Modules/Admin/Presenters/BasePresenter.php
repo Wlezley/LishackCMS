@@ -34,7 +34,7 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
         // CMS config
         $this->cmsConfig = $this->config->getValues();
         $this->lang = DEFAULT_LANG;
-        $this->translationManager->setLanguage($this->lang);
+        $this->translationManager->setCurrentLanguage($this->lang);
     }
 
     public function beforeRender(): void

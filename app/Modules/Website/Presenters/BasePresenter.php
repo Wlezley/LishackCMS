@@ -75,7 +75,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $this->title = $this->cmsConfig['SITE_TITLE'];
 
         // Translations language
-        $this->translationManager->setLanguage($this->lang);
+        $this->translationManager->setCurrentLanguage($this->lang);
 
         // SEO
         $this->seo_robots = DEBUG ? 'noindex, nofollow' : 'index, follow';
