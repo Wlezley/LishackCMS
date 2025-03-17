@@ -5,34 +5,62 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Nette\Database\Explorer;
+use Nette\InvalidArgumentException;
 
 class TranslationManager
 {
     public const TABLE_NAME = 'translations';
-    public const LANG_TABLE_NAME = 'lang';
 
     private string $currentLang = DEFAULT_LANG;
 
-    public function __construct(
-        private Explorer $db
-    ) {}
+    /** @var array<string,array<string,string>> */
+    private array $translations = [];
 
-    /** @throws \InvalidArgumentException */
+    public function __construct(
+        private Explorer $db,
+        private TranslationLanguage $languageService
+    ) {
+        $this->currentLang = $this->languageService->getDefaultLang(DEFAULT_LANG);
+    }
+
+    /** @throws InvalidArgumentException */
     public function setCurrentLanguage(string $lang): void
     {
-        if (!$this->getLanguageData($lang)) {
-            throw new \InvalidArgumentException("Language with code '$lang' is not defined.");
+        if (!$this->languageService->getLanguage($lang)) {
+            throw new InvalidArgumentException("Language with code '$lang' is not defined.");
         }
 
         $this->currentLang = $lang;
+        $this->load($lang);
+    }
+
+    private function load(string $lang, bool $reload = false): void
+    {
+        if ($reload) {
+            unset($this->translations[$lang]);
+        }
+
+        if (!isset($this->translations[$lang])) {
+            $this->translations[$lang] = $this->db->table(self::TABLE_NAME)
+                ->where('lang', $lang)
+                ->fetchPairs('key', 'text');
+        }
+    }
+
+    public function reload(string $lang): void
+    {
+        $this->load($lang, true);
     }
 
     public function get(string $key, ?string $lang = null): string
     {
-        return $this->db->table(self::TABLE_NAME)
-            ->where('key', $key)
-            ->where('lang', $lang ?? $this->currentLang)
-            ->fetch()->text ?? $key;
+        $lang = $lang ?? $this->currentLang;
+
+        if (!isset($this->translations[$lang])) {
+            $this->load($lang);
+        }
+
+        return $this->translations[$lang][$key] ?? $key;
     }
 
     public function add(string $key, string $lang, string $text): void
@@ -42,17 +70,49 @@ class TranslationManager
             'lang' => $lang,
             'text' => $text
         ]);
+
+        if (!isset($this->translations[$lang])) {
+            $this->load($lang);
+        }
+
+        $this->translations[$lang][$key] = $text;
     }
 
     public function save(string $key, string $lang, string $text): void
     {
-        $this->db->table(self::TABLE_NAME)
-            ->where([
-                'key' => $key,
-                'lang' => $lang
-            ])->update([
-                'text' => $text
+        $affectedRows = $this->db->table(self::TABLE_NAME)->where([
+            'key' => $key,
+            'lang' => $lang
+        ])->update([
+            'text' => $text
         ]);
+
+        if (!isset($this->translations[$lang])) {
+            $this->load($lang);
+        }
+
+        if ($affectedRows == 1) {
+            $this->translations[$lang][$key] = $text;
+        } // TODO: catch errors?
+    }
+
+    public function changeKey(string $oldKey, string $newKey, string $lang): void
+    {
+        $affectedRows = $this->db->table(self::TABLE_NAME)->where([
+            'key' => $oldKey,
+            'lang' => $lang
+        ])->update([
+            'key' => $newKey
+        ]);
+
+        if (!isset($this->translations[$lang])) {
+            $this->load($lang);
+        }
+
+        if ($affectedRows == 1) {
+            $this->translations[$lang][$newKey] = $this->translations[$lang][$oldKey];
+            unset($this->translations[$lang][$oldKey]);
+        } // TODO: catch errors?
     }
 
     /** @return array<T|mixed> */
@@ -81,48 +141,8 @@ class TranslationManager
         return $query->count('*');
     }
 
-    /** @return null|array<T|mixed> */
-    public function getLanguageData(string $lang): ?array
+    public function getLanguageService(): TranslationLanguage
     {
-        $row = $this->db->table(self::LANG_TABLE_NAME)
-            ->where('lang', $lang)
-            ->fetch();
-
-        return $row ? $row->toArray() : null;
-    }
-
-    /** @return array<T|mixed> */
-    public function getLanguageList(bool $enabledOnly = true): array
-    {
-        $query = $this->db->table(self::LANG_TABLE_NAME)
-            ->select('*');
-
-        if ($enabledOnly) {
-            $query->where('enabled', 1);
-        }
-
-        return $query->fetchAll();
-    }
-
-    /** @return array<T|mixed> */
-    public function getLanguageNames(bool $enabledOnly = true): array
-    {
-        $query = $this->db->table(self::LANG_TABLE_NAME)
-            ->select('lang, name');
-
-        if ($enabledOnly) {
-            $query->where('enabled', 1);
-        }
-
-        return $query->fetchPairs('lang', 'name');
-    }
-
-    public function getDefaultLang(?string $fallback = null): ?string
-    {
-        $row = $this->db->table(self::LANG_TABLE_NAME)
-            ->where('default', 1)
-            ->fetch();
-
-        return $row ? $row['lang'] : $fallback;
+        return $this->languageService;
     }
 }

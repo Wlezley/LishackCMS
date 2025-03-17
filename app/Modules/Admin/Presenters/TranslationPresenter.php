@@ -10,7 +10,7 @@ class TranslationPresenter extends SecuredPresenter
     {
         $lang = $lang ?? DEFAULT_LANG;
 
-        $langData = $this->translationManager->getLanguageData($lang);
+        $langData = $this->translationManager->getLanguageService()->getLanguage($lang);
         if ($langData === null) {
             $this->redirect('Translation:');
         }
