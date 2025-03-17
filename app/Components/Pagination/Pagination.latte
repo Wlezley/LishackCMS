@@ -2,7 +2,7 @@
     <ul class="pagination justify-content-center">
         {if $page > 1}
             <li class="page-item">
-                <a class="page-link" href="{$buildUrl($page - 1)}">« Předchozí</a>
+                <a class="page-link" href="{$buildUrl($page - 1)}">« {$_('previous')}</a>
             </li>
         {/if}
 
@@ -30,7 +30,7 @@
 
         {if $page < $totalPages}
             <li class="page-item">
-                <a class="page-link" href="{$buildUrl($page + 1)}">Další »</a>
+                <a class="page-link" href="{$buildUrl($page + 1)}">{$_('next')} »</a>
             </li>
         {/if}
     </ul>

@@ -102,4 +102,20 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
 
         return '';
     }
+
+    // ##########################################
+    // ###             COMPONENTS             ###
+    // ##########################################
+
+    protected function createComponent(string $name): ?\Nette\ComponentModel\IComponent
+    {
+        $component = parent::createComponent($name);
+
+        if ($component instanceof \App\Components\BaseControl) {
+            $component->injectTranslationManager($this->translationManager);
+            $component->setLang($this->lang);
+        }
+
+        return $component;
+    }
 }
