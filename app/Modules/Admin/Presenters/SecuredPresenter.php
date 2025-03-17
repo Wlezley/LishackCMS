@@ -4,14 +4,10 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
-use App\Components\Admin\IUserFormFactory;
 use App\Models\UserRole;
 
 class SecuredPresenter extends BasePresenter
 {
-    /** @var IUserFormFactory @inject */
-    public $userForm;
-
     protected UserRole $userRole;
 
     public function startup(): void

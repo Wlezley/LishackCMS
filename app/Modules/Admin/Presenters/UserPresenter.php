@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
-use App\Components\Admin\UserForm;
+use App\Components\Admin\IUserFormFactory;
 use App\Components\Admin\UserListGrid;
 use App\Models\UserException;
 use App\Models\UserManager;
@@ -13,6 +13,9 @@ use Nette\Utils\Json;
 
 class UserPresenter extends SecuredPresenter
 {
+    /** @var IUserFormFactory @inject */
+    public IUserFormFactory $userForm;
+
     public function __construct(
         private UserManager $userManager,
         private UserListGrid $userListGrid
@@ -89,13 +92,13 @@ class UserPresenter extends SecuredPresenter
     // ###             COMPONENTS             ###
     // ##########################################
 
-    public function createComponentUserList(): Datagrid
+    protected function createComponentUserList(): Datagrid
     {
         // $this->userListGrid->setPresenter($this);
         return $this->userListGrid->createGrid();
     }
 
-    protected function createComponentUserForm(): UserForm
+    protected function createComponentUserForm(): \App\Components\Admin\UserForm
     {
         $form = $this->userForm->create();
         $id = $this->getParameter('id');

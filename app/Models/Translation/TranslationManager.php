@@ -56,7 +56,7 @@ class TranslationManager
             ->where('lang', $lang)
             ->limit($limit, $offset);
 
-        if ($search) {
+        if ($search !== null) {
             $query->where('key LIKE ?', "%$search%");
         }
 
@@ -68,7 +68,7 @@ class TranslationManager
         $query = $this->db->table(self::TABLE_NAME)
             ->where('lang', $lang);
 
-        if ($search) {
+        if ($search !== null) {
             $query->where('key LIKE ?', "%$search%");
         }
 

@@ -31,5 +31,4 @@ services:
     - Phinx\Wrapper\TextWrapper(@Phinx\Console\PhinxApplication)
 
     # Components
-    - App\Components\Admin\UserForm
     - App\Components\Admin\UserListGrid

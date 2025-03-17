@@ -13,7 +13,7 @@ class BaseControl extends Control
     /** @var array<string,string> $cmsConfig */
     protected array $cmsConfig = [];
 
-    /** @var null|array<string, string> $param */
+    /** @var null|array<string,string> $param */
     protected ?array $param = [];
 
     public function setLang(string $lang): void
@@ -26,25 +26,25 @@ class BaseControl extends Control
         return $this->lang;
     }
 
-    /** @param array<string, string> $cmsConfig */
+    /** @param array<string,string> $cmsConfig */
     public function setCmsConfig(array $cmsConfig): void
     {
         $this->cmsConfig = $cmsConfig;
     }
 
-    /** @return array<string, string> */
+    /** @return array<string,string> */
     public function getCmsConfig(): array
     {
         return $this->cmsConfig;
     }
 
-    /** @param null|array<string, string> $param */
+    /** @param null|array<string,string> $param */
     public function setParam(?array $param): void
     {
         $this->param = $param === null ? [] : $param;
     }
 
-    /** @return array<string, string> */
+    /** @return array<string,string> */
     public function getParam(): array
     {
         return $this->param;

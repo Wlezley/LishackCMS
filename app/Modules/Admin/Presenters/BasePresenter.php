@@ -13,13 +13,13 @@ use Nette\Database\Explorer;
 abstract class BasePresenter extends \Nette\Application\UI\Presenter
 {
     /** @var Explorer @inject */
-    public $db;
+    public Explorer $db;
 
     /** @var Config @inject */
-    public $config;
+    public Config $config;
 
     /** @var TranslationManager @inject */
-    public $translationManager;
+    public TranslationManager $translationManager;
 
     /** @var array<string,string> $cmsConfig */
     protected array $cmsConfig = [];
