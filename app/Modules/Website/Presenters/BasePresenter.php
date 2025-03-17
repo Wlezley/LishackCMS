@@ -17,19 +17,19 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     protected Nette\Http\UrlScript $url;
 
     /** @var Explorer @inject */
-    public $db;
+    public Explorer $db;
 
     /** @var Config @inject */
-    public $config;
+    public Config $config;
 
     /** @var TranslationManager @inject */
-    public $translationManager;
+    public TranslationManager $translationManager;
 
     /** @var IAdminButtonFactory @inject */
-    public $adminBarFactory;
+    public IAdminButtonFactory $adminBarFactory;
 
     /** @var IMenuFactory @inject */
-    public $menuFactory;
+    public IMenuFactory $menuFactory;
 
     /** @var array<string,string> $cmsConfig */
     protected array $cmsConfig = [];
@@ -47,12 +47,6 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     protected string $social_description = '';
     protected string $social_image = '';
 
-    // public function __construct(
-    //     protected Explorer $db,
-    //     protected Config $config,
-    //     protected Menu $menu,
-    //     private AssetsVersion $assetsVersion
-    // ) { }
 
     public function startup(): void
     {
@@ -133,6 +127,10 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
             $this->redrawControl();
         }
     }
+
+    // ##########################################
+    // ###             COMPONENTS             ###
+    // ##########################################
 
     protected function createComponentAdminButton(): \App\Components\AdminButton
     {
