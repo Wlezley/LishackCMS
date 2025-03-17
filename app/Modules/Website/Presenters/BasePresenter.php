@@ -6,6 +6,7 @@ namespace App\Modules\Website\Presenters;
 
 use App\Components\IAdminButtonFactory;
 use App\Components\IMenuFactory;
+use App\Components\IPaginationFactory;
 use App\Models\Config;
 use App\Models\Helpers\AssetsVersion;
 use App\Models\TranslationManager;
@@ -30,6 +31,13 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
     /** @var IMenuFactory @inject */
     public IMenuFactory $menuFactory;
+
+    /** @var IPaginationFactory @inject */
+    public IPaginationFactory $paginationFactory;
+
+    // Pagination
+    private ?int $itemsPerPage = null;
+    private ?int $totalItems = null;
 
     /** @var array<string,string> $cmsConfig */
     protected array $cmsConfig = [];
@@ -126,6 +134,31 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         if ($this->isAjax() && !$this->isControlInvalid()) {
             $this->redrawControl();
         }
+    }
+
+    // ##########################################
+    // ###             PAGINATION             ###
+    // ##########################################
+
+    protected function setPagination(int $itemsPerPage, int $totalItems): void
+    {
+        $this->itemsPerPage = $itemsPerPage;
+        $this->totalItems = $totalItems;
+    }
+
+    protected function createComponentPagination(): \App\Components\Pagination
+    {
+        if ($this->itemsPerPage === null || $this->totalItems === null) {
+            throw new \LogicException('Call setPagination() in the render method first.');
+        }
+
+        $control = $this->paginationFactory->create();
+        $control->setQueryParams($this->getHttpRequest());
+        $control->setItemsPerPage($this->itemsPerPage);
+        $control->setTotalItems($this->totalItems);
+        $control->setCurrentPage((int) $this->getParameter('page', 1));
+
+        return $control;
     }
 
     // ##########################################

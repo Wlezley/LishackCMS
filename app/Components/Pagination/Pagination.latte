@@ -1,0 +1,43 @@
+<nav aria-label="Pagination">
+    <ul class="pagination justify-content-center">
+        {var $page = $paginator->getPage()}
+        {var $totalPages = $paginator->getPageCount()}
+
+        {if $page > 1}
+            <li class="page-item">
+                <a class="page-link" href="{$buildUrl($page - 1)}">« Předchozí</a>
+            </li>
+        {/if}
+
+        {var $start = max(1, $page - 2)}
+        {var $end = min($totalPages, $page + 2)}
+
+        {if $start > 1}
+            <li class="page-item"><a class="page-link" href="{$buildUrl(1)}">1</a></li>
+            {if $start > 2}
+                <li class="page-item disabled"><span class="page-link">...</span></li>
+            {/if}
+        {/if}
+
+        {for $i = $start; $i <= $end; $i++}
+            <li class="page-item {if $i === $page}active{/if}">
+                <a class="page-link" href="{$buildUrl($i)}">{$i}</a>
+            </li>
+        {/for}
+
+        {if $end < $totalPages}
+            {if $end < $totalPages - 1}
+                <li class="page-item disabled"><span class="page-link">...</span></li>
+            {/if}
+            <li class="page-item">
+                <a class="page-link" href="{$buildUrl($totalPages)}">{$totalPages}</a>
+            </li>
+        {/if}
+
+        {if $page < $totalPages}
+            <li class="page-item">
+                <a class="page-link" href="{$buildUrl($page + 1)}">Další »</a>
+            </li>
+        {/if}
+    </ul>
+</nav>

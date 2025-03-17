@@ -4,11 +4,19 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
+use App\Components\IPaginationFactory;
 use App\Models\UserRole;
 
 class SecuredPresenter extends BasePresenter
 {
     protected UserRole $userRole;
+
+    /** @var IPaginationFactory @inject */
+    public IPaginationFactory $paginationFactory;
+
+    // Pagination
+    private ?int $itemsPerPage = null;
+    private ?int $totalItems = null;
 
     public function startup(): void
     {
@@ -48,5 +56,30 @@ class SecuredPresenter extends BasePresenter
         parent::afterRender();
 
         $this->template->userData = $this->user->identity->getData();
+    }
+
+    // ##########################################
+    // ###             PAGINATION             ###
+    // ##########################################
+
+    protected function setPagination(int $itemsPerPage, int $totalItems): void
+    {
+        $this->itemsPerPage = $itemsPerPage;
+        $this->totalItems = $totalItems;
+    }
+
+    protected function createComponentPagination(): \App\Components\Pagination
+    {
+        if ($this->itemsPerPage === null || $this->totalItems === null) {
+            throw new \LogicException('Call setPagination() in the render method first.');
+        }
+
+        $control = $this->paginationFactory->create();
+        $control->setQueryParams($this->getHttpRequest());
+        $control->setItemsPerPage($this->itemsPerPage);
+        $control->setTotalItems($this->totalItems);
+        $control->setCurrentPage((int) $this->getParameter('page', 1));
+
+        return $control;
     }
 }
