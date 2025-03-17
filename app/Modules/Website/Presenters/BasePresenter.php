@@ -153,7 +153,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         }
 
         $control = $this->paginationFactory->create();
-        $control->setQueryParams($this->getHttpRequest()); // @phpstan-ignore argument.type
+        $control->setQueryParams($this->getHttpRequest()->getQuery());
         $control->setItemsPerPage($this->itemsPerPage);
         $control->setTotalItems($this->totalItems);
         $control->setCurrentPage((int) $this->getParameter('page', 1));

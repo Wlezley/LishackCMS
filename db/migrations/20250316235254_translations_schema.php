@@ -24,6 +24,6 @@ final class TranslationsSchema extends AbstractMigration
 
     public function down(): void
     {
-        // $this->execute("DROP TABLE `translation`;");
+        // $this->execute("DROP TABLE `translations`;");
     }
 }

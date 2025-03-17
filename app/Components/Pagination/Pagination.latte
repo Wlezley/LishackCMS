@@ -1,16 +1,10 @@
-<nav aria-label="Pagination">
+<nav n:if="$totalPages > 1" aria-label="Pagination">
     <ul class="pagination justify-content-center">
-        {var $page = $paginator->getPage()}
-        {var $totalPages = $paginator->getPageCount()}
-
         {if $page > 1}
             <li class="page-item">
                 <a class="page-link" href="{$buildUrl($page - 1)}">« Předchozí</a>
             </li>
         {/if}
-
-        {var $start = max(1, $page - 2)}
-        {var $end = min($totalPages, $page + 2)}
 
         {if $start > 1}
             <li class="page-item"><a class="page-link" href="{$buildUrl(1)}">1</a></li>

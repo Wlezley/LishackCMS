@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Components;
 
-use Nette\Http\Request;
 use Nette\Utils\Paginator;
 
 class Pagination extends BaseControl
@@ -27,9 +26,13 @@ class Pagination extends BaseControl
 
     public function render(string $template = 'Pagination'): void
     {
-        $this->template->setFile(__DIR__ . "/$template.latte");
-        $this->template->paginator = $this->paginator;
+        $this->template->page = $this->paginator->getPage();
+        $this->template->totalPages = $this->paginator->getPageCount();
+        $this->template->start = max(1, $this->template->page - 2);
+        $this->template->end = min($this->template->totalPages, $this->template->page + 2);
         $this->template->buildUrl = \Closure::fromCallable([$this, 'buildUrl']);
+
+        $this->template->setFile(__DIR__ . "/$template.latte");
         $this->template->render();
     }
 
@@ -48,9 +51,10 @@ class Pagination extends BaseControl
         $this->paginator->setPage($currentPage);
     }
 
-    public function setQueryParams(Request $httpRequest): void
+    /** @param array<string,string> $queryParams */
+    public function setQueryParams(array $queryParams): void
     {
-        $this->queryParams = $httpRequest->getQuery();
-        unset($this->queryParams['page']);
+        unset($queryParams['page']);
+        $this->queryParams = $queryParams;
     }
 }
