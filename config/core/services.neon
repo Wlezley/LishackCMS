@@ -21,6 +21,7 @@ services:
     - App\Models\Installer
     - App\Models\MenuManager
     - App\Models\SmsGate(%smsgate.url%, %smsgate.login%, %smsgate.password%, %smsgate.sender_id%, %smsgate.secured_login%)
+    - App\Models\TranslationManager
     - App\Models\Upload
     - App\Models\UrlGenerator
     - App\Models\UserManager

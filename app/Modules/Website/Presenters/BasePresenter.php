@@ -8,7 +8,7 @@ use App\Components\IAdminButtonFactory;
 use App\Components\IMenuFactory;
 use App\Models\Config;
 use App\Models\Helpers\AssetsVersion;
-use App\Models\Menu;
+use App\Models\TranslationManager;
 use Nette;
 use Nette\Database\Explorer;
 
@@ -21,6 +21,9 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
     /** @var Config @inject */
     public $config;
+
+    /** @var TranslationManager @inject */
+    public $translationManager;
 
     /** @var IAdminButtonFactory @inject */
     public $adminBarFactory;
@@ -69,6 +72,9 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $this->page = DEFAULT_PAGE;
         $this->title = $this->cmsConfig['SITE_TITLE'];
 
+        // Translations language
+        $this->translationManager->setLanguage($this->lang);
+
         // SEO
         $this->seo_robots = DEBUG ? 'noindex, nofollow' : 'index, follow';
         $this->seo_description = 'seo_description';
@@ -76,6 +82,14 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $this->social_title = 'social_title';
         $this->social_description = 'social_description';
         $this->social_image = 'social_image';
+    }
+
+    public function beforeRender(): void
+    {
+        parent::beforeRender();
+
+        // Translations
+        $this->template->_ = fn($key) => $this->translationManager->get($key, $this->lang);
     }
 
     public function afterRender(): void

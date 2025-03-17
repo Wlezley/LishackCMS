@@ -6,6 +6,7 @@ namespace App\Modules\Admin\Presenters;
 
 use App\Models\Config;
 use App\Models\Helpers\AssetsVersion;
+use App\Models\TranslationManager;
 use Nette\Application\Helpers;
 use Nette\Database\Explorer;
 
@@ -17,8 +18,14 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
     /** @var Config @inject */
     public $config;
 
+    /** @var TranslationManager @inject */
+    public $translationManager;
+
     /** @var array<string,string> $cmsConfig */
     protected array $cmsConfig = [];
+
+    /** @var string */
+    protected string $lang;
 
     public function startup(): void
     {
@@ -26,6 +33,16 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
 
         // CMS config
         $this->cmsConfig = $this->config->getValues();
+        $this->lang = DEFAULT_LANG;
+        $this->translationManager->setLanguage($this->lang);
+    }
+
+    public function beforeRender(): void
+    {
+        parent::beforeRender();
+
+        // Translations
+        $this->template->_ = fn($key) => $this->translationManager->get($key, $this->lang);
     }
 
     public function afterRender(): void
@@ -35,10 +52,10 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
         // CMS config
         $this->template->setParameters($this->cmsConfig);
         $this->template->VERSION = VERSION;
-        $this->template->HTML_LANG = (DEFAULT_LANG == 'cz' ? 'cs' : DEFAULT_LANG); // @phpstan-ignore equal.alwaysTrue
+        $this->template->HTML_LANG = DEFAULT_LANG;
         $this->template->DEFAULT_LANG = DEFAULT_LANG;
         $this->template->DEFAULT_LANG_ADMIN = DEFAULT_LANG;
-        $this->template->DEFAULT_LANG_TINYMCE = (DEFAULT_LANG == 'cz' ? 'cs' : DEFAULT_LANG); // @phpstan-ignore equal.alwaysTrue
+        $this->template->DEFAULT_LANG_TINYMCE = DEFAULT_LANG;
 
         // Assets version
         $assetsVersion = new AssetsVersion();
@@ -71,7 +88,7 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
             'Data' => 'DATA',
             'Config' => 'CONFIG',
             'User' => 'CONFIG',
-            'Strings' => 'CONFIG',
+            'Translation' => 'CONFIG',
             'Email' => 'CONFIG',
             'Website' => 'CONFIG',
             'Seo' => 'CONFIG',

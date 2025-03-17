@@ -219,6 +219,7 @@ class UserForm extends BaseControl
         return false;
     }
 
+    /** @return array<string,string> */
     private function getRoleSelectList(?string $targetRole): array
     {
         // TODO: Move to Translator
