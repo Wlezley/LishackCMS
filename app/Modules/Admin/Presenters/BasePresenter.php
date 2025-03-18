@@ -113,7 +113,6 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
 
         if ($component instanceof \App\Components\BaseControl) {
             $component->injectTranslationManager($this->translationManager);
-            $component->setLang($this->lang);
         }
 
         return $component;

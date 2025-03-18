@@ -10,8 +10,6 @@ use Nette\Application\UI\Template;
 
 class BaseControl extends Control
 {
-    protected string $lang = DEFAULT_LANG;
-
     /** @var TranslationManager */
     protected TranslationManager $translationManager;
 
@@ -26,6 +24,11 @@ class BaseControl extends Control
         $this->translationManager = $translationManager;
     }
 
+    public function getTranslationManager(): TranslationManager
+    {
+        return $this->translationManager;
+    }
+
     protected function createTemplate(?string $class = null): Template
     {
         $template = parent::createTemplate($class);
@@ -35,19 +38,9 @@ class BaseControl extends Control
         }
 
         // Translations
-        $template->_ = fn($key) => $this->translationManager->get($key, $this->lang); // @phpstan-ignore property.notFound
+        $template->_ = fn($key) => $this->translationManager->get($key); // @phpstan-ignore property.notFound
 
         return $template;
-    }
-
-    public function setLang(string $lang): void
-    {
-        $this->lang = $lang;
-    }
-
-    public function getLang(): string
-    {
-        return $this->lang;
     }
 
     /** @param array<string,string> $cmsConfig */

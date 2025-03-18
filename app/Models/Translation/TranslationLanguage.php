@@ -57,7 +57,14 @@ class TranslationLanguage
     /** @return array<string,string> */
     public function getNames(bool $enabledOnly = true): array
     {
-        return array_column($this->getList($enabledOnly), 'name', 'lang');
+        $names = [];
+        $languages = $this->getList($enabledOnly);
+
+        foreach ($languages as $key => $data) {
+            $names[$key] = $data['name'];
+        }
+
+        return $names;
     }
 
     public function getDefaultLang(?string $fallback = null): ?string

@@ -171,7 +171,6 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
         if ($component instanceof \App\Components\BaseControl) {
             $component->injectTranslationManager($this->translationManager);
-            $component->setLang($this->lang);
         }
 
         return $component;
@@ -187,7 +186,6 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     protected function createComponentMenu(): \App\Components\Menu
     {
         $control = $this->menuFactory->create();
-        $control->setLang($this->lang);
         return $control;
     }
 }

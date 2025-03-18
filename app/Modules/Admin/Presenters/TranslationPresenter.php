@@ -8,7 +8,7 @@ class TranslationPresenter extends SecuredPresenter
 {
     public function renderDefault(int $page = 1, ?string $lang = null, ?string $search = null): void
     {
-        $lang = $lang ?? DEFAULT_LANG;
+        $lang = $lang ?? $this->translationManager->getLanguageService()->getDefaultLang(DEFAULT_LANG);
 
         $langData = $this->translationManager->getLanguageService()->getLanguage($lang);
         if ($langData === null) {
@@ -30,7 +30,7 @@ class TranslationPresenter extends SecuredPresenter
         $totalItems = $this->translationManager->getCount($lang, $search);
         $this->setPagination($limit, $totalItems);
 
-        $this->template->lang = ($lang == DEFAULT_LANG) ? '' : $lang;
+        $this->template->lang = $lang;
         $this->template->totalItems = $totalItems;
         $this->template->search = $search;
     }

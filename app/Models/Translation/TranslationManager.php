@@ -11,7 +11,7 @@ class TranslationManager
 {
     public const TABLE_NAME = 'translations';
 
-    private string $currentLang = DEFAULT_LANG;
+    private string $currentLang;
 
     /** @var array<string,array<string,string>> */
     private array $translations = [];
@@ -23,6 +23,11 @@ class TranslationManager
         $this->currentLang = $this->languageService->getDefaultLang(DEFAULT_LANG);
     }
 
+    public function getLanguageService(): TranslationLanguage
+    {
+        return $this->languageService;
+    }
+
     /** @throws InvalidArgumentException */
     public function setCurrentLanguage(string $lang): void
     {
@@ -32,6 +37,11 @@ class TranslationManager
 
         $this->currentLang = $lang;
         $this->load($lang);
+    }
+
+    public function getCurrentLanguage(): string
+    {
+        return $this->currentLang;
     }
 
     private function load(string $lang, bool $reload = false): void
@@ -60,8 +70,11 @@ class TranslationManager
             $this->load($lang);
         }
 
+        // TODO: Multiple layers of the fallback: 1.) DEFAULT LANGUAGE VALUE, 2.) ($LANG)_$KEY
         return $this->translations[$lang][$key] ?? $key;
     }
+
+    // ADMIN HANDLERS
 
     public function add(string $key, string $lang, string $text): void
     {
@@ -141,8 +154,11 @@ class TranslationManager
         return $query->count('*');
     }
 
-    public function getLanguageService(): TranslationLanguage
+    /** @return array<T|mixed> */
+    public function getTextListByKey(string $key): array
     {
-        return $this->languageService;
+        return $this->db->table(self::TABLE_NAME)
+            ->where('key', $key)
+            ->fetchPairs('lang', 'text');
     }
 }
