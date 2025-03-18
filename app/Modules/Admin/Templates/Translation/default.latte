@@ -1,4 +1,15 @@
 {block content}
+
+<style>
+.key-col {
+    width: 300px;
+}
+
+.action-col {
+    width: 100px;
+}
+</style>
+
 <div class="row">
     <div class="col">
 
@@ -16,18 +27,23 @@
         <table class="table table-responsive table-striped table-hover table-dark">
             <thead>
                 <tr>
-                    <th scope="col">Klíč</th>
+                    <th scope="col" class="key-col">Klíč</th>
                     <th scope="col">Text</th>
-                    <th scope="col" class="text-end">Akce</th>
+                    <th scope="col" class="text-center action-col">Akce</th>
                 </tr>
             </thead>
             <tbody>
             {foreach $translations as $key => $text}
                 <tr>
-                    <td class="align-middle text-nowrap">{$key}</td>
+                    <td class="align-middle key-col">{$key}</td>
                     <td class="align-middle"><pre class="mb-0">{$text}</pre></td>
-                    <td class="align-middle text-end">
-                        <a href="#" class="btn btn-sm btn-primary">Edit</a>&nbsp;<a href="#" class="btn btn-sm btn-danger">Delete</a>
+                    <td class="align-middle text-center action-col">
+                        <a n:href=":edit, key: $key" class="btn btn-sm btn-primary me-1">
+                            <i class="fa-solid fa-pencil"></i>
+                        </a>
+                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteTranslationConfirmModal" data-json="{$getJson($key)}">
+                            <i class="fa-solid fa-eraser"></i>
+                        </button>
                     </td>
                 </tr>
             {/foreach}
@@ -49,3 +65,30 @@
 
     </div>
 </div>
+
+<script n:syntax="off">
+    document.addEventListener('DOMContentLoaded', () => {
+        const TranslationDeleteModal = new LishackCMS.AdminModal('#deleteTranslationConfirmModal', 'data-json');
+        TranslationDeleteModal.init();
+    });
+</script>
+
+{define modals}
+    <div class="modal fade" id="deleteTranslationConfirmModal" tabindex="-1" aria-labelledby="deleteTranslationConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered text-dark">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteTranslationConfirmModalLabel"><!-- MODAL TITLE --></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zavřít"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- MODAL BODY -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zrušit</button>
+                    <button type="submit" class="btn btn-danger" data-modal-action="delete">Smazat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{/define}

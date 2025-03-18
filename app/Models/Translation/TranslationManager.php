@@ -91,6 +91,19 @@ class TranslationManager
         $this->translations[$lang][$key] = $text;
     }
 
+    public function delete(string $key, ?string $lang = null): void
+    {
+        $query = $this->db->table(self::TABLE_NAME)
+            ->where('key', $key);
+
+        if ($lang !== null) {
+            $query->where('lang', $lang);
+        }
+
+        $query->delete();
+        // TODO: catch errors?
+    }
+
     public function save(string $key, string $lang, string $text): void
     {
         $affectedRows = $this->db->table(self::TABLE_NAME)->where([

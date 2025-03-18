@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Admin\Presenters;
 
 use App\Components\Admin\ITranslationFormFactory;
+use Nette\Utils\Json;
 
 class TranslationPresenter extends SecuredPresenter
 {
@@ -35,6 +36,16 @@ class TranslationPresenter extends SecuredPresenter
         $totalItems = $this->translationManager->getCount($lang, $search);
         $this->setPagination($limit, $totalItems);
 
+        $this->template->getJson = function($key) {
+            return Json::encode([
+                'key' => (string)$key,
+                'modal' => [
+                    'title' => 'Potvrzení o smazání',
+                    'body' => 'Opravdu chcete překlad <strong>' . $key . '</strong> smazat?'
+                ]
+            ]);
+        };
+
         $this->template->lang = $lang;
         $this->template->totalItems = $totalItems;
         $this->template->search = $search;
@@ -48,6 +59,19 @@ class TranslationPresenter extends SecuredPresenter
     public function renderEdit(string $key): void
     {
         $this->template->title = "Editace překladu '$key'";
+    }
+
+    public function handleDelete(): void
+    {
+        if (!$this->isAjax()) {
+            $this->redirect('this');
+        }
+
+        $data = $this->getHttpRequest()->getPost();
+
+        // TODO: Permission check
+
+        $this->translationManager->delete($data['key']);
     }
 
     // ##########################################
@@ -78,7 +102,7 @@ class TranslationPresenter extends SecuredPresenter
 
         $form->onSuccess = function(string $message): void {
             $this->flashMessage($message, 'info');
-            $this->redirect('Translation:default');
+            $this->redirect('Translation:');
         };
 
         $form->onError = function(string $message): void {
