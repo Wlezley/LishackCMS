@@ -6,7 +6,7 @@
 }
 
 .action-col {
-    width: 100px;
+    width: 90px;
 }
 </style>
 
@@ -16,20 +16,20 @@
         <form class="row g-3 float-end" name="searchForm">
             <input type="hidden" name="lang" value="{$lang}">
             <div class="col-auto">
-                <label for="search" class="visually-hidden">Hledat překlady</label>
-                <input type="text" class="form-control" id="search" name="search" value="{$search}" placeholder="Hledat překlady">
+                <label for="search" class="visually-hidden">Vyhledat překlad</label>
+                <input type="text" class="form-control" id="search" name="search" value="{$search}" placeholder="Vyhledat překlad">
             </div>
             <div class="col-auto">
-                <button type="submit" class="btn btn-primary mb-3">Hledat</button>
+                <button type="submit" class="btn btn-primary mb-3"><i class="fa-solid fa-magnifying-glass"></i></button>
             </div>
         </form>
 
         <table class="table table-responsive table-striped table-hover table-dark">
             <thead>
                 <tr>
-                    <th scope="col" class="key-col">Klíč</th>
-                    <th scope="col">Text</th>
-                    <th scope="col" class="text-center action-col">Akce</th>
+                    <th scope="col" class="key-col">{$_('key')}</th>
+                    <th scope="col">{$_('text')}</th>
+                    <th scope="col" class="text-center ps-0 action-col">{$_('action')}</th>
                 </tr>
             </thead>
             <tbody>
@@ -37,7 +37,7 @@
                 <tr>
                     <td class="align-middle key-col">{$key}</td>
                     <td class="align-middle"><pre class="mb-0">{$text}</pre></td>
-                    <td class="align-middle text-center action-col">
+                    <td class="align-middle text-end ps-0 py-1 action-col">
                         <a n:href=":edit, key: $key" class="btn btn-sm btn-primary me-1">
                             <i class="fa-solid fa-pencil"></i>
                         </a>

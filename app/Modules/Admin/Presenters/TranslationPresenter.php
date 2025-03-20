@@ -21,7 +21,7 @@ class TranslationPresenter extends SecuredPresenter
             $this->redirect('Translation:');
         }
 
-        $this->template->title = 'Jazykový překlad (' . $langData['name'] . ')';
+        $this->template->title = 'Lokalizace (' . $langData['name'] . ')';
 
         $limit = 10;
         $offset = ($page - 1) * $limit;
@@ -53,7 +53,7 @@ class TranslationPresenter extends SecuredPresenter
 
     public function renderCreate(): void
     {
-        $this->template->title = 'Nový jazykový překlad';
+        $this->template->title = 'Nový překlad';
     }
 
     public function renderEdit(string $key): void
