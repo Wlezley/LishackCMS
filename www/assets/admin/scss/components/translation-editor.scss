@@ -1,0 +1,23 @@
+#translationEditorTable {
+    .key-col {
+        width: 300px;
+
+        input[readonly] {
+            background-color: var(--bs-gray-500);
+            color: var(--bs-black);
+        }
+    }
+
+    .copy-col {
+        width: 50px;
+    }
+
+    .action-col {
+        width: 60px;
+    }
+
+    .linked-textarea {
+        resize: none;
+        overflow-y: hidden;
+    }
+}

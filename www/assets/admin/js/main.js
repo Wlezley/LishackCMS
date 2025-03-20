@@ -11,6 +11,7 @@ import './components/codemirror.js';
 // Component Exports
 export { MenuSettings } from './components/menu.sortable-tree.js';
 export { AdminModal } from './components/modal.js';
+export { TranslationEditor } from './components/translation-editor.js';
 
 
 // Just some debugging stuff, can be commented out or deleted
