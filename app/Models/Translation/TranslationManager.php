@@ -212,17 +212,10 @@ class TranslationManager
 
         /** @var \Nette\Database\Table\ActiveRow $row */
         foreach ($rows as $row) {
-            // $row = $row->toArray();
             $lang = $row['lang'] == $defaultLang ? 'default' : $row['lang'];
             $translations[$row['key']][$lang] = $row['text'];
         }
 
         return $translations;
-    }
-
-    /** @return array<string> */
-    public function getAllKeys(): array
-    {
-        return $this->db->table(self::TABLE_NAME)->select('DISTINCT key')->fetchPairs('key', 'key');
     }
 }

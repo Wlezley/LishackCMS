@@ -15,12 +15,12 @@
 
         <div>
             {foreach $langList as $langKey => $langData}
-                {* {continueIf !$langData['enabled']} *}
                 {var $btnColor = $langData['lang'] == $lang ? 'btn-primary' : 'btn-light btn-outline-primary'}
-
                 <a n:href="Translation:, lang: $langKey" n:class="'btn float-start me-3', $btnColor" title="Editor" aria-label="Editor">
-                    <i class="fa-solid fa-language pe-1"></i>
                     {$langData['name']}
+                    {if $langData['default']}
+                        ({$_('default')})
+                    {/if}
                 </a>
             {/foreach}
 
@@ -71,8 +71,6 @@
         <div>
             {foreach $langList as $langKey => $langData}
                 {continueIf $langData['default']}
-                {* {continueIf !$langData['enabled']} *}
-
                 <a n:href="Translation:editor, lang: $langKey" class="btn btn-light btn-outline-primary float-start me-3" title="Editor" aria-label="Editor">
                     <i class="fa-solid fa-language pe-1"></i>
                     Editor ({$langKey|upper})

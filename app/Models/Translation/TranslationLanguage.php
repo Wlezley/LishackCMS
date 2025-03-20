@@ -76,4 +76,15 @@ class TranslationLanguage
 
         return $fallback;
     }
+
+    public function getSecondaryLang(?string $fallback = null): ?string
+    {
+        foreach ($this->languages as $lang => $data) {
+            if ($data['default'] == 0 && $data['enabled'] == 1) {
+                return $lang;
+            }
+        }
+
+        return $fallback;
+    }
 }

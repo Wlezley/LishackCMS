@@ -29,7 +29,7 @@ class TranslationPresenter extends SecuredPresenter
             $this->redirect('Translation:');
         }
 
-        $this->template->title = 'Lokalizace - ' . $langData['name'] . '';
+        $this->template->title = 'Lokalizace - ' . $langData['name'] . ($langData['default'] ? ' (' . $this->t('default') . ')' : '');
 
         $limit = 10;
         $offset = ($page - 1) * $limit;
@@ -64,9 +64,7 @@ class TranslationPresenter extends SecuredPresenter
         $defaultLang = $languageService->getDefaultLang(DEFAULT_LANG);
 
         if (empty($lang) || $lang == $defaultLang || !array_key_exists($lang, $langList)) {
-            $availableLangs = $langList;
-            unset($availableLangs[$defaultLang]);
-            $redirLang = reset($availableLangs)['lang'];
+            $redirLang = $languageService->getSecondaryLang();
 
             if ($redirLang) {
                 $this->redirect('Translation:editor', ['lang' => $redirLang]);
@@ -112,8 +110,8 @@ class TranslationPresenter extends SecuredPresenter
             $form->setOrigin($form::OriginEdit);
 
             $param['key'] = $key;
-            foreach ($this->translationManager->getTextListByKey($key) as $key => $text) {
-                $param["text_$key"] = $text;
+            foreach ($this->translationManager->getTextListByKey($key) as $lang => $text) {
+                $param["text_$lang"] = $text;
             }
 
             $form->setParam($param);
@@ -132,7 +130,6 @@ class TranslationPresenter extends SecuredPresenter
 
         $form->onError = function(string $message): void {
             $this->flashMessage($message, 'danger');
-            // $this->redirect('this');
         };
 
         return $form;
@@ -143,8 +140,6 @@ class TranslationPresenter extends SecuredPresenter
         $form = $this->translationEditor->create();
         $lang = $this->getParameter('lang');
         $form->setParam(['lang' => $lang]);
-
-        $form->setLanguageList($this->translationManager->getLanguageService()->getList(false));
 
         $form->onSuccess = function(string $message, string $lang): void {
             $this->flashMessage($message, 'info');
