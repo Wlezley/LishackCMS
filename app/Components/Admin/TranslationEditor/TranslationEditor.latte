@@ -22,7 +22,7 @@
 }
 </style>
 
-{form form}
+{form form, class => 'translationEditorForm'}
     <table id="translationsTable" class="table table-responsive table-striped table-hover table-dark">
         <thead>
             <tr>
@@ -170,12 +170,27 @@
                 });
             }
 
+            // KEYBOARD EVENTS
+            function translationEditorKeyboardEvents() {
+                document.addEventListener("keydown", function (event) {
+                    if (event.key === "Insert") { // INSERT: Add new row
+                        event.preventDefault();
+                        addRow();
+                    }
+                    if (event.ctrlKey && event.key === "s") { // CTRL+S: Submit
+                        event.preventDefault();
+                        document.querySelector(".translationEditorForm input[type='submit']").click();
+                    }
+                });
+            }
+
             // INIT LISTENERS
             function initListeners() {
                 document.getElementById("addRow").addEventListener("click", () => addRow());
                 document.querySelectorAll(".remove-row").forEach(button => addRemoveListener(button));
                 document.querySelectorAll(".copy-text").forEach(button => addCopyListener(button));
-                addSubmitListener(document.querySelector("form"));
+                addSubmitListener(document.querySelector(".translationEditorForm"));
+                translationEditorKeyboardEvents();
             }
             initListeners();
 
