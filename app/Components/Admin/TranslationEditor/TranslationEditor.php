@@ -16,12 +16,6 @@ class TranslationEditor extends BaseControl
     /** @var callable(string): void */
     public $onError;
 
-    public function __construct(
-        protected \Nette\Security\User $user
-    ) {
-        $this->param = [];
-    }
-
     protected function createComponentForm(): Form
     {
         $form = new Form;

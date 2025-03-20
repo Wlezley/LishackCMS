@@ -6,10 +6,13 @@ namespace App\Modules\Admin\Presenters;
 
 use App\Components\Admin\ITranslationFormFactory;
 use App\Components\Admin\ITranslationEditorFactory;
-use Nette\Utils\Json;
+use App\Components\Admin\ITranslationListFactory;
 
 class TranslationPresenter extends SecuredPresenter
 {
+    /** @var ITranslationListFactory @inject */
+    public ITranslationListFactory $translationList;
+
     /** @var ITranslationFormFactory @inject */
     public ITranslationFormFactory $translationForm;
 
@@ -19,40 +22,17 @@ class TranslationPresenter extends SecuredPresenter
     public function renderDefault(int $page = 1, ?string $lang = null, ?string $search = null): void
     {
         $languageService = $this->translationManager->getLanguageService();
-
-        $langList = $languageService->getList(false);
-        $defaultLang = $languageService->getDefaultLang(DEFAULT_LANG);
-        $lang = $lang ?? $defaultLang;
-
+        $lang = $lang ?? $languageService->getDefaultLang(DEFAULT_LANG);
         $langData = $languageService->getLanguage($lang);
+
         if ($langData === null) {
             $this->redirect('Translation:');
         }
 
         $this->template->title = 'Lokalizace - ' . $langData['name'] . ($langData['default'] ? ' (' . $this->t('default') . ')' : '');
 
-        $limit = 10;
-        $offset = ($page - 1) * $limit;
-
-        $this->template->translations = $this->translationManager->getList($lang, $limit, $offset, $search);
-
-        $totalItems = $this->translationManager->getCount($lang, $search);
-        $this->setPagination($limit, $totalItems);
-
-        $this->template->getJson = function($key) {
-            return Json::encode([
-                'key' => (string)$key,
-                'modal' => [
-                    'title' => 'Potvrzení o smazání',
-                    'body' => 'Opravdu chcete překlad <strong>' . $key . '</strong> smazat?'
-                ]
-            ]);
-        };
-
         $this->template->lang = $lang;
-        $this->template->defaultLang = $defaultLang;
-        $this->template->langList = $langList;
-        $this->template->totalItems = $totalItems;
+        $this->template->langList = $languageService->getList(false);
         $this->template->search = $search;
     }
 
@@ -74,12 +54,12 @@ class TranslationPresenter extends SecuredPresenter
         $this->template->title = 'Editor Lokalizace (' . $langList[$defaultLang]['name'] . ' » ' . $langList[$lang]['name'] . ')';
     }
 
-    public function renderCreate(): void
+    public function renderCreate(string $lang = ''): void
     {
         $this->template->title = 'Nový překlad';
     }
 
-    public function renderEdit(string $key): void
+    public function renderEdit(string $key, string $lang = ''): void
     {
         $this->template->title = "Editace překladu '$key'";
     }
@@ -100,6 +80,17 @@ class TranslationPresenter extends SecuredPresenter
     // ##########################################
     // ###             COMPONENTS             ###
     // ##########################################
+
+    protected function createComponentTranslationList(): \App\Components\Admin\TranslationList
+    {
+        $control = $this->translationList->create();
+        $control->setParam([
+            'search' => $this->getParameter('search'),
+            'page' => $this->getParameter('page'),
+        ]);
+
+        return $control;
+    }
 
     protected function createComponentTranslationForm(): \App\Components\Admin\TranslationForm
     {
@@ -125,7 +116,7 @@ class TranslationPresenter extends SecuredPresenter
 
         $form->onSuccess = function(string $message): void {
             $this->flashMessage($message, 'info');
-            $this->redirect('Translation:');
+            $this->redirect('Translation:', ['lang' => $this->getParameter('lang')]);
         };
 
         $form->onError = function(string $message): void {
@@ -137,19 +128,19 @@ class TranslationPresenter extends SecuredPresenter
 
     protected function createComponentTranslationEditor(): \App\Components\Admin\TranslationEditor
     {
-        $form = $this->translationEditor->create();
+        $control = $this->translationEditor->create();
         $lang = $this->getParameter('lang');
-        $form->setParam(['lang' => $lang]);
+        $control->setParam(['lang' => $lang]);
 
-        $form->onSuccess = function(string $message, string $lang): void {
+        $control->onSuccess = function(string $message, string $lang): void {
             $this->flashMessage($message, 'info');
             $this->redirect('Translation:editor', ['lang' => $lang]);
         };
 
-        $form->onError = function(string $message): void {
+        $control->onError = function(string $message): void {
             $this->flashMessage($message, 'danger');
         };
 
-        return $form;
+        return $control;
     }
 }
