@@ -62,7 +62,7 @@ class TranslationManager
         $this->load($lang, true);
     }
 
-    public function get(string $key, ?string $lang = null): string
+    public function get(string $key, ?string $lang = null, bool $keyAsFallback = true): ?string
     {
         $lang = $lang ?? $this->currentLang;
 
@@ -70,8 +70,7 @@ class TranslationManager
             $this->load($lang);
         }
 
-        // TODO: Multiple layers of the fallback: 1.) DEFAULT LANGUAGE VALUE, 2.) ($LANG)_$KEY
-        return $this->translations[$lang][$key] ?? $key;
+        return $this->translations[$lang][$key] ?? ($keyAsFallback ? $key : null);
     }
 
     // ADMIN HANDLERS
@@ -89,19 +88,6 @@ class TranslationManager
         }
 
         $this->translations[$lang][$key] = $text;
-    }
-
-    public function delete(string $key, ?string $lang = null): void
-    {
-        $query = $this->db->table(self::TABLE_NAME)
-            ->where('key', $key);
-
-        if ($lang !== null) {
-            $query->where('lang', $lang);
-        }
-
-        $query->delete();
-        // TODO: catch errors?
     }
 
     public function save(string $key, string $lang, string $text): void
@@ -139,6 +125,19 @@ class TranslationManager
             $this->translations[$lang][$newKey] = $this->translations[$lang][$oldKey];
             unset($this->translations[$lang][$oldKey]);
         } // TODO: catch errors?
+    }
+
+    public function delete(string $key, ?string $lang = null): void
+    {
+        $query = $this->db->table(self::TABLE_NAME)
+            ->where('key', $key);
+
+        if ($lang !== null) {
+            $query->where('lang', $lang);
+        }
+
+        $query->delete();
+        // TODO: catch errors?
     }
 
     /** @return array<T|mixed> */
