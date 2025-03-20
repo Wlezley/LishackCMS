@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Components\Admin;
 
+use App\Components\BaseControl;
 use App\Models\UserManager;
 use App\Models\UserRole;
 use Contributte\Datagrid\Datagrid;
@@ -12,7 +13,7 @@ use Nette\Database\Explorer;
 use Nette\Security\User;
 use Nette\Utils\Json;
 
-class UserListGrid
+class UserListGrid extends BaseControl
 {
     protected UserRole $userRole;
     protected Presenter $presenter;
@@ -64,36 +65,36 @@ class UserListGrid
             ->setAlign('center');
 
         // NAME
-        $grid->addColumnText('name', 'Jméno')
+        $grid->addColumnText('name', $this->t('name'))
             ->setSortable()
             ->setAlign('start');
 
         // FULL NAME
-        $grid->addColumnText('full_name', 'Celé jméno')
+        $grid->addColumnText('full_name', $this->t('full-name'))
             ->setSortable()
             ->setAlign('start');
 
         // E-MAIL
-        $grid->addColumnText('email', 'E-mail')
+        $grid->addColumnText('email', $this->t('e-mail'))
             ->setSortable()
             ->setAlign('start');
 
 
         // USER ROLE ---->>
         $roleOptions = [
-            ['role' => 'guest',     'name' => 'Host',       'icon' => 'person-circle-question', 'class' => 'btn-secondary'],
-            ['role' => 'user',      'name' => 'Uživatel',   'icon' => 'user',                   'class' => 'btn-success'],
-            ['role' => 'redactor',  'name' => 'Redaktor',   'icon' => 'pencil',                 'class' => 'btn-info'],
-            ['role' => 'manager',   'name' => 'Moderátor',  'icon' => 'hammer',                 'class' => 'btn-warning'],
-            ['role' => 'admin',     'name' => 'Správce',    'icon' => 'user-ninja',             'class' => 'btn-danger'],
+            ['role' => 'guest',     'icon' => 'person-circle-question', 'class' => 'btn-secondary'],
+            ['role' => 'user',      'icon' => 'user',                   'class' => 'btn-success'],
+            ['role' => 'redactor',  'icon' => 'pencil',                 'class' => 'btn-info'],
+            ['role' => 'manager',   'icon' => 'hammer',                 'class' => 'btn-warning'],
+            ['role' => 'admin',     'icon' => 'user-ninja',             'class' => 'btn-danger'],
         ];
 
-        $roleColumn = $grid->addColumnStatus('role', 'Oprávnění');
+        $roleColumn = $grid->addColumnStatus('role', $this->t('permissions'));
         foreach ($roleOptions as $option) {
             if (!in_array($option['role'], $editableRoles)) {
                 continue;
             }
-            $roleColumn->addOption($option['role'], $option['name'])
+            $roleColumn->addOption($option['role'], $this->t('user.role.' . $option['role']))
                 ->setIcon($option['icon'])
                 ->setClass($option['class'])
                 ->endOption();
@@ -106,12 +107,12 @@ class UserListGrid
 
         // DELETED flag
         $columnDeleted_class = $columnDeleted_allowed ? '' : ' disabled';
-        $grid->addColumnStatus('deleted', 'Smazaný')
-            ->addOption(1, 'Ano')
+        $grid->addColumnStatus('deleted', $this->t('deleted'))
+            ->addOption(1, $this->t('yes'))
                 ->setIcon('ban')
                 ->setClass('btn-secondary' . $columnDeleted_class)
                 ->endOption()
-            ->addOption(0, 'Ne')
+            ->addOption(0, $this->t('no'))
                 ->setIcon('xmark')
                 ->setClass('btn-success' . $columnDeleted_class)
                 ->endOption()
@@ -121,12 +122,12 @@ class UserListGrid
 
         // ENABLED flag
         $columnEnabled_class = $columnEnabled_allowed ? '' : ' disabled';
-        $grid->addColumnStatus('enabled', 'Aktivní')
-            ->addOption(1, 'Ano')
+        $grid->addColumnStatus('enabled', $this->t('active'))
+            ->addOption(1, $this->t('yes'))
                 ->setIcon('check')
                 ->setClass('btn-success' . $columnEnabled_class)
                 ->endOption()
-            ->addOption(0, 'Ne')
+            ->addOption(0, $this->t('no'))
                 ->setIcon('ban')
                 ->setClass('btn-danger' . $columnEnabled_class)
                 ->endOption()
@@ -135,12 +136,12 @@ class UserListGrid
             ->onChange[] = [$this, 'setEnabled_Callback'];
 
         // CREATED (datetime)
-        $grid->addColumnDateTime('created', 'Vytvořeno')
+        $grid->addColumnDateTime('created', $this->t('created'))
             ->setAlign('end')
             ->setFormat('j.n.Y');
 
         // LAST LOGIN (datetime)
-        $grid->addColumnDateTime('last_login', 'Přihlášení')
+        $grid->addColumnDateTime('last_login', $this->t('last-login'))
             ->setAlign('end')
             ->setFormat('j.n.Y H:m:s')
             ->setReplacement(['' => 'N/A']);
