@@ -88,7 +88,11 @@ class TranslationForm extends BaseControl
 
         foreach ($this->languageList as $lang => $langName) {
             if (isset($textList[$lang])) {
-                $this->translationManager->save($key, $lang, $values["text_$lang"]); // TODO: Dlete if "$values["text_$lang"]" is empty (???)
+                if (empty($values["text_$lang"])) {
+                    $this->translationManager->delete($key, $lang);
+                } else {
+                    $this->translationManager->save($key, $lang, $values["text_$lang"]);
+                }
             } elseif (!empty($values["text_$lang"])) {
                 $this->translationManager->add($key, $lang, $values["text_$lang"]);
             }
