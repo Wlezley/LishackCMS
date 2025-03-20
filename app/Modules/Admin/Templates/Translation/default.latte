@@ -69,6 +69,16 @@
         </div>
 
         <div>
+            {foreach $langList as $langKey => $langData}
+                {continueIf $langData['default']}
+                {* {continueIf !$langData['enabled']} *}
+
+                <a n:href="Translation:editor, lang: $langKey" class="btn btn-light btn-outline-primary float-start me-3" title="Editor" aria-label="Editor">
+                    <i class="fa-solid fa-language pe-1"></i>
+                    Editor ({$langKey|upper})
+                </a>
+            {/foreach}
+
             <a n:href="Translation:create" class="btn btn-primary float-end" title="Přidat" aria-label="Přidat">
                 <i class="fa-solid fa-plus pe-2"></i>
                 Přidat

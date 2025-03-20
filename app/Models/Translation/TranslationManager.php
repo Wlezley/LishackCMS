@@ -173,4 +173,56 @@ class TranslationManager
             ->where('key', $key)
             ->fetchPairs('lang', 'text');
     }
+
+    /** @param array<string,array<string,string>> $translations */
+    public function saveTranslations(array $translations): void
+    {
+        $defaultLang = $this->languageService->getDefaultLang(DEFAULT_LANG);
+
+        foreach ($translations as $key => $texts) {
+            foreach ($texts as $lang => $text) {
+                $lang = $lang == 'default' ? $defaultLang : $lang;
+
+                if ($this->get($key, $lang, false)) { // Item exists
+                    if (!empty($text)) {
+                        $this->save($key, $lang, $text); // UPDATE
+                    } else {
+                        $this->delete($key, $lang); // DELETE
+                    }
+                } else { // Item does not exists
+                    if (!empty($text)) {
+                        $this->add($key, $lang, $text); // INSERT
+                    }
+                }
+            }
+        }
+    }
+
+    /** @return array<string,array<string,string>> */
+    public function getTranslations(string $targetLang): array
+    {
+        $defaultLang = $this->languageService->getDefaultLang(DEFAULT_LANG);
+
+        $translations = [];
+        $rows = $this->db->table(self::TABLE_NAME)
+            ->select('key, lang, text')
+            ->where('lang = ? OR lang = ?', $defaultLang, $targetLang)
+            ->order('key, lang')
+            ->fetchAll();
+
+        /** @var \Nette\Database\Table\ActiveRow $row */
+        foreach ($rows as $row) {
+            // $row = $row->toArray();
+            $lang = $row['lang'] == $defaultLang ? 'default' : $row['lang'];
+            $translations[$row['key']][$lang] = $row['text'];
+        }
+
+        return $translations;
+    }
+
+    /** @return array<string> */
+    public function getAllKeys(): array
+    {
+        return $this->db->table(self::TABLE_NAME)->select('DISTINCT key')->fetchPairs('key', 'key');
+    }
 }

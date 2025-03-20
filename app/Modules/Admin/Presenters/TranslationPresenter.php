@@ -5,12 +5,16 @@ declare(strict_types=1);
 namespace App\Modules\Admin\Presenters;
 
 use App\Components\Admin\ITranslationFormFactory;
+use App\Components\Admin\ITranslationEditorFactory;
 use Nette\Utils\Json;
 
 class TranslationPresenter extends SecuredPresenter
 {
     /** @var ITranslationFormFactory @inject */
     public ITranslationFormFactory $translationForm;
+
+    /** @var ITranslationEditorFactory @inject */
+    public ITranslationEditorFactory $translationEditor;
 
     public function renderDefault(int $page = 1, ?string $lang = null, ?string $search = null): void
     {
@@ -50,6 +54,26 @@ class TranslationPresenter extends SecuredPresenter
         $this->template->langList = $langList;
         $this->template->totalItems = $totalItems;
         $this->template->search = $search;
+    }
+
+    public function renderEditor(string $lang = ''): void
+    {
+        $languageService = $this->translationManager->getLanguageService();
+
+        $langList = $languageService->getList(false);
+        $defaultLang = $languageService->getDefaultLang(DEFAULT_LANG);
+
+        if (empty($lang) || $lang == $defaultLang || !array_key_exists($lang, $langList)) {
+            $availableLangs = $langList;
+            unset($availableLangs[$defaultLang]);
+            $redirLang = reset($availableLangs)['lang'];
+
+            if ($redirLang) {
+                $this->redirect('Translation:editor', ['lang' => $redirLang]);
+            }
+        }
+
+        $this->template->title = 'Editor Lokalizace (' . $langList[$defaultLang]['name'] . ' » ' . $langList[$lang]['name'] . ')';
     }
 
     public function renderCreate(): void
@@ -109,6 +133,26 @@ class TranslationPresenter extends SecuredPresenter
         $form->onError = function(string $message): void {
             $this->flashMessage($message, 'danger');
             // $this->redirect('this');
+        };
+
+        return $form;
+    }
+
+    protected function createComponentTranslationEditor(): \App\Components\Admin\TranslationEditor
+    {
+        $form = $this->translationEditor->create();
+        $lang = $this->getParameter('lang');
+        $form->setParam(['lang' => $lang]);
+
+        $form->setLanguageList($this->translationManager->getLanguageService()->getList(false));
+
+        $form->onSuccess = function(string $message, string $lang): void {
+            $this->flashMessage($message, 'info');
+            $this->redirect('Translation:editor', ['lang' => $lang]);
+        };
+
+        $form->onError = function(string $message): void {
+            $this->flashMessage($message, 'danger');
         };
 
         return $form;
