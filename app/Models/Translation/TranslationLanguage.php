@@ -29,7 +29,6 @@ class TranslationLanguage
             foreach ($this->db->table(self::TABLE_NAME)->fetchAll() as $row) {
                 $languageRow = $row->toArray();
                 $key = $languageRow['lang'];
-                unset($languageRow['id'], $languageRow['lang']);
                 $this->languages[$key] = $languageRow;
             }
         }

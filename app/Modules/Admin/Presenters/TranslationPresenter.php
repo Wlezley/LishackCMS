@@ -14,24 +14,23 @@ class TranslationPresenter extends SecuredPresenter
 
     public function renderDefault(int $page = 1, ?string $lang = null, ?string $search = null): void
     {
-        $lang = $lang ?? $this->translationManager->getLanguageService()->getDefaultLang(DEFAULT_LANG);
+        $languageService = $this->translationManager->getLanguageService();
 
-        $langData = $this->translationManager->getLanguageService()->getLanguage($lang);
+        $langList = $languageService->getList(false);
+        $defaultLang = $languageService->getDefaultLang(DEFAULT_LANG);
+        $lang = $lang ?? $defaultLang;
+
+        $langData = $languageService->getLanguage($lang);
         if ($langData === null) {
             $this->redirect('Translation:');
         }
 
-        $this->template->title = 'Lokalizace (' . $langData['name'] . ')';
+        $this->template->title = 'Lokalizace - ' . $langData['name'] . '';
 
         $limit = 10;
         $offset = ($page - 1) * $limit;
 
-        $this->template->translations = $this->translationManager->getList(
-            $lang,
-            $limit,
-            $offset,
-            $search
-        );
+        $this->template->translations = $this->translationManager->getList($lang, $limit, $offset, $search);
 
         $totalItems = $this->translationManager->getCount($lang, $search);
         $this->setPagination($limit, $totalItems);
@@ -47,6 +46,8 @@ class TranslationPresenter extends SecuredPresenter
         };
 
         $this->template->lang = $lang;
+        $this->template->defaultLang = $defaultLang;
+        $this->template->langList = $langList;
         $this->template->totalItems = $totalItems;
         $this->template->search = $search;
     }

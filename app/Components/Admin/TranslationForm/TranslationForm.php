@@ -35,7 +35,6 @@ class TranslationForm extends BaseControl
     public function createComponentForm(): Form
     {
         $param = $this->param;
-        bdump($param, "FORM PARAM");
 
         $form = new Form();
 
@@ -47,7 +46,6 @@ class TranslationForm extends BaseControl
             ->setRequired();
 
         foreach ($this->languageList as $key => $langData) {
-            // bdump($langData);
             $required = $langData['default'] == 1;
             $form->addTextArea("text_$key", "Text ($langData[name])" . ($required ? ' *' : ''), null, 1)
                 ->setHtmlAttribute('autocomplete', 'off')
@@ -65,12 +63,8 @@ class TranslationForm extends BaseControl
     /** @param \Nette\Utils\ArrayHash<mixed> $values */
     public function processCreate(Form $form, \Nette\Utils\ArrayHash $values): void
     {
-        bdump($values, "TRANSLATION FORM CREATE VALUES");
-
         if (!empty($this->translationManager->getTextListByKey($values['key']))) {
             $editLink = $this->buildEditUrl($values['key']);
-            bdump($editLink);
-
             $editAnchor = '<a href="' . $editLink . '" target="_blank">' . $values['key'] . ' <sup><i class="fa fa-external-link"></i></sup></a>';
             call_user_func($this->onError, "Překlad pro <strong>$values[key]</strong> již existuje. Přejmenujte klíč, nebo upravte stávající $editAnchor");
         } else {
@@ -95,8 +89,6 @@ class TranslationForm extends BaseControl
     /** @param \Nette\Utils\ArrayHash<mixed> $values */
     public function processEdit(Form $form, \Nette\Utils\ArrayHash $values): void
     {
-        bdump($values, "TRANSLATION FORM EDIT VALUES");
-
         $key = $values['key'];
         $textList = $this->translationManager->getTextListByKey($key);
 
