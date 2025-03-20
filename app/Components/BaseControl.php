@@ -29,6 +29,7 @@ class BaseControl extends Control
         return $this->translationManager;
     }
 
+    /** @throws \RuntimeException If TranslationManager is not available. */
     protected function createTemplate(?string $class = null): Template
     {
         $template = parent::createTemplate($class);
@@ -41,6 +42,28 @@ class BaseControl extends Control
         $template->_ = fn($key) => $this->translationManager->get($key); // @phpstan-ignore property.notFound
 
         return $template;
+    }
+
+    /**
+     * Returns the translation string for a given key and language.
+     *
+     * If $lang is null, the default or current language is used.
+     * If the translation is not found, the key itself is returned.
+     *
+     * @param string      $key  The translation key.
+     * @param string|null $lang The target language code (null = current language).
+     *
+     * @throws \RuntimeException If TranslationManager is not available.
+     *
+     * @return string The translated text, the key as fallback.
+     */
+    public function t(string $key, ?string $lang = null): string
+    {
+        if (!isset($this->translationManager)) {
+            throw new \RuntimeException('TranslationManager is not available in ' . static::class);
+        }
+
+        return $this->translationManager->get($key, $lang);
     }
 
     /** @param array<string,string> $cmsConfig */
