@@ -4,91 +4,299 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use Nette\Database\Table\ActiveRow;
 use App\Models\Helpers\ArrayHelper;
-use App\Models\ConfigException;
+use Nette\Database\Explorer;
+use Nette\Database\Table\ActiveRow;
 
-class ConfigManager extends BaseModel
+class ConfigManager
 {
     public const TABLE_NAME = 'cms_config';
 
-    /** @var array<string,array<string,mixed>> $data */
-    protected mixed $data = [];
+    // TODO: Rename column 'name' to 'key' in the Database !!!
+    public const TABLE_COLUMNS = [
+        'name',
+        'category',
+        'value',
+    ];
 
-    public function load(): void
+    /** @var array<string,array<string,string>> Configuration data indexed by setting name. */
+    private array $configuration = [];
+
+    public function __construct(
+        private Explorer $db
+    ) {}
+
+    /**
+     * Loads configuration data from the database if not already loaded.
+     */
+    private function load(): void
     {
-        $result = $this->db->table(self::TABLE_NAME)
-            ->fetchAll();
-
-        /** @var ActiveRow $row */
-        foreach ($result as $row) {
-            $this->data[$row['category']][$row['name']] = $row['value'];
+        if (empty($this->configuration)) {
+            $this->configuration = ArrayHelper::resultToArray(
+                $this->db->table(self::TABLE_NAME)->fetchAll(),
+                'name'
+            );
         }
     }
 
-    // /** @param array<string,string> $param */
-    // public function update(array $param): void
-    // {
-    //     foreach ($param as $name => $value) {
-    //         $this->setValue($name, $value);
-    //     }
-    // }
-
-    // public function setValue(string $name, string $value): void
-    // {
-    //     $selection = $this->db->table(self::TABLE_NAME)->where([
-    //         'name' => $name
-    //     ]);
-
-    //     if ($selection->count() > 0) {
-    //         $this->db->table(self::TABLE_NAME)->where([
-    //             'name' => $name
-    //         ])->update([
-    //             'value' => $value
-    //         ]);
-    //     } else {
-    //         $this->db->table(self::TABLE_NAME)->insert([
-    //             'name' => $name,
-    //             'value' => $value
-    //         ]);
-    //     }
-    // }
-
-    // public function getValue(string $name): string
-    // {
-    //     if (empty($this->data)) {
-    //         $this->load();
-    //     }
-
-    //     return call_user_func_array('array_merge', array_values($this->data))[$name] ?? '';
-    // }
-
-    /** @return array<string,string> $param */
-    public function getValues(bool $reload = false): array
+    /**
+     * Forces reloading of configuration data from the database.
+     */
+    public function reload(): void
     {
-        if (empty($this->data) || $reload) {
-            $this->load();
-        }
-
-        return call_user_func_array('array_merge', array_values($this->data));
+        $this->invalidate();
+        $this->load();
     }
 
-    // public function getValueByCategory(string $category, string $name): string
-    // {
-    //     if (empty($this->data)) {
-    //         $this->load();
-    //     }
+    /**
+     * Clears the cached configuration data.
+     */
+    public function invalidate(): void
+    {
+        $this->configuration = [];
+    }
 
-    //     return $this->data[$category][$name] ?: '';
-    // }
+    /**
+     * Retrieves a configuration value by key.
+     *
+     * @param string $key Configuration key.
+     * @return string|null The configuration value, or null if not found.
+     */
+    public function get(string $key): ?string
+    {
+        $this->load();
+        return $this->configuration[$key]['value'] ?? null;
+    }
 
-    // /** @return array<string,string> $param */
-    // public function getValuesByCategory(string $category): array
-    // {
-    //     if (empty($this->data)) {
-    //         $this->load();
-    //     }
+    /**
+     * Retrieves all configuration values as an associative array.
+     *
+     * @return array<string,string> Associative array where keys are setting names and values are their corresponding values.
+     */
+    public function getConfig(): array
+    {
+        $this->load();
 
-    //     return $this->data[$category] ?: [];
-    // }
+        $values = [];
+        foreach ($this->configuration as $key => $item) {
+            $values[$key] = $item['value'];
+        }
+
+        bdump($values, "CONFIG VALUES");
+
+        return $values;
+    }
+
+    /**
+     * Retrieves configuration values belonging to a specific category.
+     *
+     * @param string $category The category name.
+     * @return array<string,string> Associative array of category values (empty if none found).
+     */
+    public function getCategoryValues(string $category): array
+    {
+        $this->load();
+
+        $categoryValues = [];
+        foreach ($this->configuration as $key => $item) {
+            if ($item['category'] == $category) {
+                $categoryValues[$key] = $item['value'];
+            }
+        }
+
+        return $categoryValues;
+    }
+
+    /**
+     * Adds or updates a configuration entry.
+     *
+     * If the key already exists, it updates the value and category.
+     * Otherwise, it inserts a new entry.
+     *
+     * @param string $key Configuration key.
+     * @param string $category Category name.
+     * @param string $value Configuration value.
+     */
+    public function set(string $key, string $category, string $value): void
+    {
+        $this->load();
+
+        if (isset($this->configuration[$key])) {
+            $this->db->table(self::TABLE_NAME)->where([
+                'name' => $key
+            ])->update([
+                'category' => $category,
+                'value' => $value
+            ]);
+        } else {
+            $this->db->table(self::TABLE_NAME)->insert([
+                'name' => $key,
+                'category' => $category,
+                'value' => $value
+            ]);
+        }
+
+        $this->invalidate();
+    }
+
+    /**
+     * Adds a new configuration entry.
+     *
+     * Throws an exception if the key already exists.
+     *
+     * @param string $key Configuration key.
+     * @param string $category Category name.
+     * @param string $value Configuration value.
+     * @throws ConfigException If the key already exists.
+     */
+    public function add(string $key, string $category, string $value): void
+    {
+        $this->load();
+
+        if (isset($this->configuration[$key])) {
+            throw new ConfigException("Duplicate key '$key' found, configuration entry cannot be inserted", 1);
+        }
+
+        $item = ['name' => $key, 'category' => $category, 'value' => $value];
+
+        $this->db->table(self::TABLE_NAME)
+            ->insert($item);
+
+        $this->configuration[$key] = $item;
+    }
+
+    /**
+     * Updates an existing configuration entry.
+     *
+     * If the key does not exist, this method does nothing.
+     *
+     * @param string $key Configuration key.
+     * @param string $category Category name.
+     * @param string $value New configuration value.
+     * @throws ConfigException If the key not found.
+     */
+    public function update(string $key, string $category, string $value): void
+    {
+        $this->load();
+
+        if (!isset($this->configuration[$key])) {
+            throw new ConfigException("Key '$key' not found, configuration entry cannot be updated", 1);
+        }
+
+        $item = ['name' => $key, 'category' => $category, 'value' => $value];
+
+        $this->db->table(self::TABLE_NAME)->where([
+            'name' => $key
+        ])->update([
+            'category' => $category,
+            'value' => $value
+        ]);
+
+        $this->configuration[$key] = $item;
+    }
+
+    /**
+     * Renames a configuration key.
+     *
+     * Throws an exception if the old key does not exist or the new key already exists.
+     *
+     * @param string $oldKey The existing key name.
+     * @param string $newKey The new key name.
+     * @throws ConfigException If the old key is not found or the new key already exists.
+     */
+    public function changeKey(string $oldKey, string $newKey): void
+    {
+        $this->load();
+
+        if (!isset($this->configuration[$oldKey])) {
+            throw new ConfigException("Key '$oldKey' not found, key cannot be changed", 1);
+        }
+
+        if (isset($this->configuration[$newKey])) {
+            throw new ConfigException("Duplicate key '$newKey' found, key cannot be changed", 1);
+        }
+
+        $this->db->table(self::TABLE_NAME)->where([
+            'name' => $oldKey
+        ])->update([
+            'name' => $newKey
+        ]);
+
+        $this->invalidate();
+    }
+
+    /**
+     * Deletes a configuration entry.
+     *
+     * @param string $key Configuration key to be removed.
+     */
+    public function delete(string $key): void
+    {
+        // $this->load();
+        // if (!isset($this->configuration[$key])) {
+        //     throw new ConfigException("Key '$key' not found, configuration entry cannot be deleted", 1);
+        // }
+
+        $this->db->table(self::TABLE_NAME)
+            ->where('name', $key)
+            ->delete();
+
+        $this->invalidate();
+    }
+
+    /**
+     * Retrieves a list of configuration entries with optional filtering.
+     *
+     * @param int $limit Number of entries to retrieve.
+     * @param int $offset Offset for pagination.
+     * @param string|null $category Filter by category (optional).
+     * @param string|null $search Search term for key or value (optional).
+     * @return array<ActiveRow> List of configuration entries.
+     */
+    public function getList(int $limit = 50, int $offset = 0, ?string $category = null, ?string $search = null): array
+    {
+        $query = $this->db->table(self::TABLE_NAME)
+            ->limit($limit, $offset);
+
+        if ($category !== null) {
+            $query->where('category', $category);
+        }
+
+        if ($search !== null) {
+            $query->whereOr([
+                'name LIKE ?' => "%$search%",
+                'value LIKE ?' => "%$search%"
+            ]);
+        }
+
+        // DEBUG: Array test @return array<T|mixed>
+        // return ArrayHelper::resultToArray($query->fetchAll(), null);
+
+        return $query->fetchAll();
+    }
+
+    /**
+     * Returns the total count of configuration entries with optional filtering.
+     *
+     * @param string|null $category Filter by category (optional).
+     * @param string|null $search Search term for key or value (optional).
+     * @return int Number of matching entries.
+     */
+    public function getCount(?string $category = null, ?string $search = null): int
+    {
+        $query = $this->db->table(self::TABLE_NAME);
+
+        if ($category !== null) {
+            $query->where('category', $category);
+        }
+
+        if ($search !== null) {
+            $query->whereOr([
+                'name LIKE ?' => "%$search%",
+                'value LIKE ?' => "%$search%"
+            ]);
+        }
+
+        return $query->count('*');
+    }
 }
