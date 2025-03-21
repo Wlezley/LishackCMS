@@ -8,7 +8,7 @@ use Nette\Database\Table\ActiveRow;
 use App\Models\Helpers\ArrayHelper;
 use App\Models\ConfigException;
 
-class Config extends BaseModel
+class ConfigManager extends BaseModel
 {
     public const TABLE_NAME = 'cms_config';
 

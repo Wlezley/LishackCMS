@@ -11,7 +11,7 @@ services:
     authenticator: App\Models\Authenticator
 
     # Models
-    - App\Models\Config
+    - App\Models\ConfigManager
     - App\Models\Files
     - App\Models\Gallery
     - App\Models\Helpers\ArrayHelper

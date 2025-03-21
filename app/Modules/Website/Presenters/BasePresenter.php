@@ -7,7 +7,7 @@ namespace App\Modules\Website\Presenters;
 use App\Components\IAdminButtonFactory;
 use App\Components\IMenuFactory;
 use App\Components\IPaginationFactory;
-use App\Models\Config;
+use App\Models\ConfigManager;
 use App\Models\Helpers\AssetsVersion;
 use App\Models\TranslationManager;
 use Nette;
@@ -20,8 +20,8 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     /** @var Explorer @inject */
     public Explorer $db;
 
-    /** @var Config @inject */
-    public Config $config;
+    /** @var ConfigManager @inject */
+    public ConfigManager $config;
 
     /** @var TranslationManager @inject */
     public TranslationManager $translationManager;
