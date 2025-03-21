@@ -11,7 +11,7 @@ use Nette\Utils\Validators;
 class ConfigValidator
 {
     public const COLUMNS = [
-        'name',
+        'key',
         'caregory',
         'value'
     ];
@@ -19,16 +19,16 @@ class ConfigValidator
     /**
      * Builds a structured array of config data with default values.
      *
-     * @param string $name The name of the config item
+     * @param string $key The key of the config item
      * @param string|null $category
      * @param string|null $value
      *
      * @return array<string,string|int|null> An associative array containing config data
      */
-    public static function buildData(string $name, ?string $category = null, ?string $value = null): array
+    public static function buildData(string $key, ?string $category = null, ?string $value = null): array
     {
         return [
-            'name' => $name,
+            'key' => $key,
             'category' => $category ?? '',
             'value' => $value ?? '',
         ];
@@ -43,7 +43,7 @@ class ConfigValidator
     public static function prepareData(array $data): array
     {
         return [
-            'name' => $data['name'],
+            'key' => $data['key'],
             'category' => $data['category'] ?? null,
             'value' => $data['value'] ?? null,
         ];
@@ -59,9 +59,9 @@ class ConfigValidator
     {
         ArrayHelper::assertExtraKeys(self::COLUMNS, $data, 'ConfigData');
 
-        if (isset($data['name'])) {
-            Validators::assert($data['name'], 'string:1..50', 'Name');
-            // StringHelper::assertSlug($data['name'], 'Name');
+        if (isset($data['key'])) {
+            Validators::assert($data['key'], 'string:1..50', 'Key');
+            // StringHelper::assertSlug($data['key'], 'Key');
         }
         if (isset($data['category'])) {
             Validators::assert($data['category'], 'string:1..50', 'Category');

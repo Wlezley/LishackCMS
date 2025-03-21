@@ -11,13 +11,7 @@ use Nette\Database\Table\ActiveRow;
 class ConfigManager
 {
     public const TABLE_NAME = 'cms_config';
-
-    // TODO: Rename column 'name' to 'key' in the Database !!!
-    public const TABLE_COLUMNS = [
-        'name',
-        'category',
-        'value',
-    ];
+    // public const TABLE_COLUMNS = ConfigValidator::COLUMNS;
 
     /** @var array<string,array<string,string>> Configuration data indexed by setting name. */
     private array $configuration = [];
@@ -34,7 +28,7 @@ class ConfigManager
         if (empty($this->configuration)) {
             $this->configuration = ArrayHelper::resultToArray(
                 $this->db->table(self::TABLE_NAME)->fetchAll(),
-                'name'
+                'key'
             );
         }
     }
@@ -82,8 +76,6 @@ class ConfigManager
             $values[$key] = $item['value'];
         }
 
-        bdump($values, "CONFIG VALUES");
-
         return $values;
     }
 
@@ -123,14 +115,14 @@ class ConfigManager
 
         if (isset($this->configuration[$key])) {
             $this->db->table(self::TABLE_NAME)->where([
-                'name' => $key
+                'key' => $key
             ])->update([
                 'category' => $category,
                 'value' => $value
             ]);
         } else {
             $this->db->table(self::TABLE_NAME)->insert([
-                'name' => $key,
+                'key' => $key,
                 'category' => $category,
                 'value' => $value
             ]);
@@ -157,7 +149,7 @@ class ConfigManager
             throw new ConfigException("Duplicate key '$key' found, configuration entry cannot be inserted", 1);
         }
 
-        $item = ['name' => $key, 'category' => $category, 'value' => $value];
+        $item = ['key' => $key, 'category' => $category, 'value' => $value];
 
         $this->db->table(self::TABLE_NAME)
             ->insert($item);
@@ -183,10 +175,10 @@ class ConfigManager
             throw new ConfigException("Key '$key' not found, configuration entry cannot be updated", 1);
         }
 
-        $item = ['name' => $key, 'category' => $category, 'value' => $value];
+        $item = ['key' => $key, 'category' => $category, 'value' => $value];
 
         $this->db->table(self::TABLE_NAME)->where([
-            'name' => $key
+            'key' => $key
         ])->update([
             'category' => $category,
             'value' => $value
@@ -200,8 +192,8 @@ class ConfigManager
      *
      * Throws an exception if the old key does not exist or the new key already exists.
      *
-     * @param string $oldKey The existing key name.
-     * @param string $newKey The new key name.
+     * @param string $oldKey The existing key.
+     * @param string $newKey The new key.
      * @throws ConfigException If the old key is not found or the new key already exists.
      */
     public function changeKey(string $oldKey, string $newKey): void
@@ -217,9 +209,9 @@ class ConfigManager
         }
 
         $this->db->table(self::TABLE_NAME)->where([
-            'name' => $oldKey
+            'key' => $oldKey
         ])->update([
-            'name' => $newKey
+            'key' => $newKey
         ]);
 
         $this->invalidate();
@@ -238,7 +230,7 @@ class ConfigManager
         // }
 
         $this->db->table(self::TABLE_NAME)
-            ->where('name', $key)
+            ->where('key', $key)
             ->delete();
 
         $this->invalidate();
@@ -264,7 +256,7 @@ class ConfigManager
 
         if ($search !== null) {
             $query->whereOr([
-                'name LIKE ?' => "%$search%",
+                'key LIKE ?' => "%$search%",
                 'value LIKE ?' => "%$search%"
             ]);
         }
@@ -292,7 +284,7 @@ class ConfigManager
 
         if ($search !== null) {
             $query->whereOr([
-                'name LIKE ?' => "%$search%",
+                'key LIKE ?' => "%$search%",
                 'value LIKE ?' => "%$search%"
             ]);
         }
