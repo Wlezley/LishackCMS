@@ -91,7 +91,7 @@ class TranslationForm extends BaseControl
                 if (empty($values["text_$lang"])) {
                     $this->translationManager->delete($key, $lang);
                 } else {
-                    $this->translationManager->save($key, $lang, $values["text_$lang"]);
+                    $this->translationManager->update($key, $lang, $values["text_$lang"]);
                 }
             } elseif (!empty($values["text_$lang"])) {
                 $this->translationManager->add($key, $lang, $values["text_$lang"]);

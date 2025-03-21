@@ -27,9 +27,9 @@ class TranslationLanguage
 
         if (empty($this->languages)) {
             foreach ($this->db->table(self::TABLE_NAME)->fetchAll() as $row) {
-                $languageRow = $row->toArray();
-                $key = $languageRow['lang'];
-                $this->languages[$key] = $languageRow;
+                $item = $row->toArray();
+                $key = $item['lang'];
+                $this->languages[$key] = $item;
             }
         }
     }
