@@ -11,17 +11,21 @@ class ArrayHelper
     /**
      * Converts an array of `ActiveRow` objects into an associative array.
      *
-     * Keys are taken from the 'id' field of each row.
+     * If `$keyColumn` is provided, it is used as the array key.
+     * If `$keyColumn` is `null`, the array will be numerically indexed.
      *
      * @param array<ActiveRow> $result Array of `ActiveRow` objects.
-     * @return array<int,array<string,string|int|null>> Associative array of row data.
+     * @param string|null $keyColumn Column name to be used as the array key, or `null` for numeric indexing (default: 'id').
+     * @return array<int|string,array<string,string|int|null>> Associative or numerically indexed array of result data.
      */
-    public static function resultToArray(array $result): array
+    public static function resultToArray(array $result, ?string $keyColumn = 'id'): array
     {
         $data = [];
         foreach ($result as $row) {
             $item = $row->toArray();
-            $data[$item['id']] = $item;
+            $keyColumn
+                ? $data[$item[$keyColumn]] = $item
+                : $data[] = $item;
         }
         return $data;
     }
