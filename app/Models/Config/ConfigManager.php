@@ -11,7 +11,6 @@ use Nette\Database\Table\ActiveRow;
 class ConfigManager
 {
     public const TABLE_NAME = 'cms_config';
-    // public const TABLE_COLUMNS = ConfigValidator::COLUMNS;
 
     /** @var array<string,array<string,string>> Configuration data indexed by setting name. */
     private array $configuration = [];

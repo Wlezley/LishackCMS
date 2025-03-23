@@ -12,6 +12,21 @@ use Nette\Database\Explorer;
 
 abstract class BasePresenter extends \Nette\Application\UI\Presenter
 {
+    private const CATEGORY_MAP = [
+        'Admin' => 'HOME',
+        'Article' => 'ARTICLE',
+        'Menu' => 'MENU',
+        'Data' => 'DATA',
+        'Config' => 'CONFIG',
+        'User' => 'CONFIG',
+        'Translation' => 'CONFIG',
+        'Email' => 'CONFIG',
+        'Website' => 'CONFIG',
+        'Seo' => 'CONFIG',
+        'Redirect' => 'CONFIG',
+        'Debug' => 'CONFIG',
+    ];
+
     /** @var Explorer @inject */
     public Explorer $db;
 
@@ -78,17 +93,14 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
     }
 
     /**
-     * Returns the translation string for a given key and language.
+     * Retrieves a translated text for a given key in a specified language.
      *
-     * If $lang is null, the default or current language is used.
-     * If the translation is not found, the key itself is returned.
+     * This is a shorthand wrapper for `TranslationManager::get()`.
      *
-     * @param string      $key  The translation key.
-     * @param string|null $lang The target language code (null = current language).
-     *
+     * @param string $key The translation key.
+     * @param string|null $lang Optional language code (defaults to current language).
      * @throws \RuntimeException If TranslationManager is not available.
-     *
-     * @return string The translated text, the key as fallback.
+     * @return string The translated text, or the key itself if not found.
      */
     public function t(string $key, ?string $lang = null): string
     {
@@ -99,30 +111,17 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
         return $this->translationManager->get($key, $lang);
     }
 
+    /**
+     * Gets the category associated with the current presenter.
+     *
+     * Determines the presenter name and maps it to a predefined category.
+     * If no matching category is found, returns an empty string.
+     *
+     * @return string The category name or an empty string if not found.
+     */
     protected function getPresenterCategory(): string
     {
-        $presenterName = Helpers::splitName($this->getName())[1];
-
-        $categoryList = [
-            'Admin' => 'HOME',
-            'Article' => 'ARTICLE',
-            'Menu' => 'MENU',
-            'Data' => 'DATA',
-            'Config' => 'CONFIG',
-            'User' => 'CONFIG',
-            'Translation' => 'CONFIG',
-            'Email' => 'CONFIG',
-            'Website' => 'CONFIG',
-            'Seo' => 'CONFIG',
-            'Redirect' => 'CONFIG',
-            'Debug' => 'CONFIG',
-        ];
-
-        if (array_key_exists($presenterName, $categoryList)) {
-            return $categoryList[$presenterName];
-        }
-
-        return '';
+        return self::CATEGORY_MAP[Helpers::splitName($this->getName())[1]] ?? '';
     }
 
     // ##########################################
@@ -134,7 +133,7 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
         $component = parent::createComponent($name);
 
         if ($component instanceof \App\Components\BaseControl) {
-            $component->injectTranslationManager($this->translationManager);
+            $component->setTranslationManager($this->translationManager);
         }
 
         return $component;

@@ -55,7 +55,7 @@ class TranslationList extends BaseControl
         $presenter = $this->getPresenter();
 
         $control = $presenter->paginationFactory->create();
-        $control->injectTranslationManager($presenter->translationManager);
+        $control->setTranslationManager($presenter->translationManager);
         $control->setQueryParams($presenter->getHttpRequest()->getQuery());
         $control->setItemsPerPage($this->limit);
         $control->setTotalItems($this->totalItems);

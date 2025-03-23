@@ -19,7 +19,7 @@ class BaseControl extends Control
     /** @var null|array<string,string> $param */
     protected ?array $param = [];
 
-    public function injectTranslationManager(TranslationManager $translationManager): void
+    public function setTranslationManager(TranslationManager $translationManager): void
     {
         $this->translationManager = $translationManager;
     }

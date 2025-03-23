@@ -95,7 +95,7 @@ class UserPresenter extends SecuredPresenter
     protected function createComponentUserList(): Datagrid
     {
         // $this->userListGrid->setPresenter($this);
-        $this->userListGrid->injectTranslationManager($this->translationManager);
+        $this->userListGrid->setTranslationManager($this->translationManager);
         return $this->userListGrid->createGrid();
     }
 

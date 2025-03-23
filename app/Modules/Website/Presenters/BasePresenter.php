@@ -192,7 +192,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $component = parent::createComponent($name);
 
         if ($component instanceof \App\Components\BaseControl) {
-            $component->injectTranslationManager($this->translationManager);
+            $component->setTranslationManager($this->translationManager);
         }
 
         return $component;
