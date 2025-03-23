@@ -99,6 +99,28 @@ class ConfigManager
     }
 
     /**
+     * Retrieves a list of configuration categories with the number of items in each.
+     *
+     * @return array<string,int> Associative array where keys are category names and values are the number of items in each category.
+     */
+    public function getCategories(): array
+    {
+        $this->load();
+
+        $categories = [];
+        foreach ($this->configuration as $item) {
+            $category = $item['category'];
+            if ($categories[$category]) {
+                $categories[$category] += 1;
+            } else {
+                $categories[$category] =  1;
+            }
+        }
+
+        return $categories;
+    }
+
+    /**
      * Adds or updates a configuration entry.
      *
      * If the key already exists, it updates the value and category.
