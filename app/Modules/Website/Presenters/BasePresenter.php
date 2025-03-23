@@ -137,17 +137,14 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     }
 
     /**
-     * Returns the translation string for a given key and language.
+     * Retrieves a translated text for a given key in a specified language.
      *
-     * If $lang is null, the default or current language is used.
-     * If the translation is not found, the key itself is returned.
+     * This is a shorthand wrapper for `TranslationManager::get()`.
      *
-     * @param string      $key  The translation key.
-     * @param string|null $lang The target language code (null = current language).
-     *
+     * @param string $key The translation key.
+     * @param string|null $lang Optional language code (defaults to current language).
      * @throws \RuntimeException If TranslationManager is not available.
-     *
-     * @return string The translated text, the key as fallback.
+     * @return string The translated text, or the key itself if not found.
      */
     public function t(string $key, ?string $lang = null): string
     {
