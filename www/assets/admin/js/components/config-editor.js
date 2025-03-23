@@ -21,8 +21,9 @@ export class ConfigEditor {
     tr.classList.add("config-row")
 
     tr.innerHTML = `
+      <td class="align-middle status-col status-new"></td>
       <td class="align-top key-col"><input type="text" class="form-control key-input" value="${key}"></td>
-      <td class="align-top key-col"><input type="text" class="form-control category-input" value="${category}"></td>
+      <td class="align-top category-col"><input type="text" class="form-control category-input" value="${category}"></td>
       <td class="align-middle"><textarea class="form-control linked-textarea config-value" rows="1">${value}</textarea></td>
       <td class="align-middle action-col"><button type="button" class="btn btn-danger remove-row" tabindex=-1><i class="fa-solid fa-minus"></i></button></td>
     `;
@@ -42,7 +43,12 @@ export class ConfigEditor {
       value = value.replace(/__+/g, "_");
       value = value.replace(/^_+/g, "");
       event.target.value = value;
-    });
+
+      const row = event.target.closest("tr");
+      if (row) {
+        this.markChangedRow(row, "status-changed");
+      }
+    }.bind(this));
     input.addEventListener("blur", function (event) {
       let value = event.target.value;
       value = value.replace(/^_+|_+$/g, "");
@@ -86,8 +92,11 @@ export class ConfigEditor {
             hasDuplicate = true;
             keyInput.classList.add("is-invalid");
             keyValues.get(key).classList.add("is-invalid");
+            this.markChangedRow(row, "status-error");
+            this.markChangedRow(keyValues.get(key).closest("tr"), "status-error");
           } else {
             keyValues.set(key, keyInput);
+            this.markChangedRow(keyInput.closest("tr"), "");
           }
 
           data[key] = {
@@ -97,6 +106,7 @@ export class ConfigEditor {
         } else if (configCategory || configValue) {
           hasNoKeyValues = true;
           keyInput.classList.add("is-invalid");
+          this.markChangedRow(row, "status-error");
         }
       });
 
@@ -140,7 +150,13 @@ export class ConfigEditor {
 
   addTextareaSizing(parent) {
     parent.querySelectorAll(".linked-textarea").forEach(textarea => {
-      textarea.addEventListener("input", () => this.adjustHeight(textarea));
+      textarea.addEventListener("input", function (event) {
+        this.adjustHeight(event.target);
+        const row = event.target.closest("tr");
+        if (row) {
+          this.markChangedRow(row, "status-changed");
+        }
+      }.bind(this));
       textarea.addEventListener("mousedown", () => this.adjustHeight(textarea));
     });
   }
@@ -159,4 +175,24 @@ export class ConfigEditor {
     textarea.style.height = newHeight + "px";
   }
 
+  // Row status
+  markChangedRow(row, statusClass) {
+    const statusCell = row.querySelector(".status-col");
+    if (!statusCell) {
+      return;
+    }
+
+    if (statusCell.classList.contains("status-new") && statusClass === "status-changed") {
+      return;
+    }
+
+    if (statusCell.classList.contains("status-changed") && statusClass === "") {
+      return;
+    }
+
+    statusCell.classList.remove("status-changed", "status-new", "status-error");
+    if (statusClass) {
+      statusCell.classList.add(statusClass);
+    }
+  }
 }

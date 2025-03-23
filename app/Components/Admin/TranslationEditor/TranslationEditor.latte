@@ -2,6 +2,7 @@
     <table id="translationEditorTable" class="table table-responsive table-striped table-hover table-dark">
         <thead>
             <tr>
+                <th scope="col" class="status-col"></th>
                 <th scope="col" class="key-col">{$_('key')}</th>
                 <th scope="col">{$languages[$defaultLang]} ({$_('default')})</th>
                 <th scope="col" class="copy-col"></th>
@@ -12,6 +13,7 @@
         <tbody>
             {foreach $translations as $key => $texts}
                 <tr class="translation-row">
+                    <td class="align-middle status-col"></td>
                     <td class="align-top key-col"><input type="text" class="form-control key-input" value="{$key}" tabindex=-1 required readonly></td>
                     <td class="align-middle"><textarea class="form-control linked-textarea source-text" rows="1">{$texts['default']}</textarea></td>
                     <td class="align-middle copy-col"><button type="button" class="btn btn-secondary copy-text" tabindex=-1><i class="fa-solid fa-right-from-bracket"></i></i></button></td>
@@ -22,7 +24,7 @@
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="4"></td>
+                <td colspan="5"></td>
                 <td class="align-middle action-col"><button type="button" class="btn btn-success" id="addRow"><i class="fa-solid fa-plus"></i></button></td>
             </tr>
         </tfoot>

@@ -1,6 +1,25 @@
 #translationEditorTable {
+    .status-col {
+        width: 0.4rem;
+        padding: 0;
+
+        &.status-changed {
+            box-shadow: none;
+            background-color: rgba(var(--bs-primary-rgb), var(--bs-bg-opacity)) !important;
+        }
+        &.status-new {
+            box-shadow: none;
+            background-color: rgba(var(--bs-success-rgb), var(--bs-bg-opacity)) !important;
+        }
+        &.status-error {
+            box-shadow: none;
+            background-color: rgba(var(--bs-danger-rgb), var(--bs-bg-opacity)) !important;
+        }
+    }
+
     .key-col {
         width: 300px;
+        padding-left: 0.5rem;
 
         input[readonly] {
             background-color: var(--bs-gray-500);

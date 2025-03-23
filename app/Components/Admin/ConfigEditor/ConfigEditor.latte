@@ -2,6 +2,7 @@
     <table id="configEditorTable" class="table table-responsive table-striped table-hover table-dark">
         <thead>
             <tr>
+                <th scope="col" class="status-col"></th>
                 <th scope="col" class="key-col">{$_('key')}</th>
                 <th scope="col">{$_('category')}</th>
                 <th scope="col">{$_('value')}</th>
@@ -11,8 +12,9 @@
         <tbody>
             {foreach $configuration as $key => $item}
                 <tr class="config-row">
+                    <td class="align-middle status-col"></td>
                     <td class="align-top key-col"><input type="text" class="form-control key-input" value="{$key}" tabindex=-1 required readonly></td>
-                    <td class="align-top key-col"><input type="text" class="form-control category-input" value="{$item['category']}"></td>
+                    <td class="align-top category-col"><input type="text" class="form-control category-input" value="{$item['category']}"></td>
                     <td class="align-middle"><textarea class="form-control linked-textarea config-value" rows="1">{$item['value']}</textarea></td>
                     <td class="align-middle action-col"><button type="button" class="btn btn-secondary remove-row" tabindex=-1 disabled><i class="fa-solid fa-minus"></i></button></td>
                 </tr>
@@ -20,7 +22,7 @@
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="3"></td>
+                <td colspan="4"></td>
                 <td class="align-middle action-col"><button type="button" class="btn btn-success" id="addRow"><i class="fa-solid fa-plus"></i></button></td>
             </tr>
         </tfoot>
