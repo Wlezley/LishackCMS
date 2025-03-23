@@ -13,7 +13,7 @@ class ConfigPresenter extends SecuredPresenter
 
     public function renderDefault(): void
     {
-        $this->template->title = 'Nastavení';
+        $this->redirect('Config:editor');
     }
 
     public function renderEditor(): void
