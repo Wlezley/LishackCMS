@@ -12,7 +12,7 @@ class ConfigManager
 {
     public const TABLE_NAME = 'cms_config';
 
-    /** @var array<string,array<string,string>> Configuration data indexed by setting name. */
+    /** @var array<string,array<string,string>> Configuration data indexed by setting key. */
     private array $configuration = [];
 
     public function __construct(
@@ -62,11 +62,11 @@ class ConfigManager
     }
 
     /**
-     * Retrieves all configuration values as an associative array.
+     * Returns an associative array of all configuration values.
      *
-     * @return array<string,string> Associative array where keys are setting names and values are their corresponding values.
+     * @return array<string,string> Associative array of configuration keys and their values.
      */
-    public function getConfig(): array
+    public function getConfigValues(): array
     {
         $this->load();
 
@@ -257,6 +257,8 @@ class ConfigManager
         $this->invalidate();
     }
 
+    // LISTING METHODS
+
     /**
      * Retrieves a list of configuration entries with optional filtering.
      *
@@ -311,5 +313,50 @@ class ConfigManager
         }
 
         return $query->count('*');
+    }
+
+    // CONFIG EDITOR METHODS
+
+    /**
+     * Saves multiple configuration values in batch.
+     *
+     * Updates existing configuration entries if their value or category has changed.
+     * Otherwise, inserts new configuration entries.
+     *
+     * @param array<string, array{category: string, value: string}> $configuration Associative array of configuration items.
+     */
+    public function saveConfig(array $configuration): void
+    {
+        $this->load();
+        $oldConfig = $this->configuration;
+
+        foreach ($configuration as $key => $item) {
+            if (isset($oldConfig[$key])) {
+                if ($oldConfig[$key]['category'] != $item['category'] || $oldConfig[$key]['value'] != $item['value']) {
+                    $this->update($key, $item['category'], $item['value']);
+                }
+                if (empty($item['category']) && empty($item['value'])) {
+                    $this->delete($key);
+                }
+            } else if ($item['category'] || $item['value']) {
+                $this->add($key, $item['category'], $item['value']);
+            }
+        }
+
+        $this->invalidate();
+    }
+
+    /**
+     * Returns configuration data.
+     *
+     * @return array<string,array<string,string>> Associative array of configuration data indexed by setting key.
+     */
+    public function getConfigData(): array
+    {
+        $this->load();
+        $sortedData = $this->configuration;
+        ksort($sortedData);
+
+        return $sortedData;
     }
 }

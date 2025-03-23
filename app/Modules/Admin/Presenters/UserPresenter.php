@@ -96,6 +96,7 @@ class UserPresenter extends SecuredPresenter
     {
         // $this->userListGrid->setPresenter($this);
         $this->userListGrid->setTranslationManager($this->translationManager);
+        $this->userListGrid->setConfigManager($this->configManager);
         return $this->userListGrid->createGrid();
     }
 

@@ -31,13 +31,10 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
     public Explorer $db;
 
     /** @var ConfigManager @inject */
-    public ConfigManager $config;
+    public ConfigManager $configManager;
 
     /** @var TranslationManager @inject */
     public TranslationManager $translationManager;
-
-    /** @var array<string,string> $cmsConfig */
-    protected array $cmsConfig = [];
 
     /** @var string */
     protected string $lang;
@@ -46,9 +43,8 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
     {
         parent::startup();
 
-        // CMS config
-        $this->cmsConfig = $this->config->getConfig();
-        $this->lang = DEFAULT_LANG;
+        $this->lang = $this->c('DEFAULT_LANG'); // TODO: Get lang from URL, DEFAULT_LANG use here only as fallback
+
         $this->translationManager->setCurrentLanguage($this->lang);
     }
 
@@ -58,6 +54,9 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
 
         // Translations
         $this->template->_ = fn($key) => $this->translationManager->get($key, $this->lang);
+
+        // Configuration
+        $this->template->_C = fn($key) => $this->configManager->get($key);
     }
 
     public function afterRender(): void
@@ -65,12 +64,15 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
         parent::afterRender();
 
         // CMS config
-        $this->template->setParameters($this->cmsConfig);
-        $this->template->VERSION = VERSION;
-        $this->template->HTML_LANG = DEFAULT_LANG;
-        $this->template->DEFAULT_LANG = DEFAULT_LANG;
-        $this->template->DEFAULT_LANG_ADMIN = DEFAULT_LANG;
-        $this->template->DEFAULT_LANG_TINYMCE = DEFAULT_LANG;
+        // $this->template->setParameters($this->configManager->getConfigValues());
+
+        $this->template->VERSION = VERSION; // $this->c('VERSION');
+
+        // TODO: Get lang from URL, DEFAULT_LANG use here only as fallback
+        $this->template->HTML_LANG = $this->c('DEFAULT_LANG');
+        $this->template->DEFAULT_LANG = $this->c('DEFAULT_LANG');
+        $this->template->DEFAULT_LANG_ADMIN = $this->c('DEFAULT_LANG');
+        $this->template->DEFAULT_LANG_TINYMCE = $this->c('DEFAULT_LANG');
 
         // Assets version
         $assetsVersion = new AssetsVersion();
@@ -112,6 +114,24 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
     }
 
     /**
+     * Retrieves a configuration value for a given key.
+     *
+     * This is a shorthand wrapper for `ConfigManager::get()`.
+     *
+     * @param string $key The configuration key.
+     * @throws \RuntimeException If ConfigManager is not available.
+     * @return string|null The configuration value, or null if not found.
+     */
+    public function c(string $key): ?string
+    {
+        if (!isset($this->configManager)) {
+            throw new \RuntimeException('ConfigManager is not available in ' . static::class);
+        }
+
+        return $this->configManager->get($key);
+    }
+
+    /**
      * Gets the category associated with the current presenter.
      *
      * Determines the presenter name and maps it to a predefined category.
@@ -134,6 +154,7 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
 
         if ($component instanceof \App\Components\BaseControl) {
             $component->setTranslationManager($this->translationManager);
+            $component->setConfigManager($this->configManager);
         }
 
         return $component;

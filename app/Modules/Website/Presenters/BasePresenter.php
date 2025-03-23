@@ -21,7 +21,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     public Explorer $db;
 
     /** @var ConfigManager @inject */
-    public ConfigManager $config;
+    public ConfigManager $configManager;
 
     /** @var TranslationManager @inject */
     public TranslationManager $translationManager;
@@ -39,9 +39,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     private ?int $itemsPerPage = null;
     private ?int $totalItems = null;
 
-    /** @var array<string,string> $cmsConfig */
-    protected array $cmsConfig = [];
-
+    // Page defaults
     protected string $baseUrl;
     protected string $currentUrl;
     protected string $adminUrl;
@@ -60,9 +58,6 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     {
         parent::startup();
 
-        // CMS config
-        $this->cmsConfig = $this->config->getConfig();
-
         // Url
         $this->url = $this->getHttpRequest()->getUrl();
         $this->baseUrl = $this->url->getBaseUrl();
@@ -70,9 +65,9 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $this->adminUrl = ADMIN_HOME_URL;
 
         // Page settings
-        $this->lang = strtolower($this->cmsConfig['DEFAULT_LANG']);
+        $this->lang = strtolower($this->c('DEFAULT_LANG'));
         $this->page = DEFAULT_PAGE;
-        $this->title = $this->cmsConfig['SITE_TITLE'];
+        $this->title = $this->c('SITE_TITLE');
 
         // Translations language
         $this->translationManager->setCurrentLanguage($this->lang);
@@ -92,6 +87,9 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
         // Translations
         $this->template->_ = fn($key) => $this->translationManager->get($key, $this->lang);
+
+        // Configuration
+        $this->template->_C = fn($key) => $this->configManager->get($key);
     }
 
     public function afterRender(): void
@@ -99,7 +97,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         parent::afterRender();
 
         // CMS config
-        $this->template->setParameters($this->cmsConfig);
+        // $this->template->setParameters($this->configManager->getConfigValues());
 
         // Url
         $this->template->url = $this->url;
@@ -155,6 +153,24 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         return $this->translationManager->get($key, $lang);
     }
 
+    /**
+     * Retrieves a configuration value for a given key.
+     *
+     * This is a shorthand wrapper for `ConfigManager::get()`.
+     *
+     * @param string $key The configuration key.
+     * @throws \RuntimeException If ConfigManager is not available.
+     * @return string|null The configuration value, or null if not found.
+     */
+    public function c(string $key): ?string
+    {
+        if (!isset($this->configManager)) {
+            throw new \RuntimeException('ConfigManager is not available in ' . static::class);
+        }
+
+        return $this->configManager->get($key);
+    }
+
     // ##########################################
     // ###             PAGINATION             ###
     // ##########################################
@@ -190,6 +206,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
         if ($component instanceof \App\Components\BaseControl) {
             $component->setTranslationManager($this->translationManager);
+            $component->setConfigManager($this->configManager);
         }
 
         return $component;

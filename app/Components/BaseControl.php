@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Components;
 
+use App\Models\ConfigManager;
 use App\Models\TranslationManager;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Template;
@@ -12,6 +13,9 @@ class BaseControl extends Control
 {
     /** @var TranslationManager */
     protected TranslationManager $translationManager;
+
+    /** @var ConfigManager */
+    protected ConfigManager $configManager;
 
     /** @var array<string,string> $cmsConfig */
     protected array $cmsConfig = [];
@@ -29,7 +33,17 @@ class BaseControl extends Control
         return $this->translationManager;
     }
 
-    /** @throws \RuntimeException If TranslationManager is not available. */
+    public function setConfigManager(ConfigManager $configManager): void
+    {
+        $this->configManager = $configManager;
+    }
+
+    public function getConfigManager(): ConfigManager
+    {
+        return $this->configManager;
+    }
+
+    /** @throws \RuntimeException If TranslationManager or ConfigManager is not available. */
     protected function createTemplate(?string $class = null): Template
     {
         $template = parent::createTemplate($class);
@@ -38,8 +52,15 @@ class BaseControl extends Control
             throw new \RuntimeException('TranslationManager is not available in ' . static::class);
         }
 
+        if (!isset($this->configManager)) {
+            throw new \RuntimeException('ConfigManager is not available in ' . static::class);
+        }
+
         // Translations
         $template->_ = fn($key) => $this->translationManager->get($key); // @phpstan-ignore property.notFound
+
+        // Configuration
+        $template->_C = fn($key) => $this->configManager->get($key); // @phpstan-ignore property.notFound
 
         return $template;
     }
@@ -61,6 +82,24 @@ class BaseControl extends Control
         }
 
         return $this->translationManager->get($key, $lang);
+    }
+
+    /**
+     * Retrieves a configuration value for a given key.
+     *
+     * This is a shorthand wrapper for `ConfigManager::get()`.
+     *
+     * @param string $key The configuration key.
+     * @throws \RuntimeException If ConfigManager is not available.
+     * @return string|null The configuration value, or null if not found.
+     */
+    public function c(string $key): ?string
+    {
+        if (!isset($this->configManager)) {
+            throw new \RuntimeException('ConfigManager is not available in ' . static::class);
+        }
+
+        return $this->configManager->get($key);
     }
 
     /** @param array<string,string> $cmsConfig */

@@ -121,9 +121,14 @@
                         </a>
                     </li>
                     <li class="sidebar-item">
+                        <a n:href="Config:editor" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('Config:editor') ? active">
+                            <i class="fa-solid fa-table-list"></i>
+                            Editor nastavení
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
                         <a n:href="Redirect:" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('Redirect:*') ? active">
                             <i class="fa-solid fa-arrows-split-up-and-left"></i>
-                            {* <i class="fa-solid fa-arrows-turn-to-dots"></i> *}
                             Přesměrování
                         </a>
                     </li>
