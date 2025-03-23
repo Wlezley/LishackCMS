@@ -33,6 +33,7 @@ export class TranslationEditor {
     this.addTextareaSizing(tr);
     this.addRemoveListener(tr.querySelector(".remove-row"));
     this.addCopyListener(tr.querySelector(".copy-text"));
+    tr.querySelector(".key-input").focus();
   }
 
   addRemoveListener(button) {
@@ -70,7 +71,7 @@ export class TranslationEditor {
 
   addSubmitListener(form) {
     form.addEventListener("submit", function (event) {
-      const rows = document.querySelectorAll("#translationEditorTable tbody tr");
+      const rows = this.table.querySelectorAll("tr");
 
       let data = {};
       let keyValues = new Map();
