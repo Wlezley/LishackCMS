@@ -1,0 +1,56 @@
+{form form}
+    <div class="row">
+        <div class="col-12 mx-auto">
+            <div class="row mb-3">
+                <div class="col-6">
+                    <h2 class="text-warning">Open Graph protocol</h2>
+                    <div class="mb-3">
+                        {label OG_TITLE, class => 'form-label' /}
+                        {input OG_TITLE, class => 'form-control'}
+                    </div>
+                    <div class="mb-3">
+                        {label OG_DESCRIPTION, class => 'form-label' /}
+                        {input OG_DESCRIPTION, class => 'form-control'}
+                    </div>
+                    <div class="mb-3">
+                        {label OG_IMAGE, class => 'form-label' /}
+                        {input OG_IMAGE, class => 'form-control'}
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch mt-4">
+                            <input n:name="OG_SHOW_LOCALE" class="form-check-input" type="checkbox">
+                            <label n:name="OG_SHOW_LOCALE" class="form-check-label">{$_('open-graph.show-locale')}</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <h2 class="text-warning">SEO</h2>
+                    <div class="mb-3">
+                        {label SEO_TITLE, class => 'form-label' /}
+                        {input SEO_TITLE, class => 'form-control'}
+                    </div>
+                    <div class="mb-3">
+                        {label SEO_DESCRIPTION, class => 'form-label' /}
+                        {input SEO_DESCRIPTION, class => 'form-control'}
+                    </div>
+                    <div class="mb-3">
+                        {label SEO_INDEX, class => 'form-label required' /}
+                        {input SEO_INDEX, class => 'form-control'}
+                    </div>
+                    <div class="mb-3">
+                        {label SEO_ROBOTS, class => 'form-label required' /}
+                        {input SEO_ROBOTS, class => 'form-control'}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6 my-auto">
+                    <span class="required">* Povinné položky</span>
+                </div>
+                <div class="col-6">
+                    <button n:name="save" type="submit" class="btn btn-primary btn-lg float-end">{$_('save.config')}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{/form}

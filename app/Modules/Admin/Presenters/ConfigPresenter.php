@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Admin\Presenters;
 
 use App\Components\Admin\IConfigEditorFactory;
+use App\Components\Admin\IConfigSeoFormFactory;
 use App\Components\Admin\IConfigWebsiteFormFactory;
 
 class ConfigPresenter extends SecuredPresenter
@@ -14,6 +15,9 @@ class ConfigPresenter extends SecuredPresenter
 
     /** @var IConfigWebsiteFormFactory @inject */
     public IConfigWebsiteFormFactory $configWebsiteForm;
+
+    /** @var IConfigSeoFormFactory @inject */
+    public IConfigSeoFormFactory $configSeoForm;
 
     public function renderDefault(): void
     {
@@ -28,6 +32,11 @@ class ConfigPresenter extends SecuredPresenter
     public function renderWebsite(): void
     {
         $this->template->title = 'Nastavení Website';
+    }
+
+    public function renderSeo(): void
+    {
+        $this->template->title = 'Nastavení SEO';
     }
 
     // ##########################################
@@ -57,6 +66,22 @@ class ConfigPresenter extends SecuredPresenter
         $form->onSuccess = function(string $message): void {
             $this->flashMessage($message, 'info');
             $this->redirect('Config:website');
+        };
+
+        $form->onError = function(string $message): void {
+            $this->flashMessage($message, 'danger');
+        };
+
+        return $form;
+    }
+
+    protected function createComponentConfigSeoForm(): \App\Components\Admin\ConfigSeoForm
+    {
+        $form = $this->configSeoForm->create();
+
+        $form->onSuccess = function(string $message): void {
+            $this->flashMessage($message, 'info');
+            $this->redirect('Config:seo');
         };
 
         $form->onError = function(string $message): void {

@@ -49,12 +49,14 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     protected string $page;
     protected string $title;
     protected string $seo_index;
+    protected string $seo_title;
     protected string $seo_description;
     protected string $seo_canonical;
     protected string $og_title;
     protected string $og_description;
     protected string $og_image;
     protected string $og_locale;
+    protected bool $og_show_locale;
 
 
     public function startup(): void
@@ -71,13 +73,14 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $this->lang = $this->c('DEFAULT_LANG'); // TODO: Get language from URL or session
         $this->htmlLang = $this->translationManager->getLanguageService()->getLanguage($this->lang)['html_lang'] ?? $this->lang;
         $this->page = $this->c('DEFAULT_PAGE');
-        $this->title = $this->c('SITE_TITLE');
+        $this->title = $this->c('SITE_TITLE'); // TODO: Use SEO_TITLE instead?
 
         // Translations language
         $this->translationManager->setCurrentLanguage($this->lang);
 
         // SEO (TODO: Read overloads from atricles)
         $this->seo_index = DEBUG ? 'noindex, nofollow' : $this->c('SEO_INDEX');
+        $this->seo_title = $this->c('SEO_TITLE');
         $this->seo_description = $this->c('SEO_DESCRIPTION');
         $this->seo_canonical = $this->currentUrl;
 
@@ -85,7 +88,10 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $this->og_title = $this->c('OG_TITLE');
         $this->og_description = $this->c('OG_DESCRIPTION');
         $this->og_image = $this->c('OG_IMAGE');
-        $this->og_locale = $this->translationManager->getLanguageService()->getLanguage($this->lang)['locale'] ?? $this->c('DEFAULT_LOCALE');
+        $this->og_show_locale = $this->c('OG_SHOW_LOCALE') == 1;
+        if ($this->og_show_locale) {
+            $this->og_locale = $this->translationManager->getLanguageService()->getLanguage($this->lang)['locale'] ?? $this->c('DEFAULT_LOCALE');
+        }
     }
 
     public function beforeRender(): void
@@ -116,6 +122,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
         // SEO
         $this->template->seo_index = $this->seo_index;
+        $this->template->seo_title = $this->seo_title;
         $this->template->seo_description = $this->seo_description;
         $this->template->seo_canonical = $this->seo_canonical;
 
@@ -123,7 +130,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $this->template->og_title = $this->og_title;
         $this->template->og_description = $this->og_description;
         $this->template->og_image = $this->og_image;
-        $this->template->og_locale = $this->og_locale;
+        $this->template->og_locale = $this->og_show_locale ? $this->og_locale : '';
 
         // JS + CSS code injecting
         $this->template->cssInject = $this->c('CSS_INJECT');

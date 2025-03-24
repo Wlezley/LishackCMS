@@ -76,11 +76,6 @@ class ConfigWebsiteForm extends BaseControl
         $form->addTextArea('CSS_INJECT', $this->t('css_inject'), null, 4)
             ->setValue($this->c('CSS_INJECT'));
 
-        // SEO - robots.txt
-        $form->addTextArea('SEO_ROBOTS', $this->t('robots.txt'), null, 4)
-            ->setValue($this->c('SEO_ROBOTS'))
-            ->setRequired();
-
         $form->addSubmit('save', $this->t('save.config'));
 
         $form->onSuccess[] = [$this, 'processSave'];
@@ -98,7 +93,6 @@ class ConfigWebsiteForm extends BaseControl
             ['name' => 'DEFAULT_LANG_ADMIN', 'label.key' => 'default_lang.admin'],
             ['name' => 'PAGINATION_PAGE_ITEMS', 'label.key' => 'pagination.page_items'],
             ['name' => 'PAGINATION_MAX_PAGES', 'label.key' => 'pagination.max_pages'],
-            ['name' => 'SEO_ROBOTS', 'label.key' => 'robots.txt'],
         ];
 
         foreach ($required as $item) {
