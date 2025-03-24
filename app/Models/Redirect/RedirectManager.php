@@ -59,7 +59,7 @@ class RedirectManager
             'source' => $source,
             'target' => $target,
             'code' => $code,
-            'enabled,' => $enabled ? 1 : 0
+            'enabled' => $enabled ? 1 : 0
         ]);
     }
 
@@ -84,7 +84,7 @@ class RedirectManager
         ])->update([
             'target' => $target,
             'code' => $code,
-            'enabled,' => $enabled ? 1 : 0
+            'enabled' => $enabled ? 1 : 0
         ]);
     }
 
