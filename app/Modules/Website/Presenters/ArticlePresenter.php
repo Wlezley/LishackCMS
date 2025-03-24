@@ -38,7 +38,7 @@ final class ArticlePresenter extends BasePresenter
         // No Category
         if (empty($categoryList)) {
             // Homepage is always without articleUrl
-            if ($articleUrl === DEFAULT_PAGE) {
+            if ($articleUrl === $this->c('DEFAULT_PAGE')) {
                 $this->redirect('this', []);
             }
 
@@ -55,7 +55,7 @@ final class ArticlePresenter extends BasePresenter
                 $this->redirect('this', []);
             }
 
-            $articleUrl = DEFAULT_PAGE;
+            $articleUrl = $this->c('DEFAULT_PAGE');
         }
 
         // // Load Category & trace Article

@@ -23,9 +23,13 @@ class TranslationManager
      */
     public function __construct(
         private Explorer $db,
-        private TranslationLanguage $languageService
+        private TranslationLanguage $languageService,
+        private ConfigManager $configManager
     ) {
-        $this->currentLang = $this->languageService->getDefaultLang(DEFAULT_LANG);
+        ;
+        $this->currentLang = $this->languageService->getDefaultLang(
+            $this->configManager->get('DEFAULT_LANG')
+        );
     }
 
     /**
@@ -297,7 +301,9 @@ class TranslationManager
      */
     public function saveTranslations(array $translations): void
     {
-        $defaultLang = $this->languageService->getDefaultLang(DEFAULT_LANG);
+        $defaultLang = $this->languageService->getDefaultLang(
+            $this->configManager->get('DEFAULT_LANG')
+        );
 
         foreach ($translations as $key => $texts) {
             foreach ($texts as $lang => $text) {
@@ -331,7 +337,9 @@ class TranslationManager
      */
     public function getTranslations(string $targetLang): array
     {
-        $defaultLang = $this->languageService->getDefaultLang(DEFAULT_LANG);
+        $defaultLang = $this->languageService->getDefaultLang(
+            $this->configManager->get('DEFAULT_LANG')
+        );
 
         $translations = [];
         $rows = $this->db->table(self::TABLE_NAME)

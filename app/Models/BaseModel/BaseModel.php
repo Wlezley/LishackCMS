@@ -17,9 +17,13 @@ abstract class BaseModel
 
     protected string $lang;
 
-    public function __construct(protected Explorer $db)
+    public function __construct(
+        protected Explorer $db,
+        // TODO: TranslatorManager (?)
+        protected ConfigManager $configManager
+    )
     {
-        $this->lang = DEFAULT_LANG;
+        $this->lang = $this->configManager->get('DEFAULT_LANG');
     }
 
     public function load(): void

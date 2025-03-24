@@ -1,8 +1,6 @@
 <?php
 
 define('VERSION', '');
-define('DEFAULT_LANG', '');
-define('DEFAULT_PAGE', '');
 define('ROOT_DIR', '');
 define('ROOT_DIR_ABSOLUTE', '');
 define('APP_DIR', '');

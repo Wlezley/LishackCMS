@@ -17,8 +17,6 @@ if (isset($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
 }
 
 define('VERSION', '0.1a');
-define('DEFAULT_LANG', 'cs');
-define('DEFAULT_PAGE', 'home');
 define('ROOT_DIR', '../');
 define('ROOT_DIR_ABSOLUTE', __DIR__ . '/' . ROOT_DIR);
 define('APP_DIR', ROOT_DIR . 'app/');

@@ -22,7 +22,7 @@ class TranslationPresenter extends SecuredPresenter
     public function renderDefault(int $page = 1, ?string $lang = null, ?string $search = null): void
     {
         $languageService = $this->translationManager->getLanguageService();
-        $lang = $lang ?? $languageService->getDefaultLang(DEFAULT_LANG);
+        $lang = $lang ?? $languageService->getDefaultLang($this->c('DEFAULT_LANG'));
         $langData = $languageService->getLanguage($lang);
 
         if ($langData === null) {
@@ -41,7 +41,7 @@ class TranslationPresenter extends SecuredPresenter
         $languageService = $this->translationManager->getLanguageService();
 
         $langList = $languageService->getList(false);
-        $defaultLang = $languageService->getDefaultLang(DEFAULT_LANG);
+        $defaultLang = $languageService->getDefaultLang($this->c('DEFAULT_LANG'));
 
         if (empty($lang) || $lang == $defaultLang || !array_key_exists($lang, $langList)) {
             $redirLang = $languageService->getSecondaryLang();

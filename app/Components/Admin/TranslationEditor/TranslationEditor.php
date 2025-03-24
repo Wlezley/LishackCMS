@@ -21,7 +21,7 @@ class TranslationEditor extends BaseControl
         $form = new Form;
 
         $languageService = $this->translationManager->getLanguageService();
-        $defaultLang = $languageService->getDefaultLang(DEFAULT_LANG);
+        $defaultLang = $languageService->getDefaultLang($this->c('DEFAULT_LANG'));
         $languages = $languageService->getNames(false);
         unset($languages[$defaultLang]);
 
@@ -54,7 +54,7 @@ class TranslationEditor extends BaseControl
     public function render(): void
     {
         $languageService = $this->translationManager->getLanguageService();
-        $defaultLang = $languageService->getDefaultLang(DEFAULT_LANG);
+        $defaultLang = $languageService->getDefaultLang($this->c('DEFAULT_LANG'));
         $targetLang = $this->param['lang'] ?? $languageService->getSecondaryLang('en');
         $this->template->translations = $this->translationManager->getTranslations($targetLang);
 
