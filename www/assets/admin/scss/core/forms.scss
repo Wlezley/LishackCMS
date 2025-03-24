@@ -1,0 +1,13 @@
+label {
+    &.required:after {
+        content: " *";
+        color: var(--bs-gray-300) !important;
+    }
+}
+
+span {
+    &.required {
+        color: var(--bs-gray-300) !important;
+        font-style: italic !important;
+    }
+}

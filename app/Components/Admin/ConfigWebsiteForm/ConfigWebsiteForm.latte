@@ -1,0 +1,99 @@
+<style>
+
+</style>
+
+{form form}
+    <div class="row">
+        <div class="col-12 mx-auto">
+            <div class="row mb-3">
+                <div class="col-6">
+                    <h2 class="text-warning">Applikace</h2>
+                    <div class="mb-3">
+                        {label APP_NAME, class => 'form-label required' /}
+                        {input APP_NAME, class => 'form-control'}
+                    </div>
+                    <div class="mb-3">
+                        {label SITE_TITLE, class => 'form-label required' /}
+                        {input SITE_TITLE, class => 'form-control'}
+                    </div>
+                </div>
+                <div class="col-6">
+                    <h2 class="text-warning">Jazyk</h2>
+                    <div class="mb-3">
+                        {label DEFAULT_LANG, class => 'form-label required' /}
+                        {input DEFAULT_LANG, class => 'form-control'}
+                    </div>
+                    <div class="mb-3">
+                        {label DEFAULT_LANG_ADMIN, class => 'form-label required' /}
+                        {input DEFAULT_LANG_ADMIN, class => 'form-control'}
+                    </div>
+                </div>
+                <div class="col-6">
+                    <h2 class="text-warning">Google Recaptcha</h2>
+                    <div class="mb-3">
+                        {label RECAPTCHA_SITE_KEY, class => 'form-label' /}
+                        {input RECAPTCHA_SITE_KEY, class => 'form-control'}
+                    </div>
+                    <div class="mb-3">
+                        {label RECAPTCHA_SECRET, class => 'form-label' /}
+                        {input RECAPTCHA_SECRET, class => 'form-control'}
+                    </div>
+                </div>
+                <div class="col-6">
+                    <h2 class="text-warning">Stránkování</h2>
+                    <div class="mb-3">
+                        {label PAGINATION_PAGE_ITEMS, class => 'form-label required' /}
+                        {input PAGINATION_PAGE_ITEMS, class => 'form-control'}
+                    </div>
+                    <div class="mb-3">
+                        {label PAGINATION_MAX_PAGES, class => 'form-label required' /}
+                        {input PAGINATION_MAX_PAGES, class => 'form-control'}
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="row">
+                        <h2 class="text-warning">JavaScript injection</h2>
+                        <div class="mb-3 col-6">
+                            {label JS_INJECT_HEAD, class => 'form-label' /}
+                            {input JS_INJECT_HEAD, class => 'form-control'}
+                        </div>
+                        <div class="mb-3 col-6">
+                            {label JS_INJECT_BODY_FIRST, class => 'form-label' /}
+                            {input JS_INJECT_BODY_FIRST, class => 'form-control'}
+                        </div>
+                        <div class="mb-3 col-6">
+                            {label JS_INJECT_BODY_LAST, class => 'form-label' /}
+                            {input JS_INJECT_BODY_LAST, class => 'form-control'}
+                        </div>
+                        <div class="mb-3 col-6">
+                            {label JS_IP_EXCEPTIONS, class => 'form-label' /}
+                            {input JS_IP_EXCEPTIONS, class => 'form-control'}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <h2 class="text-warning">CSS injection</h2>
+                    <div class="mb-3">
+                        {label CSS_INJECT, class => 'form-label' /}
+                        {input CSS_INJECT, class => 'form-control'}
+                    </div>
+                </div>
+                <div class="col-6">
+                    <h2 class="text-warning">SEO</h2>
+                    <div class="mb-3">
+                        {label SEO_ROBOTS, class => 'form-label required' /}
+                        {input SEO_ROBOTS, class => 'form-control'}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6 my-auto">
+                    <span class="required">* Povinné položky</span>
+                </div>
+                <div class="col-6">
+                    <button n:name="save" type="submit" class="btn btn-primary btn-lg float-end">{$_('save.config')}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{/form}

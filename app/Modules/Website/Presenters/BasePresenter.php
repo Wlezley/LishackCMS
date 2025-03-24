@@ -9,6 +9,7 @@ use App\Components\IMenuFactory;
 use App\Components\IPaginationFactory;
 use App\Models\ConfigManager;
 use App\Models\Helpers\AssetsVersion;
+use App\Models\Helpers\IPValidator;
 use App\Models\TranslationManager;
 use Nette;
 use Nette\Database\Explorer;
@@ -43,15 +44,17 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     protected string $baseUrl;
     protected string $currentUrl;
     protected string $adminUrl;
-    protected string $lang = '';
-    protected string $page = '';
-    protected string $title = '';
-    protected string $seo_robots = '';
-    protected string $seo_description = '';
-    protected string $seo_canonical = '';
-    protected string $social_title = '';
-    protected string $social_description = '';
-    protected string $social_image = '';
+    protected string $lang;
+    protected string $htmlLang;
+    protected string $page;
+    protected string $title;
+    protected string $seo_index;
+    protected string $seo_description;
+    protected string $seo_canonical;
+    protected string $og_title;
+    protected string $og_description;
+    protected string $og_image;
+    protected string $og_locale;
 
 
     public function startup(): void
@@ -65,20 +68,24 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $this->adminUrl = ADMIN_HOME_URL;
 
         // Page settings
-        $this->lang = strtolower($this->c('DEFAULT_LANG'));
-        $this->page = DEFAULT_PAGE;
+        $this->lang = $this->c('DEFAULT_LANG'); // TODO: Get language from URL or session
+        $this->htmlLang = $this->translationManager->getLanguageService()->getLanguage($this->lang)['html_lang'] ?? $this->lang;
+        $this->page = $this->c('DEFAULT_PAGE');
         $this->title = $this->c('SITE_TITLE');
 
         // Translations language
         $this->translationManager->setCurrentLanguage($this->lang);
 
-        // SEO
-        $this->seo_robots = DEBUG ? 'noindex, nofollow' : 'index, follow';
-        $this->seo_description = 'seo_description';
+        // SEO (TODO: Read overloads from atricles)
+        $this->seo_index = DEBUG ? 'noindex, nofollow' : $this->c('SEO_INDEX');
+        $this->seo_description = $this->c('SEO_DESCRIPTION');
         $this->seo_canonical = $this->currentUrl;
-        $this->social_title = 'social_title';
-        $this->social_description = 'social_description';
-        $this->social_image = 'social_image';
+
+        // Open Graph data (TODO: Read overloads from atricles)
+        $this->og_title = $this->c('OG_TITLE');
+        $this->og_description = $this->c('OG_DESCRIPTION');
+        $this->og_image = $this->c('OG_IMAGE');
+        $this->og_locale = $this->translationManager->getLanguageService()->getLanguage($this->lang)['locale'] ?? $this->c('DEFAULT_LOCALE');
     }
 
     public function beforeRender(): void
@@ -96,27 +103,35 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     {
         parent::afterRender();
 
-        // CMS config
-        // $this->template->setParameters($this->configManager->getConfigValues());
-
         // Url
         $this->template->url = $this->url;
         $this->template->currentUrl = $this->currentUrl;
 
         // Page settings
         $this->template->lang = $this->lang;
-        $this->template->html_lang = ($this->lang == 'cz' ? 'cs' : $this->lang);
-        $this->template->default_lang = DEFAULT_LANG;
+        $this->template->HTML_LANG = $this->htmlLang;
+        $this->template->DEFAULT_LANG = $this->c('DEFAULT_LANG');
         $this->template->page = $this->page;
         $this->template->title = $this->title;
 
         // SEO
-        $this->template->seo_robots = $this->seo_robots;
+        $this->template->seo_index = $this->seo_index;
         $this->template->seo_description = $this->seo_description;
         $this->template->seo_canonical = $this->seo_canonical;
-        $this->template->social_title = $this->social_title;
-        $this->template->social_description = $this->social_description;
-        $this->template->social_image = $this->social_image;
+
+        // Social networks (Open Graph data)
+        $this->template->og_title = $this->og_title;
+        $this->template->og_description = $this->og_description;
+        $this->template->og_image = $this->og_image;
+        $this->template->og_locale = $this->og_locale;
+
+        // JS + CSS code injecting
+        $this->template->cssInject = $this->c('CSS_INJECT');
+        if (!IPValidator::ipInList($_SERVER['REMOTE_ADDR'], explode(',', $this->c('JS_IP_EXCEPTIONS')))) {
+            $this->template->jsInjectHead = $this->c('JS_INJECT_HEAD');
+            $this->template->jsInjectBodyFirst = $this->c('JS_INJECT_BODY_FIRST');
+            $this->template->jsInjectBodyLast = $this->c('JS_INJECT_BODY_LAST');
+        }
 
         // Assets version
         $assetsVersion = new AssetsVersion();

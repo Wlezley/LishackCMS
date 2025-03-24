@@ -38,14 +38,16 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
 
     /** @var string */
     protected string $lang;
+    protected string $htmlLang;
 
     public function startup(): void
     {
         parent::startup();
 
-        $this->lang = $this->c('DEFAULT_LANG'); // TODO: Get lang from URL, DEFAULT_LANG use here only as fallback
-
+        // TODO: Get language from URL or session
+        $this->lang = $this->c('DEFAULT_LANG_ADMIN');
         $this->translationManager->setCurrentLanguage($this->lang);
+        $this->htmlLang = $this->translationManager->getLanguageService()->getLanguage($this->lang)['html_lang'] ?? $this->lang;
     }
 
     public function beforeRender(): void
@@ -64,15 +66,13 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
         parent::afterRender();
 
         // CMS config
-        // $this->template->setParameters($this->configManager->getConfigValues());
-
         $this->template->VERSION = VERSION; // $this->c('VERSION');
+        $this->template->HTML_LANG = $this->htmlLang;
 
-        // TODO: Get lang from URL, DEFAULT_LANG use here only as fallback
-        $this->template->HTML_LANG = $this->c('DEFAULT_LANG');
+        // TODO: Get language from URL or session
         $this->template->DEFAULT_LANG = $this->c('DEFAULT_LANG');
-        $this->template->DEFAULT_LANG_ADMIN = $this->c('DEFAULT_LANG');
-        $this->template->DEFAULT_LANG_TINYMCE = $this->c('DEFAULT_LANG');
+        $this->template->DEFAULT_LANG_ADMIN = $this->c('DEFAULT_LANG_ADMIN');
+        $this->template->DEFAULT_LANG_TINYMCE = $this->c('DEFAULT_LANG_ADMIN');
 
         // Assets version
         $assetsVersion = new AssetsVersion();

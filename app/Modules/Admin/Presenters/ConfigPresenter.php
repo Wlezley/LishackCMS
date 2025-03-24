@@ -5,11 +5,15 @@ declare(strict_types=1);
 namespace App\Modules\Admin\Presenters;
 
 use App\Components\Admin\IConfigEditorFactory;
+use App\Components\Admin\IConfigWebsiteFormFactory;
 
 class ConfigPresenter extends SecuredPresenter
 {
     /** @var IConfigEditorFactory @inject */
     public IConfigEditorFactory $configEditor;
+
+    /** @var IConfigWebsiteFormFactory @inject */
+    public IConfigWebsiteFormFactory $configWebsiteForm;
 
     public function renderDefault(): void
     {
@@ -19,6 +23,11 @@ class ConfigPresenter extends SecuredPresenter
     public function renderEditor(): void
     {
         $this->template->title = 'Editor Nastavení';
+    }
+
+    public function renderWebsite(): void
+    {
+        $this->template->title = 'Nastavení Website';
     }
 
     // ##########################################
@@ -39,5 +48,21 @@ class ConfigPresenter extends SecuredPresenter
         };
 
         return $control;
+    }
+
+    protected function createComponentConfigWebsiteForm(): \App\Components\Admin\ConfigWebsiteForm
+    {
+        $form = $this->configWebsiteForm->create();
+
+        $form->onSuccess = function(string $message): void {
+            $this->flashMessage($message, 'info');
+            $this->redirect('Config:website');
+        };
+
+        $form->onError = function(string $message): void {
+            $this->flashMessage($message, 'danger');
+        };
+
+        return $form;
     }
 }

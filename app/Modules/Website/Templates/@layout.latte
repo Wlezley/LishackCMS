@@ -1,27 +1,38 @@
 <!DOCTYPE html>
-<html lang="{$html_lang}">
+<html lang="{$HTML_LANG}">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">
     <title>{$title}</title>
     <meta name="description" content="{$seo_description|striptags|truncate:150|trim}">
-    <meta name="robots" content="{$seo_robots}">
+    <meta name="robots" content="{$seo_index}">
     <meta name="author" content="Ladislav Alexa, www.lishack.cz">
-    <meta property="og:title" content="{$title}">
-    <meta property="og:description" content="">
-    <meta property="og:image" content="">
+    <meta property="og:title" content="{$og_title}">
+    <meta property="og:description" content="{$og_description}">
+    <meta property="og:image" content="{$og_image}">
     <meta property="og:url" content="{$currentUrl}">
     <meta property="og:type" content="website">
+    <meta property="og:locale" content="{$og_locale}" n:if="!empty($og_locale)" />
     <link rel="shortcut icon" type="image/x-icon" href="{$baseUrl}/favicon.ico">
     <link rel="canonical" href="{$seo_canonical}">
     <link rel="stylesheet" href="{$baseUrl}/assets/website/dist/styles-main.css?v{$css_version}">
-    <script type="text/javascript">
+    <style n:if="$cssInject">{$cssInject|noescape|spaceless}</style>
+
+    <script>
         var baseUrl = {$baseUrl};
     </script>
+
+    {if !empty($jsInjectHead)}
+        <script>{$jsInjectHead|noescape}</script>
+    {/if}
 </head>
 
 <body class="bg-dark text-white">
+    {if !empty($jsInjectBodyFirst)}
+        <script>{$jsInjectBodyFirst|noescape}</script>
+    {/if}
+
     <div n:foreach="$flashes as $flash" n:class="flash, $flash->type">{$flash->message}</div>
 
     <main>
@@ -37,5 +48,9 @@
     {block scripts}
         <script src="{$baseUrl}/assets/website/dist/scripts.min.js?v{$js_version}"></script>
     {/block}
+
+    {if !empty($jsInjectBodyLast)}
+        <script>{$jsInjectBodyLast|noescape}</script>
+    {/if}
 </body>
 </html>
