@@ -209,6 +209,32 @@ class ConfigManager
     }
 
     /**
+     * Updates configuration value.
+     *
+     * If the key does not exist, this method does nothing.
+     *
+     * @param string $key Configuration key.
+     * @param string $value New configuration value.
+     * @throws ConfigException If the key not found.
+     */
+    public function updateValue(string $key, string $value): void
+    {
+        $this->load();
+
+        if (!isset($this->configuration[$key])) {
+            throw new ConfigException("Key '$key' not found, configuration entry cannot be updated", 1);
+        }
+
+        $this->db->table(self::TABLE_NAME)->where([
+            'key' => $key
+        ])->update([
+            'value' => $value
+        ]);
+
+        $this->configuration[$key]['value'] = $value;
+    }
+
+    /**
      * Renames a configuration key.
      *
      * Throws an exception if the old key does not exist or the new key already exists.
@@ -358,5 +384,28 @@ class ConfigManager
         ksort($sortedData);
 
         return $sortedData;
+    }
+
+    // VALUE UPDATE FORMS
+
+    /**
+     * Updates multiple configuration values in batch.
+     *
+     * This function updates only existing configuration entries if their value has changed.
+     * It does not create new entries or delete any keys.
+     *
+     * @param array<string,string> $configuration List of configuration items.
+     */
+    public function saveConfigValues(array $configuration): void
+    {
+        $this->load();
+
+        foreach ($configuration as $key => $value) {
+            if (isset($this->configuration[$key]) && $this->configuration[$key]['value'] != $value) {
+                $this->updateValue($key, (string)$value);
+            }
+        }
+
+        $this->invalidate();
     }
 }
