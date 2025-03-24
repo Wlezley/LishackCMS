@@ -18,6 +18,7 @@ services:
     - App\Models\Images
     - App\Models\Installer
     - App\Models\MenuManager
+    - App\Models\RedirectManager
     - App\Models\SmsGate(%smsgate.url%, %smsgate.login%, %smsgate.password%, %smsgate.sender_id%, %smsgate.secured_login%)
     - App\Models\TranslationLanguage
     - App\Models\TranslationManager

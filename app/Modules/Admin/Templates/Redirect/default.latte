@@ -1,6 +1,40 @@
 {block content}
 <div class="row">
     <div class="col">
-        <p>TODO...</p>
+
+        <div>
+            <a n:href="Redirect:import" class="btn btn-primary float-start me-3" title="Import" aria-label="Import">
+                <i class="fa-solid fa-file-import pe-2"></i>
+                Import
+            </a>
+            <a n:href="Redirect:export" class="btn btn-primary float-start me-3" title="Export" aria-label="Export">
+                <i class="fa-solid fa-file-export pe-1"></i>
+                Export
+            </a>
+
+            <form class="row g-3 float-end" name="searchForm">
+                <div class="col-auto">
+                    <label for="search" class="visually-hidden">{$_('search.key')}</label>
+                    <input type="text" class="form-control" id="search" name="search" value="{$search}" placeholder="{$_('search.key')}">
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary mb-3"><i class="fa-solid fa-magnifying-glass"></i></button>
+                </div>
+            </form>
+        </div>
+
+        {control redirectList}
+
+        <div class="datagrid-mt-fix">
+            <hr class="my-3">
+        </div>
+
+        <div>
+            <a n:href="Redirect:create" class="btn btn-primary float-end" title="{$_('add')}" aria-label="{$_('add')}">
+                <i class="fa-solid fa-plus pe-2"></i>
+                {$_('add')}
+            </a>
+        </div>
+
     </div>
 </div>

@@ -10,6 +10,7 @@ use App\Components\IPaginationFactory;
 use App\Models\ConfigManager;
 use App\Models\Helpers\AssetsVersion;
 use App\Models\Helpers\IPValidator;
+use App\Models\RedirectManager;
 use App\Models\TranslationManager;
 use Nette;
 use Nette\Database\Explorer;
@@ -26,6 +27,9 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
     /** @var TranslationManager @inject */
     public TranslationManager $translationManager;
+
+    /** @var RedirectManager @inject */
+    public RedirectManager $redirectManager;
 
     /** @var IAdminButtonFactory @inject */
     public IAdminButtonFactory $adminBarFactory;
@@ -68,6 +72,13 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $this->baseUrl = $this->url->getBaseUrl();
         $this->currentUrl = $this->url->getAbsoluteUrl();
         $this->adminUrl = ADMIN_HOME_URL;
+
+        // Redirect
+        $redirectCode = 0;
+        $redirectUrl = $this->redirectManager->get($this->currentUrl, $redirectCode);
+        if ($redirectUrl) {
+            $this->redirectUrl($redirectUrl, $redirectCode ?? 302);
+        }
 
         // Page settings
         $this->lang = $this->c('DEFAULT_LANG'); // TODO: Get language from URL or session
