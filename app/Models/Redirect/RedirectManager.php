@@ -34,8 +34,8 @@ class RedirectManager
             return null;
         }
 
-        $code = (int) $redirect->code;
-        return $redirect->target;
+        $code = (int) $redirect['code'];
+        return $redirect['target'];
     }
 
     /**
