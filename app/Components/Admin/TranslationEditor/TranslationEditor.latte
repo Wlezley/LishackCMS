@@ -15,9 +15,9 @@
                 <tr class="translation-row">
                     <td class="align-middle status-col"></td>
                     <td class="align-top key-col"><input type="text" class="form-control key-input" value="{$key}" tabindex=-1 required readonly></td>
-                    <td class="align-middle"><textarea class="form-control linked-textarea source-text" rows="1">{$texts['default']}</textarea></td>
-                    <td class="align-middle copy-col"><button type="button" class="btn btn-secondary copy-text" tabindex=-1><i class="fa-solid fa-right-from-bracket"></i></i></button></td>
-                    <td class="align-middle"><textarea class="form-control linked-textarea target-text" rows="1">{$texts[$targetLang]}</textarea></td>
+                    <td class="align-middle"><textarea class="form-control linked-textarea source-text" rows="1">{if isset($texts['default'])}{$texts['default']}{/if}</textarea></td>
+                    <td class="align-middle copy-col"><button type="button" class="btn btn-secondary copy-text" tabindex=-1><i class="fa-solid fa-right-from-bracket"></i></button></td>
+                    <td class="align-middle"><textarea class="form-control linked-textarea target-text" rows="1">{if isset($texts[$targetLang])}{$texts[$targetLang]}{/if}</textarea></td>
                     <td class="align-middle action-col"><button type="button" class="btn btn-secondary remove-row" tabindex=-1 disabled><i class="fa-solid fa-minus"></i></button></td>
                 </tr>
             {/foreach}
