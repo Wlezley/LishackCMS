@@ -24,20 +24,18 @@ class RedirectManager
      */
     public function get(string $source, ?int &$code = null): ?string
     {
-        $row = $this->db->table(self::TABLE_NAME)
+        $redirect = $this->db->table(self::TABLE_NAME)
+            ->select('target, code')
             ->where('source', $source)
             ->where('enabled', 1)
-            ->limit(1);
+            ->fetch();
 
-        $redirect = $row->fetch();
-
-        if ($redirect) {
-            $redirect = $redirect->toArray();
-            $code = (int) $redirect['code'];
-            return $redirect['target'];
+        if (!$redirect) {
+            return null;
         }
 
-        return null;
+        $code = (int) $redirect->code;
+        return $redirect->target;
     }
 
     /**
@@ -48,10 +46,19 @@ class RedirectManager
      * @param int $code HTTP redirect code (default: 302).
      * @param bool $enabled Whether the redirect is enabled (default: true).
      * @throws RedirectException If a redirect with the same source already exists.
+     * @throws RedirectException If the source and target URLs are the same (to prevent redirect loops).
      */
     public function add(string $source, string $target, int $code = 302, bool $enabled = true): void
     {
-        if ($this->get($source)) {
+        if ($source === $target) {
+            throw new RedirectException("Redirect source and target cannot be the same (source:'$source')", 1);
+        }
+
+        $exists = $this->db->table(self::TABLE_NAME)
+            ->where('source', $source)
+            ->count('*');
+
+        if ($exists) {
             throw new RedirectException("Duplicate redirect (source:'$source') found, entry cannot be added", 1);
         }
 
@@ -71,21 +78,29 @@ class RedirectManager
      * @param int $code HTTP redirect code.
      * @param bool $enabled Whether the redirect is enabled.
      * @throws RedirectException If the redirect does not exist.
+     * @throws RedirectException If the source and target URLs are the same (to prevent redirect loops).
      */
     public function update(string $source, string $target, int $code, bool $enabled): void
     {
-        if (!$this->get($source)) {
+        if ($source === $target) {
+            throw new RedirectException("Redirect source and target cannot be the same (source:'$source')", 1);
+        }
+
+        $exists = $this->db->table(self::TABLE_NAME)
+            ->where('source', $source)
+            ->count('*');
+
+        if (!$exists) {
             throw new RedirectException("Redirect (source:'$source') not found, entry cannot be modified", 1);
         }
 
         $this->db->table(self::TABLE_NAME)
-            ->where([
-            'source' => $source
-        ])->update([
-            'target' => $target,
-            'code' => $code,
-            'enabled' => $enabled ? 1 : 0
-        ]);
+            ->where('source', $source)
+            ->update([
+                'target' => $target,
+                'code' => $code,
+                'enabled' => $enabled ? 1 : 0
+            ]);
     }
 
     /**
@@ -117,10 +132,7 @@ class RedirectManager
             ->limit($limit, $offset);
 
         if ($search !== null) {
-            $query->whereOr([
-                'source LIKE ?' => "%$search%",
-                'target LIKE ?' => "%$search%"
-            ]);
+            $query->where('source LIKE ? OR target LIKE ?', "%$search%", "%$search%");
         }
 
         $data = $query->fetchAll();
@@ -139,10 +151,7 @@ class RedirectManager
         $query = $this->db->table(self::TABLE_NAME);
 
         if ($search !== null) {
-            $query->whereOr([
-                'source LIKE ?' => "%$search%",
-                'target LIKE ?' => "%$search%"
-            ]);
+            $query->where('source LIKE ? OR target LIKE ?', "%$search%", "%$search%");
         }
 
         return $query->count('*');
