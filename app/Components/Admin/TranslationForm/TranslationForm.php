@@ -34,14 +34,14 @@ class TranslationForm extends BaseControl
 
         $form->setHtmlAttribute('autocomplete', 'off');
 
-        $form->addText('key', 'Klíč *')
+        $form->addText('key', $this->t('key'))
             ->setHtmlAttribute('autocomplete', 'off')
             ->setValue($param['key'] ?? '')
             ->setRequired();
 
         foreach ($this->languageList as $key => $langData) {
             $required = $langData['default'] == 1;
-            $form->addTextArea("text_$key", "Text ($langData[name])" . ($required ? ' *' : ''), null, 1)
+            $form->addTextArea("text_$key", $this->t('text') . " ($langData[name])", null, 1)
                 ->setHtmlAttribute('autocomplete', 'off')
                 ->setValue($param["text_$key"] ?? '')
                 ->setRequired($required);
@@ -104,7 +104,7 @@ class TranslationForm extends BaseControl
     public function render(int|string|null $key = null): void
     {
         $this->template->languageList = $this->languageList;
-        $this->template->setFile(__DIR__ . '/TranslationForm' . $this->origin . '.latte');
+        $this->template->setFile(__DIR__ . '/TranslationForm.latte');
         $this->template->render();
     }
 

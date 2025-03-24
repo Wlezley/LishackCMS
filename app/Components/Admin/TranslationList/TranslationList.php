@@ -13,9 +13,9 @@ class TranslationList extends BaseControl
     private ?int $limit = null;
     private ?int $totalItems = null;
 
-    public function render(string $lang, int $limit = 10): void
+    public function render(string $lang, ?int $limit = null): void
     {
-        $this->limit = $limit;
+        $this->limit = $limit ?? (int)$this->c('PAGINATION_PAGE_ITEMS');
 
         $page = $this->param['page'] ?? 1;
         $search = $this->param['search'] ?? null;

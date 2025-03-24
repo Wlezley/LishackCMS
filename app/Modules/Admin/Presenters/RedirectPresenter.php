@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
+use App\Components\Admin\IRedirectFormFactory;
 use App\Components\Admin\IRedirectListFactory;
 use App\Models\RedirectManager;
 
@@ -14,6 +15,9 @@ class RedirectPresenter extends SecuredPresenter
 
     /** @var IRedirectListFactory @inject */
     public IRedirectListFactory $redirectList;
+
+    /** @var IRedirectFormFactory @inject */
+    public IRedirectFormFactory $redirectForm;
 
     public function renderDefault(int $page = 1, ?string $search = null): void
     {
@@ -27,10 +31,13 @@ class RedirectPresenter extends SecuredPresenter
         $this->template->title = 'Vytvořit přesměrování';
     }
 
-    public function renderEdit(string $source): void
+    public function renderEdit(?string $id): void
     {
+        if (!$id) {
+            $this->redirect(':default');
+        }
+
         $this->template->title = 'Editace přesměrování';
-        $this->template->source = $source;
     }
 
     public function renderImport(): void
@@ -53,7 +60,7 @@ class RedirectPresenter extends SecuredPresenter
 
         // TODO: Permission check
 
-        $this->redirectManager->delete($data['source']);
+        $this->redirectManager->delete($data['id']);
     }
 
     // ##########################################
@@ -69,5 +76,38 @@ class RedirectPresenter extends SecuredPresenter
         ]);
 
         return $control;
+    }
+
+    protected function createComponentRedirectForm(): \App\Components\Admin\RedirectForm
+    {
+        $form = $this->redirectForm->create();
+        $id = $this->getParameter('id');
+
+
+        if ($id) {
+            $form->setOrigin($form::OriginEdit);
+            $param = $this->redirectManager->getRow($id);
+
+            if ($param) {
+                $param['page'] = $this->getHttpRequest()->getQuery('page');
+                $form->setParam($param);
+            } else {
+                $this->flashMessage('Přesměrování nebylo nalezeno');
+            }
+        } else {
+            $form->setOrigin($form::OriginCreate);
+            $form->setParam($this->getHttpRequest()->getPost('param'));
+        }
+
+        $form->onSuccess = function(string $message, int $page): void {
+            $this->flashMessage($message, 'info');
+            $this->redirect('Redirect:', ['page' => $page]);
+        };
+
+        $form->onError = function(string $message): void {
+            $this->flashMessage($message, 'danger');
+        };
+
+        return $form;
     }
 }

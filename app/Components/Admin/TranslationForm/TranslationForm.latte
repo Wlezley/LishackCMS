@@ -3,16 +3,17 @@
         <div class="col-4 mx-auto">
             <div class="row">
                 <div class="mb-3 col-12">
-                    {label key, class => 'form-label' /}
+                    {label key, class => 'form-label required' /}
                     {input key, class => 'form-control'}
                 </div>
                 <div n:foreach="$languageList as $key => $langData" class="mb-3 col-12">
                     {var $textKey = 'text_' . $key}
-                    {label $textKey, class => 'form-label' /}
+                    {var $textKey_class = 'form-label' . ($langData['default'] == 1 ? ' required' : '')}
+                    {label $textKey, class => $textKey_class /}
                     {input $textKey, class => 'form-control'}
                 </div>
                 <div class="mb-3 col-12">
-                    <sup class="fst-italic">* Povinné položky</sup>
+                    <span class="required">* {$_('required-items')}</span>
                 </div>
             </div>
             <div class="row">

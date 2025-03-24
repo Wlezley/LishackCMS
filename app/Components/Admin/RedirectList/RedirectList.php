@@ -18,9 +18,9 @@ class RedirectList extends BaseControl
         private RedirectManager $redirectManager
     ) {}
 
-    public function render(int $limit = 10): void
+    public function render(?int $limit = null): void
     {
-        $this->limit = $limit;
+        $this->limit = $limit ?? (int)$this->c('PAGINATION_PAGE_ITEMS');
 
         $page = $this->param['page'] ?? 1;
         $search = $this->param['search'] ?? null;
@@ -29,9 +29,11 @@ class RedirectList extends BaseControl
         $this->totalItems = $this->redirectManager->getCount($search);
         $this->template->redirectList = $this->redirectManager->getList($this->limit, $offset, $search);
 
-        $this->template->getJson = function($source) {
+        $this->template->getJson = function($id, $source) {
+            // TODO: Fix empty modal on second call of deletion method
             return Json::encode([
-                'source' => (string)$source,
+                'id' => (string)$id,
+                // 'source' => (string)$source,
                 'modal' => [
                     'title' => 'Potvrzení o smazání',
                     'body' => 'Opravdu chcete přesměrování <strong>' . $source . '</strong> smazat?'
@@ -43,9 +45,12 @@ class RedirectList extends BaseControl
         $this->template->render();
     }
 
-    public function handleEdit(string $source): void
+    public function handleEdit(string $id): void
     {
-        $this->presenter->redirect('Redirect:edit', ['source' => $source]);
+        $this->presenter->redirect('Redirect:edit', [
+            'id' => $id,
+            'page' => $this->getPresenter()->getParameter('page', 1)
+        ]);
     }
 
     // ##########################################
