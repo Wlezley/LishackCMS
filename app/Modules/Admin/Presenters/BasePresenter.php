@@ -114,6 +114,28 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
     }
 
     /**
+     * Translates a key and formats the translation with the given values.
+     *
+     * This is a wrapper around `TranslationManager::getf()`, which:
+     * - Retrieves the translated string for the given key.
+     * - Uses `vsprintf()` to format the string with the provided values.
+     * - Falls back to returning the key if the translation is missing or formatting fails.
+     *
+     * @param string $key The translation key.
+     * @param mixed ...$values Values to be formatted into the translated string.
+     * @return string The formatted translated text, or the key itself if translation is unavailable.
+     * @throws \RuntimeException If `TranslationManager` is not available.
+     */
+    public function tf(string $key, mixed ...$values): string
+    {
+        if (!isset($this->translationManager)) {
+            throw new \RuntimeException('TranslationManager is not available in ' . static::class);
+        }
+
+        return $this->translationManager->getf($key, null, $values);
+    }
+
+    /**
      * Retrieves a configuration value for a given key.
      *
      * This is a shorthand wrapper for `ConfigManager::get()`.

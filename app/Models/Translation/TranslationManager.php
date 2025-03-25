@@ -124,6 +124,40 @@ class TranslationManager
     }
 
     /**
+     * Retrieves a formatted translation for a given key and language.
+     * Uses `vsprintf()` to format the translation with the provided values.
+     *
+     * - If the translation key is not found, the function returns the key itself.
+     * - If no values are provided, the untranslated format string is returned.
+     * - If the number of values does not match the expected placeholders in the translation,
+     *   a `ValueError` is caught, and the key itself is returned instead.
+     *
+     * @param string $key The translation key.
+     * @param string|null $lang The language code (defaults to the current language).
+     * @param array<mixed> $values Values to be formatted into the translation string.
+     * @return string The formatted translated text. If translation is missing or formatting fails, returns the key as a fallback.
+     */
+    public function getf(string $key, ?string $lang, array $values): ?string
+    {
+        $format = $this->get($key, $lang, false);
+
+        if (!$format) {
+            return $key;
+        }
+
+        if (empty($values)) {
+            return $format;
+        }
+
+        try {
+            return vsprintf($format, $values);
+        } catch (\ValueError $e) {
+            // TODO: LOG TRANSLATION FORMAT ERRORS
+            return $key;
+        }
+    }
+
+    /**
      * Adds a new translation entry.
      *
      * @param string $key The translation key.
