@@ -54,19 +54,14 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
     {
         parent::beforeRender();
 
-        // Translated Title
-        $this->template->title = $this->getPresenterTitle();
+        // Configuration
+        $this->template->_C = fn($key) => $this->configManager->get($key);
 
         // Translations
         $this->template->_ = fn($key) => $this->translationManager->get($key, $this->lang);
 
-        // Configuration
-        $this->template->_C = fn($key) => $this->configManager->get($key);
-    }
-
-    public function afterRender(): void
-    {
-        parent::afterRender();
+        // Translated Title
+        $this->template->title = $this->getPresenterTitle();
 
         // CMS config
         $this->template->VERSION = VERSION; // $this->c('VERSION');
@@ -76,6 +71,11 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
         $this->template->DEFAULT_LANG = $this->c('DEFAULT_LANG');
         $this->template->DEFAULT_LANG_ADMIN = $this->c('DEFAULT_LANG_ADMIN');
         $this->template->DEFAULT_LANG_TINYMCE = $this->c('DEFAULT_LANG_ADMIN');
+    }
+
+    public function afterRender(): void
+    {
+        parent::afterRender();
 
         // Assets version
         $assetsVersion = new AssetsVersion();

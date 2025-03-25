@@ -109,16 +109,11 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     {
         parent::beforeRender();
 
-        // Translations
-        $this->template->_ = fn($key) => $this->translationManager->get($key, $this->lang);
-
         // Configuration
         $this->template->_C = fn($key) => $this->configManager->get($key);
-    }
 
-    public function afterRender(): void
-    {
-        parent::afterRender();
+        // Translations
+        $this->template->_ = fn($key) => $this->translationManager->get($key, $this->lang);
 
         // Url
         $this->template->url = $this->url;
@@ -142,6 +137,11 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $this->template->og_description = $this->og_description;
         $this->template->og_image = $this->og_image;
         $this->template->og_locale = $this->og_show_locale ? $this->og_locale : '';
+    }
+
+    public function afterRender(): void
+    {
+        parent::afterRender();
 
         // JS + CSS code injecting
         $this->template->cssInject = $this->c('CSS_INJECT');
