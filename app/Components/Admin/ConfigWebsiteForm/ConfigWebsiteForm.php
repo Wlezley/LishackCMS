@@ -98,13 +98,13 @@ class ConfigWebsiteForm extends BaseControl
         foreach ($required as $item) {
             if (empty($values[$item['name']])) {
                 $label = $this->t($item['label.key']);
-                call_user_func($this->onError, "Povinná položka nastavení '$label' je prázdná. Nastavení nebylo uloženo.");
+                call_user_func($this->onError, $this->tf('error.form.missing-required.settings', $label));
                 return;
             }
         }
 
         $this->configManager->saveConfigValues((array)$values);
-        call_user_func($this->onSuccess, 'Nastavení bylo uloženo.');
+        call_user_func($this->onSuccess, $this->t('success.form.settings-saved'));
     }
 
     public function render(): void

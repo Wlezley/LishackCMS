@@ -60,7 +60,7 @@ class TranslationForm extends BaseControl
         if (!empty($this->translationManager->getTextListByKey($values['key']))) {
             $editLink = $this->buildEditUrl($values['key']);
             $editAnchor = '<a href="' . $editLink . '" target="_blank">' . $values['key'] . ' <sup><i class="fa fa-external-link"></i></sup></a>';
-            call_user_func($this->onError, "Překlad pro <strong>$values[key]</strong> již existuje. Přejmenujte klíč, nebo upravte stávající $editAnchor");
+            call_user_func($this->onError, $this->tf('error.form.translation-duplicate-key', $values['key'], $editAnchor));
         } else {
             foreach ($this->languageList as $lang => $langData) {
                 if (isset($values["text_$lang"])) {
@@ -73,9 +73,9 @@ class TranslationForm extends BaseControl
             }
 
             if (!empty($this->translationManager->getTextListByKey($values['key']))) {
-                call_user_func($this->onSuccess, "Překlad pro <strong>$values[key]</strong> byl vytvořen.");
+                call_user_func($this->onSuccess, $this->tf('success.form.translation-created.named', $values['key']));
             } else {
-                call_user_func($this->onError, 'Překlad se nepodařilo vytvořit.');
+                call_user_func($this->onError, $this->t('error.form.translation-create'));
             }
         }
     }
@@ -98,7 +98,7 @@ class TranslationForm extends BaseControl
             }
         }
 
-        call_user_func($this->onSuccess, 'Překlad byl upraven');
+        call_user_func($this->onSuccess, $this->t('success.form.translation-saved'));
     }
 
     public function render(int|string|null $key = null): void

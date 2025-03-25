@@ -16,24 +16,24 @@
                 </div>
                 <div class="mb-3 col-12">
                     {label role, class => 'form-label' /}
-                    {input role, class => 'form-select', aria-label => 'User role selection'}
+                    {input role, class => 'form-select'}
                 </div>
                 <div class="mb-3 col-12">
                     <div class="form-check form-switch">
                         <input n:name="deleted" class="form-check-input" type="checkbox">
-                        <label n:name="deleted" class="form-check-label">Smazaný uživatel</label>
+                        <label n:name="deleted" class="form-check-label">{$_('deleted.user')}</label>
                     </div>
                 </div>
                 <div class="mb-3 col-12">
                     <div class="form-check form-switch">
                         <input n:name="enabled" class="form-check-input" type="checkbox">
-                        <label n:name="enabled" class="form-check-label">Povolený uživatel (smí se přihlásit)</label>
+                        <label n:name="enabled" class="form-check-label">{$_('enabled.user')}</label>
                     </div>
                 </div>
                 <div class="mb-3 col-12">
                     <div class="form-check form-switch">
                         <input n:name="change_password" class="form-check-input change-password-toggle" type="checkbox" data-bs-toggle="collapse" data-bs-target="#changePassword" aria-expanded="false" aria-controls="changePassword">
-                        <label n:name="change_password" class="form-check-label">Změnit heslo</label>
+                        <label n:name="change_password" class="form-check-label">{$_('password.change')}</label>
                     </div>
                 </div>
                 <div class="collapse" id="changePassword">
@@ -50,13 +50,13 @@
             <div class="row">
                 <div class=" my-3 col-12">
                     {if $readOnly}
-                        {* <a href="{plink User:}" class="btn btn-primary btn-lg float-start" title="Zpět na seznam uživatelů" aria-label="Zpět na seznam uživatelů">
+                        {* <a href="{plink User:}" class="btn btn-primary btn-lg float-start">
                             <i class="fa-solid fa-arrow-left pe-2"></i>
-                            Zpět
+                            {$_('back')}
                         </a> *}
                         <span class="btn active btn-danger-outline text-danger btn-lg float-end" style="cursor: not-allowed;">READ-ONLY</span>
                     {else}
-                        <button n:name="save" type="submit" class="btn btn-primary btn-lg float-end">Uložit</button>
+                        <button n:name="save" type="submit" class="btn btn-primary btn-lg float-end">{$_('save')}</button>
                     {/if}
                 </div>
             </div>

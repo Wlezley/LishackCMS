@@ -35,8 +35,8 @@ class RedirectList extends BaseControl
                 'id' => (string)$id,
                 // 'source' => (string)$source,
                 'modal' => [
-                    'title' => 'Potvrzení o smazání',
-                    'body' => 'Opravdu chcete přesměrování <strong>' . $source . '</strong> smazat?'
+                    'title' => $this->t('modal.title.confirm-delete'),
+                    'body' => $this->tf('modal.body.delete-redirect', $source)
                 ]
             ]);
         };

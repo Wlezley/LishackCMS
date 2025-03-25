@@ -11,19 +11,18 @@
 
             <div class="d-flex bd-highlight gap-3">
                 <div class="me-auto">
-                    <a n:href="User:" class="btn btn-primary" title="Zpět na seznam uživatelů" aria-label="Zpět na seznam uživatelů">
+                    <a n:href="User:" class="btn btn-primary">
                         <i class="fa-solid fa-arrow-left pe-2"></i>
-                        Zpět
+                        {$_('back')}
                     </a>
                 </div>
-                {* TODO: COPY BUTTON (?) *}
-                {* <a n:href="User:create" class="btn btn-primary" title="Uložit" aria-label="Uložit">
+                {* <a n:href="User:create" class="btn btn-primary">
                     <i class="fa-solid fa-save pe-2"></i>
-                    Uložit
+                    {$_('create')}
                 </a>
                 <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteUserConfirmModal" data-json="{$jsonData}">
                     <i class="fa-solid fa-eraser pe-2"></i>
-                    Smazat
+                    {$_('btn.delete')}
                 </button> *}
             </div>
         </div>
@@ -31,11 +30,10 @@
 {else}
     <div class="row">
         <div class="col">
-            {* <p class="fst-italic">Uživatel nebyl nalezen.</p> *}
             <hr class="mb-3 mt-2">
-            <a n:href="User:" class="btn btn-primary" title="Zpět na seznam uživatelů" aria-label="Zpět na seznam uživatelů">
+            <a n:href="User:" class="btn btn-primary">
                 <i class="fa-solid fa-arrow-left pe-2"></i>
-                Zpět
+                {$_('back')}
             </a>
         </div>
     </div>
@@ -54,14 +52,14 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="deleteUserConfirmModalLabel"><!-- MODAL TITLE --></h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zavřít"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{$_('close')}"></button>
                 </div>
                 <div class="modal-body">
                     <!-- MODAL BODY -->
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zrušit</button>
-                    <a n:href="User:delete $item['id']" class="btn btn-danger" title="Smazat" aria-label="Smazat">Smazat</a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{$_('cancel')}</button>
+                    <a n:href="User:delete $item['id']" class="btn btn-danger" title="{$_('delete')}" aria-label="{$_('delete')}">{$_('btn.delete')}</a>
                 </div>
             </div>
         </div>

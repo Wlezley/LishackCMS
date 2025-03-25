@@ -230,15 +230,13 @@ class UserListGrid extends BaseControl
             'deleted' => $item->deleted,
             'enabled' => $item->enabled,
             'modal' => [
-                'title' => 'Potvrzení o smazání',
-                'body' => 'Opravdu chcete uživatele <strong>' . $item->name . '</strong> smazat?'
+                'title' => $this->t('modal.title.confirm-delete'),
+                'body' => $this->tf('modal.body.delete-user', $item->name)
             ]
         ]);
 
         return $data;
     }
-
-    // TODO: TRANSLATIONS !!!
 
     public function setRole_Callback(string $id, string $role): void
     {
@@ -250,17 +248,17 @@ class UserListGrid extends BaseControl
             $userData = $this->userManager->get((int)$id);
 
             if ($userData['role'] == $role) {
-                return; // No change was made...
+                return;
             } elseif ($this->user->getId() == (int)$id) {
-                $this->presenter->flashMessage('Uživatel nemůže měnit vlastní oprávnění.', 'danger');
+                $this->presenter->flashMessage($this->t('user.role-callback.himself'), 'danger');
             } elseif ($id == 1) {
-                $this->presenter->flashMessage('Oprávnění hlavního administrátora nelze měnit.', 'danger');
+                $this->presenter->flashMessage($this->t('user.role-callback.admin'), 'danger');
             } elseif ($this->userRole->isLessOrEqualsThan($userData['role']) && $this->userRole->isNot('admin')) {
-                $this->presenter->flashMessage('Nemůžete měnit oprávnění uživatele, který má stejné (nebo vyšší) oprávnění jako Vy.', 'danger');
+                $this->presenter->flashMessage($this->t('user.role-callback.same-role'), 'danger');
             } elseif ($this->userRole->isLessOrEqualsThan($role) && $this->userRole->isNot('admin')) {
-                $this->presenter->flashMessage('Uživateli nelze udělit stejné, ani vyšší oprávnění, než jaké máte Vy.', 'danger');
+                $this->presenter->flashMessage($this->t('user.role-callback.role-elevation'), 'danger');
             } elseif (!$this->userManager->setRole((int)$id, $role)) {
-                $this->presenter->flashMessage('U vybraného uživatele se nepodařilo změnit oprávnění.', 'danger');
+                $this->presenter->flashMessage($this->t('user.role-callback.update-failed'), 'danger');
             }
 
             $this->presenter->redrawControl();
@@ -275,18 +273,18 @@ class UserListGrid extends BaseControl
 
         if ($this->presenter->isAjax()) {
             $userData = $this->userManager->get((int)$id);
-            $actionName = $enabled === '1' ? 'povolit' : 'zakázat';
+            $actionName = $enabled === '1' ? $this->t('enable') : $this->t('disable');
 
             if ($userData['enabled'] == $enabled) {
-                return; // No change was made...
+                return;
             } elseif ($this->user->getId() == (int)$id) {
-                $this->presenter->flashMessage("Uživatel nemůže $actionName sám sebe.", 'danger');
+                $this->presenter->flashMessage($this->tf('user.enabled-callback.himself', $actionName), 'danger');
             } elseif ($id == 1) {
-                $this->presenter->flashMessage("Hlavního administrátora nelze $actionName přes administraci.", 'danger');
+                $this->presenter->flashMessage($this->tf('user.enabled-callback.admin', $actionName), 'danger');
             } elseif ($this->userRole->isLessOrEqualsThan($userData['role']) && $this->userRole->isNot('admin')) {
-                $this->presenter->flashMessage("Nemůžete $actionName uživatele, který má stejné (nebo vyšší) oprávnění jako Vy.", 'danger');
+                $this->presenter->flashMessage($this->tf('user.enabled-callback.same-role', $actionName), 'danger');
             } elseif (!$this->userManager->setEnabled((int)$id, $enabled === '1')) {
-                $this->presenter->flashMessage("Vybraného uživatele se nepodařilo $actionName.", 'danger');
+                $this->presenter->flashMessage($this->tf('user.enabled-callback.update-failed', $actionName), 'danger');
             }
 
             $this->presenter->redrawControl();
@@ -301,18 +299,18 @@ class UserListGrid extends BaseControl
 
         if ($this->presenter->isAjax()) {
             $userData = $this->userManager->get((int)$id);
-            $actionName = $deleted === '1' ? 'smazat' : 'obnovit';
+            $actionName = $deleted === '1' ? $this->t('delete') : $this->t('restore');
 
             if ($userData['deleted'] == $deleted) {
-                return; // No change was made...
+                return;
             } elseif ($this->user->getId() == (int)$id) {
-                $this->presenter->flashMessage("Uživatel nemůže $actionName sám sebe.", 'danger');
+                $this->presenter->flashMessage($this->tf('user.deleted-callback.himself', $actionName), 'danger');
             } elseif ($id == 1) {
-                $this->presenter->flashMessage("Hlavního administrátora nelze $actionName přes administraci.", 'danger');
+                $this->presenter->flashMessage($this->tf('user.deleted-callback.admin', $actionName), 'danger');
             } elseif ($this->userRole->isLessOrEqualsThan($userData['role']) && $this->userRole->isNot('admin')) {
-                $this->presenter->flashMessage("Nemůžete $actionName uživatele, který má stejné (nebo vyšší) oprávnění jako Vy.", 'danger');
+                $this->presenter->flashMessage($this->tf('user.deleted-callback.same-role', $actionName), 'danger');
             } elseif (!$this->userManager->setDeleted((int)$id, $deleted === '1')) {
-                $this->presenter->flashMessage("Vybraného uživatele se nepodařilo $actionName.", 'danger');
+                $this->presenter->flashMessage($this->tf('user.deleted-callback.update-failed', $actionName), 'danger');
             }
 
             $this->presenter->redrawControl();

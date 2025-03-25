@@ -11,9 +11,9 @@
         <hr class="my-3">
 
         <div class="d-flex justify-content-end gap-3">
-            <a n:href="Menu:create" class="btn btn-primary" title="Přidat" aria-label="Přidat">
+            <a n:href="Menu:create" class="btn btn-primary">
                 <i class="fa-solid fa-plus pe-2"></i>
-                Přidat
+                {$_('add')}
             </a>
         </div>
     </div>
@@ -35,14 +35,14 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="deleteMenuConfirmModalLabel"><!-- MODAL TITLE --></h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zavřít"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{$_('close')}"></button>
                 </div>
                 <div class="modal-body">
                     <!-- MODAL BODY -->
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zrušit</button>
-                    <button type="submit" class="btn btn-danger" data-modal-action="delete">Smazat</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{$_('cancel')}</button>
+                    <button type="submit" class="btn btn-danger" data-modal-action="delete">{$_('btn.delete')}</button>
                 </div>
             </div>
         </div>

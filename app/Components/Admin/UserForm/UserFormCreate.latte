@@ -16,18 +16,18 @@
                 </div>
                 <div class="mb-3 col-12">
                     {label role, class => 'form-label' /}
-                    {input role, class => 'form-select', aria-label => 'User role selection'}
+                    {input role, class => 'form-select'}
                 </div>
                 <div class="mb-3 col-12">
                     <div class="form-check form-switch">
                         <input n:name="deleted" class="form-check-input" type="checkbox">
-                        <label n:name="deleted" class="form-check-label">Smazaný uživatel</label>
+                        <label n:name="deleted" class="form-check-label">{$_('deleted.user')}</label>
                     </div>
                 </div>
                 <div class="mb-3 col-12">
                     <div class="form-check form-switch">
                         <input n:name="enabled" class="form-check-input" type="checkbox">
-                        <label n:name="enabled" class="form-check-label">Povolený uživatel (smí se přihlásit)</label>
+                        <label n:name="enabled" class="form-check-label">{$_('enabled.user')}</label>
                     </div>
                 </div>
                 <div class="mb-3 col-12">
@@ -41,7 +41,7 @@
             </div>
             <div class="row">
                 <div class=" my-3 col-12">
-                    <button n:name="save" type="submit" class="btn btn-primary btn-lg float-end">Uložit</button>
+                    <button n:name="save" type="submit" class="btn btn-primary btn-lg float-end">{$_('create')}</button>
                 </div>
             </div>
         </div>

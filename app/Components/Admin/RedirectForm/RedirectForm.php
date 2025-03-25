@@ -79,29 +79,29 @@ class RedirectForm extends BaseControl
         foreach ($required as $item) {
             if (empty($values[$item['name']])) {
                 $label = $this->t($item['label.key']);
-                call_user_func($this->onError, "Povinná položka nastavení '$label' je prázdná. Nastavení nebylo uloženo.");
+                call_user_func($this->onError, $this->tf('error.form.missing-required', $label));
                 return;
             }
         }
 
         if (!$this->redirectManager->checkHttpCode($values['code'])) {
-            call_user_func($this->onError, "Neplatný HTTP code '$values[code]'. Nastavení nebylo uloženo.");
+            call_user_func($this->onError, $this->tf('error.form.redirect.invalid-http-code', $values['code']));
             return;
         }
 
         try {
             if ($this->origin == self::OriginCreate) {
                 $this->redirectManager->add($values['source'], $values['target'], $values['code'], $values['enabled'] == 1);
-                call_user_func($this->onSuccess, "Přesměrování bylo vytvořeno", 1);
+                call_user_func($this->onSuccess, $this->t('success.form.redirect-created'), 1);
             } else if ($this->origin == self::OriginEdit) {
                 $this->redirectManager->update($values['id'], $values['source'], $values['target'], $values['code'], $values['enabled'] == 1);
-                call_user_func($this->onSuccess, 'Přesměrování bylo upraveno', $values['page'] ?? 1);
+                call_user_func($this->onSuccess, $this->t('success.form.redirect-saved'), $values['page'] ?? 1);
             } else {
-                call_user_func($this->onError, 'Chyba: Neznámý typ formuláře');
+                call_user_func($this->onError, $this->t('error.form.unknown-origin'));
                 return;
             }
         } catch (RedirectException $e) {
-            call_user_func($this->onError, 'Chyba: ' . $e->getMessage());
+            call_user_func($this->onError, $e->getMessage()); // TODO: Translation based on the error codes
         }
     }
 

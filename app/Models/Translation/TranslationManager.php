@@ -379,7 +379,7 @@ class TranslationManager
         $rows = $this->db->table(self::TABLE_NAME)
             ->select('key, lang, text')
             ->where('lang = ? OR lang = ?', $defaultLang, $targetLang)
-            ->order('key, lang')
+            // ->order('key, lang')
             ->fetchAll();
 
         /** @var \Nette\Database\Table\ActiveRow $row */

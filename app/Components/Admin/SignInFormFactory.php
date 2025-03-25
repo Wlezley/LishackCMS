@@ -4,30 +4,38 @@ declare(strict_types=1);
 
 namespace App\Components\Admin;
 
+use App\Models\TranslationManager;
 use Nette\Security\User;
 use Nette\Application\UI\Form;
 
 class SignInFormFactory
 {
-    public function __construct(protected User $user)
-    {
-    }
+    public function __construct(
+        protected User $user,
+        protected TranslationManager $translationManager
+    ) {}
 
     public function create(): Form
     {
         $form = new Form();
 
-        $form->addText('username', 'Přihlašovací jméno')
-            ->setHtmlAttribute('placeholder', 'Přihlašovací jméno')
+        $form->addText('username', $this->translationManager->get('login-name'))
+            ->setHtmlAttribute('placeholder', $this->translationManager->get('login-name'))
             ->setRequired();
 
-        $form->addPassword('password', 'Heslo')
-            ->setHtmlAttribute('placeholder', 'Heslo')
+        $form->addPassword('password', $this->translationManager->get('password'))
+            ->setHtmlAttribute('placeholder', $this->translationManager->get('password'))
             ->setRequired();
 
-        $form->addCheckbox('remember');
+        $rememberLabel = \Nette\Utils\Html::el('span')
+            ->setAttribute('class', 'form-check-label')
+            ->setAttribute('style', 'font-size: 17px;') // TODO: css ...
+            ->setText($this->translationManager->get('login.remember'));
 
-        $form->addSubmit('login', 'Přihlásit se');
+        $form->addCheckbox('remember', $rememberLabel)
+            ->setHtmlAttribute('class', 'form-check-input me-2 p-2');
+
+        $form->addSubmit('login', $this->translationManager->get('btn.login'));
 
         $form->onSuccess[] = [$this, 'process'];
 
@@ -43,7 +51,7 @@ class SignInFormFactory
             if ($values->remember) {
                 $this->user->setExpiration('7 days');
             } else {
-                $this->user->setExpiration('1 hour');
+                $this->user->setExpiration('12 hours');
             }
 
         } catch(\Nette\Security\AuthenticationException $e) {

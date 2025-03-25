@@ -47,8 +47,8 @@ class UserPresenter extends SecuredPresenter
                 'id' => $item['id'],
                 'name' => $item['name'],
                 'modal' => [
-                    'title' => 'Potvrzení o smazání',
-                    'body' => 'Opravdu chcete uživatele <strong>' . $item['name'] . '</strong> smazat?'
+                    'title' => $this->t('modal.title.confirm-delete'),
+                    'body' => $this->tf('modal.body.delete-user', $item['name'])
                 ],
             ]);
         } catch (\Exception $e) {

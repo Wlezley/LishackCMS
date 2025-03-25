@@ -20,12 +20,11 @@
                     {input password, class => 'form-control'}
                 </div>
                 <div class="mb-3 col-12">
-                    <input n:name="remember" type="checkbox" class="form-check-input me-2 p-2">
-                    <label n:name="remember" class="form-check-label">Zapamatovat přihlášení na 7 dní</label>
+                    {label remember /}
+                    {input remember}
                 </div>
                 <div clss="mb-0">
-                    <button n:name="login" type="submit" class="btn btn-primary btn-lg float-end">Přihlásit se</button>
-                    {* <input n:name="login" class="btn btn-primary btn-lg float-end"> *}
+                    {input login, class => 'btn btn-primary btn-lg float-end'}
                 </div>
             {/form}
         </div>

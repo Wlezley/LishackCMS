@@ -31,7 +31,7 @@ class ConfigEditor extends BaseControl
     public function processSave(Form $form, \Nette\Utils\ArrayHash $values): void
     {
         if (empty($values['configuration'])) {
-            call_user_func($this->onError, 'Chyba: Formulář odeslal prázdná data nastavení.');
+            call_user_func($this->onError, $this->t('error.form.empty-data'));
             return;
         }
 

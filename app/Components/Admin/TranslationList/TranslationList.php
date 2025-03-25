@@ -27,8 +27,8 @@ class TranslationList extends BaseControl
             return Json::encode([
                 'key' => (string)$key,
                 'modal' => [
-                    'title' => 'Potvrzení o smazání',
-                    'body' => 'Opravdu chcete překlad <strong>' . $key . '</strong> smazat?'
+                    'title' => $this->t('modal.title.confirm-delete'),
+                    'body' => $this->tf('modal.body.delete-translation', $key)
                 ]
             ]);
         };

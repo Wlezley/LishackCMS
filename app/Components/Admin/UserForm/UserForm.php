@@ -65,56 +65,56 @@ class UserForm extends BaseControl
             $form->addHidden('id', $param['id']);
         }
 
-        $form->addText('name', 'Přihlašovací jméno')
-            ->setHtmlAttribute('placeholder', 'Přihlašovací jméno')
+        $form->addText('name', $this->t('login-name'))
+            ->setHtmlAttribute('placeholder', $this->t('login-name'))
             ->setHtmlAttribute('autocomplete', 'off')
             ->setHtmlAttribute('readonly', $readOnly)
             ->setValue($param['name'])
             ->setRequired();
 
-        $form->addText('full_name', 'Celé jméno')
-            ->setHtmlAttribute('placeholder', 'Celé jméno')
+        $form->addText('full_name', $this->t('full-name'))
+            ->setHtmlAttribute('placeholder', $this->t('full-name'))
             ->setHtmlAttribute('autocomplete', 'off')
             ->setHtmlAttribute('readonly', $readOnly)
             ->setValue($param['full_name'])
             ->setRequired();
 
-        $form->addEmail('email', 'E-mail')
-            ->setHtmlAttribute('placeholder', 'E-mail')
+        $form->addEmail('email', $this->t('e-mail'))
+            ->setHtmlAttribute('placeholder', $this->t('e-mail'))
             ->setHtmlAttribute('autocomplete', 'off')
             ->setHtmlAttribute('readonly', $readOnly)
             ->setValue($param['email']);
 
-        $form->addSelect('role', 'Oprávnění', $this->getRoleSelectList($param['role']))
+        $form->addSelect('role', $this->t('permissions'), $this->getRoleSelectList($param['role']))
             ->setValue($param['role'])
             ->setDisabled($this->readOnlyRole($param['role']))
             ->setRequired();
 
-        $form->addCheckbox('deleted', 'Smazáno')
+        $form->addCheckbox('deleted', $this->t('deleted.user'))
             ->setDisabled($readOnly)
             ->setValue($param['deleted']);
 
-        $form->addCheckbox('enabled', 'Aktivní uživatel')
+        $form->addCheckbox('enabled', $this->t('active.user'))
             ->setDisabled($readOnly)
             ->setValue($param['enabled']);
 
         if ($this->origin === self::OriginEdit) {
-            $form->addCheckbox('change_password', 'Změnit heslo')
+            $form->addCheckbox('change_password', $this->t('password.change'))
                 ->setDisabled($readOnly)
                 ->setValue(false);
         }
 
-        $form->addPassword('password', 'Heslo')
-            ->setHtmlAttribute('placeholder', 'Heslo')
+        $form->addPassword('password', $this->t('password'))
+            ->setHtmlAttribute('placeholder', $this->t('password'))
             ->setHtmlAttribute('autocomplete', 'new-password')
             ->setRequired($this->origin === self::OriginCreate);
 
-        $form->addPassword('password2', 'Heslo znovu')
-            ->setHtmlAttribute('placeholder', 'Heslo znovu')
+        $form->addPassword('password2', $this->t('password.again'))
+            ->setHtmlAttribute('placeholder', $this->t('password.again'))
             ->setHtmlAttribute('autocomplete', 'new-password')
             ->setRequired($this->origin === self::OriginCreate);
 
-        $form->addSubmit('save', $this->origin === self::OriginEdit ? 'Uložit' : 'Vytvořit');
+        $form->addSubmit('save', $this->origin === self::OriginEdit ? $this->t('save') : $this->t('create'));
 
         $form->onSuccess[] = [$this, 'process' . $this->origin];
 
@@ -125,21 +125,21 @@ class UserForm extends BaseControl
     public function processCreate(Form $form, \Nette\Utils\ArrayHash $values): void
     {
         if (empty($values['password'])) {
-            call_user_func($this->onError, 'Vyplňte heslo.');
+            call_user_func($this->onError, $this->t('error.form.fill-password'));
             return;
         } elseif ($values['password'] !== $values['password2']) {
-            call_user_func($this->onError, 'Hesla se neshodují.');
+            call_user_func($this->onError, $this->t('error.form.passwords-not-match'));
             return;
         }
 
         if ($this->editorRole->isLessOrEqualsThan($values['role'])) {
-            call_user_func($this->onError, 'Uživateli nelze přidelit vyšší nebo stejnou roli, než je ta vaše.');
+            call_user_func($this->onError, $this->t('error.form.user-role-elevation'));
             return;
         }
 
         try {
             $userID = $this->userManager->create((array)$values);
-            call_user_func($this->onSuccess, "Uživatel byl vytvořen (ID: $userID).");
+            call_user_func($this->onSuccess, $this->tf('success.form.user-created', $userID));
         } catch(UserException $e) {
             call_user_func($this->onError, $e->getMessage());
         }
@@ -150,7 +150,7 @@ class UserForm extends BaseControl
     {
         if ($values['change_password']) {
             if ($values['password'] !== $values['password2']) {
-                call_user_func($this->onError, 'Hesla se neshodují.');
+                call_user_func($this->onError, $this->t('error.form.passwords-not-match'));
                 return;
             }
         }
@@ -158,18 +158,18 @@ class UserForm extends BaseControl
         // TODO: Check user permissions for role settings, check if not READ-ONLY, etc...
 
         // if ($this->isReadOnly($values['id'], $values['role'])) {
-        //     call_user_func($this->onError, 'Nemáte dostatečná oprávnění pro editaci tohoto uživatele.');
+        //     call_user_func($this->onError, $this->t('error.form.no-permissions.user-edit'));
         //     return;
         // }
         // if ($this->editorRole->isLessOrEqualsThan($values['role'])) {
-        //     call_user_func($this->onError, 'Uživateli nelze přidelit vyšší nebo stejnou roli, než je ta vaše.');
+        //     call_user_func($this->onError, $this->t('error.form.user-role-elevation'));
         //     return;
         // }
 
         try {
             $userData = UserValidator::prepareData((array)$values);
             $this->userManager->update((int)$values['id'], $userData);
-            call_user_func($this->onSuccess, 'Uživatel byl upraven');
+            call_user_func($this->onSuccess, $this->t('success.form.user-saved'));
         } catch(UserException $e) {
             call_user_func($this->onError, $e->getMessage());
         } catch (\InvalidArgumentException $e) {
@@ -222,14 +222,10 @@ class UserForm extends BaseControl
     /** @return array<string,string> */
     private function getRoleSelectList(?string $targetRole): array
     {
-        // TODO: Move to Translator
-        $USER_ROLES_SELECT = [
-            'guest' => 'Host',
-            'user' => 'Uživatel',
-            'redactor' => 'Redaktor',
-            'manager' => 'Moderátor',
-            'admin' => 'Správce'
-        ];
+        $USER_ROLES_SELECT = [];
+        foreach (UserRole::USER_ROLES as $role_name) {
+            $USER_ROLES_SELECT[$role_name] = $this->t('user.role.' . $role_name);
+        }
 
         if ($this->origin === self::OriginEdit && $this->editorRole->isLessOrEqualsThan($targetRole)) {
             return [$targetRole => $USER_ROLES_SELECT[$targetRole]];
