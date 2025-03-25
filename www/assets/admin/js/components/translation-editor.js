@@ -40,6 +40,12 @@ export class TranslationEditor {
 
   addCodeInputListener(input) {
     input.addEventListener("input", function (event) {
+      let value = event.target.value.toLowerCase();
+      value = value.replace(/[^a-z0-9_.-]+/g, "_");
+      value = value.replace(/__+/g, "_");
+      value = value.replace(/^_+/g, "");
+      event.target.value = value;
+
       const row = event.target.closest("tr");
       if (row) {
         this.markChangedRow(row, "status-changed");
@@ -101,19 +107,20 @@ export class TranslationEditor {
       rows.forEach(row => {
         const keyInput = row.querySelector(".key-input");
         const key = keyInput.value.trim();
+        const keyLower = keyInput.value.trim().toLowerCase();
         const sourceText = row.querySelector(".source-text").value.trim();
         const targetText = row.querySelector(".target-text").value.trim();
         const targetLang = this.hiddenTargetLang.value;
 
         if (key && (sourceText || targetLang)) {
-          if (keyValues.has(key)) {
+          if (keyValues.has(keyLower)) {
             hasDuplicate = true;
             keyInput.classList.add("is-invalid");
-            keyValues.get(key).classList.add("is-invalid");
+            keyValues.get(keyLower).classList.add("is-invalid");
             this.markChangedRow(row, "status-error");
-            this.markChangedRow(keyValues.get(key).closest("tr"), "status-error");
+            this.markChangedRow(keyValues.get(keyLower).closest("tr"), "status-error");
           } else {
-            keyValues.set(key, keyInput);
+            keyValues.set(keyLower, keyInput);
             this.markChangedRow(keyInput.closest("tr"), "");
           }
 
@@ -152,6 +159,9 @@ export class TranslationEditor {
       if (event.ctrlKey && event.key === "s") { // Ctrl+S: Submit
         event.preventDefault();
         document.querySelector(".translationEditorForm input[type='submit']").click();
+      }
+      if (event.ctrlKey && event.key === "r") { // Ctrl+R: (Reload prevention)
+        event.preventDefault();
       }
     }.bind(this));
   }
