@@ -19,7 +19,7 @@ class SignPresenter extends UnsecuredPresenter
 
     public function renderIn(): void
     {
-        $this->template->title = "Admin Login";
+        $this->template->title = $this->getPresenterTitle();
 
         if ($this->user->isLoggedIn()) {
             $this->redirect('Admin:default');

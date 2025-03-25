@@ -21,14 +21,11 @@ class RedirectPresenter extends SecuredPresenter
 
     public function renderDefault(int $page = 1, ?string $search = null): void
     {
-        $this->template->title = 'Přesměrování';
-
         $this->template->search = $search;
     }
 
     public function renderCreate(): void
     {
-        $this->template->title = 'Vytvořit přesměrování';
     }
 
     public function renderEdit(?string $id): void
@@ -36,18 +33,14 @@ class RedirectPresenter extends SecuredPresenter
         if (!$id) {
             $this->redirect(':default');
         }
-
-        $this->template->title = 'Editace přesměrování';
     }
 
     public function renderImport(): void
     {
-        $this->template->title = 'Import přesměrování';
     }
 
     public function renderExport(): void
     {
-        $this->template->title = 'Export přesměrování';
     }
 
     public function handleDelete(): void
@@ -82,7 +75,6 @@ class RedirectPresenter extends SecuredPresenter
     {
         $form = $this->redirectForm->create();
         $id = $this->getParameter('id');
-
 
         if ($id) {
             $form->setOrigin($form::OriginEdit);

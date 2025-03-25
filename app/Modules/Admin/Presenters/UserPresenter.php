@@ -25,18 +25,14 @@ class UserPresenter extends SecuredPresenter
 
     public function renderDefault(): void
     {
-        $this->template->title = 'Uživatelské účty';
     }
 
     public function renderCreate(): void
     {
-        $this->template->title = 'Vytvoření nového uživatele';
     }
 
     public function renderEdit(int $id): void
     {
-        $this->template->title = 'Editace uživatele';
-
         try {
             $item = $this->userManager->get($id);
 

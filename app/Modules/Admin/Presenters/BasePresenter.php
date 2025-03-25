@@ -54,6 +54,9 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
     {
         parent::beforeRender();
 
+        // Translated Title
+        $this->template->title = $this->getPresenterTitle();
+
         // Translations
         $this->template->_ = fn($key) => $this->translationManager->get($key, $this->lang);
 
@@ -164,6 +167,24 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
     protected function getPresenterCategory(): string
     {
         return self::CATEGORY_MAP[Helpers::splitName($this->getName())[1]] ?? '';
+    }
+
+    /**
+     * Returns the translated title for the current presenter and action.
+     *
+     * The translation key is generated as `title.{presenter}.{action}`.
+     *
+     * Example:
+     * - Presenter: `Admin:Dashboard`
+     * - Action: `default`
+     * - Key: `title.admin.dashboard.default`
+     *
+     * @return string The translated title.
+     */
+    protected function getPresenterTitle(): string
+    {
+        $translationKey = strtolower('title.' . str_replace(':', '.', $this->getName()) . '.' . $this->getAction());
+        return $this->translationManager->get($translationKey);
     }
 
     // ##########################################

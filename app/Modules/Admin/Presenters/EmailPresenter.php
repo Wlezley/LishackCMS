@@ -8,6 +8,5 @@ class EmailPresenter extends SecuredPresenter
 {
     public function renderDefault(): void
     {
-        $this->template->title = 'E-mail';
     }
 }

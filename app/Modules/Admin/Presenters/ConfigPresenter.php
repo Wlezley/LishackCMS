@@ -26,17 +26,14 @@ class ConfigPresenter extends SecuredPresenter
 
     public function renderEditor(): void
     {
-        $this->template->title = 'Editor Nastavení';
     }
 
     public function renderWebsite(): void
     {
-        $this->template->title = 'Nastavení Website';
     }
 
     public function renderSeo(): void
     {
-        $this->template->title = 'Nastavení SEO';
     }
 
     // ##########################################

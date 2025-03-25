@@ -8,18 +8,16 @@ class ArticlePresenter extends SecuredPresenter
 {
     public function renderDefault(): void
     {
-        $this->template->title = 'Seznam článků';
         $this->template->articleList = [];
     }
 
     public function renderCreate(): void
     {
-        $this->template->title = 'Vytvoření nového článku';
     }
 
     public function renderEdit(int $id = 0): void
     {
-        $this->template->title = "Editace článku ID: $id";
+        $this->template->title .= " ID: $id";
         $this->template->articleId = $id;
     }
 

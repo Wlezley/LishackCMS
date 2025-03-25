@@ -16,19 +16,15 @@ class MenuPresenter extends SecuredPresenter
 
     public function renderDefault(): void
     {
-        $this->template->title = 'Menu';
         $this->template->sortable = $this->userHavePermissionsTo('move'); // or 'sort' ???
     }
 
     public function renderCreate(): void
     {
-        $this->template->title = 'Vytvoření menu';
     }
 
     public function renderEdit(int $id = 0): void
     {
-        $this->template->title = 'Editace menu';
-
         try {
             $item = $this->menuManager->get($id);
 

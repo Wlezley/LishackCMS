@@ -8,6 +8,5 @@ class DebugPresenter extends SecuredPresenter
 {
     public function renderDefault(): void
     {
-        $this->template->title = 'Ladění';
     }
 }

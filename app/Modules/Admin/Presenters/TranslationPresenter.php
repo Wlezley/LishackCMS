@@ -29,7 +29,7 @@ class TranslationPresenter extends SecuredPresenter
             $this->redirect('Translation:');
         }
 
-        $this->template->title = 'Lokalizace - ' . $langData['name'] . ($langData['default'] ? ' (' . $this->t('default') . ')' : '');
+        $this->template->title .= ' - ' . $langData['name'] . ($langData['default'] ? ' (' . $this->t('default') . ')' : '');
 
         $this->template->lang = $lang;
         $this->template->langList = $languageService->getList(false);
@@ -51,17 +51,16 @@ class TranslationPresenter extends SecuredPresenter
             }
         }
 
-        $this->template->title = 'Editor Lokalizace (' . $langList[$defaultLang]['name'] . ' » ' . $langList[$lang]['name'] . ')';
+        $this->template->title .= ' (' . $langList[$defaultLang]['name'] . ' » ' . $langList[$lang]['name'] . ')';
     }
 
     public function renderCreate(string $lang = ''): void
     {
-        $this->template->title = 'Nový překlad';
     }
 
     public function renderEdit(string $key, string $lang = ''): void
     {
-        $this->template->title = "Editace překladu '$key'";
+        $this->template->title .= " '$key'";
     }
 
     public function handleDelete(): void
