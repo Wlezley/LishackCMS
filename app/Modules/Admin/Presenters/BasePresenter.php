@@ -15,16 +15,15 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
     private const CATEGORY_MAP = [
         'Admin' => 'HOME',
         'Article' => 'ARTICLE',
-        'Menu' => 'MENU',
-        'Data' => 'DATA',
         'Config' => 'CONFIG',
-        'User' => 'CONFIG',
-        'Translation' => 'CONFIG',
-        'Email' => 'CONFIG',
-        'Website' => 'CONFIG',
-        'Seo' => 'CONFIG',
-        'Redirect' => 'CONFIG',
+        'Data' => 'DATA',
         'Debug' => 'CONFIG',
+        'Email' => 'CONFIG',
+        'Menu' => 'MENU',
+        'Redirect' => 'CONFIG',
+        'Translation' => 'CONFIG',
+        'User' => 'CONFIG',
+        'Website' => 'CONFIG',
     ];
 
     /** @var Explorer @inject */
@@ -59,9 +58,15 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
 
         // Translations
         $this->template->_ = fn($key) => $this->translationManager->get($key, $this->lang);
+        $this->template->_F = fn($key, $values) => $this->translationManager->getf($key, $this->lang, $values);
 
         // Translated Title
         $this->template->title = $this->getPresenterTitle();
+    }
+
+    public function afterRender(): void
+    {
+        parent::afterRender();
 
         // CMS config
         $this->template->VERSION = VERSION; // $this->c('VERSION');
@@ -71,11 +76,6 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
         $this->template->DEFAULT_LANG = $this->c('DEFAULT_LANG');
         $this->template->DEFAULT_LANG_ADMIN = $this->c('DEFAULT_LANG_ADMIN');
         $this->template->DEFAULT_LANG_TINYMCE = $this->c('DEFAULT_LANG_ADMIN');
-    }
-
-    public function afterRender(): void
-    {
-        parent::afterRender();
 
         // Assets version
         $assetsVersion = new AssetsVersion();

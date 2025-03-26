@@ -58,6 +58,7 @@ class BaseControl extends Control
 
         // Translations
         $template->_ = fn($key) => $this->translationManager->get($key); // @phpstan-ignore property.notFound
+        $template->_F = fn($key, $values) => $this->translationManager->getf($key, null, $values); // @phpstan-ignore property.notFound
 
         // Configuration
         $template->_C = fn($key) => $this->configManager->get($key); // @phpstan-ignore property.notFound

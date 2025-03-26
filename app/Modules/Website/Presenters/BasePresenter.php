@@ -114,6 +114,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
         // Translations
         $this->template->_ = fn($key) => $this->translationManager->get($key, $this->lang);
+        $this->template->_F = fn($key, $values) => $this->translationManager->getf($key, $this->lang, $values);
 
         // Url
         $this->template->url = $this->url;

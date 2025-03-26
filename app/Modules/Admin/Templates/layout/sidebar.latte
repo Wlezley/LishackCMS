@@ -6,14 +6,14 @@
 
         <ul class="sidebar-nav mb-5">
             <li class="sidebar-header">
-                Správa webu
+                {$_('admin.sidebar.main')}
             </li>
 
             {* DASHBOARD *}
             <li class="sidebar-item">
                 <a n:href="Admin:" n:class="sidebar-link, $activeMenu == 'HOME' ? active">
                     <i class="fa-solid fa-sliders"></i>
-                    Přehled
+                    {$_('admin.sidebar.main.overview')}
                 </a>
             </li>
 
@@ -21,19 +21,19 @@
             <li class="sidebar-item">
                 <a n:href="Article:" n:class="'sidebar-link collapsed', $activeMenu == 'ARTICLE' ? active" data-bs-toggle="collapse" data-bs-target="#sidebar-articles" aria-expanded="false" aria-controls="sidebar-articles">
                     <i class="fa-regular fa-file-lines"></i>
-                    Články
+                    {$_('admin.sidebar.main.article')}
                 </a>
                 <ul id="sidebar-articles" n:class="'sidebar-dropdown list-unstyled collapse', $activeMenu == 'ARTICLE' ? show">
                     <li class="sidebar-item">
                         <a n:href="Article:" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('Article:default') ? active">
                             <i class="fa-solid fa-list"></i>
-                            Přehled článků
+                            {$_('admin.sidebar.main.article.list')}
                         </a>
                     </li>
                     <li class="sidebar-item">
                         <a n:href="Article:create" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('Article:create') ? active">
                             <i class="fa-solid fa-plus"></i>
-                            Nový článek
+                            {$_('admin.sidebar.main.article.create')}
                         </a>
                     </li>
                 </ul>
@@ -43,19 +43,19 @@
             <li class="sidebar-item">
                 <a n:href="Menu:" n:class="'sidebar-link collapsed', $activeMenu == 'MENU' ? active" data-bs-toggle="collapse" data-bs-target="#sidebar-user-settings" aria-expanded="false" aria-controls="sidebar-user-settings">
                     <i class="fa-solid fa-table-list"></i>
-                    Menu
+                    {$_('admin.sidebar.main.menu')}
                 </a>
                 <ul id="sidebar-user-settings" n:class="'sidebar-dropdown list-unstyled collapse', $activeMenu == 'MENU' ? show">
                     <li class="sidebar-item">
                         <a n:href="Menu:" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('Menu:default') ? active">
                             <i class="fa-solid fa-list"></i>
-                            Položky menu
+                            {$_('admin.sidebar.main.menu.list')}
                         </a>
                     </li>
                     <li class="sidebar-item">
                         <a n:href="Menu:create" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('Menu:create') ? active">
                             <i class="fa-solid fa-plus"></i>
-                            Nové menu
+                            {$_('admin.sidebar.main.menu.create')}
                         </a>
                     </li>
                 </ul>
@@ -65,19 +65,19 @@
             <li class="sidebar-item">
                 <a n:href="Data:" n:class="'sidebar-link collapsed', $activeMenu == 'DATA' ? active" data-bs-toggle="collapse" data-bs-target="#sidebar-database" aria-expanded="false" aria-controls="sidebar-database">
                     <i class="fa-solid fa-database"></i>
-                    Data
+                    {$_('admin.sidebar.main.data')}
                 </a>
                 <ul id="sidebar-database" n:class="'sidebar-dropdown list-unstyled collapse', $activeMenu == 'DATA' ? show">
                     <li class="sidebar-item">
                         <a n:href="Data:" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('Data:default') ? active">
                             <i class="fa-solid fa-cubes"></i>
-                            Datové kontejnery
+                            {$_('admin.sidebar.main.data.list')}
                         </a>
                     </li>
                     <li class="sidebar-item">
                         <a n:href="Data:create" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('Data:create') ? active">
                             <i class="fa-solid fa-plus"></i>
-                            Nový kontejner
+                            {$_('admin.sidebar.main.data.create')}
                         </a>
                     </li>
                 </ul>
@@ -87,55 +87,55 @@
             <li class="sidebar-item">
                 <a n:href="Config:" n:class="'sidebar-link collapsed', $activeMenu == 'CONFIG' ? active" data-bs-toggle="collapse" data-bs-target="#sidebar-cms-config" aria-expanded="false" aria-controls="sidebar-cms-config">
                     <i class="fa-solid fa-cog"></i>
-                    Nastavení
+                    {$_('admin.sidebar.main.config')}
                 </a>
                 <ul id="sidebar-cms-config" n:class="'sidebar-dropdown list-unstyled collapse', $activeMenu == 'CONFIG' ? show">
                     <li class="sidebar-item">
                         <a n:href="User:" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('User:*') ? active">
                             <i class="fa-solid fa-user-group"></i>
-                            Uživatelské účty
+                            {$_('admin.sidebar.main.config.users')}
                         </a>
                     </li>
                     <li class="sidebar-item">
                         <a n:href="Translation:" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('Translation:*') ? active">
                             <i class="fa-solid fa-language"></i>
-                            Lokalizace
+                            {$_('admin.sidebar.main.config.localization')}
                         </a>
                     </li>
                     <li class="sidebar-item">
                         <a n:href="Email:" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('Email:*') ? active">
                             <i class="fa-solid fa-at"></i>
-                            E-mail
+                            {$_('admin.sidebar.main.config.email')}
                         </a>
                     </li>
                     <li class="sidebar-item">
                         <a n:href="Config:website" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('Config:website') ? active">
                             <i class="fa-solid fa-globe"></i>
-                            Website
+                            {$_('admin.sidebar.main.config.website')}
                         </a>
                     </li>
                     <li class="sidebar-item">
                         <a n:href="Config:seo" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('Config:seo') ? active">
                             <i class="fa-solid fa-arrow-trend-up"></i>
-                            SEO
+                            {$_('admin.sidebar.main.config.seo')}
                         </a>
                     </li>
                     <li class="sidebar-item">
                         <a n:href="Config:editor" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('Config:editor') ? active">
                             <i class="fa-solid fa-table-list"></i>
-                            Editor nastavení
+                            {$_('admin.sidebar.main.config.editor')}
                         </a>
                     </li>
                     <li class="sidebar-item">
                         <a n:href="Redirect:" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('Redirect:*') ? active">
                             <i class="fa-solid fa-arrows-split-up-and-left"></i>
-                            Přesměrování
+                            {$_('admin.sidebar.main.config.redirect')}
                         </a>
                     </li>
                     <li class="sidebar-item">
                         <a n:href="Debug:" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('Debug:*') ? active">
                             <i class="fa-solid fa-bug-slash"></i>
-                            Ladění
+                            {$_('admin.sidebar.main.config.debug')}
                         </a>
                     </li>
                 </ul>
@@ -145,12 +145,12 @@
 
             {* TOOLS *}
             <li class="sidebar-header">
-                Nástroje webu
+                {$_('admin.sidebar.tools')}
             </li>
             <li class="sidebar-item">
                 <a href="{$baseUrl}" class="sidebar-link text-success" target="_blank">
                     <i class="fa-solid fa-up-right-from-square"></i>
-                    Zobrazit web
+                    {$_('admin.sidebar.tools.goto-website')}
                 </a>
             </li>
 
@@ -158,18 +158,18 @@
 
             {* LOGGED USER *}
             <li class="sidebar-header">
-                Uživatel <strong class="text-warning">{$userData[full_name]}</strong>
+                {$_F('admin.sidebar.user', [$userData[full_name]])|noescape}
             </li>
             <li class="sidebar-item">
                 <a n:href="User:edit $userData[id]" class="sidebar-link">
                     <i class="fa-solid fa-cog"></i>
-                    Můj profil
+                    {$_('admin.sidebar.user.profile')}
                 </a>
             </li>
             <li class="sidebar-item">
                 <a n:href="Sign:out" class="sidebar-link text-danger">
                     <i class="fa-solid fa-right-from-bracket"></i>
-                    Odhlášení
+                    {$_('admin.sidebar.user.signout')}
                 </a>
             </li>
         </ul>
