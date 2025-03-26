@@ -20,13 +20,15 @@ class TranslationManager
     /**
      * @param Explorer $db Database explorer instance.
      * @param TranslationLanguage $languageService Service for handling language metadata.
+     * @param ConfigManager $configManager Manages configuration settings, including default language.
+     * @param TranslationLog $log Handles logging of missing or problematic translations.
      */
     public function __construct(
         private Explorer $db,
         private TranslationLanguage $languageService,
-        private ConfigManager $configManager
+        private ConfigManager $configManager,
+        private TranslationLog $log
     ) {
-        ;
         $this->currentLang = $this->languageService->getDefaultLang(
             $this->configManager->get('DEFAULT_LANG')
         );
@@ -120,7 +122,17 @@ class TranslationManager
         $lang = $lang ?? $this->currentLang;
 
         $this->load($lang);
-        return $this->translations[$lang][$key] ?? ($keyAsFallback ? $key : null);
+        $found = isset($this->translations[$lang][$key]);
+
+        if (!$found) {
+            if ($this->configManager->get('LOG_TRANSLATION_FALLBACK') == 1) {
+                $this->log->logMissingKey($key, $lang);
+            }
+
+            return $keyAsFallback ? $key : null;
+        }
+
+        return $this->translations[$lang][$key];
     }
 
     /**
@@ -139,6 +151,7 @@ class TranslationManager
      */
     public function getf(string $key, ?string $lang, array $values): ?string
     {
+        $lang = $lang ?? $this->currentLang;
         $format = $this->get($key, $lang, false);
 
         if (!$format) {
@@ -152,7 +165,9 @@ class TranslationManager
         try {
             return vsprintf($format, $values);
         } catch (\ValueError $e) {
-            // TODO: LOG TRANSLATION FORMAT ERRORS
+            if ($this->configManager->get('LOG_TRANSLATION_FALLBACK') == 1) {
+                $this->log->logMissingArguments($key, $lang, $values, $e->getMessage());
+            }
             return $key;
         }
     }
@@ -379,7 +394,7 @@ class TranslationManager
         $rows = $this->db->table(self::TABLE_NAME)
             ->select('key, lang, text')
             ->where('lang = ? OR lang = ?', $defaultLang, $targetLang)
-            // ->order('key, lang')
+            // ->order('key, lang') // TODO: Add sort order option
             ->fetchAll();
 
         /** @var \Nette\Database\Table\ActiveRow $row */

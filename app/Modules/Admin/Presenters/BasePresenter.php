@@ -179,12 +179,13 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
      * - Action: `default`
      * - Key: `title.admin.dashboard.default`
      *
+     * @param string|null $lang Optional language code (defaults to current language).
      * @return string The translated title.
      */
-    protected function getPresenterTitle(): string
+    protected function getPresenterTitle(?string $lang = null): string
     {
         $translationKey = strtolower('title.' . str_replace(':', '.', $this->getName()) . '.' . $this->getAction());
-        return $this->translationManager->get($translationKey);
+        return $this->translationManager->get($translationKey, $lang);
     }
 
     // ##########################################

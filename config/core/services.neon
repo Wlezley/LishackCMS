@@ -21,6 +21,7 @@ services:
     - App\Models\RedirectManager
     - App\Models\SmsGate(%smsgate.url%, %smsgate.login%, %smsgate.password%, %smsgate.sender_id%, %smsgate.secured_login%)
     - App\Models\TranslationLanguage
+    - App\Models\TranslationLog
     - App\Models\TranslationManager
     - App\Models\Upload
     - App\Models\UrlGenerator
