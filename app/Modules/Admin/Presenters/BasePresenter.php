@@ -23,7 +23,6 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
         'Redirect' => 'CONFIG',
         'Translation' => 'CONFIG',
         'User' => 'CONFIG',
-        'Website' => 'CONFIG',
     ];
 
     /** @var Explorer @inject */

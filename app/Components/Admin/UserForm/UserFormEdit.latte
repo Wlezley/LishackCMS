@@ -32,7 +32,8 @@
                 </div>
                 <div class="mb-3 col-12">
                     <div class="form-check form-switch">
-                        <input n:name="change_password" class="form-check-input change-password-toggle" type="checkbox" data-bs-toggle="collapse" data-bs-target="#changePassword" aria-expanded="false" aria-controls="changePassword">
+                        <input n:name="change_password" class="form-check-input change-password-toggle" type="checkbox"
+                            data-bs-toggle="collapse" data-bs-target="#changePassword" aria-expanded="false" aria-controls="changePassword">
                         <label n:name="change_password" class="form-check-label">{$_('password.change')}</label>
                     </div>
                 </div>
@@ -50,10 +51,6 @@
             <div class="row">
                 <div class=" my-3 col-12">
                     {if $readOnly}
-                        {* <a href="{plink User:}" class="btn btn-primary btn-lg float-start">
-                            <i class="fa-solid fa-arrow-left pe-2"></i>
-                            {$_('back')}
-                        </a> *}
                         <span class="btn active btn-danger-outline text-danger btn-lg float-end" style="cursor: not-allowed;">READ-ONLY</span>
                     {else}
                         <button n:name="save" type="submit" class="btn btn-primary btn-lg float-end">{$_('save')}</button>

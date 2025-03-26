@@ -3,13 +3,13 @@
     <div class="col">
 
         <div>
-            <a n:href="Redirect:import" class="btn btn-primary float-start me-3" title="Import" aria-label="Import">
+            <a n:href="Redirect:import" class="btn btn-primary float-start me-3">
                 <i class="fa-solid fa-file-import pe-2"></i>
-                Import
+                {$_('import')}
             </a>
-            <a n:href="Redirect:export" class="btn btn-primary float-start me-3" title="Export" aria-label="Export">
+            <a n:href="Redirect:export" class="btn btn-primary float-start me-3">
                 <i class="fa-solid fa-file-export pe-1"></i>
-                Export
+                {$_('export')}
             </a>
 
             <form class="row g-3 float-end" name="searchForm">
@@ -30,7 +30,7 @@
         </div>
 
         <div>
-            <a n:href="Redirect:create" class="btn btn-primary float-end" title="{$_('add')}" aria-label="{$_('add')}">
+            <a n:href="Redirect:create" class="btn btn-primary float-end">
                 <i class="fa-solid fa-plus pe-2"></i>
                 {$_('add')}
             </a>

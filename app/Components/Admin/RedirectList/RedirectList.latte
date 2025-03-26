@@ -13,8 +13,16 @@
     {foreach $redirectList as $id => $redirectItem}
         <tr>
             <td class="align-middle text-end id-col">{$id}</td>
-            <td class="align-middle url-col"><a href="{$redirectItem['source']}" target="_blank" rel="noopener">{$redirectItem['source']} <sup class="fa-solid fa-up-right-from-square text-secondary"></sup></a></td>
-            <td class="align-middle url-col"><a href="{$redirectItem['target']}" target="_blank" rel="noopener">{$redirectItem['target']} <sup class="fa-solid fa-up-right-from-square text-secondary"></sup></a></td>
+            <td class="align-middle url-col">
+                <a href="{$redirectItem['source']}" target="_blank" rel="noopener">{$redirectItem['source']}
+                    <sup class="fa-solid fa-up-right-from-square text-secondary"></sup>
+                </a>
+            </td>
+            <td class="align-middle url-col">
+                <a href="{$redirectItem['target']}" target="_blank" rel="noopener">{$redirectItem['target']}
+                    <sup class="fa-solid fa-up-right-from-square text-secondary"></sup>
+                </a>
+            </td>
             <td class="align-middle text-center http-code-col">{$redirectItem['code']}</td>
             <td class="align-middle text-center http-code-col">{$redirectItem['enabled'] ? $_('yes') : $_('no')}</td>
             <td class="align-middle text-end ps-0 py-1 action-col">
