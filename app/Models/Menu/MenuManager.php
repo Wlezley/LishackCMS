@@ -9,7 +9,7 @@ use App\Models\MenuException;
 
 class MenuManager extends BaseModel
 {
-    public const TABLE_NAME = 'menu';
+    public const TABLE_NAME = 'category';
 
     /** @var array<int,array<string,string|int|null>> $data */
     protected mixed $data = [];
@@ -180,7 +180,7 @@ class MenuManager extends BaseModel
         // Update positions
         $sql = "UPDATE `menu` SET `position` = CASE `id`\n";
         foreach ($data['order_list'] as $position => $id) {
-            $sql .= "    WHEN $id THEN $position\n";
+            $sql .= "WHEN $id THEN $position\n";
 
             if (!empty($this->data)) {
                 $this->data[$id]['position'] = $position;
