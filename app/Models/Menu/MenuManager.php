@@ -178,7 +178,7 @@ class MenuManager extends BaseModel
         }
 
         // Update positions
-        $sql = "UPDATE `menu` SET `position` = CASE `id`\n";
+        $sql = "UPDATE `" . self::TABLE_NAME . "` SET `position` = CASE `id`\n";
         foreach ($data['order_list'] as $position => $id) {
             $sql .= "WHEN $id THEN $position\n";
 
