@@ -172,6 +172,12 @@ class ArticleManager extends BaseModel
         $this->db->table(self::TABLE_NAME_ARTICLE)
             ->where('id', $id)
             ->update($data);
+
+        $this->db->table(self::TABLE_NAME_ARTICLE_CATEGORY)
+            ->where('article_id', $id)
+            ->update([
+                'article_name_url' => $data['name_url']
+            ]);
     }
 
     public function delete(int $id): void
