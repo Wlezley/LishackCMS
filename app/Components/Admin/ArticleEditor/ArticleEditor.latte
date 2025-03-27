@@ -64,10 +64,6 @@
                         {label og_image, class => 'form-label' /}
                         {input og_image, class => 'form-control form-control-sm'}
                     </div>
-                    {* <div class="mb-3">
-                        {label og_url, class => 'form-label' /}
-                        {input og_url, class => 'form-control form-control-sm'}
-                    </div> *}
                     <div class="mb-3">
                         {label og_type, class => 'form-label' /}
                         {input og_type, class => 'form-control form-control-sm'}
@@ -87,6 +83,10 @@
                 </div>
                 <div class="col-6">
                     {input save, class => 'btn btn-primary btn-lg float-end'}
+
+                    {if $origin == 'Edit'}
+                        {input copy, class => 'btn btn-light btn-outline-primary btn-lg float-end me-3'}
+                    {/if}
                 </div>
             </div>
         </div>

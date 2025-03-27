@@ -81,7 +81,7 @@ class ArticlePresenter extends SecuredPresenter
                 $articleData = $this->articleManager->getById($id);
                 $form->setParam($articleData);
                 $form->setOrigin($form::OriginEdit);
-            } catch (\Exception $e) {
+            } catch (ArticleException $e) {
                 $this->flashMessage('Chyba při čtení dat článku: ' . $e->getMessage(), 'danger');
             }
         } else {

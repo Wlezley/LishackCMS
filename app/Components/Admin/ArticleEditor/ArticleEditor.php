@@ -18,6 +18,8 @@ class ArticleEditor extends BaseControl
     public const OriginCreate = 'Create';
     public const OriginEdit = 'Edit';
 
+    private string $origin;
+
     /** @var ArticleManager @inject */
     private ArticleManager $articleManager;
 
@@ -29,10 +31,6 @@ class ArticleEditor extends BaseControl
 
     /** @var callable(string): void */
     public $onError;
-
-    // Origin
-    private string $origin;
-
 
     public function createComponentForm(): Form
     {
@@ -114,10 +112,6 @@ class ArticleEditor extends BaseControl
             ->setHtmlAttribute('placeholder', $this->t('form.article.og_image'))
             ->setValue($this->param['og_image'] ?? '');
 
-        // $form->addText('og_url', $this->t('form.article.og_url'))
-        //     ->setHtmlAttribute('placeholder', $this->t('form.article.og_url'))
-        //     ->setValue($this->param['og_url'] ?? '');
-
         $form->addText('og_type', $this->t('form.article.og_type'))
             ->setHtmlAttribute('placeholder', $this->t('form.article.og_type'))
             ->setValue($this->param['og_type'] ?? '');
@@ -126,13 +120,16 @@ class ArticleEditor extends BaseControl
         $form->addTextArea('content', $this->t('form.article.content'))
             ->setValue($this->param['content'] ?? '');
 
-        if ($this->origin == self::OriginCreate) {
-            $form->addSubmit('save', $this->t('form.article.create'));
-        } else {
-            $form->addSubmit('save', $this->t('form.article.save'));
-        }
 
-        $form->onSuccess[] = [$this, 'processSave'];
+        $saveBtnName = ($this->origin == self::OriginCreate)
+            ? $this->t('form.article.create')
+            : $this->t('form.article.save');
+
+        $form->addSubmit('save', $saveBtnName)
+            ->onClick[] = [$this, 'processSave'];
+
+        $form->addSubmit('copy', $this->t('form.article.save-copy'))
+            ->onClick[] = [$this, 'processSaveAsCopy'];
 
         return $form;
     }
@@ -165,7 +162,7 @@ class ArticleEditor extends BaseControl
             }
         }
 
-        if ($data['id']) {
+        if ($this->origin == self::OriginEdit) {
             $articleId = (int) $data['id'];
 
             try {
@@ -175,8 +172,10 @@ class ArticleEditor extends BaseControl
                 call_user_func($this->onError, $e->getMessage());
             }
         } else {
+            unset($data['id']);
+            $data['user_id'] = $this->presenter->getUser()->getId();
+
             try {
-                $data['user_id'] = $this->presenter->getUser()->getId();
                 $newArticleId = $this->articleManager->create($data);
                 call_user_func($this->onSuccess, $this->t('success.form.article-created'), $newArticleId);
             } catch (ArticleException $e) {
@@ -185,8 +184,16 @@ class ArticleEditor extends BaseControl
         }
     }
 
+    /** @param \Nette\Utils\ArrayHash<mixed> $values */
+    public function processSaveAsCopy(Form $form, \Nette\Utils\ArrayHash $values): void
+    {
+        $this->setOrigin(self::OriginCreate);
+        $this->processSave($form, $values);
+    }
+
     public function render(): void
     {
+        $this->template->origin = $this->origin;
         $this->template->setFile(__DIR__ . '/ArticleEditor.latte');
         $this->template->render();
     }

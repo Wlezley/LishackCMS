@@ -64,7 +64,7 @@ final class ArticlePresenter extends BasePresenter
 
         // ARTICLE CONTENT
         $this->template->article[] = $article['content'];
-        $this->template->have_custom_h1 = (strpos(strtolower($article['content']), '<h1>') !== false);
+        $this->template->have_custom_h1 = (strpos(strtolower($article['content']), '<h1') !== false);
 
         // DEBUG ONLY
         // bdump($article, "ARTICLE DATA");
