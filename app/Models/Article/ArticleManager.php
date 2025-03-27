@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\Helpers\ArrayHelper;
-
 class ArticleManager extends BaseModel
 {
     public const TABLE_NAME_ARTICLE = 'article';
@@ -16,7 +14,7 @@ class ArticleManager extends BaseModel
     public const MAIN_CATEGORY_ID = 1;
 
     /** @return array<string,mixed> */
-    public function getArticleData(int $id): array
+    public function getById(int $id): array
     {
         $article = $this->db->table(self::TABLE_NAME_ARTICLE)
             ->where('id', $id)
@@ -32,7 +30,24 @@ class ArticleManager extends BaseModel
         return $article->toArray();
     }
 
-    public function findAtricleId(string $nameUrl, int $categoryId): int
+    /** @return array<string,mixed> */
+    public function getByNameUrl(string $name_url): array
+    {
+        $article = $this->db->table(self::TABLE_NAME_ARTICLE)
+            ->where('name_url', $name_url)
+            ->fetch();
+
+        if (!$article) {
+            throw new ArticleException(
+                "Article (name_url: '$name_url') not found.",
+                \Nette\Http\IResponse::S404_NotFound
+            );
+        }
+
+        return $article->toArray();
+    }
+
+    public function getIdByUrlAndCategory(string $nameUrl, int $categoryId): int
     {
         $articleId = $this->db->table(self::TABLE_NAME_ARTICLE_CATEGORY)
             ->select('article_id')
@@ -51,7 +66,7 @@ class ArticleManager extends BaseModel
     }
 
     /** @param array<string> $categoryUrlList */
-    public function findArticleCategoryId(array $categoryUrlList): int
+    public function resolveCategoryId(array $categoryUrlList): int
     {
         $categoryId = self::MAIN_CATEGORY_ID;
 
@@ -82,7 +97,7 @@ class ArticleManager extends BaseModel
         return $categoryId;
     }
 
-    public function getArticleUrl(int $id): string
+    public function generateUrl(int $id): string
     {
         $article_category = $this->db->table(self::TABLE_NAME_ARTICLE_CATEGORY)
             ->where('article_id', $id)
@@ -124,6 +139,21 @@ class ArticleManager extends BaseModel
         return HOME_URL . $name_url . '/';
     }
 
+    /** @return array<string> */
+    public function normalizeCategoryUrl(string $categoryUrl): array
+    {
+        $categoryUrlListRaw = explode('/', $categoryUrl);
+        $categoryUrlList = array_values(array_filter($categoryUrlListRaw));
+
+        if (!empty($categoryUrl) && count($categoryUrlListRaw) !== count($categoryUrlList)) {
+            $e = new ArticleException('Broken Category URL', \Nette\Http\IResponse::S301_MovedPermanently);
+            $e->setCategoryUrl(implode('/', $categoryUrlList));
+            throw $e;
+        }
+
+        return $categoryUrlList;
+    }
+
     // #####################################
     // ###          DB HANDLERS          ###
     // #####################################
@@ -146,18 +176,16 @@ class ArticleManager extends BaseModel
             throw new ArticleException('Article creation failed.', 1);
         }
 
-        $articleId = (int) $newArticle['id'];
-
         if ($categoryId) {
             $this->db->table(self::TABLE_NAME_ARTICLE_CATEGORY)
                 ->insert([
-                    'article_id' => $articleId,
+                    'article_id' => $newArticle['id'],
                     'article_name_url' => $data['name_url'],
                     'category_id' => $categoryId,
                 ]);
         }
 
-        return $articleId;
+        return (int) $newArticle['id'];
     }
 
     /**

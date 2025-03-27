@@ -38,14 +38,14 @@ class ArticlePresenter extends SecuredPresenter
         $this->template->title .= " ID: $id";
 
         try {
-            $this->template->article = $this->articleManager->getArticleData($id);
+            $this->template->article = $this->articleManager->getById($id);
         } catch (ArticleException $e) {
             $this->flashMessage("Článek $id nebyl nalezen.", 'danger');
             $this->redirect('Article:');
         }
 
         try {
-            $this->template->articleURL = $this->articleManager->getArticleUrl($id);
+            $this->template->articleURL = $this->articleManager->generateUrl($id);
         } catch (ArticleException $e) {
             $this->template->notInCategoryError = $e->getMessage();
         }
@@ -54,7 +54,7 @@ class ArticlePresenter extends SecuredPresenter
     public function actionDelete(int $id): void
     {
         try {
-            $this->articleManager->getArticleData($id);
+            $this->articleManager->getById($id);
         } catch (\Exception $e) {
             $this->flashMessage("Článek ID: $id nebyl nalezen.", 'danger');
             $this->redirect('Article:');
@@ -78,7 +78,7 @@ class ArticlePresenter extends SecuredPresenter
 
         if ($id) {
             try {
-                $articleData = $this->articleManager->getArticleData($id);
+                $articleData = $this->articleManager->getById($id);
                 $form->setParam($articleData);
                 $form->setOrigin($form::OriginEdit);
             } catch (\Exception $e) {
