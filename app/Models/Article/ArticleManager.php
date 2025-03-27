@@ -67,6 +67,23 @@ class ArticleManager extends BaseModel
         return (int) $articleId['article_id'];
     }
 
+    public function getCategoryIdById(int $id): int
+    {
+        $categoryId = $this->db->table(self::TABLE_NAME_ARTICLE_CATEGORY)
+            ->select('category_id')
+            ->where('article_id', $id)
+            ->fetch();
+
+        if (!$categoryId) {
+            throw new ArticleException(
+                "Unable to find category ID by article_id: '$id'.",
+                \Nette\Http\IResponse::S404_NotFound
+            );
+        }
+
+        return (int) $categoryId['category_id'];
+    }
+
     /** @param array<string> $categoryUrlList */
     public function resolveCategoryId(array $categoryUrlList): int
     {
@@ -197,17 +214,28 @@ class ArticleManager extends BaseModel
      *
      * @todo Create something like... ArticleValidator::prepare($data)
      */
-    public function update(int $id, array $data): void
+    public function update(int $id, array $data, ?int $categoryId = null): void
     {
         $this->db->table(self::TABLE_NAME_ARTICLE)
             ->where('id', $id)
             ->update($data);
 
-        $this->db->table(self::TABLE_NAME_ARTICLE_CATEGORY)
+        $article_category['article_name_url'] = $data['name_url'];
+
+        if ($categoryId) {
+            $article_category['category_id'] = $categoryId;
+        }
+
+        $affectedRows = $this->db->table(self::TABLE_NAME_ARTICLE_CATEGORY)
             ->where('article_id', $id)
-            ->update([
-                'article_name_url' => $data['name_url']
-            ]);
+            ->update($article_category);
+
+        if ($affectedRows == 0) {
+            $article_category['article_id'] = $id;
+            $this->db->table(self::TABLE_NAME_ARTICLE_CATEGORY)
+                ->where('article_id', $id)
+                ->insert($article_category);
+        }
     }
 
     public function delete(int $id): void

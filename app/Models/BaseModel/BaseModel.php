@@ -14,7 +14,7 @@ abstract class BaseModel
     use \App\Models\Config;
     use \App\Models\Translation;
 
-    protected mixed $data = [];
+    protected mixed $data = null;
 
     public function __construct(
         protected Explorer $db,
@@ -34,7 +34,7 @@ abstract class BaseModel
 
     public function invalidate(): void
     {
-        $this->data = [];
+        unset($this->data);
     }
 
     public function setLang(?string $lang = null): void

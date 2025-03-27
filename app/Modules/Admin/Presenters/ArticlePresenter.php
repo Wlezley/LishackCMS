@@ -8,12 +8,16 @@ use App\Components\Admin\IArticleEditorFactory;
 use App\Components\Admin\IArticleListFactory;
 use App\Models\ArticleException;
 use App\Models\ArticleManager;
+use App\Models\CategoryManager;
 use App\Models\UserManager;
 
 class ArticlePresenter extends SecuredPresenter
 {
     /** @var ArticleManager @inject */
     public ArticleManager $articleManager;
+
+    /** @var CategoryManager @inject */
+    public CategoryManager $categoryManager;
 
     /** @var UserManager @inject */
     public UserManager $userManager;
@@ -102,6 +106,7 @@ class ArticlePresenter extends SecuredPresenter
         $id = (int) $this->getParameter('id');
 
         $form->setArticleManager($this->articleManager);
+        $form->setCategoryManager($this->categoryManager);
         $form->setUserManager($this->userManager);
 
         if ($id) {

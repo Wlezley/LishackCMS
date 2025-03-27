@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
+use App\Components\Admin\ICategoryFormFactory;
 use App\Models\CategoryException;
 use App\Models\CategoryManager;
 use Nette\Utils\Json;
 
 class MenuPresenter extends SecuredPresenter
 {
-    public function __construct(
-        private CategoryManager $categoryManager
-    ) {}
+    /** @var CategoryManager @inject */
+    public CategoryManager $categoryManager;
+
+    /** @var ICategoryFormFactory @inject */
+    public ICategoryFormFactory $categoryForm;
 
     public function renderDefault(): void
     {
@@ -23,32 +26,13 @@ class MenuPresenter extends SecuredPresenter
     {
     }
 
-    public function renderEdit(int $id = 0): void
+    public function renderEdit(?int $id): void
     {
-        try {
-            $item = $this->categoryManager->get($id);
-
-            $this->template->title .= " ID: $id";
-            $this->template->item = $item;
-
-            $this->template->jsonData = Json::encode([
-                'id' => $item['id'],
-                'name' => $item['name'],
-                'modal' => [
-                    'title' => $this->t('modal.title.confirm-delete'),
-                    'body' => $this->tf('modal.body.delete-menu', $item['name'])
-                ],
-            ]);
-
-            $this->template->editable = $this->userHavePermissionsTo('edit');
-
-            // TODO: Test render for the "Menu Parent" tree <select> elem.
-            $this->template->tree = $this->categoryManager->getTree();
-            bdump($this->template->tree, "MENU TREE");
-
-        } catch (CategoryException $e) {
-            $this->flashMessage('Chyba: ' . $e->getMessage(), 'danger');
+        if (!$id) {
+            $this->redirect(':default');
         }
+
+        $this->template->title .= " ID: $id";
     }
 
     public function actionDelete(int $id): void
@@ -118,11 +102,9 @@ class MenuPresenter extends SecuredPresenter
             $this->redirect('this');
         }
 
-        $data = $this->getHttpRequest()->getPost();
-
         try {
             if ($this->userHavePermissionsTo('move')) {
-                $this->categoryManager->updatePosition($data);
+                $this->categoryManager->updatePosition((array) $this->getHttpRequest()->getPost());
             } else {
                 $this->flashMessage('K přesunutí menu nemáte oprávnění.', 'danger');
                 $this->sendJson([
@@ -160,5 +142,42 @@ class MenuPresenter extends SecuredPresenter
         }
 
         return false;
+    }
+
+    // ##########################################
+    // ###             COMPONENTS             ###
+    // ##########################################
+
+    protected function createComponentCategoryForm(): \App\Components\Admin\CategoryForm
+    {
+        $form = $this->categoryForm->create();
+        $id = $this->getParameter('id');
+
+        $form->setCategoryManager($this->categoryManager);
+
+        if ($id) {
+            $form->setOrigin($form::OriginEdit);
+            $param = $this->categoryManager->getById((int) $id);
+
+            if ($param) {
+                $form->setParam($param);
+            } else {
+                $this->flashMessage('Kategorie nebyla nalezena'); // TODO: Translate
+            }
+        } else {
+            $form->setOrigin($form::OriginCreate);
+            $form->setParam($this->getHttpRequest()->getPost('param'));
+        }
+
+        $form->onSuccess = function(string $message): void {
+            $this->flashMessage($message, 'info');
+            $this->redirect('Menu:');
+        };
+
+        $form->onError = function(string $message): void {
+            $this->flashMessage($message, 'danger');
+        };
+
+        return $form;
     }
 }

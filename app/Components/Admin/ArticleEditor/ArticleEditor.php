@@ -7,6 +7,7 @@ namespace App\Components\Admin;
 use App\Components\BaseControl;
 use App\Models\ArticleException;
 use App\Models\ArticleManager;
+use App\Models\CategoryManager;
 use App\Models\Helpers\StringHelper;
 use App\Models\UserException;
 use App\Models\UserManager;
@@ -22,6 +23,9 @@ class ArticleEditor extends BaseControl
 
     /** @var ArticleManager @inject */
     private ArticleManager $articleManager;
+
+    /** @var CategoryManager @inject */
+    private CategoryManager $categoryManager;
 
     /** @var UserManager @inject */
     private UserManager $userManager;
@@ -41,7 +45,10 @@ class ArticleEditor extends BaseControl
             $form->addHidden('id', $this->param['id']);
 
             try {
+                $this->param['category'] = $this->articleManager->getCategoryIdById((int) $this->param['id']);
                 $this->param['user_name'] = $this->userManager->get((int) $this->param['user_id'])['full_name'];
+            } catch (ArticleException $e) {
+                $this->param['category'] = ArticleManager::MAIN_CATEGORY_ID;
             } catch (UserException $e) {
                 $this->param['user_name'] = $this->t('author.unknown');
             }
@@ -59,11 +66,16 @@ class ArticleEditor extends BaseControl
             ->setValue($this->param['title'] ?? '')
             ->setRequired();
 
+        // CATEGORY
+        $categorySelectOptions = $this->categoryManager->getCategorySelectData();
+        $form->addSelect('category', $this->t('form.article.category'), $categorySelectOptions)
+            ->setValue($this->param['category'] ?? ArticleManager::MAIN_CATEGORY_ID)
+            ->setRequired();
+
         // COMMON ATTRIBUTES
         $form->addText('name_url', $this->t('form.article.name_url'))
             ->setHtmlAttribute('placeholder', $this->t('form.article.name_url'))
             ->setValue($this->param['name_url'] ?? '');
-            // ->setRequired();
 
         $form->addText('user_name', $this->t('form.article.author'))
             ->setHtmlAttribute('readonly')
@@ -150,6 +162,7 @@ class ArticleEditor extends BaseControl
 
         $required = [
             ['name' => 'title', 'label.key' => 'form.article.title'],
+            ['name' => 'category', 'label.key' => 'form.article.category'],
             ['name' => 'name_url', 'label.key' => 'form.article.name_url'],
             ['name' => 'published_at', 'label.key' => 'form.article.published_at'],
         ];
@@ -162,11 +175,14 @@ class ArticleEditor extends BaseControl
             }
         }
 
+        $categoryId = (int) $data['category'];
+        unset($data['category']);
+
         if ($this->origin == self::OriginEdit) {
             $articleId = (int) $data['id'];
 
             try {
-                $this->articleManager->update($articleId, $data);
+                $this->articleManager->update($articleId, $data, $categoryId);
                 call_user_func($this->onSuccess, $this->t('success.form.article-saved'), $articleId);
             } catch (ArticleException $e) {
                 call_user_func($this->onError, $e->getMessage());
@@ -176,7 +192,7 @@ class ArticleEditor extends BaseControl
             $data['user_id'] = $this->presenter->getUser()->getId();
 
             try {
-                $newArticleId = $this->articleManager->create($data);
+                $newArticleId = $this->articleManager->create($data, $categoryId);
                 call_user_func($this->onSuccess, $this->t('success.form.article-created'), $newArticleId);
             } catch (ArticleException $e) {
                 call_user_func($this->onError, $e->getMessage());
@@ -206,6 +222,11 @@ class ArticleEditor extends BaseControl
     public function setArticleManager(ArticleManager $articleManager): void
     {
         $this->articleManager = $articleManager;
+    }
+
+    public function setCategoryManager(CategoryManager $categoryManager): void
+    {
+        $this->categoryManager = $categoryManager;
     }
 
     public function setUserManager(UserManager $userManager): void

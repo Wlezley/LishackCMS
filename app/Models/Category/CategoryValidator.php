@@ -102,7 +102,7 @@ class CategoryValidator
             StringHelper::assertWebalized($data['name_url']);
         }
         if (isset($data['title'])) {
-            Validators::assert($data['title'], 'string:1..255', 'Title');
+            Validators::assert($data['title'], 'string:0..255', 'Title');
         }
         if (isset($data['description'])) {
             Validators::assert($data['description'], 'string', 'Description');

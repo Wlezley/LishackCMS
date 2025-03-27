@@ -1,0 +1,46 @@
+{form form}
+    <div class="row">
+        <div class="col-4 mx-auto">
+            <div class="row">
+                <div class="mb-3 col-12">
+                    {label name, class => 'form-label required' /}
+                    {input name, class => 'form-control'}
+                </div>
+                <div class="mb-3 col-12">
+                    <label n:name="parent_id" class="form-label required">{$_('form.category.parent_id')}</label>
+                    <select n:name="parent_id" class="form-select"> </select>
+                </div>
+                <div class="mb-3 col-12">
+                    {label name_url, class => 'form-label' /}
+                    {input name_url, class => 'form-control'}
+                </div>
+                <div class="mb-3 col-12">
+                    {label title, class => 'form-label' /}
+                    {input title, class => 'form-control'}
+                </div>
+                <div class="mb-3 col-12">
+                    {label description, class => 'form-label' /}
+                    {input description, class => 'form-control'}
+                </div>
+                <div class="mb-3 col-12">
+                    {label body, class => 'form-label' /}
+                    {input body, class => 'form-control'}
+                </div>
+                <div class="mb-3 col-12">
+                    <div class="form-check form-switch mt-4">
+                        <input n:name="hidden" class="form-check-input" type="checkbox">
+                        <label n:name="hidden" class="form-check-label">{$_('form.category.hidden')}</label>
+                    </div>
+                </div>
+                <div class="mb-3 col-12">
+                    <span class="required">* {$_('required-items')}</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class=" my-3 col-12">
+                    <button n:name="save" type="submit" class="btn btn-primary btn-lg float-end">{$_(save)}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{/form}
