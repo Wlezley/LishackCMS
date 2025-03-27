@@ -17,7 +17,8 @@ use Nette\Database\Explorer;
 
 abstract class BasePresenter extends Nette\Application\UI\Presenter
 {
-    protected Nette\Http\UrlScript $url;
+    use \App\Models\Config;
+    use \App\Models\Translation;
 
     /** @var Explorer @inject */
     public Explorer $db;
@@ -39,6 +40,9 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
     /** @var IPaginationFactory @inject */
     public IPaginationFactory $paginationFactory;
+
+    // URL
+    protected Nette\Http\UrlScript $url;
 
     // Pagination
     private ?int $itemsPerPage = null;
@@ -116,7 +120,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $this->template->_ = fn($key) => $this->translationManager->get($key, $this->lang);
         $this->template->_F = fn($key, $values) => $this->translationManager->getf($key, $this->lang, $values);
 
-        // Url
+        // URL
         $this->template->url = $this->url;
         $this->template->currentUrl = $this->currentUrl;
 
@@ -166,65 +170,6 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         if ($this->isAjax() && !$this->isControlInvalid()) {
             $this->redrawControl();
         }
-    }
-
-    /**
-     * Retrieves a translated text for a given key in a specified language.
-     *
-     * This is a shorthand wrapper for `TranslationManager::get()`.
-     *
-     * @param string $key The translation key.
-     * @param string|null $lang Optional language code (defaults to current language).
-     * @throws \RuntimeException If TranslationManager is not available.
-     * @return string The translated text, or the key itself if not found.
-     */
-    public function t(string $key, ?string $lang = null): string
-    {
-        if (!isset($this->translationManager)) {
-            throw new \RuntimeException('TranslationManager is not available in ' . static::class);
-        }
-
-        return $this->translationManager->get($key, $lang);
-    }
-
-    /**
-     * Translates a key and formats the translation with the given values.
-     *
-     * This is a wrapper around `TranslationManager::getf()`, which:
-     * - Retrieves the translated string for the given key.
-     * - Uses `vsprintf()` to format the string with the provided values.
-     * - Falls back to returning the key if the translation is missing or formatting fails.
-     *
-     * @param string $key The translation key.
-     * @param mixed ...$values Values to be formatted into the translated string.
-     * @return string The formatted translated text, or the key itself if translation is unavailable.
-     * @throws \RuntimeException If `TranslationManager` is not available.
-     */
-    public function tf(string $key, mixed ...$values): string
-    {
-        if (!isset($this->translationManager)) {
-            throw new \RuntimeException('TranslationManager is not available in ' . static::class);
-        }
-
-        return $this->translationManager->getf($key, null, $values);
-    }
-
-    /**
-     * Retrieves a configuration value for a given key.
-     *
-     * This is a shorthand wrapper for `ConfigManager::get()`.
-     *
-     * @param string $key The configuration key.
-     * @throws \RuntimeException If ConfigManager is not available.
-     * @return string|null The configuration value, or null if not found.
-     */
-    public function c(string $key): ?string
-    {
-        if (!isset($this->configManager)) {
-            throw new \RuntimeException('ConfigManager is not available in ' . static::class);
-        }
-
-        return $this->configManager->get($key);
     }
 
     // ##########################################

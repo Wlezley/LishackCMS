@@ -11,6 +11,9 @@ use Nette\Application\UI\Template;
 
 class BaseControl extends Control
 {
+    use \App\Models\Config;
+    use \App\Models\Translation;
+
     /** @var TranslationManager */
     protected TranslationManager $translationManager;
 
@@ -22,26 +25,6 @@ class BaseControl extends Control
 
     /** @var null|array<string,string> $param */
     protected ?array $param = [];
-
-    public function setTranslationManager(TranslationManager $translationManager): void
-    {
-        $this->translationManager = $translationManager;
-    }
-
-    public function getTranslationManager(): TranslationManager
-    {
-        return $this->translationManager;
-    }
-
-    public function setConfigManager(ConfigManager $configManager): void
-    {
-        $this->configManager = $configManager;
-    }
-
-    public function getConfigManager(): ConfigManager
-    {
-        return $this->configManager;
-    }
 
     /** @throws \RuntimeException If TranslationManager or ConfigManager is not available. */
     protected function createTemplate(?string $class = null): Template
@@ -66,63 +49,24 @@ class BaseControl extends Control
         return $template;
     }
 
-    /**
-     * Retrieves a translated text for a given key in a specified language.
-     *
-     * This is a shorthand wrapper for `TranslationManager::get()`.
-     *
-     * @param string $key The translation key.
-     * @param string|null $lang Optional language code (defaults to current language).
-     * @throws \RuntimeException If TranslationManager is not available.
-     * @return string The translated text, or the key itself if not found.
-     */
-    public function t(string $key, ?string $lang = null): string
+    public function setTranslationManager(TranslationManager $translationManager): void
     {
-        if (!isset($this->translationManager)) {
-            throw new \RuntimeException('TranslationManager is not available in ' . static::class);
-        }
-
-        return $this->translationManager->get($key, $lang);
+        $this->translationManager = $translationManager;
     }
 
-    /**
-     * Translates a key and formats the translation with the given values.
-     *
-     * This is a wrapper around `TranslationManager::getf()`, which:
-     * - Retrieves the translated string for the given key.
-     * - Uses `vsprintf()` to format the string with the provided values.
-     * - Falls back to returning the key if the translation is missing or formatting fails.
-     *
-     * @param string $key The translation key.
-     * @param mixed ...$values Values to be formatted into the translated string.
-     * @return string The formatted translated text, or the key itself if translation is unavailable.
-     * @throws \RuntimeException If `TranslationManager` is not available.
-     */
-    public function tf(string $key, mixed ...$values): string
+    public function getTranslationManager(): TranslationManager
     {
-        if (!isset($this->translationManager)) {
-            throw new \RuntimeException('TranslationManager is not available in ' . static::class);
-        }
-
-        return $this->translationManager->getf($key, null, $values);
+        return $this->translationManager;
     }
 
-    /**
-     * Retrieves a configuration value for a given key.
-     *
-     * This is a shorthand wrapper for `ConfigManager::get()`.
-     *
-     * @param string $key The configuration key.
-     * @throws \RuntimeException If ConfigManager is not available.
-     * @return string|null The configuration value, or null if not found.
-     */
-    public function c(string $key): ?string
+    public function setConfigManager(ConfigManager $configManager): void
     {
-        if (!isset($this->configManager)) {
-            throw new \RuntimeException('ConfigManager is not available in ' . static::class);
-        }
+        $this->configManager = $configManager;
+    }
 
-        return $this->configManager->get($key);
+    public function getConfigManager(): ConfigManager
+    {
+        return $this->configManager;
     }
 
     /** @param array<string,string> $cmsConfig */

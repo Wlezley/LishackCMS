@@ -11,6 +11,9 @@ abstract class BaseModel
 {
     use SmartObject;
 
+    use \App\Models\Config;
+    use \App\Models\Translation;
+
     protected mixed $data = [];
 
     public function __construct(
