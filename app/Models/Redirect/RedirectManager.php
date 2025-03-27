@@ -11,6 +11,7 @@ class RedirectManager
 {
     public const TABLE_NAME = 'redirect';
 
+    // TODO: Use Nette\Http\IRsponse instead
     public const REDIRECT_HTTP_CODES = [
         // 300 => '300 Multiple Choices', // Choices are listed in an HTML page in the body. Machine-readable choices are encouraged to be sent as Link headers with rel=alternate.
         301 => '301 Moved Permanently', // Reorganization of a website.

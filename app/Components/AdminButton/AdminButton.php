@@ -11,6 +11,7 @@ class AdminButton extends BaseControl
     public function render(): void
     {
         $this->template->adminUrl = $this->adminUrl;
+
         $this->template->setFile(__DIR__ . '/AdminButton.latte');
         $this->template->render();
     }

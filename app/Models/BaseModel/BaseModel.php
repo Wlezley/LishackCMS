@@ -11,20 +11,13 @@ abstract class BaseModel
 {
     use SmartObject;
 
-    private UrlGenerator $urlGenerator;
-
     protected mixed $data = [];
-
-    protected string $lang;
 
     public function __construct(
         protected Explorer $db,
-        // TODO: TranslatorManager (?)
-        protected ConfigManager $configManager
-    )
-    {
-        $this->lang = $this->configManager->get('DEFAULT_LANG');
-    }
+        protected ConfigManager $configManager,
+        protected TranslationManager $translationManager
+    ) {}
 
     public function load(): void
     {
@@ -32,27 +25,23 @@ abstract class BaseModel
 
     public function reload(): void
     {
-        $this->data = [];
+        $this->invalidate();
         $this->load();
     }
 
-    public function setLang(string $lang): void
+    public function invalidate(): void
     {
-        $this->lang = $lang;
+        $this->data = [];
+    }
+
+    public function setLang(?string $lang = null): void
+    {
+        $lang = $lang ?? $this->configManager->get('DEFAULT_LANG');
+        $this->translationManager->setCurrentLanguage($lang);
     }
 
     public function getLang(): string
     {
-        return $this->lang;
-    }
-
-    public function setUrlGenerator(UrlGenerator $urlGenerator): void
-    {
-        $this->urlGenerator = $urlGenerator;
-    }
-
-    public function getUrlGenerator(): UrlGenerator
-    {
-        return $this->urlGenerator;
+        return $this->translationManager->getCurrentLanguage();
     }
 }
