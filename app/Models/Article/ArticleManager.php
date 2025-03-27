@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Helpers\ArrayHelper;
+
 class ArticleManager extends BaseModel
 {
     public const TABLE_NAME_ARTICLE = 'article';
@@ -217,5 +219,49 @@ class ArticleManager extends BaseModel
         $this->db->table(self::TABLE_NAME_ARTICLE)
             ->where('id', $id)
             ->delete();
+    }
+
+    // #####################################
+    // ###         ARTICLE LIST          ###
+    // #####################################
+
+    /**
+     * Retrieves a list of articles with optional search and pagination.
+     *
+     * @param int $limit Number of results to return (default: 50).
+     * @param int $offset Offset for pagination (default: 0).
+     * @param string|null $search Optional search query for article title and content.
+     * @return array<int|string,array<string,string|int|null>>|null Array of articles indexed by id, or null if empty.
+     */
+    public function getList(int $limit = 50, int $offset = 0, ?string $search = null): ?array
+    {
+        $query = $this->db->table(self::TABLE_NAME_ARTICLE)
+            ->limit($limit, $offset)
+            ->order('id ASC');
+
+        if ($search !== null) {
+            $query->where('title LIKE ? OR content LIKE ?', "%$search%", "%$search%");
+        }
+
+        $data = $query->fetchAll();
+
+        return $data ? ArrayHelper::resultToArray($data) : null;
+    }
+
+    /**
+     * Gets the total count of articles, optionally filtered by a search query.
+     *
+     * @param string|null $search Optional search query for article title and content.
+     * @return int Total count of matching articles.
+     */
+    public function getCount(?string $search = null): int
+    {
+        $query = $this->db->table(self::TABLE_NAME_ARTICLE);
+
+        if ($search !== null) {
+            $query->where('title LIKE ? OR content LIKE ?', "%$search%", "%$search%");
+        }
+
+        return $query->count('*');
     }
 }

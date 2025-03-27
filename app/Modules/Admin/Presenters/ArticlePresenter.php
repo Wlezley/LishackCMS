@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Admin\Presenters;
 
 use App\Components\Admin\IArticleEditorFactory;
+use App\Components\Admin\IArticleListFactory;
 use App\Models\ArticleException;
 use App\Models\ArticleManager;
 use App\Models\UserManager;
@@ -17,12 +18,15 @@ class ArticlePresenter extends SecuredPresenter
     /** @var UserManager @inject */
     public UserManager $userManager;
 
+    /** @var IArticleListFactory @inject */
+    public IArticleListFactory $articleList;
+
     /** @var IArticleEditorFactory @inject */
     public IArticleEditorFactory $articleEditor;
 
-    public function renderDefault(): void
+    public function renderDefault(int $page = 1, ?string $search = null): void
     {
-        $this->template->articleList = [];
+        $this->template->search = $search;
     }
 
     public function renderCreate(): void
@@ -64,9 +68,33 @@ class ArticlePresenter extends SecuredPresenter
         $this->redirect('Article:');
     }
 
+    public function handleDelete(): void
+    {
+        if (!$this->isAjax()) {
+            $this->redirect('this');
+        }
+
+        $data = $this->getHttpRequest()->getPost();
+
+        // TODO: Permission check
+
+        $this->articleManager->delete((int)$data['id']);
+    }
+
     // ##########################################
     // ###             COMPONENTS             ###
     // ##########################################
+
+    protected function createComponentArticleList(): \App\Components\Admin\ArticleList
+    {
+        $control = $this->articleList->create();
+        $control->setParam([
+            'search' => $this->getParameter('search'),
+            'page' => $this->getParameter('page'),
+        ]);
+
+        return $control;
+    }
 
     protected function createComponentArticleEditor(): \App\Components\Admin\ArticleEditor
     {

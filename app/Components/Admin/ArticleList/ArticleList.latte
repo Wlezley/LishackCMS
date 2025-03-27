@@ -1,0 +1,62 @@
+<table id="redirectListTable" class="table table-responsive table-striped table-hover table-dark">
+    <thead>
+        <tr>
+            <th scope="col" class="text-warning text-end id-col">{$_('id')}</th>
+            <th scope="col" class="text-warning url-col">{$_('form.article.title')}</th>
+            <th scope="col" class="text-warning"></th>
+            <th scope="col" class="text-warning">{$_('form.article.published_at')}</th>
+            <th scope="col" class="text-warning text-center">{$_('form.article.published')}</th>
+            <th scope="col" class="text-warning text-center ps-0 action-col">{$_('action')}</th>
+        </tr>
+    </thead>
+    <tbody>
+    {foreach $articleList as $id => $articleItem}
+        <tr>
+            <td class="align-middle text-end id-col">{$id}</td>
+            <td class="align-middle url-col"><span class="">{$articleItem['title']}</span></td>
+            <td class="align-middle"><span class="fst-italic text-secondary">{$articleItem['name_url']}</span></td>
+
+            <td class="align-middle">{$articleItem['published_at']|date:'j. n. Y H:i'}</td>
+            <td class="align-middle text-center">{$articleItem['published'] ? $_('yes') : $_('no')}</td>
+
+            <td class="align-middle text-end ps-0 py-1 action-col">
+                <a n:href=":edit, id: $id" class="btn btn-sm btn-primary me-1">
+                    <i class="fa-solid fa-pencil"></i>
+                </a>
+                <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteArticleConfirmModal" data-json="{$getJson($id, $articleItem['title'])}">
+                    <i class="fa-solid fa-eraser"></i>
+                </button>
+            </td>
+        </tr>
+    {/foreach}
+    </tbody>
+</table>
+
+{control pagination}
+
+<script n:syntax="off">
+    document.addEventListener('DOMContentLoaded', () => {
+        const ArticleDeleteModal = new LishackCMS.AdminModal('#deleteArticleConfirmModal', 'data-json');
+        ArticleDeleteModal.init();
+    });
+</script>
+
+{* {define modals} *}
+    <div class="modal fade" id="deleteArticleConfirmModal" tabindex="-1" aria-labelledby="deleteArticleConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered text-dark">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteArticleConfirmModalLabel"><!-- MODAL TITLE --></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{$_('close')}"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- MODAL BODY -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{$_('cancel')}</button>
+                    <button type="submit" class="btn btn-danger" data-modal-action="delete">{$_('btn.delete')}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{* {/define} *}
