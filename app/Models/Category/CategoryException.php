@@ -4,6 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-class MenuException extends \Exception
+class CategoryException extends \Exception
 {
 }

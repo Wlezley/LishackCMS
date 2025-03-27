@@ -36,7 +36,9 @@
                         <div class="container-fluid mt-2 mb-5">
                             <div class="bg-secondary">
                                 <div class="p-3">
-                                    <h1 class="mb-4 border-bottom border-warning text-warning">{ifset $title}{$title|stripHtml}{else}Lishack CMS{/ifset}</h1>
+                                    {block title}
+                                        <h1 class="mb-4 border-bottom border-warning text-warning">{ifset $title}{$title|stripHtml}{else}Lishack CMS{/ifset}</h1>
+                                    {/block}
 
                                     {include 'layout/alerts.latte'}
 

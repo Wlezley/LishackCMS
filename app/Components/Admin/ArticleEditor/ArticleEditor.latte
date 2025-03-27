@@ -1,0 +1,94 @@
+{form form}
+    <div class="row">
+        <div class="col-12 mx-auto">
+            <div class="mb-3">
+                {label title, class => 'form-label required' /}
+                {input title, class => 'form-control form-control-lg'}
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-4">
+                    <div class="mb-3">
+                        {label name_url, class => 'form-label required' /}
+                        {input name_url, class => 'form-control form-control-sm'}
+                    </div>
+                    <div class="mb-3">
+                        {label user_name, class => 'form-label' /}
+                        {input user_name, class => 'form-control form-control-sm'}
+                    </div>
+                    <div class="mb-3">
+                        {label published_at, class => 'form-label required' /}
+                        {input published_at, class => 'form-control form-control-sm'}
+                    </div>
+                    <div class="mb-3">
+                        {label updated_at, class => 'form-label' /}
+                        {input updated_at, class => 'form-control form-control-sm'}
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch mt-4">
+                            <input n:name="published" class="form-check-input" type="checkbox">
+                            <label n:name="published" class="form-check-label">{$_('form.article.published')}</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-4">
+                    <div class="mb-3">
+                        {label robots, class => 'form-label' /}
+                        {input robots, class => 'form-control form-control-sm'}
+                    </div>
+                    <div class="mb-3">
+                        {label canonical_url, class => 'form-label' /}
+                        {input canonical_url, class => 'form-control form-control-sm'}
+                    </div>
+                    <div class="mb-3">
+                        {label meta_title, class => 'form-label' /}
+                        {input meta_title, class => 'form-control form-control-sm'}
+                    </div>
+                    <div class="mb-3">
+                        {label meta_description, class => 'form-label' /}
+                        {input meta_description, class => 'form-control form-control-sm'}
+                    </div>
+                </div>
+
+                <div class="col-4">
+                    <div class="mb-3">
+                        {label og_title, class => 'form-label' /}
+                        {input og_title, class => 'form-control form-control-sm'}
+                    </div>
+                    <div class="mb-3">
+                        {label og_description, class => 'form-label' /}
+                        {input og_description, class => 'form-control form-control-sm'}
+                    </div>
+                    <div class="mb-3">
+                        {label og_image, class => 'form-label' /}
+                        {input og_image, class => 'form-control form-control-sm'}
+                    </div>
+                    {* <div class="mb-3">
+                        {label og_url, class => 'form-label' /}
+                        {input og_url, class => 'form-control form-control-sm'}
+                    </div> *}
+                    <div class="mb-3">
+                        {label og_type, class => 'form-label' /}
+                        {input og_type, class => 'form-control form-control-sm'}
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                {input content, class => 'tinymce d-none'}
+            </div>
+
+            <hr class="my-3">
+
+            <div class="row">
+                <div class="col-6 my-auto">
+                    <span class="required">* {$_('required-items')}</span>
+                </div>
+                <div class="col-6">
+                    {input save, class => 'btn btn-primary btn-lg float-end'}
+                </div>
+            </div>
+        </div>
+    </div>
+{/form}

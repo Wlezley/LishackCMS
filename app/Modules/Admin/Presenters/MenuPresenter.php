@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
-use App\Models\MenuException;
-use App\Models\MenuManager;
+use App\Models\CategoryException;
+use App\Models\CategoryManager;
 use Nette\Utils\Json;
 
 class MenuPresenter extends SecuredPresenter
 {
     public function __construct(
-        private MenuManager $menuManager
+        private CategoryManager $categoryManager
     ) {}
 
     public function renderDefault(): void
@@ -26,7 +26,7 @@ class MenuPresenter extends SecuredPresenter
     public function renderEdit(int $id = 0): void
     {
         try {
-            $item = $this->menuManager->get($id);
+            $item = $this->categoryManager->get($id);
 
             $this->template->title .= " ID: $id";
             $this->template->item = $item;
@@ -43,10 +43,10 @@ class MenuPresenter extends SecuredPresenter
             $this->template->editable = $this->userHavePermissionsTo('edit');
 
             // TODO: Test render for the "Menu Parent" tree <select> elem.
-            $this->template->tree = $this->menuManager->getTree();
+            $this->template->tree = $this->categoryManager->getTree();
             bdump($this->template->tree, "MENU TREE");
 
-        } catch (MenuException $e) {
+        } catch (CategoryException $e) {
             $this->flashMessage('Chyba: ' . $e->getMessage(), 'danger');
         }
     }
@@ -54,7 +54,7 @@ class MenuPresenter extends SecuredPresenter
     public function actionDelete(int $id): void
     {
         if ($this->userHavePermissionsTo('delete')) {
-            // $this->menuManager->delete($id); // Bypass (temp.)
+            $this->categoryManager->delete($id);
             $this->flashMessage("Menu ID: $id bylo odstraněno.", 'info');
         } else {
             $this->flashMessage('K odstranění menu nemáte oprávnění.', 'danger');
@@ -77,7 +77,7 @@ class MenuPresenter extends SecuredPresenter
 
         try {
             if ($this->userHavePermissionsTo('delete')) {
-                // $this->menuManager->delete($data['id']); // Bypass (temp.)
+                $this->categoryManager->delete((int) $data['id']);
                 $this->flashMessage("Menu ID: " . $data['id'] . " bylo odstraněno.", 'info');
             } else {
                 $this->flashMessage('K odstranění menu nemáte oprávnění.', 'danger');
@@ -86,7 +86,7 @@ class MenuPresenter extends SecuredPresenter
                     'message' => 'Insufficient user permissions.',
                 ]);
             }
-        } catch (MenuException $e) {
+        } catch (CategoryException $e) {
             $this->sendJson([
                 'status' => 'error',
                 'message' => $e->getMessage(),
@@ -99,8 +99,6 @@ class MenuPresenter extends SecuredPresenter
             'id' => $data['id'],
             'call' => 'removeFromList',
         ]);
-
-        // $this->redrawControl();
     }
 
     public function handleLoad(): void
@@ -110,7 +108,7 @@ class MenuPresenter extends SecuredPresenter
         }
 
         $this->sendJson([
-            'nodes' => $this->menuManager->getSortableTree()
+            'nodes' => $this->categoryManager->getSortableTree()
         ]);
     }
 
@@ -124,7 +122,7 @@ class MenuPresenter extends SecuredPresenter
 
         try {
             if ($this->userHavePermissionsTo('move')) {
-                $this->menuManager->updatePosition($data);
+                $this->categoryManager->updatePosition($data);
             } else {
                 $this->flashMessage('K přesunutí menu nemáte oprávnění.', 'danger');
                 $this->sendJson([
@@ -132,8 +130,7 @@ class MenuPresenter extends SecuredPresenter
                     'message' => 'Insufficient user permissions.',
                 ]);
             }
-
-        } catch (MenuException $e) {
+        } catch (CategoryException $e) {
             $this->sendJson([
                 'status' => 'error',
                 'message' => $e->getMessage(),
@@ -143,7 +140,7 @@ class MenuPresenter extends SecuredPresenter
         $this->sendJson([
             'status' => 'success',
             'message' => 'Menu position successfully updated',
-            'nodes' => $this->menuManager->getSortableTree(),
+            'nodes' => $this->categoryManager->getSortableTree(),
         ]);
     }
 

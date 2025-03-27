@@ -9,9 +9,6 @@ use Nette\Application\UI\Form;
 
 class ConfigSeoForm extends BaseControl
 {
-    public const OriginCreate = 'Create';
-    public const OriginEdit = 'Edit';
-
     /** @var callable(string): void */
     public $onSuccess;
 

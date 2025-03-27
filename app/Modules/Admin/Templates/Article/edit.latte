@@ -1,15 +1,25 @@
+{block title}
+    <div class="mb-4 border-bottom border-warning row">
+        <div class="col">
+            <h1 class="text-warning mb-0">{$title|stripHtml}</h1>
+        </div>
+        <div class="col">
+            {if $articleURL}
+                <a href="{$articleURL}" target="_blank" class="btn btn-primary float-end">
+                    Go to page <i class="fa-solid fa-up-right-from-square ms-1"></i>
+                </a>
+            {elseif $notInCategoryError}
+                <span class="btn active btn-dark float-end" style="cursor: not-allowed;" title="{$notInCategoryError}">
+                    Go to page <i class="fa-solid fa-up-right-from-square ms-1"></i>
+                </span>
+            {/if}
+        </div>
+    </div>
+{/block}
+
 {block content}
 <div class="row">
     <div class="col">
-        <p>TODO: Formulář pro editaci článků</p>
-
-        <textarea class="tinymce d-none">Hello, World!</textarea>
-
-        <hr class="my-3">
-
-        <a n:href="Article:delete $articleId" class="btn btn-primary">
-            <i class="fa-solid fa-eraser pe-2"></i>
-            Delete (ID {$articleId})
-        </a>
+        {control articleEditor}
     </div>
 </div>

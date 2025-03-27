@@ -8,7 +8,7 @@ use App\Models\Helpers\ArrayHelper;
 use App\Models\Helpers\StringHelper;
 use Nette\Utils\Validators;
 
-class MenuValidator
+class CategoryValidator
 {
     public const COLUMNS = [
         'id',
@@ -23,18 +23,18 @@ class MenuValidator
     ];
 
     /**
-     * Builds a structured array of menu data with default values.
+     * Builds a structured array of category data with default values.
      *
-     * @param string $name The name of the menu item
-     * @param int $parentID The parent menu item's ID (default: 1)
-     * @param int $position The position in the menu order (default: 0)
+     * @param string $name The name of the category item
+     * @param int $parentID The parent category item's ID (default: 1)
+     * @param int $position The position in the category order (default: 0)
      * @param string|null $nameURL The URL-friendly name (default: generated from $name)
-     * @param string|null $title The title of the menu item
-     * @param string|null $description A brief description of the menu item
-     * @param string|null $body The content/body of the menu item
-     * @param bool $hidden Whether the menu item is hidden (default: false)
+     * @param string|null $title The title of the category item
+     * @param string|null $description A brief description of the category item
+     * @param string|null $body The content/body of the category item
+     * @param bool $hidden Whether the category item is hidden (default: false)
      *
-     * @return array<string,string|int|null> An associative array containing menu data
+     * @return array<string,string|int|null> An associative array containing category data
      */
     public static function buildData(string $name, int $parentID = 1, int $position = 0, ?string $nameURL = null, ?string $title = null, ?string $description = null, ?string $body = null, bool $hidden = false): array
     {
@@ -52,10 +52,10 @@ class MenuValidator
     }
 
     /**
-     * Prepares menu data by normalizing and ensuring all required fields have valid values.
+     * Prepares category data by normalizing and ensuring all required fields have valid values.
      *
-     * @param array<string,string|int|null> $data The raw menu data array.
-     * @return array<string,string|int|null> The prepared menu data array.
+     * @param array<string,string|int|null> $data The raw category data array.
+     * @return array<string,string|int|null> The prepared category data array.
      */
     public static function prepareData(array $data): array
     {
@@ -76,14 +76,14 @@ class MenuValidator
     }
 
     /**
-     * Validates menu data against expected formats and constraints.
+     * Validates category data against expected formats and constraints.
      *
      * @param array<string,string|int|null> $data The data to validate
      * @throws \InvalidArgumentException If any validation rule fails
      */
     public static function validateData(array $data): void
     {
-        ArrayHelper::assertExtraKeys(self::COLUMNS, $data, 'MenuData');
+        ArrayHelper::assertExtraKeys(self::COLUMNS, $data, 'CategoryData');
 
         if (isset($data['id'])) {
             Validators::assert($data['id'], 'numericint', 'ID');

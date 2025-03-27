@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace App\Modules\Website\Presenters;
 
+use App\Models\ArticleManager;
 use Nette;
 
 final class ArticlePresenter extends BasePresenter
 {
-    public const MAIN_CATEGORY_ID = 1;
+    /** @var ArticleManager @inject */
+    public ArticleManager $articleManager;
 
+    /** @todo Translate error messages */
     public function renderDetail(string $articleUrl = '', string $categoryUrl = ''): void
     {
         // URL CHECK ---->>
@@ -44,59 +47,37 @@ final class ArticlePresenter extends BasePresenter
         // <<---- URL CHECK
 
         // GET ARTICLE CATEGORY ID
-        $articleCategoryId = self::MAIN_CATEGORY_ID;
-
-        if (!empty($categoryUrlList)) {
-            $categoryResult = $this->db->table('category')
-                ->select('id, parent_id, name_url')
-                ->fetchAll();
-
-            foreach ($categoryUrlList as $categoryUrlName) {
-                $found = false;
-
-                foreach ($categoryResult as $categoryRow) {
-                    if ($categoryRow['name_url'] == $categoryUrlName && $categoryRow['parent_id'] == $articleCategoryId) {
-                        $found = true;
-                        $articleCategoryId = $categoryRow['id'];
-                        break;
-                    }
-                }
-
-                if (!$found) {
-                    $articleCategoryId = null;
-                    break;
-                }
-            }
-
-            if (!$articleCategoryId) {
-                $this->error('Článek nebyl v kategoriích nalezen.', Nette\Http\IResponse::S404_NotFound);
-            }
+        $articleCategoryId = null;
+        try {
+            $articleCategoryId = $this->articleManager->findArticleCategoryId($categoryUrlList);
+        } catch (\App\Models\ArticleException $e) {
+            $this->error($e->getMessage(), $e->getCode());
+            // $this->error('Článek nebyl v kategoriích nalezen.', \Nette\Http\IResponse::S404_NotFound);
         }
 
         // GET ARTICLE ID
-        $articleId = $this->db->table('article_category')
-            ->select('article_id')
-            ->where('article_name_url', $articleUrl)
-            ->where('category_id', $articleCategoryId)
-            ->fetch();
-
-        if (!$articleId) {
-            bdump($articleCategoryId, "ARTICLE CATEGORY ID");
-            $this->error('ID Článku nebylo nalezeno.', Nette\Http\IResponse::S404_NotFound);
+        $articleId = null;
+        try {
+            $articleId = $this->articleManager->findAtricleId($articleUrl, $articleCategoryId);
+        } catch (\App\Models\ArticleException $e) {
+            $this->error($e->getMessage(), $e->getCode());
+            // $this->error('ID Článku nebylo nalezeno.', Nette\Http\IResponse::S404_NotFound);
         }
-
-        $articleId = $articleId['article_id'];
 
         // GET ARTICLE DATA
-        $articleData = $this->db->table('article')
-            ->where('id', $articleId)
-            ->fetch();
-
-        if (!$articleData) {
-            bdump($articleId, "ARTICLE ID");
-            $this->error('Článek nebyl nalezen.', Nette\Http\IResponse::S404_NotFound);
+        $articleData = [];
+        try {
+            $articleData = $this->articleManager->getArticleData($articleId);
+        } catch (\App\Models\ArticleException $e) {
+            $this->error($e->getMessage(), $e->getCode());
+            // $this->error('Článek nebyl nalezen.', Nette\Http\IResponse::S404_NotFound);
         }
 
+        if ($articleData['published'] != 1) {
+            $this->error('Článek nebyl publikován.', Nette\Http\IResponse::S404_NotFound);
+        }
+
+        // ARTICLE ATTRIBUTES
         $this->template->title = $articleData['title'];
         $this->template->robots = $articleData['robots'];
         $this->template->canonical_url = $articleData['canonical_url'];
@@ -110,7 +91,9 @@ final class ArticlePresenter extends BasePresenter
 
         // ARTICLE CONTENT
         $this->template->article[] = $articleData['content'];
+        $this->template->have_custom_h1 = (strpos(strtolower($articleData['content']), '<h1>') !== false);
 
+        // DEBUG ONLY
         // bdump($articleData, "ARTICLE DATA");
     }
 }

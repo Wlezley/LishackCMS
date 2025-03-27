@@ -22,7 +22,7 @@ if (isset($argv[1]) && in_array($argv[1], array_keys($commandList))) {
 }
 
 $container = App\Bootstrap::boot()->createContainer();
-$manager = $container->getByType(App\Models\MenuManager::class);
+$manager = $container->getByType(App\Models\CategoryManager::class);
 
 switch ($command) {
     case '--create':

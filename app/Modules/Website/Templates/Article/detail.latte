@@ -1,8 +1,8 @@
 {block content}
 <div class="container mt-5">
-    <h1>{$title}</h1>
-
-    <p>DETAIL:</p>
+    {if !$have_custom_h1}
+        <h1>{$title}</h1>
+    {/if}
 
     {foreach $article as $articleBlock}
         {$articleBlock|noescape}

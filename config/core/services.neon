@@ -11,13 +11,14 @@ services:
     authenticator: App\Models\Authenticator
 
     # Models
+    - App\Models\ArticleManager
+    - App\Models\CategoryManager
     - App\Models\ConfigManager
     - App\Models\Files
     - App\Models\Gallery
     - App\Models\Helpers\AssetsVersion
     - App\Models\Images
     - App\Models\Installer
-    - App\Models\MenuManager
     - App\Models\RedirectManager
     - App\Models\SmsGate(%smsgate.url%, %smsgate.login%, %smsgate.password%, %smsgate.sender_id%, %smsgate.secured_login%)
     - App\Models\TranslationLanguage

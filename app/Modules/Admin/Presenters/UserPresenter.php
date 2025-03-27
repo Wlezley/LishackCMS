@@ -121,7 +121,6 @@ class UserPresenter extends SecuredPresenter
 
         $form->onError = function(string $message): void {
             $this->flashMessage($message, 'danger');
-            // $this->redirect('this');
         };
 
         return $form;

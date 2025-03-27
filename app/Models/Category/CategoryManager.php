@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Helpers\ArrayHelper;
-use App\Models\MenuException;
+use App\Models\CategoryException;
 
-class MenuManager extends BaseModel
+class CategoryManager extends BaseModel
 {
     public const TABLE_NAME = 'category';
 
@@ -30,7 +30,7 @@ class MenuManager extends BaseModel
             ->get($id);
 
         if (!$result) {
-            throw new MenuException("Menu ID '$id' not found.");
+            throw new CategoryException("Category ID '$id' not found.");
         }
 
         return $result->toArray();
@@ -39,8 +39,8 @@ class MenuManager extends BaseModel
     /** @param array<string,string|int|null> $data */
     public function create(array $data): int
     {
-        $data = MenuValidator::prepareData($data);
-        MenuValidator::validateData($data);
+        $data = CategoryValidator::prepareData($data);
+        CategoryValidator::validateData($data);
 
         $id = $this->db->table(self::TABLE_NAME)
             ->insert($data);
@@ -52,7 +52,7 @@ class MenuManager extends BaseModel
     /** @param array<string,string|int|null> $data */
     public function update(int $id, array $data): int
     {
-        MenuValidator::validateData($data);
+        CategoryValidator::validateData($data);
 
         $affectedRows = $this->db->table(self::TABLE_NAME)
             ->where(['id' => $id])
@@ -64,14 +64,14 @@ class MenuManager extends BaseModel
     public function delete(int $id): void
     {
         if ($id == 1) {
-            throw new MenuException('MAIN_MENU cannot be removed.');
+            throw new CategoryException('MAIN_CATEGORY cannot be removed.');
         }
 
         $node = $this->db->table(self::TABLE_NAME)
             ->get($id);
 
         if (!$node) {
-            throw new MenuException("Menu item ID '$id' not found.");
+            throw new CategoryException("Category item ID '$id' not found.");
         }
 
         $parentID = $node['parent_id'];
@@ -127,8 +127,8 @@ class MenuManager extends BaseModel
     /** @return list<array> */
     public function getSortableTree(bool $forceReload = false): array
     {
-        $menuTree = $this->getTree($forceReload);
-        return $this->sortableTreeFormat($menuTree);
+        $categoryTree = $this->getTree($forceReload);
+        return $this->sortableTreeFormat($categoryTree);
     }
 
     /**
@@ -159,11 +159,11 @@ class MenuManager extends BaseModel
     public function updatePosition(mixed $data): void
     {
         if (!is_array($data)) {
-            throw new MenuException("Param 'data' must be an array.");
+            throw new CategoryException("Param 'data' must be an array.");
         }
 
         if (empty($data)) {
-            throw new MenuException("Param 'data' is empty.");
+            throw new CategoryException("Param 'data' is empty.");
         }
 
         ArrayHelper::assertMissingKeys(['node_id', 'source_id', 'target_id', 'order_list'], $data);
@@ -190,5 +190,29 @@ class MenuManager extends BaseModel
         $sql .= "WHERE `id` IN (" . implode(',', $data['order_list']) . ");";
 
         $this->db->query($sql);
+
+        // Update levels
+        $this->updateChildLevels(1, 0);
+    }
+
+    private function updateChildLevels(int $parentId, int $parentLevel): void
+    {
+        $children = $this->db->table(self::TABLE_NAME)
+            ->where('parent_id', $parentId)
+            ->fetchPairs('id', 'level');
+
+        foreach ($children as $childId => $_) {
+            $newLevel = $parentLevel + 1;
+
+            $this->db->table(self::TABLE_NAME)
+                ->where('id', $childId)
+                ->update(['level' => $newLevel]);
+
+            if (!empty($this->data)) {
+                $this->data[$childId]['level'] = $newLevel;
+            }
+
+            $this->updateChildLevels($childId, $newLevel);
+        }
     }
 }
