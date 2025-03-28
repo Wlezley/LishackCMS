@@ -5,10 +5,18 @@ search:
             - *Factory
             - *Facade
 
+extensions:
+    console: Contributte\Console\DI\ConsoleExtension(%consoleMode%)
+
 services:
     router: App\RouterFactory::createRouter
     security.passwords: Nette\Security\Passwords(::PASSWORD_BCRYPT, [cost: 12])
     authenticator: App\Models\Authenticator
+
+    # Commands
+    - App\Commands\UserAddCommand
+    - App\Commands\UserPasswordCommand
+    - App\Commands\UserRoleCommand
 
     # Models
     - App\Models\ArticleManager

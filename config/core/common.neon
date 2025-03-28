@@ -7,6 +7,13 @@ application:
     mapping:
         *: App\Modules\*\Presenters\*Presenter
 
+console:
+    name: Lishack CMS
+    version: '1.0'
+    catchExceptions: true
+    autoExit: true
+    url: https://localhost
+
 database:
     user: %database.user%
     password: %database.password%

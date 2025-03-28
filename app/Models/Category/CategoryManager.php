@@ -208,11 +208,20 @@ class CategoryManager extends BaseModel
         }
     }
 
+    /**
+     * @return list<array>
+     */
     public function getCategorySelectData(): array
     {
         return $this->buildCategorySelectData($this->getTree());
     }
 
+    /**
+     * @param list<array> $items
+     * @param array<mixed> $options
+     * @param int $level
+     * @return list<array>
+     */
     private function buildCategorySelectData(array $items, array &$options = [], int $level = 0): array
     {
         foreach ($items as $item) {

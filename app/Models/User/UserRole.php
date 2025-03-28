@@ -14,6 +14,8 @@ class UserRole
         4 => 'admin'
     ];
 
+    public const DEFAULT_ROLE = 'user';
+
     public int $level;
 
     /**

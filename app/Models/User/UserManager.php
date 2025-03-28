@@ -47,6 +47,34 @@ class UserManager extends BaseModel
         return $result->toArray();
     }
 
+    /** @return array<string,mixed> */
+    public function getByName(string $name): array
+    {
+        $result = $this->db->table(self::TABLE_NAME)
+            ->where('name', $name)
+            ->fetch();
+
+        if (!$result) {
+            throw new UserException("User NAME: '$name' not found.");
+        }
+
+        return $result->toArray();
+    }
+
+    public function getIdByName(string $name): int
+    {
+        $result = $this->db->table(self::TABLE_NAME)
+            ->select('id')
+            ->where('name', $name)
+            ->fetch();
+
+        if (!$result) {
+            throw new UserException("User NAME: '$name' not found.");
+        }
+
+        return $result['id'];
+    }
+
     /** @param array<string,string|int|null> $data */
     public function create(array $data): int
     {
