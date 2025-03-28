@@ -11,6 +11,9 @@ class CategoryManager extends BaseModel
 {
     public const TABLE_NAME = 'category';
 
+    /** @todo Make this value configurable? */
+    public const MAIN_CATEGORY_ID = 1;
+
     /** @var array<int,array<string,string|int|null>> $categories */
     protected array $categories = [];
 
@@ -57,7 +60,7 @@ class CategoryManager extends BaseModel
         $this->db->table(self::TABLE_NAME)
             ->insert($data);
 
-        $this->updateChildLevels(1, 0);
+        $this->updateChildLevels();
         $this->invalidate();
     }
 
@@ -76,7 +79,7 @@ class CategoryManager extends BaseModel
             ->where(['id' => $id])
             ->update($data);
 
-        $this->updateChildLevels(1, 0);
+        $this->updateChildLevels();
         $this->invalidate();
     }
 
@@ -186,12 +189,19 @@ class CategoryManager extends BaseModel
         $this->db->query($sql);
 
         // Update levels
-        $this->updateChildLevels(1, 0);
+        $this->updateChildLevels();
 
         $this->invalidate();
     }
 
-    private function updateChildLevels(int $parentId, int $parentLevel): void
+    /**
+     * Recursively updates the nesting level (`level`) of all child categories
+     * based on the given parent category.
+     *
+     * @param int $parentId The ID of the parent category (default: `CategoryManager::MAIN_CATEGORY_ID`).
+     * @param int $parentLevel The level of the parent category (default: 0).
+     */
+    public function updateChildLevels(int $parentId = self::MAIN_CATEGORY_ID, int $parentLevel = 0): void
     {
         $children = $this->db->table(self::TABLE_NAME)
             ->where('parent_id', $parentId)
@@ -209,7 +219,10 @@ class CategoryManager extends BaseModel
     }
 
     /**
-     * @return list<array>
+     * Returns a list of categories formatted for Nette form `addSelect()`,
+     * using dashes (`— `) to visually indicate nesting levels.
+     *
+     * @return array<int,string> Array in the format [id => '— Category Name']
      */
     public function getCategorySelectData(): array
     {
@@ -217,20 +230,27 @@ class CategoryManager extends BaseModel
     }
 
     /**
-     * @param list<array> $items
-     * @param array<mixed> $options
-     * @param int $level
-     * @return list<array>
+     * Recursively builds an array of categories with names
+     * prefixed by dashes (`— `) to indicate hierarchical depth.
+     *
+     * @param list<array> $items Hierarchical category tree.
+     * @param int $level The current nesting level (default: `0`).
+     * @return array<int,string> Array in the format [id => '— Category Name'].
      */
-    private function buildCategorySelectData(array $items, array &$options = [], int $level = 0): array
+    private function buildCategorySelectData(array $items, int $level = 0): array
     {
+        $options = [];
+
         foreach ($items as $item) {
             $options[$item['id']] = str_repeat('— ', $level) . $item['name'];
 
-            if (isset($item['items'])) {
-                $this->buildCategorySelectData($item['items'], $options, $level + 1);
+            if (!empty($item['items'])) {
+                $options += $this->buildCategorySelectData($item['items'], $level + 1);
             }
         }
+
+        bdump($items);
+        bdump($options);
 
         return $options;
     }

@@ -48,7 +48,7 @@ class ArticleEditor extends BaseControl
                 $this->param['category'] = $this->articleManager->getCategoryIdById((int) $this->param['id']);
                 $this->param['user_name'] = $this->userManager->get((int) $this->param['user_id'])['full_name'];
             } catch (ArticleException $e) {
-                $this->param['category'] = ArticleManager::MAIN_CATEGORY_ID;
+                $this->param['category'] = CategoryManager::MAIN_CATEGORY_ID;
             } catch (UserException $e) {
                 $this->param['user_name'] = $this->t('author.unknown');
             }
@@ -69,7 +69,7 @@ class ArticleEditor extends BaseControl
         // CATEGORY
         $categorySelectOptions = $this->categoryManager->getCategorySelectData();
         $form->addSelect('category', $this->t('form.article.category'), $categorySelectOptions)
-            ->setValue($this->param['category'] ?? ArticleManager::MAIN_CATEGORY_ID)
+            ->setValue($this->param['category'] ?? CategoryManager::MAIN_CATEGORY_ID)
             ->setRequired();
 
         // COMMON ATTRIBUTES

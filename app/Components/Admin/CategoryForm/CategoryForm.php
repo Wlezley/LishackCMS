@@ -46,7 +46,7 @@ class CategoryForm extends BaseControl
 
         $categorySelectOptions = $this->categoryManager->getCategorySelectData();
         $form->addSelect('parent_id', $this->t('form.category.parent_id'), $categorySelectOptions)
-            ->setValue($this->param['parent_id'] ?? ArticleManager::MAIN_CATEGORY_ID)
+            ->setValue($this->param['parent_id'] ?? CategoryManager::MAIN_CATEGORY_ID)
             ->setRequired();
 
         $form->addText('name_url', $this->t('form.category.name_url'))

@@ -14,6 +14,7 @@ services:
     authenticator: App\Models\Authenticator
 
     # Commands
+    - App\Commands\CategoryUpdateCommand
     - App\Commands\UserAddCommand
     - App\Commands\UserPasswordCommand
     - App\Commands\UserRoleCommand

@@ -12,9 +12,6 @@ class ArticleManager extends BaseModel
     public const TABLE_NAME_ARTICLE_CATEGORY = 'article_category';
     public const TABLE_NAME_CATEGORY = 'category';
 
-    /** @todo Make this value configurable? */
-    public const MAIN_CATEGORY_ID = 1;
-
     /** @return array<string,mixed> */
     public function getById(int $id): array
     {
@@ -87,7 +84,7 @@ class ArticleManager extends BaseModel
     /** @param array<string> $categoryUrlList */
     public function resolveCategoryId(array $categoryUrlList): int
     {
-        $categoryId = self::MAIN_CATEGORY_ID;
+        $categoryId = CategoryManager::MAIN_CATEGORY_ID;
 
         /** @todo Get from category manager */
         $categoryList = $this->db->table(self::TABLE_NAME_CATEGORY)
@@ -129,7 +126,7 @@ class ArticleManager extends BaseModel
         $name_url = $article_category['article_name_url'];
         $cID = $article_category['category_id'];
 
-        if ($cID == self::MAIN_CATEGORY_ID) {
+        if ($cID == CategoryManager::MAIN_CATEGORY_ID) {
             if ($this->configManager->get('DEFAULT_PAGE') == $name_url) {
                 return HOME_URL;
             } else {
@@ -179,14 +176,14 @@ class ArticleManager extends BaseModel
 
     /**
      * @param array<string,mixed> $data Article data
-     * @param int|null $categoryId Article category ID, default is `ArticleManager::MAIN_CATEGORY_ID`.
+     * @param int|null $categoryId Article category ID, default is `CategoryManager::MAIN_CATEGORY_ID`.
      * @return int New article ID
      * @throws \InvalidArgumentException If any extra data keys are found.
      * @throws ArticleException If article cration failed.
      *
      * @todo Create something like... ArticleValidator::prepare($data)
      */
-    public function create(array $data, ?int $categoryId = self::MAIN_CATEGORY_ID): int
+    public function create(array $data, ?int $categoryId = CategoryManager::MAIN_CATEGORY_ID): int
     {
         $newArticle = $this->db->table(self::TABLE_NAME_ARTICLE)
             ->insert($data);
