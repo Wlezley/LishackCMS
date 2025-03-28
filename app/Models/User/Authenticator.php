@@ -13,9 +13,11 @@ use Nette\Security\SimpleIdentity;
 
 class Authenticator implements \Nette\Security\Authenticator
 {
-    public function __construct(protected Explorer $db, private Session $session, private Passwords $passwords)
-    {
-    }
+    public function __construct(
+        protected Explorer $db,
+        private Session $session,
+        private Passwords $passwords
+    ) {}
 
     public function authenticate(string $username, #[\SensitiveParameter] string $password): SimpleIdentity
     {

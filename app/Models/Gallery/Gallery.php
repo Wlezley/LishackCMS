@@ -6,8 +6,4 @@ namespace App\Models;
 
 class Gallery extends BaseModel
 {
-    // TODO ...
-    // public function __construct()
-    // {
-    // }
 }

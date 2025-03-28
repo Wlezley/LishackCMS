@@ -6,8 +6,4 @@ namespace App\Models;
 
 class Images extends BaseModel
 {
-    // TODO ...
-    // public function __construct()
-    // {
-    // }
 }

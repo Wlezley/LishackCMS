@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Components\Admin;
 
 use App\Components\BaseControl;
-use App\Models\ArticleManager;
 use App\Models\CategoryException;
 use App\Models\CategoryManager;
 use App\Models\Helpers\StringHelper;

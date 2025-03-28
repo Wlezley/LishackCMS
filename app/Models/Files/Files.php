@@ -6,10 +6,6 @@ namespace App\Models;
 
 class Files extends BaseModel
 {
-    // TODO ...
-    // public function __construct()
-    // {
-    // }
 }
 
 

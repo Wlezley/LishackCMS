@@ -12,9 +12,9 @@ use Nette\Bridges\ApplicationLatte\Template;
 
 class ArticleParser
 {
-    public function __construct(private TemplateFactory $templateFactory)
-    {
-    }
+    public function __construct(
+        private TemplateFactory $templateFactory
+    ) {}
 
     public function parseText(string $text, ?Control $presenter = null): string
     {

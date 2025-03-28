@@ -9,8 +9,9 @@ use Nette\Application\UI\Presenter;
 
 final class InstallPresenter extends Presenter
 {
-    public function __construct(private Installer $installer)
-    {
+    public function __construct(
+        private Installer $installer
+    ) {
         parent::__construct();
     }
 

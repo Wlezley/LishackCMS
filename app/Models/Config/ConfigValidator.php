@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Helpers\ArrayHelper;
-use App\Models\Helpers\StringHelper;
 use Nette\Utils\Validators;
 
 class ConfigValidator

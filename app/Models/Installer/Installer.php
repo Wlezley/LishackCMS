@@ -15,8 +15,10 @@ class Installer
 
     private string $log;
 
-    public function __construct(protected Explorer $db, private TextWrapper $phinx)
-    {
+    public function __construct(
+        protected Explorer $db,
+        private TextWrapper $phinx
+    ) {
         $this->log = '';
     }
 

@@ -6,9 +6,4 @@ namespace App\Models;
 
 class UrlGenerator extends BaseModel
 {
-    // TODO ...
-    public function getUrl(): string
-    {
-        return "";
-    }
 }
