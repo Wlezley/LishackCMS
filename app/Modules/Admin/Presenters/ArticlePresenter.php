@@ -53,7 +53,7 @@ class ArticlePresenter extends SecuredPresenter
         }
 
         try {
-            $this->template->articleURL = $this->articleManager->generateUrl($id);
+            $this->template->articleURL = HOME_URL . $this->articleManager->generateUrl($id);
             if ($this->template->article['published'] != 1) {
                 $this->template->articleURL .= '?preview=1';
             }
@@ -66,7 +66,7 @@ class ArticlePresenter extends SecuredPresenter
     {
         try {
             $this->articleManager->getById($id);
-        } catch (\Exception $e) {
+        } catch (ArticleException $e) {
             $this->flashMessage("Článek ID: $id nebyl nalezen.", 'danger');
             $this->redirect('Article:');
         }

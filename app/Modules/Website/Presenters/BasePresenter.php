@@ -7,6 +7,7 @@ namespace App\Modules\Website\Presenters;
 use App\Components\IAdminButtonFactory;
 use App\Components\IMenuFactory;
 use App\Components\IPaginationFactory;
+use App\Models\CategoryManager;
 use App\Models\ConfigManager;
 use App\Models\Helpers\AssetsVersion;
 use App\Models\Helpers\IPValidator;
@@ -114,6 +115,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
         // Default parameters
         $this->template->setParameters($this->defaultParams);
+        $this->template->activeCategory = CategoryManager::MAIN_CATEGORY_ID;
     }
 
     public function afterRender(): void
@@ -188,7 +190,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     protected function createComponentAdminButton(): \App\Components\AdminButton
     {
         $control = $this->adminBarFactory->create();
-        $control->setAdminUrl($this->adminUrl);
+        $control->setAdminUrl($this->template->adminUrl);
         return $control;
     }
 

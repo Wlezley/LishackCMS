@@ -1,0 +1,14 @@
+{block content}
+<div class="container mt-5">
+    {* {if !$have_custom_h1} *}
+        <h1>{$title}</h1>
+    {* {/if} *}
+
+    <div class="row">
+        {foreach $articleList as $article}
+            <div clas="col-4">
+                <a href="{$categoryUrl}{$article[name_url]}/">{$article['title']}</a>
+            </div>
+        {/foreach}
+    </div>
+</div>

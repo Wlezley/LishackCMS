@@ -36,7 +36,7 @@
     <div n:foreach="$flashes as $flash" n:class="flash, $flash->type">{$flash->message}</div>
 
     <main>
-        {control menu}
+        {control menu, $activeCategory}
 
         {include content}
 

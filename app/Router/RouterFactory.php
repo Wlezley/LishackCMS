@@ -52,7 +52,7 @@ class RouterFactory
             ->addRoute('install/[<action>]', 'Install:default')
             ->addRoute('[[<categoryUrl [0-9a-zA-Z_\-\/]+>/]<articleUrl>/]', [
                 'presenter' => 'Article',
-                'action' => 'detail',
+                'action' => 'default',
                 'categoryUrl' => null,
                 'articleUrl' => null,
             ])

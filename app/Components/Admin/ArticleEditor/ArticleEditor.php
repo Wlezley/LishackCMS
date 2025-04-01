@@ -68,8 +68,8 @@ class ArticleEditor extends BaseControl
 
         // CATEGORY
         $categorySelectOptions = $this->categoryManager->getCategorySelectData();
-        $form->addSelect('category', $this->t('form.article.category'), $categorySelectOptions)
-            ->setValue($this->param['category'] ?? CategoryManager::MAIN_CATEGORY_ID)
+        $form->addSelect('category_id', $this->t('form.article.category'), $categorySelectOptions)
+            ->setValue($this->param['category_id'] ?? CategoryManager::MAIN_CATEGORY_ID)
             ->setRequired();
 
         // COMMON ATTRIBUTES
@@ -161,7 +161,7 @@ class ArticleEditor extends BaseControl
 
         $required = [
             ['name' => 'title', 'label.key' => 'form.article.title'],
-            ['name' => 'category', 'label.key' => 'form.article.category'],
+            ['name' => 'category_id', 'label.key' => 'form.article.category_id'],
             ['name' => 'name_url', 'label.key' => 'form.article.name_url'],
             ['name' => 'published_at', 'label.key' => 'form.article.published_at'],
         ];
@@ -174,14 +174,12 @@ class ArticleEditor extends BaseControl
             }
         }
 
-        $categoryId = (int) $data['category'];
-        unset($data['category']);
-
         if ($this->origin == self::OriginEdit) {
             $articleId = (int) $data['id'];
+            $data['name_url'] = $this->articleManager->generateUniqueNameUrl($data['name_url'], $articleId);
 
             try {
-                $this->articleManager->update($articleId, $data, $categoryId);
+                $this->articleManager->update($articleId, $data);
                 call_user_func($this->onSuccess, $this->t('success.form.article-saved'), $articleId);
             } catch (ArticleException $e) {
                 call_user_func($this->onError, $e->getMessage());
@@ -189,9 +187,10 @@ class ArticleEditor extends BaseControl
         } else {
             unset($data['id']);
             $data['user_id'] = $this->presenter->getUser()->getId();
+            $data['name_url'] = $this->articleManager->generateUniqueNameUrl($data['name_url']);
 
             try {
-                $newArticleId = $this->articleManager->create($data, $categoryId);
+                $newArticleId = $this->articleManager->create($data);
                 call_user_func($this->onSuccess, $this->t('success.form.article-created'), $newArticleId);
             } catch (ArticleException $e) {
                 call_user_func($this->onError, $e->getMessage());

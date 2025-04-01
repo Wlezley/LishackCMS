@@ -60,8 +60,8 @@ class CategoryManager extends BaseModel
         $this->db->table(self::TABLE_NAME)
             ->insert($data);
 
-        $this->updateChildLevels();
         $this->invalidate();
+        $this->updateChildLevels();
     }
 
     /** @param array<string,string|int|null> $data */
@@ -79,13 +79,13 @@ class CategoryManager extends BaseModel
             ->where(['id' => $id])
             ->update($data);
 
-        $this->updateChildLevels();
         $this->invalidate();
+        $this->updateChildLevels();
     }
 
     public function delete(int $id): void
     {
-        if ($id == 1) {
+        if ($id == self::MAIN_CATEGORY_ID) {
             throw new CategoryException('MAIN_CATEGORY cannot be removed.');
         }
 
@@ -104,6 +104,7 @@ class CategoryManager extends BaseModel
             ->update(['parent_id' => $parentID]);
 
         $this->invalidate();
+        $this->updateChildLevels();
     }
 
     /** @return array<int,array<string,string|int|null>> */
@@ -130,6 +131,91 @@ class CategoryManager extends BaseModel
         }
 
         return $tree;
+    }
+
+    /** @return array<int> */
+    public function getActiveList(int $activeCategory): array
+    {
+        $this->load();
+
+        $activeList = [];
+
+        $limit = $this->categories[$activeCategory]['level'];
+        $parent_id = $this->categories[$activeCategory]['id'];
+        $activeList[] = (int) $parent_id;
+
+        for ($level = 1; $level < $limit; $level++) {
+            if (!isset($this->categories[$parent_id])) {
+                throw new CategoryException("Category ID $parent_id not found.", 1);
+            }
+
+            $parent_id = $this->categories[$parent_id]['parent_id'];
+            $activeList[] = (int) $parent_id;
+        }
+
+        return $activeList;
+    }
+
+    /** @param array<string> $categoryUrlList */
+    public function resolveCategoryId(array $categoryUrlList): int
+    {
+        $this->load();
+
+        $categoryId = self::MAIN_CATEGORY_ID;
+
+        foreach ($categoryUrlList as $nameUrl) {
+            $found = false;
+
+            foreach ($this->categories as $category) {
+                if ($category['name_url'] == $nameUrl && $category['parent_id'] == $categoryId) {
+                    $found = true;
+                    $categoryId = $category['id'];
+                    break;
+                }
+            }
+
+            if (!$found) {
+                throw new CategoryException(
+                    "Unable to find category ID for name_url: '$nameUrl' with parent_id: '$categoryId'.",
+                    \Nette\Http\IResponse::S404_NotFound
+                );
+            }
+        }
+
+        return $categoryId;
+    }
+
+    /** @return array<string> */
+    public function normalizeCategoryUrl(string $categoryUrl): array
+    {
+        $categoryUrlListRaw = explode('/', $categoryUrl);
+        $categoryUrlList = array_values(array_filter($categoryUrlListRaw));
+
+        if (!empty($categoryUrl) && count($categoryUrlListRaw) !== count($categoryUrlList)) {
+            throw new CategoryException('Broken Category URL', \Nette\Http\IResponse::S404_NotFound);
+        }
+
+        return $categoryUrlList;
+    }
+
+    public function generateUrl(int $id): string
+    {
+        $this->load();
+
+        $limit = $this->categories[$id]['level'];
+        $parent_id = $this->categories[$id]['id'];
+        $name_url = $this->categories[$id]['name_url'];
+
+        for ($level = 1; $level < $limit; $level++) {
+            if (!isset($this->categories[$parent_id])) {
+                throw new CategoryException("Category ID $parent_id not found.", 1);
+            }
+
+            $parent_id = $this->categories[$parent_id]['parent_id'];
+            $name_url = $this->categories[$parent_id]['name_url'] . '/' . $name_url;
+        }
+
+        return $name_url . '/';
     }
 
     /** @return list<array> */
@@ -203,17 +289,23 @@ class CategoryManager extends BaseModel
      */
     public function updateChildLevels(int $parentId = self::MAIN_CATEGORY_ID, int $parentLevel = 0): void
     {
-        $children = $this->db->table(self::TABLE_NAME)
-            ->where('parent_id', $parentId)
-            ->fetchPairs('id', 'level');
+        $this->load();
 
-        foreach ($children as $childId => $_) {
+        $childs = [];
+        foreach ($this->categories as $id => $category) {
+            if ($category['parent_id'] == $parentId) {
+                $childs[$id] = $category;
+            }
+        }
+
+        foreach ($childs as $childId => $childCategory) {
             $newLevel = $parentLevel + 1;
 
-            $this->db->table(self::TABLE_NAME)
-                ->where('id', $childId)
-                ->update(['level' => $newLevel]);
-
+            if ($childCategory['level'] != $newLevel) {
+                $this->db->table(self::TABLE_NAME)
+                    ->where('id', $childId)
+                    ->update(['level' => $newLevel]);
+            }
             $this->updateChildLevels($childId, $newLevel);
         }
     }
@@ -248,9 +340,6 @@ class CategoryManager extends BaseModel
                 $options += $this->buildCategorySelectData($item['items'], $level + 1);
             }
         }
-
-        bdump($items);
-        bdump($options);
 
         return $options;
     }

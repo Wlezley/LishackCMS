@@ -12,9 +12,13 @@ class Menu extends BaseControl
         protected CategoryManager $categoryManager
     ) {}
 
-    public function render(string $template = "Menu"): void
+    public function render(?int $activeCategory = null, string $template = "Menu"): void
     {
-        // $this->template->menu = $this->categoryManager->getTree()[0]['items'];
+        $activeCategory = $activeCategory ?? CategoryManager::MAIN_CATEGORY_ID;
+
+        $this->template->activeCategory = $activeCategory;
+        $this->template->activeList = $this->categoryManager->getActiveList($activeCategory);
+        $this->template->menuItems = $this->categoryManager->getTree()[0]['items'];
 
         $this->template->setFile(__DIR__ . '/' . $template . '.latte');
         $this->template->render();
