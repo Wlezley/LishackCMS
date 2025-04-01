@@ -10,12 +10,12 @@
     <meta name="author" content="Ladislav Alexa, www.lishack.cz">
     <meta property="og:title" content="{$og_title}">
     <meta property="og:description" content="{$og_description}">
-    <meta property="og:image" content="{$og_image}">
-    <meta property="og:url" content="{$currentUrl}">
+    <meta property="og:image" content="{$og_image|noescape}">
+    <meta property="og:url" content="{$currentUrl|noescape}">
     <meta property="og:type" content="website">
-    <meta property="og:locale" content="{$og_locale}" n:if="!empty($og_locale)" />
+    <meta property="og:locale" content="{$og_locale}" n:if="$og_show_locale" />
     <link rel="shortcut icon" type="image/x-icon" href="{$baseUrl}/favicon.ico">
-    <link rel="canonical" href="{$seo_canonical}">
+    <link rel="canonical" href="{$seo_canonical|noescape}">
     <link rel="stylesheet" href="{$baseUrl}/assets/website/dist/styles-main.css?v{$css_version}">
     <style n:if="$cssInject">{$cssInject|noescape|spaceless}</style>
 

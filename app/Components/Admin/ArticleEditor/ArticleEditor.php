@@ -132,7 +132,6 @@ class ArticleEditor extends BaseControl
         $form->addTextArea('content', $this->t('form.article.content'))
             ->setValue($this->param['content'] ?? '');
 
-
         $saveBtnName = ($this->origin == self::OriginCreate)
             ? $this->t('form.article.create')
             : $this->t('form.article.save');

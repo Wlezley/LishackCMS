@@ -1,76 +1,93 @@
+<style>
+    .tox-tinymce {
+        border-radius: var(--bs-border-radius) !important;
+    }
+</style>
+
 {form form}
     <div class="row">
         <div class="col-12 mx-auto">
-            <div class="mb-3">
-                {label title, class => 'form-label required' /}
-                {input title, class => 'form-control form-control-lg'}
-            </div>
-
-            <div class="mb-3">
-                <select n:name="category" class="form-select"></select>
-            </div>
-
             <div class="row mb-3">
-                <div class="col-4">
-                    <div class="mb-3">
-                        {label name_url, class => 'form-label required' /}
-                        {input name_url, class => 'form-control form-control-sm'}
-                    </div>
-                    <div class="mb-3">
-                        {label user_name, class => 'form-label' /}
-                        {input user_name, class => 'form-control form-control-sm'}
-                    </div>
-                    <div class="mb-3">
-                        {label published_at, class => 'form-label required' /}
-                        {input published_at, class => 'form-control form-control-sm'}
-                    </div>
-                    <div class="mb-3">
-                        {label updated_at, class => 'form-label' /}
-                        {input updated_at, class => 'form-control form-control-sm'}
-                    </div>
-                    <div class="mb-3">
-                        <div class="form-check form-switch mt-4">
-                            <input n:name="published" class="form-check-input" type="checkbox">
-                            <label n:name="published" class="form-check-label">{$_('form.article.published')}</label>
+                <div class="col-8">
+                    <div class="row pe-3">
+                        <div class="col-12 mb-3">
+                            {label title, class => 'form-label required' /}
+                            {input title, class => 'form-control form-control-lg'}
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label n:name="category" class="form-label required">{$_('form.article.category')}</label>
+                            <select n:name="category" class="form-select"></select>
+                        </div>
+                        <div class="col-6 mb-3">
+                            {label name_url, class => 'form-label required' /}
+                            {input name_url, class => 'form-control form-control'}
+                        </div>
+                        <div class="col-6 mb-3">
+                            {label user_name, class => 'form-label' /}
+                            {input user_name, class => 'form-control form-control'}
+                        </div>
+                        <div class="col-3 mb-3">
+                            {label published_at, class => 'form-label required' /}
+                            {input published_at, class => 'form-control form-control'}
+                        </div>
+                        <div class="col-3 mb-3">
+                            {label updated_at, class => 'form-label' /}
+                            {input updated_at, class => 'form-control form-control'}
+                        </div>
+                        <div class="col border rounded mx-3">
+                            <div class="form-check form-switch my-3">
+                                <input n:name="published" class="form-check-input" type="checkbox">
+                                <label n:name="published" class="form-check-label">{$_('form.article.published')}</label>
+                            </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="col-4">
-                    <div class="mb-3">
-                        {label robots, class => 'form-label' /}
-                        {input robots, class => 'form-control form-control-sm'}
-                    </div>
-                    <div class="mb-3">
-                        {label canonical_url, class => 'form-label' /}
-                        {input canonical_url, class => 'form-control form-control-sm'}
-                    </div>
-                    <div class="mb-3">
-                        {label meta_title, class => 'form-label' /}
-                        {input meta_title, class => 'form-control form-control-sm'}
-                    </div>
-                    <div class="mb-3">
-                        {label meta_description, class => 'form-label' /}
-                        {input meta_description, class => 'form-control form-control-sm'}
-                    </div>
-                </div>
-
-                <div class="col-4">
-                    <div class="mb-3">
-                        {label og_title, class => 'form-label' /}
-                        {input og_title, class => 'form-control form-control-sm'}
-                    </div>
-                    <div class="mb-3">
-                        {label og_description, class => 'form-label' /}
-                        {input og_description, class => 'form-control form-control-sm'}
-                    </div>
-                    <div class="mb-3">
-                        {label og_image, class => 'form-label' /}
-                        {input og_image, class => 'form-control form-control-sm'}
-                    </div>
-                    <div class="mb-3">
-                        {label og_type, class => 'form-label' /}
-                        {input og_type, class => 'form-control form-control-sm'}
+                <div class="bg-dark col-4 row rounded pt-3">
+                    <ul class="nav nav-underline px-2 mb-3">
+                        <li class="nav-item">
+                            <a href="#list2" id="list2-tab" data-bs-toggle="tab" data-bs-target="#list2" role="tab" aria-controls="list2" aria-selected="true" class="nav-link text-warning active">SEO</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#list3" id="list3-tab" data-bs-toggle="tab" data-bs-target="#list3" role="tab" aria-controls="list3" aria-selected="false" class="nav-link text-warning">Open Graph</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content form-block">
+                        <div id="list2" role="tabpanel" aria-labelledby="list2-tab" class="tab-pane active">
+                            <div class="mb-3">
+                                {label robots, class => 'form-label' /}
+                                {input robots, class => 'form-control form-control-sm'}
+                            </div>
+                            <div class="mb-3">
+                                {label canonical_url, class => 'form-label' /}
+                                {input canonical_url, class => 'form-control form-control-sm'}
+                            </div>
+                            <div class="mb-3">
+                                {label meta_title, class => 'form-label' /}
+                                {input meta_title, class => 'form-control form-control-sm'}
+                            </div>
+                            <div class="mb-3">
+                                {label meta_description, class => 'form-label' /}
+                                {input meta_description, class => 'form-control form-control-sm'}
+                            </div>
+                        </div>
+                        <div id="list3" role="tabpanel" aria-labelledby="list3-tab" class="tab-pane">
+                            <div class="mb-3">
+                                {label og_title, class => 'form-label' /}
+                                {input og_title, class => 'form-control form-control-sm'}
+                            </div>
+                            <div class="mb-3">
+                                {label og_description, class => 'form-label' /}
+                                {input og_description, class => 'form-control form-control-sm'}
+                            </div>
+                            <div class="mb-3">
+                                {label og_image, class => 'form-label' /}
+                                {input og_image, class => 'form-control form-control-sm'}
+                            </div>
+                            <div class="mb-3">
+                                {label og_type, class => 'form-label' /}
+                                {input og_type, class => 'form-control form-control-sm'}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

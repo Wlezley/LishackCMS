@@ -53,10 +53,17 @@ class UserListGrid extends BaseControl
             ]));
         }
 
+        $paginationIntemLimit = (int) $this->c('PAGINATION_PAGE_ITEMS');
+        $paginationIntemLimitList = [
+            $paginationIntemLimit,
+            $paginationIntemLimit * 2,
+            $paginationIntemLimit * 3
+        ];
+
         // Datagrid settings
         $grid->setDefaultSort(['id' => 'ASC']);
-        $grid->setDefaultPerPage(25);
-        $grid->setItemsPerPageList([25, 50, 100], true);
+        $grid->setDefaultPerPage($paginationIntemLimit);
+        $grid->setItemsPerPageList($paginationIntemLimitList, true);
         $grid->allowRowsInlineEdit(function() { return false; });
 
         // ID

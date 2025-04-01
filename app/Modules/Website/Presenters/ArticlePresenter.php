@@ -13,16 +13,17 @@ final class ArticlePresenter extends BasePresenter
     /** @var ArticleManager @inject */
     public ArticleManager $articleManager;
 
-    /** @todo Translate error messages */
-    public function renderDetail(string $articleUrl = '', string $categoryUrl = ''): void
+    /** @var array<string,mixed> $article */
+    private array $article;
+
+    public function actionDetail(string $articleUrl = '', string $categoryUrl = ''): void
     {
         try {
             $categoryUrlList = $this->articleManager->normalizeCategoryUrl($categoryUrl);
         } catch (ArticleException $e) {
-            $this->redirect('this', [
-                'articleUrl' => $articleUrl,
-                'categoryUrl' => $e->getCategoryUrl(),
-            ]);
+            $this->article = $this->articleManager->getByNameUrl('404');
+            $this->getHttpResponse()->setCode(Nette\Http\IResponse::S404_NotFound);
+            return;
         }
 
         if (empty($categoryUrlList)) {
@@ -31,7 +32,9 @@ final class ArticlePresenter extends BasePresenter
             }
 
             if ($articleUrl == '404') {
+                $this->article = $this->articleManager->getByNameUrl('404');
                 $this->getHttpResponse()->setCode(Nette\Http\IResponse::S404_NotFound);
+                return;
             }
         }
 
@@ -40,33 +43,53 @@ final class ArticlePresenter extends BasePresenter
         try {
             $categoryId = $this->articleManager->resolveCategoryId($categoryUrlList);
             $articleId = $this->articleManager->getIdByUrlAndCategory($articleUrl, $categoryId);
-            $article = $this->articleManager->getById($articleId);
+            $this->article = $this->articleManager->getById($articleId);
         } catch (ArticleException $e) {
-            $this->error($e->getMessage(), $e->getCode());
+            if ($e->getCode() == Nette\Http\IResponse::S404_NotFound) {
+                $this->article = $this->articleManager->getByNameUrl('404');
+                $this->getHttpResponse()->setCode(Nette\Http\IResponse::S404_NotFound);
+            } else {
+                $this->error($e->getMessage(), $e->getCode());
+            }
             return;
         }
+    }
 
-        if ($article['published'] != 1) {
-            $this->error('Článek nebyl publikován.', Nette\Http\IResponse::S404_NotFound);
+    public function renderDetail(): void
+    {
+        $titleSuffix = '';
+        if ($this->article['published'] != 1) {
+            if ($this->user->isLoggedIn() && $this->getHttpRequest()->getQuery('preview') == 1) {
+                $titleSuffix .= ' ' . $this->t('article.title.preview');
+            } else {
+                $this->article = $this->articleManager->getByNameUrl('404');
+                $this->getHttpResponse()->setCode(Nette\Http\IResponse::S404_NotFound);
+            }
         }
 
+        // PAGE TITLE
+        $this->template->title = $this->article['title'] . $titleSuffix;
+
         // ARTICLE ATTRIBUTES
-        $this->template->title = $article['title'];
-        $this->template->robots = $article['robots'];
-        $this->template->canonical_url = $article['canonical_url'];
-        $this->template->og_title = $article['og_title'];
-        $this->template->og_description = $article['og_description'];
-        $this->template->og_image = $article['og_image'];
-        $this->template->og_url = $article['og_url'];
-        $this->template->og_type = $article['og_type'];
-        $this->template->meta_title = $article['meta_title'];
-        $this->template->meta_description = $article['meta_description'];
+        $urlScript = $this->getHttpRequest()->getUrl();
+        $this->template->seo_index = $this->article['robots'] ?: $this->c('SEO_ROBOTS');
+        $this->template->seo_canonical = $this->article['canonical_url'] ?: $urlScript->getHostUrl() . $urlScript->getPath();
+        $this->template->seo_title = $this->article['meta_title'] ?: $this->article['title'];
+        $this->template->seo_description = $this->article['meta_description'] ?: $this->c('SEO_DESCRIPTION');
+
+        // OPEN GRAPH PROTOCOL
+        $this->template->og_title = $this->article['og_title'] ?: $this->template->seo_title;
+        $this->template->og_description = $this->article['og_description'] ?: $this->template->seo_description;
+        $this->template->og_image = $this->article['og_image'] ?: $this->c('OG_IMAGE');
+        $this->template->og_url = $this->article['og_url'] ?: $this->template->seo_canonical;
+        $this->template->og_type = $this->article['og_type'] ?: 'website';
 
         // ARTICLE CONTENT
-        $this->template->article[] = $article['content'];
-        $this->template->have_custom_h1 = (strpos(strtolower($article['content']), '<h1') !== false);
+        $this->template->article[] = $this->article['content'];
+        $this->template->have_custom_h1 = (strpos(strtolower($this->article['content']), '<h1') !== false);
 
         // DEBUG ONLY
         // bdump($article, "ARTICLE DATA");
+        // bdump($urlScript, "URL SCRIPT");
     }
 }

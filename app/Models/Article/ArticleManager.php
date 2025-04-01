@@ -162,9 +162,7 @@ class ArticleManager extends BaseModel
         $categoryUrlList = array_values(array_filter($categoryUrlListRaw));
 
         if (!empty($categoryUrl) && count($categoryUrlListRaw) !== count($categoryUrlList)) {
-            $e = new ArticleException('Broken Category URL', \Nette\Http\IResponse::S301_MovedPermanently);
-            $e->setCategoryUrl(implode('/', $categoryUrlList));
-            throw $e;
+            throw new ArticleException('Broken Category URL', \Nette\Http\IResponse::S404_NotFound);
         }
 
         return $categoryUrlList;

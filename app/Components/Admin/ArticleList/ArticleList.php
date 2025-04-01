@@ -48,7 +48,7 @@ class ArticleList extends BaseControl
     {
         $this->presenter->redirect('Article:edit', [
             'id' => $id,
-            'page' => $this->getPresenter()->getParameter('page', 1)
+            'page' => $this->getPresenter()->getParameter('page')
         ]);
     }
 

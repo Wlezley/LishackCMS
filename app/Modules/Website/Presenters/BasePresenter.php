@@ -53,18 +53,9 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     protected string $currentUrl;
     protected string $adminUrl;
     protected string $lang;
-    protected string $htmlLang;
-    protected string $page;
-    protected string $title;
-    protected string $seo_index;
-    protected string $seo_title;
-    protected string $seo_description;
-    protected string $seo_canonical;
-    protected string $og_title;
-    protected string $og_description;
-    protected string $og_image;
-    protected string $og_locale;
-    protected bool $og_show_locale;
+
+    /** @var array<string,mixed> $defaultParams */
+    protected array $defaultParams = [];
 
 
     public function startup(): void
@@ -81,32 +72,33 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $redirectCode = 0;
         $redirectUrl = $this->redirectManager->get($this->currentUrl, $redirectCode);
         if ($redirectUrl) {
-            $this->redirectUrl($redirectUrl, $redirectCode ?? 302);
+            $this->redirectUrl($redirectUrl, $redirectCode ?? Nette\Http\IResponse::S302_Found);
         }
 
-        // Page settings
+        // Language
         $this->lang = $this->c('DEFAULT_LANG'); // TODO: Get language from URL or session
-        $this->htmlLang = $this->translationManager->getLanguageService()->getLanguage($this->lang)['html_lang'] ?? $this->lang;
-        $this->page = $this->c('DEFAULT_PAGE');
-        $this->title = $this->c('SITE_TITLE'); // TODO: Use SEO_TITLE instead?
-
-        // Translations language
         $this->translationManager->setCurrentLanguage($this->lang);
 
-        // SEO (TODO: Read overloads from atricles)
-        $this->seo_index = DEBUG ? 'noindex, nofollow' : $this->c('SEO_INDEX');
-        $this->seo_title = $this->c('SEO_TITLE');
-        $this->seo_description = $this->c('SEO_DESCRIPTION');
-        $this->seo_canonical = $this->currentUrl;
-
-        // Open Graph data (TODO: Read overloads from atricles)
-        $this->og_title = $this->c('OG_TITLE');
-        $this->og_description = $this->c('OG_DESCRIPTION');
-        $this->og_image = $this->c('OG_IMAGE');
-        $this->og_show_locale = $this->c('OG_SHOW_LOCALE') == 1;
-        if ($this->og_show_locale) {
-            $this->og_locale = $this->translationManager->getLanguageService()->getLanguage($this->lang)['locale'] ?? $this->c('DEFAULT_LOCALE');
-        }
+        // Default parameters
+        $this->defaultParams = [
+            'lang' => $this->lang, // TODO: Get language from URL or session
+            'HTML_LANG' => $this->translationManager->getLanguageService()->getLanguage($this->lang)['html_lang'] ?? $this->lang,
+            'DEFAULT_LANG' => $this->c('DEFAULT_LANG'),
+            'page' => $this->c('DEFAULT_PAGE'),
+            'title' => $this->c('SITE_TITLE'), // TODO: Use SEO_TITLE instead?
+            // 'baseUrl' => $this->baseUrl,
+            'currentUrl' => $this->currentUrl,
+            'adminUrl' => $this->adminUrl,
+            'seo_index' => DEBUG ? 'noindex, nofollow' : $this->c('SEO_INDEX'),
+            'seo_title' => $this->c('SEO_TITLE'),
+            'seo_description' => $this->c('SEO_DESCRIPTION'),
+            'seo_canonical' => $this->url->getHostUrl() . $this->url->getPath(),
+            'og_title' => $this->c('OG_TITLE'),
+            'og_description' => $this->c('OG_DESCRIPTION'),
+            'og_image' => $this->c('OG_IMAGE'),
+            'og_show_locale' => ($this->c('OG_SHOW_LOCALE') == 1),
+            'og_locale' => $this->translationManager->getLanguageService()->getLanguage($this->lang)['locale'] ?? $this->c('DEFAULT_LOCALE'),
+        ];
     }
 
     public function beforeRender(): void
@@ -120,28 +112,8 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $this->template->_ = fn($key) => $this->translationManager->get($key, $this->lang);
         $this->template->_F = fn($key, $values) => $this->translationManager->getf($key, $this->lang, $values);
 
-        // URL
-        $this->template->url = $this->url;
-        $this->template->currentUrl = $this->currentUrl;
-
-        // Page settings
-        $this->template->lang = $this->lang;
-        $this->template->HTML_LANG = $this->htmlLang;
-        $this->template->DEFAULT_LANG = $this->c('DEFAULT_LANG');
-        $this->template->page = $this->page;
-        $this->template->title = $this->title;
-
-        // SEO
-        $this->template->seo_index = $this->seo_index;
-        $this->template->seo_title = $this->seo_title;
-        $this->template->seo_description = $this->seo_description;
-        $this->template->seo_canonical = $this->seo_canonical;
-
-        // Social networks (Open Graph data)
-        $this->template->og_title = $this->og_title;
-        $this->template->og_description = $this->og_description;
-        $this->template->og_image = $this->og_image;
-        $this->template->og_locale = $this->og_show_locale ? $this->og_locale : '';
+        // Default parameters
+        $this->template->setParameters($this->defaultParams);
     }
 
     public function afterRender(): void

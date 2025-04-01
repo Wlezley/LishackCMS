@@ -48,12 +48,15 @@ class ArticlePresenter extends SecuredPresenter
         try {
             $this->template->article = $this->articleManager->getById($id);
         } catch (ArticleException $e) {
-            $this->flashMessage("Článek $id nebyl nalezen.", 'danger');
+            $this->flashMessage($this->tf('article.id.not-found', $id), 'danger');
             $this->redirect('Article:');
         }
 
         try {
             $this->template->articleURL = $this->articleManager->generateUrl($id);
+            if ($this->template->article['published'] != 1) {
+                $this->template->articleURL .= '?preview=1';
+            }
         } catch (ArticleException $e) {
             $this->template->notInCategoryError = $e->getMessage();
         }
