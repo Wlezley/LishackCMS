@@ -10,7 +10,7 @@ use Nette\Database\Explorer;
 
 class ArticleManager extends BaseModel
 {
-    public const TABLE_NAME_ARTICLE = 'article';
+    public const TABLE_NAME = 'article';
 
     public function __construct(
         protected Explorer $db,
@@ -24,7 +24,7 @@ class ArticleManager extends BaseModel
     /** @return array<string,mixed> */
     public function getById(int $id): array
     {
-        $article = $this->db->table(self::TABLE_NAME_ARTICLE)
+        $article = $this->db->table(self::TABLE_NAME)
             ->where('id', $id)
             ->fetch();
 
@@ -41,7 +41,7 @@ class ArticleManager extends BaseModel
     /** @return array<string,mixed> */
     public function getByNameUrl(string $name_url): array
     {
-        $article = $this->db->table(self::TABLE_NAME_ARTICLE)
+        $article = $this->db->table(self::TABLE_NAME)
             ->where('name_url', $name_url)
             ->fetch();
 
@@ -57,7 +57,7 @@ class ArticleManager extends BaseModel
 
     public function getIdByUrlAndCategory(string $nameUrl, int $categoryId): int
     {
-        $article = $this->db->table(self::TABLE_NAME_ARTICLE)
+        $article = $this->db->table(self::TABLE_NAME)
             ->select('id')
             ->where('name_url', $nameUrl)
             ->where('category_id', $categoryId)
@@ -75,7 +75,7 @@ class ArticleManager extends BaseModel
 
     public function getCategoryIdById(int $id): int
     {
-        $categoryId = $this->db->table(self::TABLE_NAME_ARTICLE)
+        $categoryId = $this->db->table(self::TABLE_NAME)
             ->select('category_id')
             ->where('id', $id)
             ->fetch();
@@ -92,7 +92,7 @@ class ArticleManager extends BaseModel
 
     public function generateUrl(int $id): string
     {
-        $article = $this->db->table(self::TABLE_NAME_ARTICLE)
+        $article = $this->db->table(self::TABLE_NAME)
             ->select('name_url, category_id')
             ->where('id', $id)
             ->fetch();
@@ -146,7 +146,7 @@ class ArticleManager extends BaseModel
     {
         $newNameUrl = $counter > 0 ? "{$baseNameUrl}-{$counter}" : $baseNameUrl;
 
-        $query = $this->db->table(self::TABLE_NAME_ARTICLE)
+        $query = $this->db->table(self::TABLE_NAME)
             ->where('name_url', $newNameUrl);
 
         if ($ignoreId !== null) {
@@ -171,7 +171,7 @@ class ArticleManager extends BaseModel
      */
     public function create(array $data): int
     {
-        $newArticle = $this->db->table(self::TABLE_NAME_ARTICLE)
+        $newArticle = $this->db->table(self::TABLE_NAME)
             ->insert($data);
 
         if (!$newArticle) {
@@ -189,14 +189,14 @@ class ArticleManager extends BaseModel
      */
     public function update(int $id, array $data): void
     {
-        $this->db->table(self::TABLE_NAME_ARTICLE)
+        $this->db->table(self::TABLE_NAME)
             ->where('id', $id)
             ->update($data);
     }
 
     public function delete(int $id): void
     {
-        $this->db->table(self::TABLE_NAME_ARTICLE)
+        $this->db->table(self::TABLE_NAME)
             ->where('id', $id)
             ->delete();
     }
@@ -216,7 +216,7 @@ class ArticleManager extends BaseModel
      */
     public function getList(int $limit = 50, int $offset = 0, ?string $search = null, ?int $categoryId = null): ?array
     {
-        $query = $this->db->table(self::TABLE_NAME_ARTICLE)
+        $query = $this->db->table(self::TABLE_NAME)
             ->limit($limit, $offset)
             ->order('id ASC');
 
@@ -241,7 +241,7 @@ class ArticleManager extends BaseModel
      */
     public function getCount(?string $search = null): int
     {
-        $query = $this->db->table(self::TABLE_NAME_ARTICLE);
+        $query = $this->db->table(self::TABLE_NAME);
 
         if ($search !== null) {
             $query->where('title LIKE ? OR content LIKE ?', "%$search%", "%$search%");
