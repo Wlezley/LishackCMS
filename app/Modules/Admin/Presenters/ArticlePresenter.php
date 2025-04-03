@@ -9,6 +9,7 @@ use App\Components\Admin\IArticleListFactory;
 use App\Models\ArticleException;
 use App\Models\ArticleManager;
 use App\Models\CategoryManager;
+use App\Models\UrlGenerator;
 use App\Models\UserManager;
 
 class ArticlePresenter extends SecuredPresenter
@@ -18,6 +19,9 @@ class ArticlePresenter extends SecuredPresenter
 
     /** @var CategoryManager @inject */
     public CategoryManager $categoryManager;
+
+    /** @var UrlGenerator @inject */
+    public UrlGenerator $urlGenerator;
 
     /** @var UserManager @inject */
     public UserManager $userManager;
@@ -53,7 +57,7 @@ class ArticlePresenter extends SecuredPresenter
         }
 
         try {
-            $this->template->articleURL = HOME_URL . $this->articleManager->generateUrl($id);
+            $this->template->articleURL = HOME_URL . $this->urlGenerator->generateArticleUrl($id);
             if ($this->template->article['published'] != 1) {
                 $this->template->articleURL .= '?preview=1';
             }
@@ -110,6 +114,7 @@ class ArticlePresenter extends SecuredPresenter
 
         $form->setArticleManager($this->articleManager);
         $form->setCategoryManager($this->categoryManager);
+        $form->setUrlGenerator($this->urlGenerator);
         $form->setUserManager($this->userManager);
 
         if ($id) {

@@ -185,39 +185,6 @@ class CategoryManager extends BaseModel
         return $categoryId;
     }
 
-    /** @return array<string> */
-    public function normalizeCategoryUrl(string $categoryUrl): array
-    {
-        $categoryUrlListRaw = explode('/', $categoryUrl);
-        $categoryUrlList = array_values(array_filter($categoryUrlListRaw));
-
-        if (!empty($categoryUrl) && count($categoryUrlListRaw) !== count($categoryUrlList)) {
-            throw new CategoryException('Broken Category URL', \Nette\Http\IResponse::S404_NotFound);
-        }
-
-        return $categoryUrlList;
-    }
-
-    public function generateUrl(int $id): string
-    {
-        $this->load();
-
-        $limit = $this->categories[$id]['level'];
-        $parent_id = $this->categories[$id]['id'];
-        $name_url = $this->categories[$id]['name_url'];
-
-        for ($level = 1; $level < $limit; $level++) {
-            if (!isset($this->categories[$parent_id])) {
-                throw new CategoryException("Category ID $parent_id not found.", 1);
-            }
-
-            $parent_id = $this->categories[$parent_id]['parent_id'];
-            $name_url = $this->categories[$parent_id]['name_url'] . '/' . $name_url;
-        }
-
-        return $name_url . '/';
-    }
-
     /** @return list<array> */
     public function getSortableTree(): array
     {

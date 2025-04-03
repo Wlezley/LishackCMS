@@ -8,6 +8,7 @@ use App\Models\ArticleException;
 use App\Models\ArticleManager;
 use App\Models\CategoryException;
 use App\Models\CategoryManager;
+use App\Models\UrlGenerator;
 use Nette;
 
 final class ArticlePresenter extends BasePresenter
@@ -17,6 +18,9 @@ final class ArticlePresenter extends BasePresenter
 
     /** @var CategoryManager @inject */
     public CategoryManager $categoryManager;
+
+    /** @var UrlGenerator @inject */
+    public UrlGenerator $urlGenerator;
 
     /** @var array<string,mixed> $article */
     private array $article;
@@ -30,7 +34,7 @@ final class ArticlePresenter extends BasePresenter
     public function actionDefault(string $articleUrl = '', string $categoryUrl = ''): void
     {
         try {
-            $categoryUrlList = $this->categoryManager->normalizeCategoryUrl($categoryUrl);
+            $categoryUrlList = $this->urlGenerator->normalizeCategoryUrl($categoryUrl);
         } catch (CategoryException $e) {
             $this->article = $this->articleManager->getByNameUrl('404');
             $this->getHttpResponse()->setCode(Nette\Http\IResponse::S404_NotFound);
@@ -82,7 +86,7 @@ final class ArticlePresenter extends BasePresenter
             $category = $this->categoryManager->getById($this->activeCategory);
             $this->template->title = $this->titlePrefix . $category['name'] . $this->titleSuffix;
 
-            $this->template->categoryUrl = HOME_URL . $this->categoryManager->generateUrl($this->activeCategory);
+            $this->template->categoryUrl = HOME_URL . $this->urlGenerator->generateCategoryUrl($this->activeCategory);
             $this->template->articleList = $this->articleManager->getList(50, 0, null, $this->activeCategory);
             $this->template->activeCategory = $this->activeCategory;
 

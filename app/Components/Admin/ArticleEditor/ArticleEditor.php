@@ -9,6 +9,7 @@ use App\Models\ArticleException;
 use App\Models\ArticleManager;
 use App\Models\CategoryManager;
 use App\Models\Helpers\StringHelper;
+use App\Models\UrlGenerator;
 use App\Models\UserException;
 use App\Models\UserManager;
 use Nette\Application\UI\Form;
@@ -19,16 +20,16 @@ class ArticleEditor extends BaseControl
     public const OriginCreate = 'Create';
     public const OriginEdit = 'Edit';
 
-    private string $origin;
-
-    /** @var ArticleManager @inject */
+    /** @var ArticleManager */
     private ArticleManager $articleManager;
 
-    /** @var CategoryManager @inject */
+    /** @var CategoryManager */
     private CategoryManager $categoryManager;
 
-    /** @var UserManager @inject */
+    /** @var UserManager */
     private UserManager $userManager;
+
+    private string $origin;
 
     /** @var callable(string, int): void */
     public $onSuccess;
@@ -176,7 +177,7 @@ class ArticleEditor extends BaseControl
 
         if ($this->origin == self::OriginEdit) {
             $articleId = (int) $data['id'];
-            $data['name_url'] = $this->articleManager->generateUniqueNameUrl($data['name_url'], $articleId);
+            $data['name_url'] = $this->urlGenerator->generateUniqueNameUrl($data['name_url'], $articleId);
 
             try {
                 $this->articleManager->update($articleId, $data);
@@ -187,7 +188,7 @@ class ArticleEditor extends BaseControl
         } else {
             unset($data['id']);
             $data['user_id'] = $this->presenter->getUser()->getId();
-            $data['name_url'] = $this->articleManager->generateUniqueNameUrl($data['name_url']);
+            $data['name_url'] = $this->urlGenerator->generateUniqueNameUrl($data['name_url']);
 
             try {
                 $newArticleId = $this->articleManager->create($data);
@@ -225,6 +226,11 @@ class ArticleEditor extends BaseControl
     public function setCategoryManager(CategoryManager $categoryManager): void
     {
         $this->categoryManager = $categoryManager;
+    }
+
+    public function setUrlGenerator(UrlGenerator $urlGenerator): void
+    {
+        $this->urlGenerator = $urlGenerator;
     }
 
     public function setUserManager(UserManager $userManager): void

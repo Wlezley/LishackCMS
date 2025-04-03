@@ -6,6 +6,7 @@ namespace App\Components;
 
 use App\Models\ConfigManager;
 use App\Models\TranslationManager;
+use App\Models\UrlGenerator;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Template;
 
@@ -14,11 +15,14 @@ class BaseControl extends Control
     use \App\Models\Config;
     use \App\Models\Translation;
 
-    /** @var TranslationManager */
-    protected TranslationManager $translationManager;
+    /** @var ConfigManager @inject */
+    public ConfigManager $configManager;
 
-    /** @var ConfigManager */
-    protected ConfigManager $configManager;
+    /** @var TranslationManager @inject */
+    public TranslationManager $translationManager;
+
+    /** @var UrlGenerator @inject */
+    public UrlGenerator $urlGenerator;
 
     /** @var array<string,string> $cmsConfig */
     protected array $cmsConfig = [];
@@ -49,16 +53,6 @@ class BaseControl extends Control
         return $template;
     }
 
-    public function setTranslationManager(TranslationManager $translationManager): void
-    {
-        $this->translationManager = $translationManager;
-    }
-
-    public function getTranslationManager(): TranslationManager
-    {
-        return $this->translationManager;
-    }
-
     public function setConfigManager(ConfigManager $configManager): void
     {
         $this->configManager = $configManager;
@@ -69,16 +63,14 @@ class BaseControl extends Control
         return $this->configManager;
     }
 
-    /** @param array<string,string> $cmsConfig */
-    public function setCmsConfig(array $cmsConfig): void
+    public function setTranslationManager(TranslationManager $translationManager): void
     {
-        $this->cmsConfig = $cmsConfig;
+        $this->translationManager = $translationManager;
     }
 
-    /** @return array<string,string> */
-    public function getCmsConfig(): array
+    public function getTranslationManager(): TranslationManager
     {
-        return $this->cmsConfig;
+        return $this->translationManager;
     }
 
     /** @param null|array<string,string> $param */
