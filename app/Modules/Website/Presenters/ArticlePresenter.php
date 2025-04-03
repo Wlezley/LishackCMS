@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Modules\Website\Presenters;
 
-use App\Models\ArticleException;
 use App\Models\ArticleManager;
 use App\Models\CategoryException;
 use App\Models\CategoryManager;
