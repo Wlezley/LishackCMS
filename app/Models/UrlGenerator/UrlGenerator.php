@@ -9,7 +9,15 @@ use App\Models\Helpers\StringHelper;
 
 class UrlGenerator extends BaseModel
 {
-    /** @return array<string> */
+    /**
+     * Normalizes a raw category URL string into a clean array of slugs.
+     *
+     * Removes empty parts and validates the structure of the URL.
+     *
+     * @param string $categoryUrl Raw category URL (e.g. "category//sub-category/").
+     * @return array<string> List of cleaned URL segments.
+     * @throws CategoryException If the URL contains redundant slashes or is malformed.
+     */
     public function normalizeCategoryUrl(string $categoryUrl): array
     {
         $categoryUrlListRaw = explode('/', $categoryUrl);
@@ -22,6 +30,16 @@ class UrlGenerator extends BaseModel
         return $categoryUrlList;
     }
 
+    /**
+     * Generates a full category URL path based on its ID.
+     *
+     * Traverses the category tree upward to construct a nested URL
+     * from the root to the specified category.
+     *
+     * @param int $id ID of the category.
+     * @return string Complete category URL (e.g. "parent/sub/child/").
+     * @throws CategoryException If the category or any of its parents cannot be found.
+     */
     public function generateCategoryUrl(int $id): string
     {
         $result = $this->db->table(CategoryManager::TABLE_NAME)
@@ -46,6 +64,15 @@ class UrlGenerator extends BaseModel
         return $name_url . '/';
     }
 
+    /**
+     * Generates a full URL path for an article, including category hierarchy.
+     *
+     * Handles edge cases like articles in the root (main) category and the default page.
+     *
+     * @param int $id ID of the article.
+     * @return string Full article URL (e.g. "category/sub/article/").
+     * @throws ArticleException If the article cannot be found.
+     */
     public function generateArticleUrl(int $id): string
     {
         $article = $this->db->table(ArticleManager::TABLE_NAME)
@@ -78,11 +105,13 @@ class UrlGenerator extends BaseModel
     }
 
     /**
-     * Generates a unique `name_url` for an article by appending a numerical suffix if needed.
+     * Generates a unique slug (`name_url`) for an article.
      *
-     * @param string $nameUrl The proposed `name_url` from the user.
-     * @param int|null $ignoreId If updating an existing article, provide its ID to ignore in the uniqueness check.
-     * @return string Unique `name_url` that does not exist in the database.
+     * If the given slug already exists, appends a numeric suffix to ensure uniqueness.
+     *
+     * @param string $nameUrl User-provided slug suggestion.
+     * @param int|null $ignoreId Optional article ID to exclude from the check (used during updates).
+     * @return string Unique `name_url` suitable for saving.
      */
     public function generateUniqueNameUrl(string $nameUrl, ?int $ignoreId = null): string
     {
@@ -91,12 +120,14 @@ class UrlGenerator extends BaseModel
     }
 
     /**
-     * Recursively finds a unique `name_url` by checking the database and adding a numerical suffix if necessary.
+     * Recursively checks the database for slug conflicts and generates a unique `name_url`.
      *
-     * @param string $baseNameUrl The base `name_url` (without suffix).
-     * @param int $counter The current numerical suffix (0 means no suffix).
-     * @param int|null $ignoreId If updating, this ID is ignored in the uniqueness check.
-     * @return string Unique `name_url`.
+     * Adds incremental suffixes ("-1", "-2", ...) until an unused slug is found.
+     *
+     * @param string $baseNameUrl Base slug to check against.
+     * @param int $counter Numeric suffix to try (0 means no suffix).
+     * @param int|null $ignoreId Optional ID to exclude from conflict check.
+     * @return string Available unique `name_url`.
      */
     private function findUniqueNameUrl(string $baseNameUrl, int $counter, ?int $ignoreId): string
     {

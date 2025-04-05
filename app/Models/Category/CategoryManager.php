@@ -17,6 +17,10 @@ class CategoryManager extends BaseModel
     /** @var array<int,array<string,string|int|null>> $categories */
     protected array $categories = [];
 
+    /**
+     * Loads all categories from the database into internal cache.
+     * Categories are indexed by their ID and ordered by `position`.
+     */
     public function load(): void
     {
         if (empty($this->categories)) {
@@ -28,18 +32,30 @@ class CategoryManager extends BaseModel
         }
     }
 
+    /**
+     * Invalidates the category cache and reloads categories from the database.
+     */
     public function reload(): void
     {
         $this->invalidate();
         $this->load();
     }
 
+    /**
+     * Clears the internal category cache.
+     */
     public function invalidate(): void
     {
         $this->categories = [];
     }
 
-    /** @return array<string,mixed> */
+    /**
+     * Returns a category by its ID from the internal cache.
+     *
+     * @param int $id Category ID.
+     * @return array<string,mixed> Category data.
+     * @throws CategoryException If category is not found.
+     */
     public function getById(int $id): array
     {
         $this->load();
@@ -51,7 +67,12 @@ class CategoryManager extends BaseModel
         return $this->categories[$id];
     }
 
-    /** @param array<string,string|int|null> $data */
+    /**
+     * Creates a new category in the database.
+     *
+     * @param array<string,string|int|null> $data Data to insert (must pass validation).
+     * @throws CategoryException If validation fails or DB insert fails.
+     */
     public function create(array $data): void
     {
         $data = CategoryValidator::prepareData($data);
@@ -64,7 +85,13 @@ class CategoryManager extends BaseModel
         $this->updateChildLevels();
     }
 
-    /** @param array<string,string|int|null> $data */
+    /**
+     * Updates an existing category in the database.
+     *
+     * @param int $id Category ID to update.
+     * @param array<string,string|int|null> $data New data (must pass validation).
+     * @throws CategoryException If the category does not exist or validation fails.
+     */
     public function update(int $id, array $data): void
     {
         $this->load();
@@ -83,6 +110,14 @@ class CategoryManager extends BaseModel
         $this->updateChildLevels();
     }
 
+    /**
+     * Deletes a category and updates related data:
+     * - Moves child categories under the deleted category's parent.
+     * - Moves related articles to the parent category.
+     *
+     * @param int $id Category ID to delete.
+     * @throws CategoryException If MAIN_CATEGORY is being deleted or category doesn't exist.
+     */
     public function delete(int $id): void
     {
         if ($id == self::MAIN_CATEGORY_ID) {
@@ -112,14 +147,22 @@ class CategoryManager extends BaseModel
         $this->updateChildLevels();
     }
 
-    /** @return array<int,array<string,string|int|null>> */
+    /**
+     * Returns all cached categories indexed by ID.
+     *
+     * @return array<int,array<string,string|int|null>> Category data.
+     */
     public function getData(): array
     {
         $this->load();
         return $this->categories;
     }
 
-    /** @return list<array> */
+    /**
+     * Builds and returns a hierarchical tree of categories.
+     *
+     * @return list<array> Nested category tree.
+     */
     public function getTree(): array
     {
         $this->load();
@@ -138,7 +181,13 @@ class CategoryManager extends BaseModel
         return $tree;
     }
 
-    /** @return array<int> */
+    /**
+     * Returns a list of active category IDs from a given category up to the root.
+     *
+     * @param int $activeCategory Category ID to trace.
+     * @return array<int> List of category IDs (from current to top-level).
+     * @throws CategoryException If any parent category is missing.
+     */
     public function getActiveList(int $activeCategory): array
     {
         $this->load();
@@ -161,7 +210,13 @@ class CategoryManager extends BaseModel
         return $activeList;
     }
 
-    /** @param array<string> $categoryUrlList */
+    /**
+     * Resolves a full category URL path (as list of slugs) into a category ID.
+     *
+     * @param array<string> $categoryUrlList List of category `name_url` parts (e.g. ['blog', 'tech']).
+     * @return int Resolved category ID.
+     * @throws CategoryException If path is invalid or category not found.
+     */
     public function resolveCategoryId(array $categoryUrlList): int
     {
         $this->load();
@@ -190,7 +245,11 @@ class CategoryManager extends BaseModel
         return $categoryId;
     }
 
-    /** @return list<array> */
+    /**
+     * Returns a nested tree of categories formatted for drag-and-drop sorting.
+     *
+     * @return list<array> Nested sortable category data.
+     */
     public function getSortableTree(): array
     {
         $categoryTree = $this->getTree();
@@ -198,8 +257,12 @@ class CategoryManager extends BaseModel
     }
 
     /**
-     * @param list<array> $items
-     * @return list<array>
+     * Recursively formats a category tree for sorting purposes.
+     * Builds a nested structure with metadata (id, name, url, etc.) for each node.
+     *
+     * @param list<array> $items List of category items (from getTree()).
+     * @param string $url URL prefix built recursively (default: '').
+     * @return list<array> Formatted tree suitable for sortable UI components.
      */
     private function sortableTreeFormat(array $items, string $url = ''): array
     {
@@ -222,7 +285,18 @@ class CategoryManager extends BaseModel
         return $sortableTree;
     }
 
-    /** @param array<mixed> $data */
+    /**
+     * Updates category positions and parent relationships based on drag-and-drop data.
+     *
+     * @param array<mixed> $data Reordering data, must contain keys:
+     *   - node_id
+     *   - source_id
+     *   - target_id
+     *   - order_list (ordered array of category IDs).
+     *
+     * @throws CategoryException If data is empty.
+     * @throws \InvalidArgumentException If required keys are missing.
+     */
     public function updatePosition(array $data): void
     {
         if (empty($data)) {
@@ -253,11 +327,10 @@ class CategoryManager extends BaseModel
     }
 
     /**
-     * Recursively updates the nesting level (`level`) of all child categories
-     * based on the given parent category.
+     * Recursively updates the `level` field of child categories based on the parent category.
      *
-     * @param int $parentId The ID of the parent category (default: `CategoryManager::MAIN_CATEGORY_ID`).
-     * @param int $parentLevel The level of the parent category (default: 0).
+     * @param int $parentId Parent category ID (default: MAIN_CATEGORY_ID).
+     * @param int $parentLevel Nesting level of parent category (default: 0).
      */
     public function updateChildLevels(int $parentId = self::MAIN_CATEGORY_ID, int $parentLevel = 0): void
     {
@@ -283,10 +356,10 @@ class CategoryManager extends BaseModel
     }
 
     /**
-     * Returns a list of categories formatted for Nette form `addSelect()`,
-     * using dashes (`— `) to visually indicate nesting levels.
+     * Returns a flat list of categories formatted for select boxes,
+     * with dashes to indicate nesting depth.
      *
-     * @return array<int,string> Array in the format [id => '— Category Name']
+     * @return array<int,string> Format: [id => '— Category Name']
      */
     public function getCategorySelectData(): array
     {
@@ -294,12 +367,11 @@ class CategoryManager extends BaseModel
     }
 
     /**
-     * Recursively builds an array of categories with names
-     * prefixed by dashes (`— `) to indicate hierarchical depth.
+     * Helper for building a flat, indented category list from a nested tree.
      *
-     * @param list<array> $items Hierarchical category tree.
-     * @param int $level The current nesting level (default: `0`).
-     * @return array<int,string> Array in the format [id => '— Category Name'].
+     * @param list<array> $items Category tree.
+     * @param int $level Current nesting level (default: 0).
+     * @return array<int,string> Format: [id => '— Category Name']
      */
     private function buildCategorySelectData(array $items, int $level = 0): array
     {

@@ -20,7 +20,13 @@ class ArticleManager extends BaseModel
         parent::__construct($db, $configManager, $translationManager);
     }
 
-    /** @return array<string,mixed> */
+    /**
+     * Retrieves an article by its unique ID.
+     *
+     * @param int $id ID of the article.
+     * @return array<string,mixed> Article data as an associative array.
+     * @throws ArticleException If the article does not exist.
+     */
     public function getById(int $id): array
     {
         $article = $this->db->table(self::TABLE_NAME)
@@ -37,7 +43,13 @@ class ArticleManager extends BaseModel
         return $article->toArray();
     }
 
-    /** @return array<string,mixed> */
+    /**
+     * Retrieves an article by its unique `name_url` slug.
+     *
+     * @param string $name_url Slug of the article.
+     * @return array<string,mixed> Article data as an associative array.
+     * @throws ArticleException If the article is not found.
+     */
     public function getByNameUrl(string $name_url): array
     {
         $article = $this->db->table(self::TABLE_NAME)
@@ -54,6 +66,14 @@ class ArticleManager extends BaseModel
         return $article->toArray();
     }
 
+    /**
+     * Finds the article ID based on its unique `name_url` slug and category ID.
+     *
+     * @param string $nameUrl Slug of the article.
+     * @param int $categoryId Category ID the article belongs to.
+     * @return int ID of the matching article.
+     * @throws ArticleException If no matching article is found.
+     */
     public function getIdByUrlAndCategory(string $nameUrl, int $categoryId): int
     {
         $article = $this->db->table(self::TABLE_NAME)
@@ -72,6 +92,13 @@ class ArticleManager extends BaseModel
         return (int) $article['id'];
     }
 
+    /**
+     * Gets the category ID associated with a given article ID.
+     *
+     * @param int $id ID of the article.
+     * @return int Category ID of the article.
+     * @throws ArticleException If the article does not exist or has no category.
+     */
     public function getCategoryIdById(int $id): int
     {
         $categoryId = $this->db->table(self::TABLE_NAME)
@@ -94,9 +121,11 @@ class ArticleManager extends BaseModel
     // #####################################
 
     /**
-     * @param array<string,mixed> $data Article data
-     * @return int New article ID
-     * @throws ArticleException If article cration failed.
+     * Inserts a new article into the database.
+     *
+     * @param array<string,mixed> $data Article data to insert.
+     * @return int ID of the newly created article.
+     * @throws ArticleException If the creation fails.
      *
      * @todo Create something like... ArticleValidator::prepare($data)
      */
@@ -113,8 +142,11 @@ class ArticleManager extends BaseModel
     }
 
     /**
-     * @param int $id Article ID
-     * @param array<string,mixed> $data Article data
+     * Updates an existing article by its ID.
+     *
+     * @param int $id ID of the article to update.
+     * @param array<string,mixed> $data Associative array of data to update.
+     * @throws ArticleException If the article does not exist.
      *
      * @todo Create something like... ArticleValidator::prepare($data)
      */
@@ -134,6 +166,11 @@ class ArticleManager extends BaseModel
         $query->update($data);
     }
 
+    /**
+     * Deletes an article by its ID.
+     *
+     * @param int $id ID of the article to delete.
+     */
     public function delete(int $id): void
     {
         $this->db->table(self::TABLE_NAME)
@@ -141,6 +178,12 @@ class ArticleManager extends BaseModel
             ->delete();
     }
 
+    /**
+     * Updates the category ID of all articles that belong to the given old category.
+     *
+     * @param int $oldCategoryId The current category ID to replace.
+     * @param int $newCategoryId The new category ID to assign.
+     */
     public function updateCategoryId(int $oldCategoryId, int $newCategoryId): void
     {
         $this->db->table(self::TABLE_NAME)
