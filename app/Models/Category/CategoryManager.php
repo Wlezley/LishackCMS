@@ -103,6 +103,11 @@ class CategoryManager extends BaseModel
             ->where(['parent_id' => $id])
             ->update(['parent_id' => $parentID]);
 
+        // $this->articleManager->updateCategoryId($id, (int) $parentID);
+        $this->db->table(ArticleManager::TABLE_NAME)
+            ->where('category_id', $id)
+            ->update(['category_id' => $parentID]);
+
         $this->invalidate();
         $this->updateChildLevels();
     }

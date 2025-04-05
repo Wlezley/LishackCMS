@@ -120,9 +120,18 @@ class ArticleManager extends BaseModel
      */
     public function update(int $id, array $data): void
     {
-        $this->db->table(self::TABLE_NAME)
-            ->where('id', $id)
-            ->update($data);
+        if (isset($data['id'])) {
+            unset($data['id']);
+        }
+
+        $query = $this->db->table(self::TABLE_NAME)
+            ->where('id', $id);
+
+        if (!$query->fetch()) {
+            throw new ArticleException("Article (ID '$id') not found.", 1);
+        }
+
+        $query->update($data);
     }
 
     public function delete(int $id): void
@@ -130,6 +139,13 @@ class ArticleManager extends BaseModel
         $this->db->table(self::TABLE_NAME)
             ->where('id', $id)
             ->delete();
+    }
+
+    public function updateCategoryId(int $oldCategoryId, int $newCategoryId): void
+    {
+        $this->db->table(self::TABLE_NAME)
+            ->where('category_id', $oldCategoryId)
+            ->update(['category_id' => $newCategoryId]);
     }
 
     // #####################################
