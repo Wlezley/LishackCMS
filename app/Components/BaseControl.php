@@ -30,6 +30,9 @@ class BaseControl extends Control
     /** @var null|array<string,string> $param */
     protected ?array $param = [];
 
+    /** @var string $templatePath */
+    protected ?string $templatePath = null;
+
     /** @throws \RuntimeException If TranslationManager or ConfigManager is not available. */
     protected function createTemplate(?string $class = null): Template
     {
@@ -83,5 +86,10 @@ class BaseControl extends Control
     public function getParam(): array
     {
         return $this->param;
+    }
+
+    public function getTemplatePath(): ?string
+    {
+        return $this->templatePath;
     }
 }

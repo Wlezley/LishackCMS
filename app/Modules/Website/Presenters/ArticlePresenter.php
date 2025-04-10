@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Website\Presenters;
 
 use App\Models\ArticleManager;
+use App\Models\ArticleParser;
 use App\Models\CategoryException;
 use App\Models\CategoryManager;
 use App\Models\UrlGenerator;
@@ -111,8 +112,11 @@ final class ArticlePresenter extends BasePresenter
             $this->template->og_type = $this->article['og_type'] ?: 'website';
 
             // ARTICLE CONTENT, MENU
-            $this->template->article[] = $this->article['content'];
-            $this->template->have_custom_h1 = (strpos(strtolower($this->article['content']), '<h1') !== false);
+            $articleParser = new ArticleParser($this->presenter);
+            // $articleContent = $this->article['content']; // DEBUG: ORIGINAL TEXT
+            $articleContent = $articleParser->parseComponents($this->article['content']); // PARSED TEXT
+            $this->template->article[] = $articleContent;
+            $this->template->have_custom_h1 = (strpos(strtolower($articleContent), '<h1') !== false);
             $this->template->activeCategory = $this->activeCategory;
 
             // ADMIN URL
