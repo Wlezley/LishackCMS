@@ -16,14 +16,14 @@ final class ArticleSystemUpdate20250401 extends AbstractMigration
             ALTER TABLE `article`
                 ADD COLUMN `category_id` INT(11) NULL DEFAULT '1' AFTER `name_url`;
 
-            RENAME TABLE `article_category` TO `_article_category_old`;
+            RENAME TABLE `article_category` TO `_article_category_old2`;
         ");
     }
 
     public function down(): void
     {
         $this->execute("
-            RENAME TABLE `_article_category_old` TO `article_category`;
+            RENAME TABLE `_article_category_old2` TO `article_category`;
 
             ALTER TABLE `article`
                 DROP COLUMN `category_id`;
