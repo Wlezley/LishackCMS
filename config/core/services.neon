@@ -15,6 +15,7 @@ services:
 
     # Commands
     - App\Commands\CategoryUpdateCommand
+    - App\Commands\DatasetAddCommand
     - App\Commands\UserAddCommand
     - App\Commands\UserPasswordCommand
     - App\Commands\UserRoleCommand
@@ -36,6 +37,15 @@ services:
     - App\Models\Upload
     - App\Models\UrlGenerator
     - App\Models\UserManager
+
+    # Dataset
+    - App\Models\Dataset\DatasetCreator
+    - App\Models\Dataset\DatasetManager
+
+    # Dataset Repository
+    - App\Models\Dataset\Repository\ColumnRepository
+    - App\Models\Dataset\Repository\DataRepository
+    - App\Models\Dataset\Repository\DatasetRepository
 
     # Vendor
     - Phinx\Console\PhinxApplication
