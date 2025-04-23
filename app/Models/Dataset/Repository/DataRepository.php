@@ -13,7 +13,6 @@ final class DataRepository
     public const TABLE_NAME_PREFIX = 'dataset_data_';
     public const DATA_COLUMN_PREFIX = 'data_';
 
-
     public function __construct(
         private Explorer $db,
         private ColumnRepository $columnRepository
@@ -28,10 +27,9 @@ final class DataRepository
     public function findAll(int $datasetId): array
     {
         $columns = $this->columnRepository->findByDatasetId($datasetId);
-        $tableName = $this->getTableName($datasetId);
-        $result = [];
 
-        foreach ($this->db->table($tableName) as $row) {
+        $result = [];
+        foreach ($this->db->table($this->getTableName($datasetId)) as $row) {
             $result[] = DatasetRow::fromDatabaseRow($row->toArray(), $columns);
         }
 
@@ -41,9 +39,8 @@ final class DataRepository
     public function findById(int $datasetId, int $id): ?DatasetRow
     {
         $columns = $this->columnRepository->findByDatasetId($datasetId);
-        $tableName = $this->getTableName($datasetId);
 
-        $row = $this->db->table($tableName)
+        $row = $this->db->table($this->getTableName($datasetId))
             ->where('id', $id)
             ->fetch();
 
@@ -53,9 +50,6 @@ final class DataRepository
     /** @param DatasetColumn[] $columns */
     public function createTable(int $datasetId, array $columns): void
     {
-        $tableName = DataRepository::TABLE_NAME_PREFIX . $datasetId;
-        // SqlHelper::assertSafeIdentifier($tableName); // N/A
-
         $parts = ["`id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY"];
 
         /** @var DatasetColumn $column */
@@ -69,7 +63,7 @@ final class DataRepository
 
         $sql = sprintf(
             "CREATE TABLE IF NOT EXISTS `%s` (%s) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;",
-            $tableName,
+            $this->getTableName($datasetId),
             implode(", ", $parts)
         );
 
@@ -78,31 +72,28 @@ final class DataRepository
 
     public function insert(int $datasetId, DatasetRow $row): DatasetRow
     {
-        $tableName = $this->getTableName($datasetId);
-        $insertData = $row->toDatabaseRow();
+        $dbRow = $this->db->table($this->getTableName($datasetId))
+            ->insert($row->toDatabaseRow());
 
-        $dbRow = $this->db->table($tableName)->insert($insertData);
         $row->id = (int) $dbRow->getPrimary();
 
         return $row;
     }
 
-    public function update(int $datasetId, DatasetRow $row): void
+    public function update(int $datasetId, DatasetRow $row): int
     {
         if ($row->id === null) {
             throw new \InvalidArgumentException('Dataset Row Entity must have an ID to be updated.');
         }
 
-        $tableName = $this->getTableName($datasetId);
-        $this->db->table($tableName)
+        return $this->db->table($this->getTableName($datasetId))
             ->where('id', $row->id)
             ->update($row->toDatabaseRow());
     }
 
-    public function delete(int $datasetId, int $rowId): void
+    public function delete(int $datasetId, int $rowId): int
     {
-        $tableName = $this->getTableName($datasetId);
-        $this->db->table($tableName)
+        return $this->db->table($this->getTableName($datasetId))
             ->where('id', $rowId)
             ->delete();
     }

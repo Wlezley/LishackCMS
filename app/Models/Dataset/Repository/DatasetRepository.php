@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models\Dataset\Repository;
 
 use App\Models\Dataset\Entity\Dataset;
+use App\Models\Helpers\SqlHelper;
 use Nette\Database\Explorer;
 
 final class DatasetRepository
@@ -58,10 +59,28 @@ final class DatasetRepository
             ->update($dataset->toDatabaseRow());
     }
 
-    public function delete(int $id): void
+    public function delete(int $id): int
     {
-        $this->db->table(self::TABLE_NAME)
+        return $this->db->table(self::TABLE_NAME)
             ->where('id', $id)
             ->delete();
+    }
+
+    public function setDeleted(int $id, bool $deleted = true): int
+    {
+        return $this->db->table(self::TABLE_NAME)
+            ->where('dataset_id', $id)
+            ->update(['deleted' => (int) $deleted]);
+    }
+
+    public function exists(int $id): bool
+    {
+        $result = $this->db->table(self::TABLE_NAME)
+            ->where([
+                'id' => $id,
+                'deleted' => 0
+            ])->fetch();
+
+        return $result !== null;
     }
 }

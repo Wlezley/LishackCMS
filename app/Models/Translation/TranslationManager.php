@@ -273,6 +273,18 @@ class TranslationManager
         $this->invalidate($lang);
     }
 
+    public function exists(string $key, ?string $lang = null): bool
+    {
+        $query = $this->db->table(self::TABLE_NAME)
+            ->where('key', $key);
+
+        if ($lang !== null) {
+            $query->where('lang', $lang);
+        }
+
+        return $query->fetch() !== null;
+    }
+
     // LISTING METHODS
 
     /**

@@ -1,0 +1,62 @@
+<table id="datasetListTable" class="table table-responsive table-striped table-hover table-dark">
+    <thead>
+        <tr>
+            <th scope="col" class="text-end id-col">{$_('id')}</th>
+            <th scope="col" class="">{$_('dataset.title')}</th>
+            <th scope="col" class="">{$_('slug')}</th>
+            <th scope="col" class="">{$_('component')}</th>
+            <th scope="col" class="">{$_('presenter')}</th>
+            <th scope="col" class="text-center">{$_('enabled')}</th>
+            <th scope="col" class="text-center ps-0 action-col">{$_('action')}</th>
+        </tr>
+    </thead>
+    <tbody>
+    {foreach $datasetList as $id => $item}
+        <tr>
+            <td class="align-middle text-end id-col">{$id}</td>
+            <td class="align-middle">{$item['name']}</td>
+            <td class="align-middle">{$item['slug']}</td>
+            <td class="align-middle">{$item['component']}</td>
+            <td class="align-middle">{$item['presenter']}</td>
+            <td class="align-middle text-center">{$item['active'] ? $_('yes') : $_('no')}</td>
+            <td class="align-middle text-end ps-0 py-1 action-col">
+                <a n:href=":edit, id: $id" class="btn btn-sm btn-primary me-1">
+                    <i class="fa-solid fa-pencil"></i>
+                </a>
+                <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteDatasetConfirmModal" data-json="{$getJson($id, $item['name'])}">
+                    <i class="fa-solid fa-eraser"></i>
+                </button>
+            </td>
+        </tr>
+    {/foreach}
+    </tbody>
+</table>
+
+{control pagination}
+
+<script n:syntax="off">
+    document.addEventListener('DOMContentLoaded', () => {
+        const DatasetDeleteModal = new LishackCMS.AdminModal('#deleteDatasetConfirmModal', 'data-json');
+        DatasetDeleteModal.init();
+    });
+</script>
+
+{* {define modals} *}
+    <div class="modal fade" id="deleteDatasetConfirmModal" tabindex="-1" aria-labelledby="deleteDatasetConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered text-dark">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteDatasetConfirmModalLabel"><!-- MODAL TITLE --></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{$_('close')}"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- MODAL BODY -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{$_('cancel')}</button>
+                    <button type="submit" class="btn btn-danger" data-modal-action="delete">{$_('btn.delete')}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{* {/define} *}

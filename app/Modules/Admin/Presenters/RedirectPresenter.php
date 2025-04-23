@@ -33,6 +33,11 @@ class RedirectPresenter extends SecuredPresenter
         if (!$id) {
             $this->redirect(':default');
         }
+
+        if (!$this->redirectManager->getRow($id)) {
+            $this->flashMessage($this->tf('redirect.id.not-found', (int) $id), 'danger');
+            $this->redirect(':default');
+        }
     }
 
     public function renderImport(): void
@@ -79,13 +84,8 @@ class RedirectPresenter extends SecuredPresenter
         if ($id) {
             $form->setOrigin($form::OriginEdit);
             $param = $this->redirectManager->getRow($id);
-
-            if ($param) {
-                $param['page'] = $this->getHttpRequest()->getQuery('page');
-                $form->setParam($param);
-            } else {
-                $this->flashMessage('Přesměrování nebylo nalezeno');
-            }
+            $param['page'] = $this->getHttpRequest()->getQuery('page');
+            $form->setParam($param);
         } else {
             $form->setOrigin($form::OriginCreate);
             $form->setParam($this->getHttpRequest()->getPost('param'));
