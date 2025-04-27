@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models\Dataset\Entity;
 
+use App\Models\Dataset\DatasetException;
 use App\Models\Helpers\StringHelper;
 
 final class Dataset
@@ -14,6 +15,7 @@ final class Dataset
     public string $component = '';
     public string $presenter = '';
     public bool $active = true;
+    public bool $deleted = false;
 
     /**
      * Create an instance from the database record
@@ -30,6 +32,7 @@ final class Dataset
         $dataset->component = (string) ($row['component'] ?? '');
         $dataset->presenter = (string) ($row['presenter'] ?? '');
         $dataset->active = (bool) ($row['active'] ?? true);
+        $dataset->deleted = (bool) ($row['deleted'] ?? false);
 
         return $dataset;
     }
@@ -47,6 +50,7 @@ final class Dataset
             'component' => $this->component,
             'presenter' => $this->presenter,
             'active' => $this->active,
+            'deleted' => $this->deleted,
         ];
     }
 
@@ -60,15 +64,13 @@ final class Dataset
     public function validate(): void
     {
         if (trim($this->name) === '') {
-            throw new \InvalidArgumentException("The dataset name must not be empty.");
+            throw new DatasetException("The dataset name must not be empty.");
         }
 
         if (trim($this->slug) === '') {
-            throw new \InvalidArgumentException("The dataset slug must not be empty.");
+            throw new DatasetException("The dataset slug must not be empty.");
         }
     }
-
-
 
     public function setId(?int $id): self
     {
@@ -103,6 +105,12 @@ final class Dataset
     public function setActive(bool $active): self
     {
         $this->active = $active;
+        return $this;
+    }
+
+    public function setDeleted(bool $deleted): self
+    {
+        $this->deleted = $deleted;
         return $this;
     }
 }

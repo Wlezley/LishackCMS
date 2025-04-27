@@ -1,13 +1,6 @@
 {block content}
 <div class="row">
     <div class="col">
-        <p>TODO: Formulář pro editaci kontejneru</p>
-
-        <hr class="my-3">
-
-        <a n:href="Data:delete $containerId" class="btn btn-primary">
-            <i class="fa-solid fa-eraser pe-2"></i>
-            Delete (ID {$containerId})
-        </a>
+        {control datasetEditor}
     </div>
 </div>

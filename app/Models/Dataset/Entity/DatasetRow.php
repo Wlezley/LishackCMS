@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models\Dataset\Entity;
 
+use App\Models\Dataset\DatasetException;
 use Nette\Utils\Json;
 
 final class DatasetRow
@@ -76,11 +77,11 @@ final class DatasetRow
             $value = $this->values[$columnId] ?? null;
 
             if ($column->required && $value === null) {
-                throw new \InvalidArgumentException("Dataset column '{$column->slug}' is required.");
+                throw new DatasetException("Dataset column '{$column->slug}' is required.");
             }
 
             if ($value !== null && !$column->isValidValue($value)) {
-                throw new \InvalidArgumentException("Invalid value for '{$column->slug}'.");
+                throw new DatasetException("Invalid value for '{$column->slug}'.");
             }
         }
     }

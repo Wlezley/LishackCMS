@@ -4,13 +4,21 @@ declare(strict_types=1);
 
 namespace App\Models\Dataset\Entity;
 
+use App\Models\Dataset\DatasetException;
 use App\Models\Helpers\SqlHelper;
 use App\Models\Helpers\StringHelper;
 use Nette\Utils\Json;
 
 final class DatasetColumn
 {
-    public const ALLOWED_TYPES = ['int', 'string', 'bool', 'json', 'text'];
+    public const ALLOWED_TYPES = [
+        'int',
+        'bool',
+        'string',
+        'text',
+        'wysiwyg',
+        'json',
+    ];
 
     public int $datasetId = 0;
     public ?int $columnId = null;
@@ -18,6 +26,7 @@ final class DatasetColumn
     public string $slug = '';
     public string $type = 'string';
     public bool $required = false;
+    public bool $deleted = false;
 
     /**
      * Create an instance from the database record
@@ -34,6 +43,7 @@ final class DatasetColumn
         $column->slug = (string) ($row['slug'] ?? '');
         $column->type = (string) ($row['type'] ?? 'string');
         $column->required = (bool) ($row['required'] ?? false);
+        $column->deleted = (bool) ($row['deleted'] ?? false);
 
         return $column;
     }
@@ -52,6 +62,7 @@ final class DatasetColumn
             'slug' => $this->slug,
             'type' => $this->type,
             'required' => $this->required ? 1 : 0,
+            'deleted' => $this->deleted ? 1 : 0,
         ];
     }
 
@@ -64,8 +75,8 @@ final class DatasetColumn
             'int' => 'INT(11)',
             'string' => 'VARCHAR(255)',
             'bool' => 'TINYINT(1)',
-            'json', 'text' => 'TEXT',
-            default => throw new \LogicException("Unknown SQL type for '{$this->type}'."),
+            'json', 'text', 'wysiwyg' => 'TEXT',
+            default => throw new DatasetException("Unknown SQL type for '{$this->type}'."),
         };
     }
 
@@ -75,23 +86,28 @@ final class DatasetColumn
 
         return match ($type) {
             'int' => (int) $value,
-            'string' => (string) $value,
+            'string', 'text', 'wysiwyg' => (string) $value,
             'bool' => (bool) $value,
             'json' => Json::decode((string) $value, true),
             default => $value,
         };
     }
 
+    public function getDatabaseColumnName(): string
+    {
+        return \App\Models\Dataset\Repository\DataRepository::DATA_COLUMN_PREFIX . $this->columnId;
+    }
+
     /**
-     * Returns the SQL column definition for CREATE/ALTER TABLE
+     * Returns the SQL column definition for CREATE/ALTER TABLE or ADD/MODIFY COLUMN
      */
     public function getColumnSqlDefinition(mixed $default = null, bool $isNullable = true): string
     {
         if (!$this->columnId) {
-            throw new \InvalidArgumentException("Cannot get SQL definition without column ID.");
+            throw new DatasetException("Cannot get SQL definition without column ID.");
         }
 
-        $columnName = \App\Models\Dataset\Repository\DataRepository::DATA_COLUMN_PREFIX . $this->columnId;
+        $columnName = $this->getDatabaseColumnName();
         $sqlType = $this->getSqlType();
         $nullableClause = $isNullable ? 'NULL' : 'NOT NULL';
         $defaultClause = SqlHelper::formatDefaultValue($default);
@@ -108,7 +124,7 @@ final class DatasetColumn
     {
         return match ($this->type) {
             'int' => is_int($value),
-            'string', 'text' => is_string($value),
+            'string', 'text', 'wysiwyg' => is_string($value),
             'bool' => is_bool($value),
             'json' => is_array($value) || is_object($value),
             default => false,
@@ -131,19 +147,17 @@ final class DatasetColumn
     public function validate(): void
     {
         if (!in_array($this->type, self::ALLOWED_TYPES, true)) {
-            throw new \InvalidArgumentException("Invalid data column type: '{$this->type}'.");
+            throw new DatasetException("Invalid data column type: '{$this->type}'.");
         }
 
         if (trim($this->name) === '') {
-            throw new \InvalidArgumentException("The column name must not be empty.");
+            throw new DatasetException("The column name must not be empty.");
         }
 
         if (trim($this->slug) === '') {
-            throw new \InvalidArgumentException("The column slug must not be empty.");
+            throw new DatasetException("The column slug must not be empty.");
         }
     }
-
-
 
     public function setDatasetId(int $datasetId): self
     {
@@ -178,6 +192,12 @@ final class DatasetColumn
     public function setRequired(bool $required = false): self
     {
         $this->required = $required;
+        return $this;
+    }
+
+    public function setDeleted(bool $deleted = false): self
+    {
+        $this->deleted = $deleted;
         return $this;
     }
 }

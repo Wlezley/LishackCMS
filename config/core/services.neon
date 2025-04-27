@@ -41,6 +41,7 @@ services:
     # Dataset
     - App\Models\Dataset\DatasetCreator
     - App\Models\Dataset\DatasetManager
+    - App\Models\Dataset\DatasetUpdater
 
     # Dataset Repository
     - App\Models\Dataset\Repository\ColumnRepository

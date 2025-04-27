@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models\Dataset\Repository;
 
+use App\Models\Dataset\DatasetException;
 use App\Models\Dataset\Entity\Dataset;
-use App\Models\Helpers\SqlHelper;
+use App\Models\Helpers\ArrayHelper;
 use Nette\Database\Explorer;
 
 final class DatasetRepository
@@ -51,7 +52,7 @@ final class DatasetRepository
     public function update(Dataset $dataset): void
     {
         if ($dataset->id === null) {
-            throw new \InvalidArgumentException('Cannot update dataset without ID.');
+            throw new DatasetException('Cannot update dataset without ID.');
         }
 
         $this->db->table(self::TABLE_NAME)
@@ -69,18 +70,55 @@ final class DatasetRepository
     public function setDeleted(int $id, bool $deleted = true): int
     {
         return $this->db->table(self::TABLE_NAME)
-            ->where('dataset_id', $id)
+            ->where('id', $id)
             ->update(['deleted' => (int) $deleted]);
     }
 
-    public function exists(int $id): bool
+    public function exists(int $id, bool $includeDeleted = false): bool
     {
-        $result = $this->db->table(self::TABLE_NAME)
-            ->where([
-                'id' => $id,
-                'deleted' => 0
-            ])->fetch();
+        $query = $this->db->table(self::TABLE_NAME)
+            ->where('id', $id);
 
-        return $result !== null;
+        if (!$includeDeleted) {
+            $query->where('deleted', 0);
+        }
+
+        return $query->fetch() !== null;
+    }
+
+    /**
+     * Retrieves a list of datasets with optional search and pagination.
+     *
+     * @param int $limit Number of results to return (default: 50).
+     * @param int $offset Offset for pagination (default: 0).
+     * @param string|null $search Optional search query for name or slug or component or presenter.
+     * @return array<int|string,array<string,string|int|null>>|null Array of datasets indexed by its id, or null if empty.
+     */
+    public function getList(int $limit = 50, int $offset = 0, ?string $search = null): ?array
+    {
+        $query = $this->db->table(DatasetRepository::TABLE_NAME)
+            ->where('deleted', 0)
+            ->limit($limit, $offset)
+            ->order('id ASC');
+
+        if ($search !== null) {
+            $query->where('name LIKE ? OR slug LIKE ? OR component LIKE ? OR presenter LIKE ?', "%$search%", "%$search%", "%$search%", "%$search%");
+        }
+
+        $data = $query->fetchAll();
+
+        return $data ? ArrayHelper::resultToArray($data) : null;
+    }
+
+    public function getCount(?string $search = null): int
+    {
+        $query = $this->db->table(DatasetRepository::TABLE_NAME)
+            ->where('deleted', 0);
+
+        if ($search !== null) {
+            $query->where('name LIKE ? OR slug LIKE ? OR component LIKE ? OR presenter LIKE ?', "%$search%", "%$search%", "%$search%", "%$search%");
+        }
+
+        return $query->count('*');
     }
 }

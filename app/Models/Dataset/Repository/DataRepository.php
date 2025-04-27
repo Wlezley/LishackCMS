@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models\Dataset\Repository;
 
+use App\Models\Dataset\DatasetException;
 use App\Models\Dataset\Entity\DatasetColumn;
 use App\Models\Dataset\Entity\DatasetRow;
 use Nette\Database\Explorer;
@@ -55,7 +56,7 @@ final class DataRepository
         /** @var DatasetColumn $column */
         foreach ($columns as $column) {
             if ($column->datasetId != $datasetId) {
-                throw new \InvalidArgumentException("Dataset ID for column '{$column->slug}' not match.");
+                throw new DatasetException("Dataset ID for column '{$column->slug}' not match.");
             }
 
             $parts[] = $column->getColumnSqlDefinition();
@@ -68,6 +69,68 @@ final class DataRepository
         );
 
         $this->db->query($sql);
+    }
+
+    /**
+     * Updates an existing dataset table structure to match the given columns.
+     *
+     * @param int $datasetId ID of the dataset.
+     * @param DatasetColumn[] $columns New columns definition.
+     */
+    public function updateTable(int $datasetId, array $columns): void
+    {
+        $tableName = $this->getTableName($datasetId);
+        $existingColumns = $this->db->fetchAll("SHOW COLUMNS FROM `$tableName`");
+
+        if (!$existingColumns) {
+            throw new DatasetException("Dataset table '$tableName' does not exist.");
+        }
+
+        $existing = [];
+        foreach ($existingColumns as $row) {
+            $existing[$row['Field']] = $row;
+        }
+
+        $new = [];
+        foreach ($columns as $column) {
+            if ($column->datasetId != $datasetId) {
+                throw new DatasetException("Dataset ID for column '{$column->slug}' does not match.");
+            }
+
+            $columnName = $column->getDatabaseColumnName();
+            $new[$columnName] = $column;
+        }
+
+        $alterParts = [];
+
+        foreach ($new as $name => $column) {
+            $definition = $column->getColumnSqlDefinition();
+
+            if (!isset($existing[$name])) {
+                $alterParts[] = "ADD $definition";
+            } else {
+                $alterParts[] = "MODIFY $definition";
+            }
+        }
+
+        // foreach ($existing as $name => $_) {
+        //     if ($name === 'id') {
+        //         continue; // Keep primary key
+        //     }
+        //     if (!isset($new[$name])) {
+        //         $alterParts[] = "DROP `$name`";
+        //     }
+        // }
+
+        if (!empty($alterParts)) {
+            $sql = sprintf(
+                "ALTER TABLE `%s` %s;",
+                $tableName,
+                implode(", ", $alterParts)
+            );
+
+            $this->db->query($sql);
+        }
     }
 
     public function insert(int $datasetId, DatasetRow $row): DatasetRow
@@ -83,7 +146,7 @@ final class DataRepository
     public function update(int $datasetId, DatasetRow $row): int
     {
         if ($row->id === null) {
-            throw new \InvalidArgumentException('Dataset Row Entity must have an ID to be updated.');
+            throw new DatasetException('Dataset Row Entity must have an ID to be updated.');
         }
 
         return $this->db->table($this->getTableName($datasetId))

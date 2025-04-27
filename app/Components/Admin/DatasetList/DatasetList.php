@@ -26,8 +26,8 @@ class DatasetList extends BaseControl
         $search = $this->param['search'] ?? null;
         $offset = ($page - 1) * $this->limit;
 
-        $this->totalItems = $this->datasetManager->getCount($search);
-        $this->template->datasetList = $this->datasetManager->getList($this->limit, $offset, $search);
+        $this->totalItems = $this->datasetManager->getDatasetRepository()->getCount($search);
+        $this->template->datasetList = $this->datasetManager->getDatasetRepository()->getList($this->limit, $offset, $search);
 
         $this->template->getJson = function($id, $name) {
             // TODO: Fix empty modal on second call of deletion method

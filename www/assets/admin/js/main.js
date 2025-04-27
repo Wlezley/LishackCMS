@@ -13,6 +13,7 @@ export { MenuSettings } from './components/menu.sortable-tree.js';
 export { AdminModal } from './components/modal.js';
 export { TranslationEditor } from './components/translation-editor.js';
 export { ConfigEditor } from './components/config-editor.js';
+export { DatasetEditor } from './components/dataset-editor.js';
 
 
 // Just some debugging stuff, can be commented out or deleted

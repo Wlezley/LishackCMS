@@ -6,43 +6,81 @@ namespace App\Models\Dataset;
 
 use App\Models\Dataset\Entity\Dataset;
 use App\Models\Dataset\Entity\DatasetColumn;
-use App\Models\Dataset\Entity\DatasetRow;
 use App\Models\Dataset\Repository\ColumnRepository;
 use App\Models\Dataset\Repository\DataRepository;
 use App\Models\Dataset\Repository\DatasetRepository;
-use App\Models\Helpers\ArrayHelper;
-use Nette\Database\Explorer;
 
 final class DatasetManager
 {
     private Dataset $dataset;
 
     /** @var DatasetColumn[] $columns */
-    private array $columns;
+    private array $columns = [];
 
     public function __construct(
         private DatasetRepository $datasetRepository,
         private ColumnRepository $columnRepository,
-        private DataRepository $dataRepository,
-        private Explorer $db
+        private DataRepository $dataRepository
     ) {}
 
-    public function loadDatasetById(int $id): bool
+    public function loadDatasetById(int $id, bool $includeDeleted = false): bool
     {
-        if (!$this->datasetRepository->exists($id)) {
+        if (!$this->datasetRepository->exists($id, $includeDeleted)) {
             return false;
         }
 
         $this->dataset = $this->datasetRepository->findById($id);
-        $this->columns = $this->columnRepository->findByDatasetId($this->dataset->id);
+        $this->columns = $this->columnRepository->findByDatasetId($this->dataset->id, $includeDeleted);
+
+        return true;
+    }
+
+    public function isReady(): bool
+    {
+        if (!isset($this->dataset) || $this->dataset->id === null || empty($this->columns)) {
+            return false;
+        }
 
         return true;
     }
 
     /** @return DatasetColumn[] */
-    public function getColumnSchema(): array
+    public function getColumnsSchema(): array
     {
         return $this->columns;
+    }
+
+    /** @return array<int,mixed> */
+    public function getColumnsList(): array
+    {
+        if (empty($this->columns)) {
+            return [];
+        }
+
+        $columnList = [];
+
+        /** @var DatasetColumn $column */
+        foreach ($this->columns as $column) {
+            $columnList[$column->columnId] = [
+                'columnId' => $column->columnId,
+                'name' => $column->name,
+                'slug' => $column->slug,
+                'type' => $column->type,
+                'required' => $column->required,
+                'deleted' => $column->deleted,
+            ];
+        }
+
+        return $columnList;
+    }
+
+    public function getLastColumnId(): int
+    {
+        if (empty($this->columns)) {
+            return 0;
+        }
+
+        return (int) max(array_keys($this->getColumnsList()));
     }
 
     public function deleteRow(int $datasetId, int $rowId): void
@@ -57,33 +95,45 @@ final class DatasetManager
      */
     public function deleteDataset(int $id): void
     {
-        $this->datasetRepository->setDeleted($id, true);
-        $this->columnRepository->deleteAllColumns($id);
+        $this->datasetRepository->setDeleted($id);
+        // $this->columnRepository->deleteAllColumns($id);
     }
 
-    public function getList(int $limit = 50, int $offset = 0, ?string $search = null): ?array
+    public function getDataset(): Dataset
     {
-        $query = $this->db->table(DatasetRepository::TABLE_NAME)
-            ->limit($limit, $offset)
-            ->order('id ASC');
-
-        if ($search !== null) {
-            $query->where('name LIKE ? OR slug LIKE ? OR component LIKE ? OR presenter LIKE ?', "%$search%", "%$search%", "%$search%", "%$search%");
-        }
-
-        $data = $query->fetchAll();
-
-        return $data ? ArrayHelper::resultToArray($data) : null;
+        return $this->dataset;
     }
 
-    public function getCount(?string $search = null): int
+    public function getDatasetRepository(): DatasetRepository
     {
-        $query = $this->db->table(DatasetRepository::TABLE_NAME);
-
-        if ($search !== null) {
-            $query->where('name LIKE ? OR slug LIKE ? OR component LIKE ? OR presenter LIKE ?', "%$search%", "%$search%", "%$search%", "%$search%");
-        }
-
-        return $query->count('*');
+        return $this->datasetRepository;
     }
+
+    public function getColumnRepository(): ColumnRepository
+    {
+        return $this->columnRepository;
+    }
+
+    public function getDataRepository(): DataRepository
+    {
+        return $this->dataRepository;
+    }
+
+    // public function getCreator(): DatasetCreator
+    // {
+    //     return new DatasetCreator(
+    //         $this->datasetRepository,
+    //         $this->columnRepository,
+    //         $this->dataRepository
+    //     );
+    // }
+
+    // public function getUpdater(): DatasetUpdater
+    // {
+    //     return new DatasetUpdater(
+    //         $this->datasetRepository,
+    //         $this->columnRepository,
+    //         $this->dataRepository
+    //     );
+    // }
 }

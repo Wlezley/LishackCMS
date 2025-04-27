@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models\Dataset\Repository;
 
+use App\Models\Dataset\DatasetException;
 use App\Models\Dataset\Entity\DatasetColumn;
 use App\Models\Helpers\SqlHelper;
 use Nette\Database\Explorer;
@@ -30,7 +31,8 @@ final class ColumnRepository
 
         $result = [];
         foreach ($rows as $row) {
-            $result[] = DatasetColumn::fromDatabaseRow($row->toArray());
+            $column = DatasetColumn::fromDatabaseRow($row->toArray());
+            $result[$column->columnId] = $column;
         }
 
         return $result;
@@ -62,7 +64,7 @@ final class ColumnRepository
 
         if ($max !== null && !is_int($max)) {
             $type = gettype($max);
-            throw new \InvalidArgumentException("Whoa... I asked for an integer, not a {$type}. Are we still in the Matrix?");
+            throw new DatasetException("Whoa... I asked for an integer, not a {$type}. Are we still in the Matrix?");
         }
 
         return $max ? (int) $max : 0;
@@ -71,7 +73,7 @@ final class ColumnRepository
     public function insert(DatasetColumn $column): DatasetColumn
     {
         if ($column->datasetId === 0) {
-            throw new \InvalidArgumentException('Cannot insert column without dataset ID.');
+            throw new DatasetException('Cannot insert column without dataset ID.');
         }
 
         $column->columnId = $this->lastColumnId($column->datasetId);
@@ -84,10 +86,10 @@ final class ColumnRepository
     public function update(DatasetColumn $column): int
     {
         if ($column->datasetId === 0) {
-            throw new \InvalidArgumentException('Cannot update column without dataset ID.');
+            throw new DatasetException('Cannot update column without dataset ID.');
         }
         if ($column->columnId === null) {
-            throw new \InvalidArgumentException('Cannot update column without column ID.');
+            throw new DatasetException('Cannot update column without column ID.');
         }
 
         return $this->db->table(self::TABLE_NAME)
@@ -100,15 +102,16 @@ final class ColumnRepository
     /**
      * @param int $datasetId ID of Dataset
      * @param int $columnId ID of Column in the Dataset
+     *
      * @return int Affected rows
-     * @throws \InvalidArgumentException If column does not exist
+     * @throws DatasetException If column does not exist
      */
     public function delete(int $datasetId, int $columnId): int
     {
         $columnName = DataRepository::DATA_COLUMN_PREFIX . $columnId;
 
         if (!$this->columnExists($datasetId, $columnName)) {
-            throw new \InvalidArgumentException("Column '{$columnName}' does not exist.");
+            throw new DatasetException("Column '{$columnName}' does not exist.");
         }
 
         return $this->db->table(self::TABLE_NAME)
