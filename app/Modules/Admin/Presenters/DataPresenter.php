@@ -82,20 +82,15 @@ class DataPresenter extends SecuredPresenter
     protected function createComponentDataEditor(): \App\Components\Admin\DataEditor
     {
         $control = $this->dataEditor->create();
-        $datasetId = $this->getParameter('datasetId');
-        $itemId = $this->getParameter('itemId');
-
-        bdump($itemId);
 
         $control->setDatasetManager($this->datasetManager);
 
         $control->setOrigin(
-            $itemId ? $control::OriginEdit : $control::OriginCreate
+            $this->getParameter('itemId') ? $control::OriginEdit : $control::OriginCreate
         );
 
         $control->onSuccess = function(string $message): void {
             $this->flashMessage($message, 'info');
-            // $this->redirect('Data:'); // TODO: Dataset ID
         };
 
         $control->onError = function(string $message): void {

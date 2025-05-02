@@ -78,7 +78,7 @@ class DataEditor extends BaseControl
         $form->setHtmlAttribute('autocomplete', 'off');
 
         $form->addHidden('datasetId')
-            ->setValue($datasetId);
+            ->setValue($this->datasetId);
 
         // DYNAMIC DATA COLUMNS
         foreach ($columns as $c) {
