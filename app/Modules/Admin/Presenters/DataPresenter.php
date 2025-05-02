@@ -10,8 +10,6 @@ use App\Models\Dataset\DatasetManager;
 
 class DataPresenter extends SecuredPresenter
 {
-    // TODO: We need DataManager....
-
     /** @var DatasetManager @inject */
     public DatasetManager $datasetManager;
 
@@ -52,9 +50,6 @@ class DataPresenter extends SecuredPresenter
         $this->template->title .= " ($datasetName / $itemId)";
     }
 
-    /**
-     * @todo Create DataManager for data handling? (also usable for delete these dataset rows / items)
-     */
     public function handleDelete(): void
     {
         if (!$this->isAjax()) {
@@ -65,8 +60,8 @@ class DataPresenter extends SecuredPresenter
 
         // TODO: Permission check
 
-        // $this->dataManager->deleteRow((int) $data['itemId']);
-        // $this->flashMessage("Řádek {$data['itemId']} z {$data['datasetId']} byl odstraněn.", 'info');
+        // $this->datasetManager->deleteDataset((int) $data['datasetId']);
+        // $this->flashMessage("Dataset ID: {$data['datasetId']} byl odstraněn.", 'info');
     }
 
     // ##########################################
