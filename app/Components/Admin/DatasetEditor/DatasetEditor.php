@@ -102,7 +102,16 @@ class DatasetEditor extends BaseControl
         );
 
         foreach ($columns as $c) {
-            $this->datasetCreator->addColumn($c['name'], $c['slug'], $c['type'], $c['required'], $c['deleted']);
+            $this->datasetCreator->addColumn(
+                $c['name'],
+                $c['slug'],
+                $c['type'],
+                $c['required'],
+                $c['listed'],
+                $c['hidden'],
+                $c['deleted'],
+                null // $c['default']
+            );
         }
 
         $datasetId = $this->datasetCreator->commit();
@@ -132,7 +141,17 @@ class DatasetEditor extends BaseControl
         );
 
         foreach ($columns as $columnId => $c) {
-            $this->datasetUpdater->updateColumn($columnId, $c['name'], $c['slug'], $c['type'], $c['required'], $c['deleted']);
+            $this->datasetUpdater->updateColumn(
+                $columnId,
+                $c['name'],
+                $c['slug'],
+                $c['type'],
+                $c['required'],
+                $c['listed'],
+                $c['hidden'],
+                $c['deleted'],
+                null // $c['default']
+            );
         }
 
         $datasetId = $this->datasetUpdater->commit();
@@ -154,7 +173,10 @@ class DatasetEditor extends BaseControl
                     'slug' => "data_$i",
                     'type' => 'string',
                     'required' => false,
+                    'listed' => false,
+                    'hidden' => false,
                     'deleted' => false,
+                    'default' => null,
                 ];
             }
         } else {

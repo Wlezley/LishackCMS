@@ -55,6 +55,8 @@
                 <th scope="col">{$_('slug')}</th>
                 <th scope="col">{$_('dataset.column.type')}</th>
                 <th scope="col">{$_('required')}</th>
+                <th scope="col">{$_('listed')}</th>
+                <th scope="col">{$_('hidden')}</th>
                 <th scope="col">{$_('deleted')}</th>
                 <th scope="col" class="action-col"></th>
             </tr>
@@ -80,6 +82,16 @@
                     </td>
                     <td class="align-middle">
                         <div class="form-check form-switch">
+                            <input type="checkbox" class="form-check-input listed-input" tabindex=-1 n:attr="checked: $item['listed']">
+                        </div>
+                    </td>
+                    <td class="align-middle">
+                        <div class="form-check form-switch">
+                            <input type="checkbox" class="form-check-input hidden-input" tabindex=-1 n:attr="checked: $item['hidden']">
+                        </div>
+                    </td>
+                    <td class="align-middle">
+                        <div class="form-check form-switch">
                             <input type="checkbox" class="form-check-input deleted-input" tabindex=-1 n:attr="checked: $item['deleted']">
                         </div>
                     </td>
@@ -89,7 +101,7 @@
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="7"></td>
+                <td colspan="9"></td>
                 <td class="align-middle action-col"><button type="button" class="btn btn-success" id="addRow"><i class="fa-solid fa-plus"></i></button></td>
             </tr>
         </tfoot>
@@ -116,6 +128,16 @@
         <td class="align-middle">
             <div class="form-check form-switch">
                 <input type="checkbox" class="form-check-input required-input" tabindex=-1>
+            </div>
+        </td>
+        <td class="align-middle">
+            <div class="form-check form-switch">
+                <input type="checkbox" class="form-check-input listed-input" tabindex=-1>
+            </div>
+        </td>
+        <td class="align-middle">
+            <div class="form-check form-switch">
+                <input type="checkbox" class="form-check-input hidden-input" tabindex=-1>
             </div>
         </td>
         <td class="align-middle">

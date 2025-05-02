@@ -121,12 +121,26 @@ class DatasetUpdater
      * @param string $name Column display name.
      * @param string $slug Optional slug identifier.
      * @param string $type Column data type (e.g., 'string', 'int').
-     * @param bool $required Whether the column is required.
+     * @param bool $required The column is required.
+     * @param bool $listed The column is listed in DataList.
+     * @param bool $hidden The column is editable only with an user in the admin role.
+     * @param bool $deleted The column is marked as deleted.
+     * @param string|null $default Default value of the column.
      *
      * @throws DatasetException If dataset has not loaded.
      * @return self
      */
-    public function updateColumn(int $columnId, string $name, string $slug = '', string $type = 'string', bool $required = false, bool $deleted = false): self
+    public function updateColumn(
+        int $columnId,
+        string $name,
+        string $slug = '',
+        string $type = 'string',
+        bool $required = false,
+        bool $listed = false,
+        bool $hidden = false,
+        bool $deleted = false,
+        ?string $default = null
+    ): self
     {
         if (!isset($this->dataset)) {
             throw new DatasetException('Dataset is not loaded.');
@@ -141,7 +155,10 @@ class DatasetUpdater
             ->setSlug($slug)
             ->setType($type)
             ->setRequired($required)
-            ->setDeleted($deleted);
+            ->setListed($listed)
+            ->setHidden($hidden)
+            ->setDeleted($deleted)
+            ->setDefault($default);
 
         $this->columns[$columnId]->prepare();
         $this->columns[$columnId]->validate();

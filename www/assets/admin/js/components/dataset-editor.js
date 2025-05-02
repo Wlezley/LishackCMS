@@ -90,6 +90,8 @@ export class DatasetEditor {
         let columnSlug = row.querySelector(".slug-input").value.trim();
         const columnType = row.querySelector(".type-input").value;
         const columnRequired = row.querySelector(".required-input").checked;
+        const columnListed = row.querySelector(".listed-input").checked;
+        const columnHidden = row.querySelector(".hidden-input").checked;
         const columnDeleted = row.querySelector(".deleted-input").checked;
 
         if (!columnSlug) {
@@ -120,6 +122,8 @@ export class DatasetEditor {
           slug: columnSlug,
           type: columnType,
           required: columnRequired,
+          listed: columnListed,
+          hidden: columnHidden,
           deleted: columnDeleted
         };
       });

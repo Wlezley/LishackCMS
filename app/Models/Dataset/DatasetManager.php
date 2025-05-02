@@ -67,7 +67,10 @@ final class DatasetManager
                 'slug' => $column->slug,
                 'type' => $column->type,
                 'required' => $column->required,
+                'listed' => $column->listed,
+                'hidden' => $column->hidden,
                 'deleted' => $column->deleted,
+                'default' => $column->default,
             ];
         }
 
@@ -96,7 +99,6 @@ final class DatasetManager
     public function deleteDataset(int $id): void
     {
         $this->datasetRepository->setDeleted($id);
-        // $this->columnRepository->deleteAllColumns($id);
     }
 
     public function getDataset(): Dataset
@@ -118,22 +120,4 @@ final class DatasetManager
     {
         return $this->dataRepository;
     }
-
-    // public function getCreator(): DatasetCreator
-    // {
-    //     return new DatasetCreator(
-    //         $this->datasetRepository,
-    //         $this->columnRepository,
-    //         $this->dataRepository
-    //     );
-    // }
-
-    // public function getUpdater(): DatasetUpdater
-    // {
-    //     return new DatasetUpdater(
-    //         $this->datasetRepository,
-    //         $this->columnRepository,
-    //         $this->dataRepository
-    //     );
-    // }
 }

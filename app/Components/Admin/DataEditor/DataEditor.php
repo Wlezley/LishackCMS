@@ -157,16 +157,6 @@ class DataEditor extends BaseControl
         $this->origin = $origin;
     }
 
-    // public function setDatasetId(int $datasetId): void
-    // {
-    //     $this->datasetId = $datasetId;
-    // }
-
-    // public function setItemId(int $itemId): void
-    // {
-    //     $this->itemId = $itemId;
-    // }
-
     public function setDatasetManager(DatasetManager $datasetManager): void
     {
         $this->datasetManager = $datasetManager;

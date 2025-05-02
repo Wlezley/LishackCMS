@@ -26,7 +26,10 @@ final class DatasetColumn
     public string $slug = '';
     public string $type = 'string';
     public bool $required = false;
+    public bool $listed = false;
+    public bool $hidden = false;
     public bool $deleted = false;
+    public ?string $default = null;
 
     /**
      * Create an instance from the database record
@@ -43,7 +46,10 @@ final class DatasetColumn
         $column->slug = (string) ($row['slug'] ?? '');
         $column->type = (string) ($row['type'] ?? 'string');
         $column->required = (bool) ($row['required'] ?? false);
+        $column->listed = (bool) ($row['listed'] ?? false);
+        $column->hidden = (bool) ($row['hidden'] ?? false);
         $column->deleted = (bool) ($row['deleted'] ?? false);
+        $column->default = $row['default'] ? (string) $row['default'] : null;
 
         return $column;
     }
@@ -62,7 +68,10 @@ final class DatasetColumn
             'slug' => $this->slug,
             'type' => $this->type,
             'required' => $this->required ? 1 : 0,
+            'listed' => $this->listed ? 1 : 0,
+            'hidden' => $this->hidden ? 1 : 0,
             'deleted' => $this->deleted ? 1 : 0,
+            'default' => $this->default,
         ];
     }
 
@@ -196,9 +205,27 @@ final class DatasetColumn
         return $this;
     }
 
+    public function setListed(bool $listed = false): self
+    {
+        $this->listed = $listed;
+        return $this;
+    }
+
+    public function setHidden(bool $hidden = false): self
+    {
+        $this->hidden = $hidden;
+        return $this;
+    }
+
     public function setDeleted(bool $deleted = false): self
     {
         $this->deleted = $deleted;
+        return $this;
+    }
+
+    public function setDefault(?string $default = null): self
+    {
+        $this->default = $default;
         return $this;
     }
 }
