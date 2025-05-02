@@ -87,12 +87,36 @@ final class DatasetRepository
     }
 
     /**
+     * Retrieves a list of datasets for use in the sidebar.
+     *
+     * Returns all datasets ordered by ID. By default, deleted datasets are excluded,
+     * but this can be overridden via the `$includeDeleted` flag.
+     *
+     * @param bool $includeDeleted Whether to include datasets marked as deleted (default: false).
+     * @return array<int|string,array<string,string|int|null>>|null Array of datasets indexed by ID, or null if none found.
+     */
+    public function getSidebarList(bool $includeDeleted = false): ?array
+    {
+        $query = $this->db->table(DatasetRepository::TABLE_NAME)
+            ->select('id, name, slug')
+            ->order('id ASC');
+
+        if (!$includeDeleted) {
+            $query->where('deleted', 0);
+        }
+
+        $data = $query->fetchAll();
+
+        return $data ? ArrayHelper::resultToArray($data) : null;
+    }
+
+    /**
      * Retrieves a list of datasets with optional search and pagination.
      *
      * @param int $limit Number of results to return (default: 50).
      * @param int $offset Offset for pagination (default: 0).
-     * @param string|null $search Optional search query for name or slug or component or presenter.
-     * @return array<int|string,array<string,string|int|null>>|null Array of datasets indexed by its id, or null if empty.
+     * @param string|null $search Optional search query for name, slug, component, or presenter fields.
+     * @return array<int|string,array<string,string|int|null>>|null Array of datasets indexed by ID, or null if none found.
      */
     public function getList(int $limit = 50, int $offset = 0, ?string $search = null): ?array
     {

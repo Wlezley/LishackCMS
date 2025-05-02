@@ -1,0 +1,31 @@
+{block content}
+<div class="row">
+    <div class="col">
+
+        <div>
+            <form class="row g-3 float-end" name="searchForm">
+                <div class="col-auto">
+                    <label for="search" class="visually-hidden">{$_('search.dataset')}</label>
+                    <input type="text" class="form-control" id="search" name="search" value="{$search}" placeholder="{$_('search.dataset')}">
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary mb-3"><i class="fa-solid fa-magnifying-glass"></i></button>
+                </div>
+            </form>
+        </div>
+
+        {control datasetList}
+
+        <div class="datagrid-mt-fix">
+            <hr class="my-3">
+        </div>
+
+        <div>
+            <a n:href="Data:create" class="btn btn-primary float-end">
+                <i class="fa-solid fa-plus pe-2"></i>
+                {$_('add')}
+            </a>
+        </div>
+
+    </div>
+</div>

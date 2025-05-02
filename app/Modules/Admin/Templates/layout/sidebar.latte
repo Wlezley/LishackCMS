@@ -63,23 +63,12 @@
 
             {* DATA *}
             <li class="sidebar-item">
-                <a n:href="Data:" n:class="'sidebar-link collapsed', $activeMenu == 'DATA' ? active" data-bs-toggle="collapse" data-bs-target="#sidebar-database" aria-expanded="false" aria-controls="sidebar-database">
+                <a href="#" n:class="'sidebar-link collapsed', $activeMenu == 'DATA' ? active" data-bs-toggle="collapse" data-bs-target="#sidebar-database" aria-expanded="false" aria-controls="sidebar-database">
                     <i class="fa-solid fa-database"></i>
                     {$_('admin.sidebar.main.data')}
                 </a>
                 <ul id="sidebar-database" n:class="'sidebar-dropdown list-unstyled collapse', $activeMenu == 'DATA' ? show">
-                    <li class="sidebar-item">
-                        <a n:href="Data:" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('Data:default') ? active">
-                            <i class="fa-solid fa-cubes"></i>
-                            {$_('admin.sidebar.main.data.list')}
-                        </a>
-                    </li>
-                    <li class="sidebar-item">
-                        <a n:href="Data:create" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('Data:create') ? active">
-                            <i class="fa-solid fa-plus"></i>
-                            {$_('admin.sidebar.main.data.create')}
-                        </a>
-                    </li>
+                    {control datasetSidebar}
                 </ul>
             </li>
 
@@ -94,6 +83,12 @@
                         <a n:href="User:" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('User:*') ? active">
                             <i class="fa-solid fa-user-group"></i>
                             {$_('admin.sidebar.main.config.users')}
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a n:href="Dataset:" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('Dataset:*') ? active">
+                            <i class="fa-solid fa-database"></i>
+                            {$_('admin.sidebar.main.config.dataset')}
                         </a>
                     </li>
                     <li class="sidebar-item">

@@ -47,7 +47,7 @@ class DatasetList extends BaseControl
 
     public function handleEdit(string $id): void
     {
-        $this->presenter->redirect('Data:edit', [
+        $this->presenter->redirect('Dataset:edit', [
             'id' => $id,
             'page' => $this->getPresenter()->getParameter('page', 1)
         ]);
