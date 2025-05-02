@@ -1,0 +1,9 @@
+{foreach $datasetList as $id => $item}
+    <li class="sidebar-item">
+        {var $active = $presenter->isLinkCurrent('Data:*') && $presenter->getParameter('datasetId') == $id}
+        <a n:href=":edit, datasetId: $id" n:class="sidebar-link, sidebar-sublink, $active ? active">
+            <i class="fa-solid fa-database"></i>
+            {$item['name']}
+        </a>
+    </li>
+{/foreach}

@@ -7,9 +7,8 @@ namespace App\Components\Admin;
 use App\Components\BaseControl;
 use App\Models\Dataset\DatasetManager;
 use App\Modules\Admin\Presenters\DataPresenter;
-use Nette\Utils\Json;
 
-class DatasetList extends BaseControl
+class DataList extends BaseControl
 {
     private ?int $limit = null;
     private ?int $totalItems = null;
@@ -18,7 +17,7 @@ class DatasetList extends BaseControl
         private DatasetManager $datasetManager
     ) {}
 
-    public function render(?int $limit = null): void
+    public function render(int $datasetId, ?int $limit = null): void
     {
         $this->limit = $limit ?? (int)$this->c('PAGINATION_PAGE_ITEMS');
 
@@ -26,29 +25,19 @@ class DatasetList extends BaseControl
         $search = $this->param['search'] ?? null;
         $offset = ($page - 1) * $this->limit;
 
-        $this->totalItems = $this->datasetManager->getDatasetRepository()->getCount($search);
-        $this->template->datasetList = $this->datasetManager->getDatasetRepository()->getList($this->limit, $offset, $search);
+        $this->totalItems = $this->datasetManager->getDataRepository()->getCount($datasetId, $search);
+        $this->template->dataList = $this->datasetManager->getDataRepository()->getList($datasetId, $this->limit, $offset, $search);
+        $this->template->datasetId = $datasetId;
 
-        $this->template->getJson = function($id, $name) {
-            // TODO: Fix empty modal on second call of deletion method
-            return Json::encode([
-                'id' => (string) $id,
-                // 'name' => (string) $name,
-                'modal' => [
-                    'title' => $this->t('modal.title.confirm-delete'),
-                    'body' => $this->tf('modal.body.delete-dataset', $name, $id)
-                ]
-            ]);
-        };
-
-        $this->template->setFile(__DIR__ . '/DatasetList.latte');
+        $this->template->setFile(__DIR__ . '/DataList.latte');
         $this->template->render();
     }
 
-    public function handleEdit(string $id): void
+    public function handleEdit(string $itemId): void
     {
-        $this->presenter->redirect('Dataset:edit', [
-            'id' => $id,
+        $this->presenter->redirect('Data:edit', [
+            'datasetId' => $this->getPresenter()->getParameter('datasetId'),
+            'itemId' => $itemId,
             'page' => $this->getPresenter()->getParameter('page', 1)
         ]);
     }

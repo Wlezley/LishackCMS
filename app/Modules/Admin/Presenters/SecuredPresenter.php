@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
+use App\Components\Admin\IDatasetSidebarFactory;
 use App\Components\IPaginationFactory;
 use App\Models\UserRole;
 
 class SecuredPresenter extends BasePresenter
 {
     protected UserRole $userRole;
+
+    /** @var IDatasetSidebarFactory @inject */
+    public IDatasetSidebarFactory $datasetSidebarFactory;
 
     /** @var IPaginationFactory @inject */
     public IPaginationFactory $paginationFactory;
@@ -56,6 +60,17 @@ class SecuredPresenter extends BasePresenter
         parent::afterRender();
 
         $this->template->userData = $this->user->identity->getData();
+    }
+
+    // ##########################################
+    // ###             COMPONENTS             ###
+    // ##########################################
+
+    protected function createComponentDatasetSidebar(): \App\Components\Admin\DatasetSidebar
+    {
+        $control = $this->datasetSidebarFactory->create();
+
+        return $control;
     }
 
     // ##########################################

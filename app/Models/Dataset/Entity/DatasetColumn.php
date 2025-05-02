@@ -85,10 +85,11 @@ final class DatasetColumn
         $type = $type ?? $this->type;
 
         return match ($type) {
-            'int' => (int) $value,
+            'int' => $value ? (int) $value : null,
             'string', 'text', 'wysiwyg' => (string) $value,
             'bool' => (bool) $value,
-            'json' => Json::decode((string) $value, true),
+            // 'json' => $value ? Json::decode((string) $value, true) : null, // TODO: Fix it... ???
+            'json' => (string) $value,
             default => $value,
         };
     }

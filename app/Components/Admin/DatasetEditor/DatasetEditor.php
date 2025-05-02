@@ -46,8 +46,6 @@ class DatasetEditor extends BaseControl
             $param['id'] = $this->datasetManager->getDataset()->id;
         }
 
-        bdump($param, "Form create params");
-
         $form->addHidden('id')
             ->setValue($param['id'] ?? null);
 
@@ -94,9 +92,6 @@ class DatasetEditor extends BaseControl
 
         $columns = Json::decode($values['columns'], true);
 
-        bdump($values);
-        bdump($columns);
-
         $this->datasetCreator->configure(
             $values['name'],
             $values['slug'],
@@ -125,9 +120,6 @@ class DatasetEditor extends BaseControl
 
         $columns = Json::decode($values['columns'], true);
 
-        bdump($values);
-        bdump($columns);
-
         $this->datasetUpdater->loadDatasetById((int) $values['id']);
 
         $this->datasetUpdater->configure(
@@ -138,8 +130,6 @@ class DatasetEditor extends BaseControl
             $values['active'],
             $values['deleted']
         );
-
-        // BUG: Když ukládám smazané sloupce, tak se záhadně duplikují. Jako by se smazané nenačítali
 
         foreach ($columns as $columnId => $c) {
             $this->datasetUpdater->updateColumn($columnId, $c['name'], $c['slug'], $c['type'], $c['required'], $c['deleted']);
@@ -172,12 +162,7 @@ class DatasetEditor extends BaseControl
         }
 
         $this->template->datasetColumns = $columns;
-
-        bdump($columns);
-
         $this->template->columnTypeOptions = $this->getColumnTypeOptions();
-
-        bdump($this->template->lastColumnId);
 
         $this->template->setFile(__DIR__ . '/DatasetEditor.latte');
         $this->template->render();

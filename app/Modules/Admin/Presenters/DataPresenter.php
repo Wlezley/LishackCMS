@@ -4,46 +4,50 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
-use App\Components\Admin\IDatasetEditorFactory;
-use App\Components\Admin\IDatasetListFactory;
-use App\Models\Dataset\DatasetCreator;
+use App\Components\Admin\IDataListFactory;
+use App\Components\Admin\IDataEditorFactory;
 use App\Models\Dataset\DatasetManager;
-use App\Models\Dataset\DatasetUpdater;
 
 class DataPresenter extends SecuredPresenter
 {
-    /** @var DatasetCreator @inject */
-    public DatasetCreator $datasetCreator;
-
     /** @var DatasetManager @inject */
     public DatasetManager $datasetManager;
 
-    /** @var DatasetUpdater @inject */
-    public DatasetUpdater $datasetUpdater;
+    /** @var IDataListFactory @inject */
+    public IDataListFactory $dataList;
 
-    /** @var IDatasetListFactory @inject */
-    public IDatasetListFactory $datasetList;
+    /** @var IDataEditorFactory @inject */
+    public IDataEditorFactory $dataEditor;
 
-    /** @var IDatasetEditorFactory @inject */
-    public IDatasetEditorFactory $datasetEditor;
-
-    public function renderDefault(int $page = 1, ?string $search = null): void
+    public function renderDefault(int $datasetId, int $page = 1, ?string $search = null): void
     {
+        $this->template->title .= " (dataset ID: $datasetId)";
+        $this->template->datasetId = $datasetId;
         $this->template->search = $search;
     }
 
-    public function renderCreate(): void
+    public function renderCreate(int $datasetId): void
     {
-    }
-
-    public function renderEdit(int $id = 0): void
-    {
-        $this->template->title .= " ID: $id";
-
-        if (!$this->datasetManager->loadDatasetById($id, true)) {
-            $this->flashMessage($this->tf('dataset.id.not-found', (int) $id), 'danger');
+        if (!$this->datasetManager->loadDatasetById($datasetId, true)) {
+            $this->flashMessage($this->tf('dataset.id.not-found', (int) $datasetId), 'danger');
             $this->redirect(':default');
         }
+
+        $datasetName = $this->datasetManager->getDataset()->name;
+
+        $this->template->title .= " ($datasetName)";
+    }
+
+    public function renderEdit(int $datasetId, int $itemId): void
+    {
+        if (!$this->datasetManager->loadDatasetById($datasetId, true)) {
+            $this->flashMessage($this->tf('dataset.id.not-found', (int) $datasetId), 'danger');
+            $this->redirect(':default');
+        }
+
+        $datasetName = $this->datasetManager->getDataset()->name;
+
+        $this->template->title .= " ($datasetName / $itemId)";
     }
 
     public function handleDelete(): void
@@ -52,21 +56,21 @@ class DataPresenter extends SecuredPresenter
             $this->redirect('this');
         }
 
-        $data = $this->getHttpRequest()->getPost();
+        // $data = $this->getHttpRequest()->getPost();
 
         // TODO: Permission check
 
-        $this->datasetManager->deleteDataset((int) $data['id']);
-        $this->flashMessage("Dataset ID: {$data['id']} byl odstraněn.", 'info');
+        // $this->datasetManager->deleteDataset((int) $data['datasetId']);
+        // $this->flashMessage("Dataset ID: {$data['datasetId']} byl odstraněn.", 'info');
     }
 
     // ##########################################
     // ###             COMPONENTS             ###
     // ##########################################
 
-    protected function createComponentDatasetList(): \App\Components\Admin\DatasetList
+    protected function createComponentDataList(): \App\Components\Admin\DataList
     {
-        $control = $this->datasetList->create();
+        $control = $this->dataList->create();
         $control->setParam([
             'search' => $this->getParameter('search'),
             'page' => $this->getParameter('page'),
@@ -75,22 +79,18 @@ class DataPresenter extends SecuredPresenter
         return $control;
     }
 
-    protected function createComponentDatasetEditor(): \App\Components\Admin\DatasetEditor
+    protected function createComponentDataEditor(): \App\Components\Admin\DataEditor
     {
-        $control = $this->datasetEditor->create();
-        $id = $this->getParameter('id');
+        $control = $this->dataEditor->create();
 
-        $control->setDatasetCreator($this->datasetCreator); // TODO: Load it in Manager?
         $control->setDatasetManager($this->datasetManager);
-        $control->setDatasetUpdater($this->datasetUpdater); // TODO: Load it in Manager?
 
         $control->setOrigin(
-            $id ? $control::OriginEdit : $control::OriginCreate
+            $this->getParameter('itemId') ? $control::OriginEdit : $control::OriginCreate
         );
 
         $control->onSuccess = function(string $message): void {
             $this->flashMessage($message, 'info');
-            $this->redirect('Data:');
         };
 
         $control->onError = function(string $message): void {
