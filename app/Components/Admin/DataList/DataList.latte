@@ -1,0 +1,35 @@
+<table id="dataListTable" class="table table-responsive table-striped table-hover table-dark">
+    <thead>
+        <tr>
+            <th scope="col" class="text-end id-col">{$_('id')}</th>
+            {* DEBUG ONLY !!! *}
+            <th scope="col" class="">DATA_1</th>
+            <th scope="col" class="">DATA_2</th>
+            <th scope="col" class="">DATA_3</th>
+            <th scope="col" class="">DATA_4</th>
+            <th scope="col" class="">DATA_5</th>
+            <th scope="col" class="text-center ps-0 action-col">{$_('action')}</th>
+        </tr>
+    </thead>
+    <tbody>
+    {foreach $dataList as $item}
+        <tr>
+            <td class="align-middle text-end id-col">{$item['id']}</td>
+            {* DEBUG ONLY !!! *}
+            <td class="align-middle">{$item['data_1']}</td>
+            <td class="align-middle">{$item['data_2']}</td>
+            <td class="align-middle">{$item['data_3']}</td>
+            <td class="align-middle">{$item['data_4']}</td>
+            <td class="align-middle">{$item['data_5']}</td>
+            <td class="align-middle text-end ps-0 py-1 action-col">
+                <a n:href=":edit, itemId: $item['id']" class="btn btn-sm btn-primary me-1">
+                    <i class="fa-solid fa-pencil"></i>
+                </a>
+                {* TODO: Delete button *}
+            </td>
+        </tr>
+    {/foreach}
+    </tbody>
+</table>
+
+{control pagination}

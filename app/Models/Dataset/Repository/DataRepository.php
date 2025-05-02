@@ -7,6 +7,7 @@ namespace App\Models\Dataset\Repository;
 use App\Models\Dataset\DatasetException;
 use App\Models\Dataset\Entity\DatasetColumn;
 use App\Models\Dataset\Entity\DatasetRow;
+use App\Models\Helpers\ArrayHelper;
 use Nette\Database\Explorer;
 
 final class DataRepository
@@ -159,5 +160,42 @@ final class DataRepository
         return $this->db->table($this->getTableName($datasetId))
             ->where('id', $rowId)
             ->delete();
+    }
+
+
+    /**
+     * Retrieves a list of datasets with optional search and pagination.
+     *
+     * @param int $limit Number of results to return (default: 50).
+     * @param int $offset Offset for pagination (default: 0).
+     * @param string|null $search Optional search query for name, slug, component, or presenter fields.
+     * @return array<int|string,array<string,string|int|null>>|null Array of datasets indexed by ID, or null if none found.
+     */
+    public function getList(int $datasetId, int $limit = 50, int $offset = 0, ?string $search = null): ?array
+    {
+        $query = $this->db->table($this->getTableName($datasetId))
+            ->limit($limit, $offset)
+            ->order('id ASC');
+
+        // TODO: Search ...
+        // if ($search !== null) {
+        //     $query->where('name LIKE ? OR slug LIKE ? OR component LIKE ? OR presenter LIKE ?', "%$search%", "%$search%", "%$search%", "%$search%");
+        // }
+
+        $data = $query->fetchAll();
+
+        return $data ? ArrayHelper::resultToArray($data) : null;
+    }
+
+    public function getCount(int $datasetId, ?string $search = null): int
+    {
+        $query = $this->db->table($this->getTableName($datasetId));
+
+        // TODO: Search ...
+        // if ($search !== null) {
+        //     $query->where('name LIKE ? OR slug LIKE ? OR component LIKE ? OR presenter LIKE ?', "%$search%", "%$search%", "%$search%", "%$search%");
+        // }
+
+        return $query->count('*');
     }
 }

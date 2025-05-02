@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Modules\Admin\Presenters;
 
 use App\Components\Admin\IDatasetEditorFactory;
-use App\Components\Admin\IDatasetListFactory;
 use App\Models\Dataset\DatasetCreator;
+use App\Components\Admin\IDataListFactory;
 use App\Models\Dataset\DatasetManager;
 use App\Models\Dataset\DatasetUpdater;
 
@@ -21,14 +21,16 @@ class DataPresenter extends SecuredPresenter
     /** @var DatasetUpdater @inject */
     public DatasetUpdater $datasetUpdater;
 
-    /** @var IDatasetListFactory @inject */
-    public IDatasetListFactory $datasetList;
+    /** @var IDataListFactory @inject */
+    public IDataListFactory $dataList;
 
     /** @var IDatasetEditorFactory @inject */
     public IDatasetEditorFactory $datasetEditor;
 
-    public function renderDefault(int $page = 1, ?string $search = null): void
+    public function renderDefault(int $datasetId, int $page = 1, ?string $search = null): void
     {
+        $this->template->title .= " (dataset ID: $datasetId)";
+        $this->template->datasetId = $datasetId;
         $this->template->search = $search;
     }
 
@@ -52,21 +54,21 @@ class DataPresenter extends SecuredPresenter
             $this->redirect('this');
         }
 
-        $data = $this->getHttpRequest()->getPost();
+        // $data = $this->getHttpRequest()->getPost();
 
         // TODO: Permission check
 
-        $this->datasetManager->deleteDataset((int) $data['id']);
-        $this->flashMessage("Dataset ID: {$data['id']} byl odstraněn.", 'info');
+        // $this->datasetManager->deleteDataset((int) $data['datasetId']);
+        // $this->flashMessage("Dataset ID: {$data['datasetId']} byl odstraněn.", 'info');
     }
 
     // ##########################################
     // ###             COMPONENTS             ###
     // ##########################################
 
-    protected function createComponentDatasetList(): \App\Components\Admin\DatasetList
+    protected function createComponentDataList(): \App\Components\Admin\DataList
     {
-        $control = $this->datasetList->create();
+        $control = $this->dataList->create();
         $control->setParam([
             'search' => $this->getParameter('search'),
             'page' => $this->getParameter('page'),
