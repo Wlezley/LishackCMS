@@ -45,7 +45,7 @@ final class DatasetManager
     }
 
     /** @return DatasetColumn[] */
-    public function getColumnsSchema(): array
+    public function getColumns(): array
     {
         return $this->columns;
     }
@@ -63,6 +63,38 @@ final class DatasetManager
         foreach ($this->columns as $column) {
             $columnList[$column->columnId] = [
                 'columnId' => $column->columnId,
+                'name' => $column->name,
+                'slug' => $column->slug,
+                'type' => $column->type,
+                'required' => $column->required,
+                'listed' => $column->listed,
+                'hidden' => $column->hidden,
+                'deleted' => $column->deleted,
+                'default' => $column->default,
+            ];
+        }
+
+        return $columnList;
+    }
+
+    /** @return array<int,mixed> */
+    public function getListedColumns(): array
+    {
+        if (empty($this->columns)) {
+            return [];
+        }
+
+        $columnList = [];
+
+        /** @var DatasetColumn $column */
+        foreach ($this->columns as $column) {
+            if (!$column->listed) {
+                continue;
+            }
+
+            $columnList[$column->columnId] = [
+                'columnId' => $column->columnId,
+                'key' => "data_{$column->columnId}",
                 'name' => $column->name,
                 'slug' => $column->slug,
                 'type' => $column->type,

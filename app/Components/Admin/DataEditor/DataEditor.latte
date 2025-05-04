@@ -12,12 +12,14 @@
         <tbody>
             {foreach $columnList as $column}
                 {continueIf $column['deleted']}
+                {var $inputName = 'data_' . $column['columnId']}
                 <tr class="dataset-row">
                     <td class="align-middle status-col"></td>
                     <td class="align-middle col-id">{$column['columnId']}</td>
-                    <td class="align-middle">{$column['name']}</td>
                     <td class="align-middle">
-                        {var $inputName = 'data_' . $column['columnId']}
+                        <label for="$inputName" n:class="form-label, mb-0, $column['required'] ? required">{$column['name']}</label>
+                    </td>
+                    <td class="align-middle">
                         {if $column['type'] == 'bool'}
                             <div class="form-check form-switch mt-2">
                                 <input n:name="$inputName" class="form-check-input" type="checkbox">

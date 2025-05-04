@@ -162,4 +162,22 @@ final class ColumnRepository
 
         return $result !== null;
     }
+
+    /** @return array<string> */
+    public function getSearchColumns(int $datasetId): array
+    {
+        $query = $this->db->table(self::TABLE_NAME)
+            ->select('column_id')
+            ->where([
+                'dataset_id' => $datasetId,
+                'listed' => 1,
+            ])->fetchAll();
+
+        $columns = [];
+        foreach ($query as $row) {
+            $columns[] = "data_{$row['column_id']}";
+        }
+
+        return $columns;
+    }
 }

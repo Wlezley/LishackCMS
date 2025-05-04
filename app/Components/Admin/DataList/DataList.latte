@@ -2,12 +2,9 @@
     <thead>
         <tr>
             <th scope="col" class="text-end id-col">{$_('id')}</th>
-            {* DEBUG ONLY !!! *}
-            <th scope="col" class="">DATA_1</th>
-            <th scope="col" class="">DATA_2</th>
-            <th scope="col" class="">DATA_3</th>
-            <th scope="col" class="">DATA_4</th>
-            <th scope="col" class="">DATA_5</th>
+            {foreach $listColumns as $column}
+                <th scope="col" class="">{$column['name']}</th>
+            {/foreach}
             <th scope="col" class="text-center ps-0 action-col">{$_('action')}</th>
         </tr>
     </thead>
@@ -15,12 +12,9 @@
     {foreach $dataList as $item}
         <tr>
             <td class="align-middle text-end id-col">{$item['id']}</td>
-            {* DEBUG ONLY !!! *}
-            <td class="align-middle">{$item['data_1']}</td>
-            <td class="align-middle">{$item['data_2']}</td>
-            <td class="align-middle">{$item['data_3']}</td>
-            <td class="align-middle">{$item['data_4']}</td>
-            <td class="align-middle">{$item['data_5']}</td>
+            {foreach $listColumns as $column}
+                <td class="align-middle">{$item[$column['key']]}</td>
+            {/foreach}
             <td class="align-middle text-end ps-0 py-1 action-col">
                 <a n:href=":edit, itemId: $item['id']" class="btn btn-sm btn-primary me-1">
                     <i class="fa-solid fa-pencil"></i>

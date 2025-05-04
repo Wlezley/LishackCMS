@@ -7,7 +7,6 @@ namespace App\Models\Dataset\Entity;
 use App\Models\Dataset\DatasetException;
 use App\Models\Helpers\SqlHelper;
 use App\Models\Helpers\StringHelper;
-use Nette\Utils\Json;
 
 final class DatasetColumn
 {
@@ -49,7 +48,7 @@ final class DatasetColumn
         $column->listed = (bool) ($row['listed'] ?? false);
         $column->hidden = (bool) ($row['hidden'] ?? false);
         $column->deleted = (bool) ($row['deleted'] ?? false);
-        $column->default = $row['default'] ? (string) $row['default'] : null;
+        $column->default = (string) $row['default'];
 
         return $column;
     }
@@ -97,7 +96,6 @@ final class DatasetColumn
             'int' => $value ? (int) $value : null,
             'string', 'text', 'wysiwyg' => (string) $value,
             'bool' => (bool) $value,
-            // 'json' => $value ? Json::decode((string) $value, true) : null, // TODO: Fix it... ???
             'json' => (string) $value,
             default => $value,
         };
@@ -225,7 +223,12 @@ final class DatasetColumn
 
     public function setDefault(?string $default = null): self
     {
-        $this->default = $default;
+        if ($default === null) {
+            $this->default = null;
+        } else {
+            $default = trim($default);
+            $this->default = ($default === '') ? null : $default;
+        }
         return $this;
     }
 }

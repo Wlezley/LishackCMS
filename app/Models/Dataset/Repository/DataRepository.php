@@ -162,7 +162,6 @@ final class DataRepository
             ->delete();
     }
 
-
     /**
      * Retrieves a list of datasets with optional search and pagination.
      *
@@ -177,10 +176,13 @@ final class DataRepository
             ->limit($limit, $offset)
             ->order('id ASC');
 
-        // TODO: Search ...
-        // if ($search !== null) {
-        //     $query->where('name LIKE ? OR slug LIKE ? OR component LIKE ? OR presenter LIKE ?', "%$search%", "%$search%", "%$search%", "%$search%");
-        // }
+        $searchColumns = $this->columnRepository->getSearchColumns($datasetId);
+
+        $whereParts = [];
+        foreach ($searchColumns as $column) {
+            $whereParts["$column LIKE ?"] = "%$search%";
+        }
+        $query->whereOr($whereParts);
 
         $data = $query->fetchAll();
 
@@ -191,10 +193,13 @@ final class DataRepository
     {
         $query = $this->db->table($this->getTableName($datasetId));
 
-        // TODO: Search ...
-        // if ($search !== null) {
-        //     $query->where('name LIKE ? OR slug LIKE ? OR component LIKE ? OR presenter LIKE ?', "%$search%", "%$search%", "%$search%", "%$search%");
-        // }
+        $searchColumns = $this->columnRepository->getSearchColumns($datasetId);
+
+        $whereParts = [];
+        foreach ($searchColumns as $column) {
+            $whereParts["$column LIKE ?"] = "%$search%";
+        }
+        $query->whereOr($whereParts);
 
         return $query->count('*');
     }

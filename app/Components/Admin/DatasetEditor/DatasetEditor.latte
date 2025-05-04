@@ -2,7 +2,7 @@
     {input id}
     <div class="row">
         <div class="col-12 mx-auto">
-            <h2 class="text-warning">Dataset Metadata</h2>
+            <h2 class="text-warning">{$_('dataset.settings')}</h2>
             <div class="row mb-3">
                 <div class="col-6">
                     <div class="mb-3">
@@ -45,19 +45,20 @@
         </div>
     </div>
 
-    <h2 class="text-warning">Columns</h2>
+    <h2 class="text-warning">{$_('dataset.column')}</h2>
     <table id="datasetEditorTable" class="table table-responsive table-striped table-hover table-dark">
         <thead>
             <tr>
                 <th scope="col" class="status-col"></th>
                 <th scope="col" class="col-id">{$_('id')}</th>
                 <th scope="col">{$_('dataset.column.name')} *</th>
-                <th scope="col">{$_('slug')}</th>
+                <th scope="col">{$_('dataset.column.slug')}</th>
                 <th scope="col">{$_('dataset.column.type')}</th>
-                <th scope="col">{$_('required')}</th>
-                <th scope="col">{$_('listed')}</th>
-                <th scope="col">{$_('hidden')}</th>
-                <th scope="col">{$_('deleted')}</th>
+                <th scope="col">{$_('dataset.column.default')}</th>
+                <th scope="col">{$_('dataset.column.required')}</th>
+                <th scope="col">{$_('dataset.column.listed')}</th>
+                <th scope="col">{$_('dataset.column.hidden')}</th>
+                <th scope="col">{$_('dataset.column.deleted')}</th>
                 <th scope="col" class="action-col"></th>
             </tr>
         </thead>
@@ -75,6 +76,7 @@
                             {/foreach}
                         </select>
                     </td>
+                    <td class="align-middle"><input type="text" class="form-control default-input" value="{$item['default']}"></td>
                     <td class="align-middle">
                         <div class="form-check form-switch">
                             <input type="checkbox" class="form-check-input required-input" tabindex=-1 n:attr="checked: $item['required']">
@@ -101,7 +103,7 @@
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="9"></td>
+                <td colspan="10"></td>
                 <td class="align-middle action-col"><button type="button" class="btn btn-success" id="addRow"><i class="fa-solid fa-plus"></i></button></td>
             </tr>
         </tfoot>
@@ -125,6 +127,7 @@
                 {/foreach}
             </select>
         </td>
+        <td class="align-middle"><input type="text" class="form-control default-input" value=""></td>
         <td class="align-middle">
             <div class="form-check form-switch">
                 <input type="checkbox" class="form-check-input required-input" tabindex=-1>

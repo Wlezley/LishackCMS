@@ -110,7 +110,7 @@ class DatasetEditor extends BaseControl
                 $c['listed'],
                 $c['hidden'],
                 $c['deleted'],
-                null // $c['default']
+                $c['default']
             );
         }
 
@@ -150,7 +150,7 @@ class DatasetEditor extends BaseControl
                 $c['listed'],
                 $c['hidden'],
                 $c['deleted'],
-                null // $c['default']
+                $c['default']
             );
         }
 

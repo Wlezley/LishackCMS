@@ -25,8 +25,10 @@ class DataList extends BaseControl
         $search = $this->param['search'] ?? null;
         $offset = ($page - 1) * $this->limit;
 
+        $this->datasetManager->loadDatasetById($datasetId);
         $this->totalItems = $this->datasetManager->getDataRepository()->getCount($datasetId, $search);
         $this->template->dataList = $this->datasetManager->getDataRepository()->getList($datasetId, $this->limit, $offset, $search);
+        $this->template->listColumns = $this->datasetManager->getListedColumns();
         $this->template->datasetId = $datasetId;
 
         $this->template->setFile(__DIR__ . '/DataList.latte');

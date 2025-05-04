@@ -47,7 +47,7 @@ class DataEditor extends BaseControl
         }
 
         // LOAD COLUMNS SCHEMA
-        $columns = $this->datasetManager->getColumnsSchema();
+        $columns = $this->datasetManager->getColumns();
 
         // CHECK & SET THE ITEM ID
         $data = null;
@@ -107,10 +107,9 @@ class DataEditor extends BaseControl
                 $input->setValue($data->values[$c->columnId]);
             }
 
-            // TODO: Add column `default` to the table `dataset_column` (and to the DatasetColumn, ColumnRepository, DatasetCreator, DatasetUpdater, DatasetManager, etc.)
-            // if ($c->default) {
-            //     $input->setDefaultValue($c->default);
-            // }
+            if ($this->origin == self::OriginCreate && isset($c->default)) {
+                $input->setDefaultValue($c->default);
+            }
         }
 
         if ($this->origin == self::OriginCreate) {
