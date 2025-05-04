@@ -133,6 +133,11 @@ final class DatasetManager
         $this->datasetRepository->setDeleted($id);
     }
 
+    public function getDatasetId(): ?int
+    {
+        return $this->dataset->id;
+    }
+
     public function getDataset(): Dataset
     {
         return $this->dataset;

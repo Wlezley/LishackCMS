@@ -7,6 +7,7 @@ namespace App\Components\Admin;
 use App\Components\BaseControl;
 use App\Models\Dataset\DatasetManager;
 use App\Models\Dataset\Entity\DatasetColumn;
+use App\Models\Dataset\Entity\DatasetRow;
 use Nette\Application\UI\Form;
 
 class DataEditor extends BaseControl
@@ -40,7 +41,7 @@ class DataEditor extends BaseControl
             if ($datasetId && $this->datasetManager->loadDatasetById((int) $datasetId)) {
                 $this->datasetId = (int) $datasetId;
             } else {
-                throw new \Exception("Dataset '$datasetId' not found."); // TODO: Translate, improve, etc...
+                throw new \Exception("Dataset '$datasetId' not found."); // TODO: Translations...
             }
         } else {
             $this->datasetId = $this->datasetManager->getDataset()->id;
@@ -57,7 +58,7 @@ class DataEditor extends BaseControl
             if ($itemId) {
                 $this->itemId = (int) $itemId;
             } else {
-                throw new \Exception("Dataset item ID doeas not set."); // TODO: Translate, improve, etc...
+                throw new \Exception("Dataset item ID doeas not set."); // TODO: Translations...
             }
 
             // LOAD ITEMS
@@ -65,13 +66,9 @@ class DataEditor extends BaseControl
 
             // CHECK ITEMS (?)
             if (!$data) {
-                throw new \Exception("Dataset item '$itemId' not found."); // TODO: Translate, improve, etc...
+                throw new \Exception("Dataset item '{$this->itemId}' not found."); // TODO: Translations...
             }
         }
-
-        bdump($columns, "Form COLUMNS");
-        bdump($data, "Form DATA");
-        bdump($this->origin, "Form ORIGIN");
 
         $form = new Form;
 
@@ -79,6 +76,9 @@ class DataEditor extends BaseControl
 
         $form->addHidden('datasetId')
             ->setValue($this->datasetId);
+
+        $form->addHidden('itemId')
+            ->setValue($this->itemId);
 
         // DYNAMIC DATA COLUMNS
         foreach ($columns as $c) {
@@ -126,26 +126,84 @@ class DataEditor extends BaseControl
     /** @param \Nette\Utils\ArrayHash<mixed> $values */
     public function processCreate(Form $form, \Nette\Utils\ArrayHash $values): void
     {
-        bdump($values, "PROCESS CREATE: VALUES");
+        if (!$this->datasetManager->isReady()) {
+            call_user_func($this->onError, "ID datasetu nebylo nastaveno. Data nebyla uložena!"); // TODO: Translations...
+            return;
+        }
 
-        // call_user_func($this->onSuccess, "Položka do datasetu '$datasetId' byla přidána.");
-        call_user_func($this->onSuccess, "VYTVOŘENO, ID: 'xyz'."); // DEBUG ONLY !!!
+        foreach ($this->datasetManager->getColumnsList() as $column) {
+            if ($column['required'] && empty($values["data_{$column['columnId']}"])) {
+                $label = $column['name'];
+                call_user_func($this->onError, $this->tf('error.form.missing-required', $label));
+                return;
+            }
+        }
+
+        $dataRow = new DatasetRow();
+
+        foreach ($values as $key => $value) {
+            if (!str_starts_with($key, 'data_')) {
+                continue;
+            }
+
+            $dataRow->setValue((int) substr($key, 5), $value);
+        }
+
+        if (empty($dataRow->getValues())) {
+            call_user_func($this->onError, $this->t('error.form.empty-data'));
+            return;
+        }
+
+        $dataRow = $this->datasetManager->getDataRepository()->insert($this->datasetId, $dataRow);
+
+        if (!$dataRow->id) {
+            call_user_func($this->onError, "Položku datasetu se nepodařilo vytvořit."); // TODO: Translations...
+            return;
+        }
+
+        call_user_func($this->onSuccess, "Položka do datasetu byla přidána, ID: {$dataRow->id}."); // TODO: Translations...
     }
 
     /** @param \Nette\Utils\ArrayHash<mixed> $values */
     public function processSave(Form $form, \Nette\Utils\ArrayHash $values): void
     {
-        bdump($values, "PROCESS SAVE: VALUES");
+        if (!$this->datasetManager->isReady()) {
+            call_user_func($this->onError, "ID datasetu nebylo nastaveno. Data nebyla uložena!"); // TODO: Translations...
+            return;
+        }
 
-        // call_user_func($this->onSuccess, "Položka '$itemId' v datasetu '$datasetId' byla uložena.");
-        call_user_func($this->onSuccess, "ULOŽENO, ID: 'xyz'."); // DEBUG ONLY !!!
+        foreach ($this->datasetManager->getColumnsList() as $column) {
+            if ($column['required'] && empty($values["data_{$column['columnId']}"])) {
+                $label = $column['name'];
+                call_user_func($this->onError, $this->tf('error.form.missing-required', $label));
+                return;
+            }
+        }
+
+        $dataRow = new DatasetRow();
+        $dataRow->id = $values['itemId'] ? (int) $values['itemId']: null;
+
+        foreach ($values as $key => $value) {
+            if (!str_starts_with($key, 'data_')) {
+                continue;
+            }
+
+            $dataRow->setValue((int) substr($key, 5), $value);
+        }
+
+        if (empty($dataRow->getValues())) {
+            call_user_func($this->onError, $this->t('error.form.empty-data'));
+            return;
+        }
+
+        $this->datasetManager->getDataRepository()->update($this->datasetId, $dataRow);
+
+        call_user_func($this->onSuccess, "Položka ID: {$dataRow->id} byla uložena."); // TODO: Translations...
     }
 
     public function render(): void
     {
         $this->template->columnList = $this->datasetManager->getColumnsList();
-
-        bdump($this->template->columnList, "Form render COLUMNS");
 
         $this->template->setFile(__DIR__ . '/DataEditor.latte');
         $this->template->render();

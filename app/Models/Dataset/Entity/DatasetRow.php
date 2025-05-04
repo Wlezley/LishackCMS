@@ -86,8 +86,6 @@ final class DatasetRow
         }
     }
 
-
-
     /** @return array<int,mixed> */
     public function getValues(): array
     {
