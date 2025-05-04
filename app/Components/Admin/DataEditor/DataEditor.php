@@ -22,7 +22,7 @@ class DataEditor extends BaseControl
     /** @var DatasetManager @inject */
     public DatasetManager $datasetManager;
 
-    /** @var callable(string): void */
+    /** @var callable(string, int): void */
     public $onSuccess;
 
     /** @var callable(string): void */
@@ -34,23 +34,18 @@ class DataEditor extends BaseControl
             throw new \Exception($this->t('error.form.unknown-origin'));
         }
 
-        // CHECK IF THE DATASET READY & SET THE DATASET ID
         if (!$this->datasetManager->isReady()) {
             $datasetId = $this->getPresenter()->getParameter('datasetId');
 
             if ($datasetId && $this->datasetManager->loadDatasetById((int) $datasetId)) {
                 $this->datasetId = (int) $datasetId;
             } else {
-                throw new \Exception("Dataset '$datasetId' not found."); // TODO: Translations...
+                throw new \Exception($this->tf('dataset.id.not-found', (int) $datasetId));
             }
         } else {
             $this->datasetId = $this->datasetManager->getDataset()->id;
         }
 
-        // LOAD COLUMNS SCHEMA
-        $columns = $this->datasetManager->getColumns();
-
-        // CHECK & SET THE ITEM ID
         $data = null;
         if ($this->origin == self::OriginEdit) {
             $itemId = $this->getPresenter()->getParameter('itemId');
@@ -58,15 +53,13 @@ class DataEditor extends BaseControl
             if ($itemId) {
                 $this->itemId = (int) $itemId;
             } else {
-                throw new \Exception("Dataset item ID doeas not set."); // TODO: Translations...
+                throw new \Exception($this->t('dataset.item-id.not-set'));
             }
 
-            // LOAD ITEMS
             $data = $this->datasetManager->getDataRepository()->findById($this->datasetId, $this->itemId);
 
-            // CHECK ITEMS (?)
             if (!$data) {
-                throw new \Exception("Dataset item '{$this->itemId}' not found."); // TODO: Translations...
+                throw new \Exception($this->tf('dataset.item-id.not-found', $this->itemId));
             }
         }
 
@@ -80,8 +73,7 @@ class DataEditor extends BaseControl
         $form->addHidden('itemId')
             ->setValue($this->itemId);
 
-        // DYNAMIC DATA COLUMNS
-        foreach ($columns as $c) {
+        foreach ($this->datasetManager->getColumns() as $c) {
             if ($c->deleted) {
                 continue;
             }
@@ -127,7 +119,7 @@ class DataEditor extends BaseControl
     public function processCreate(Form $form, \Nette\Utils\ArrayHash $values): void
     {
         if (!$this->datasetManager->isReady()) {
-            call_user_func($this->onError, "ID datasetu nebylo nastaveno. Data nebyla uložena!"); // TODO: Translations...
+            call_user_func($this->onError, $this->t('dataset.id.not-set'));
             return;
         }
 
@@ -157,18 +149,18 @@ class DataEditor extends BaseControl
         $dataRow = $this->datasetManager->getDataRepository()->insert($this->datasetId, $dataRow);
 
         if (!$dataRow->id) {
-            call_user_func($this->onError, "Položku datasetu se nepodařilo vytvořit."); // TODO: Translations...
+            call_user_func($this->onError, $this->t('dataset.item.not-created'));
             return;
         }
 
-        call_user_func($this->onSuccess, "Položka do datasetu byla přidána, ID: {$dataRow->id}."); // TODO: Translations...
+        call_user_func($this->onSuccess, $this->tf('dataset.item.created', $dataRow->id), $this->datasetId);
     }
 
     /** @param \Nette\Utils\ArrayHash<mixed> $values */
     public function processSave(Form $form, \Nette\Utils\ArrayHash $values): void
     {
         if (!$this->datasetManager->isReady()) {
-            call_user_func($this->onError, "ID datasetu nebylo nastaveno. Data nebyla uložena!"); // TODO: Translations...
+            call_user_func($this->onError, $this->t('dataset.id.not-set'));
             return;
         }
 
@@ -198,7 +190,7 @@ class DataEditor extends BaseControl
 
         $this->datasetManager->getDataRepository()->update($this->datasetId, $dataRow);
 
-        call_user_func($this->onSuccess, "Položka ID: {$dataRow->id} byla uložena."); // TODO: Translations...
+        call_user_func($this->onSuccess, $this->tf('dataset.item.saved', $dataRow->id), $this->datasetId);
     }
 
     public function render(): void

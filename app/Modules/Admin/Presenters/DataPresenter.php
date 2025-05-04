@@ -94,8 +94,9 @@ class DataPresenter extends SecuredPresenter
             $this->getParameter('itemId') ? $control::OriginEdit : $control::OriginCreate
         );
 
-        $control->onSuccess = function(string $message): void {
+        $control->onSuccess = function(string $message, int $datasetId): void {
             $this->flashMessage($message, 'info');
+            $this->redirect('Data:', ['datasetId' => $datasetId]);
         };
 
         $control->onError = function(string $message): void {
