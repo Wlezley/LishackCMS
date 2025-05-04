@@ -20,7 +20,7 @@ final class InstallPresenter extends Presenter
         parent::beforeRender();
 
         if ($this->installer->isInstalled()) {
-            $this->redirect('Article:detail');
+            $this->redirect('Article:default');
         }
 
         $this->layout = 'systemLayout';
@@ -28,7 +28,20 @@ final class InstallPresenter extends Presenter
 
     public function renderRun(): void
     {
-        $this->installer->run();
+        try {
+            $this->installer->run();
+        } catch (\Exception $e) {
+            $this->redirect('Install:failed', [
+                'error' => $e->getMessage()
+            ]);
+            return;
+        }
+
         $this->template->phinxLog = $this->installer->getLog();
+    }
+
+    public function renderFailed(string $error = ''): void
+    {
+        $this->template->error = $error;
     }
 }

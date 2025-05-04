@@ -1,6 +1,13 @@
 {block title}Installation{/block}
 {block content}
-<div>
-    <h1>Lishack CMS - Installation</h1>
-    <a n:href="Install:run">Install</a>
+<div class="container mt-5">
+    <h1 class="text-white mb-4">Lishack CMS 🦊 INSTALLATION PROCESS</h1>
+
+    <p class="text-warning">!!! WARNING !!!<br />
+        This action will write all necessary tables and data<br />
+        to the database, which you have set in the /config/local.neon file.
+    </p>
+    <p class="text-warning">Are you sure you want to continue?</p>
+
+    <a n:href="Install:run" class="btn btn-primary mt-4">Yeah, let's install it!</a>
 </div>

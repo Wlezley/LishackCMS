@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Nette\Database\ConnectionException;
+use Nette\Database\DriverException;
 use Nette\Database\Explorer;
 use PDO;
 use Phinx\Wrapper\TextWrapper;
@@ -27,15 +29,37 @@ class Installer
         try {
             $result = $this->db->query('SHOW TABLES LIKE ?', self::TABLE_TO_CHECK);
             return $result->getRowCount() === 1;
-        } catch (\Nette\Database\DriverException $e) {
+        } catch (DriverException $e) {
             return false;
         }
     }
 
-    public function run(): void
+    private function isReady(): bool
+    {
+        try {
+            $this->db->getConnection()->getPdo();
+        } catch (ConnectionException $e) {
+            $this->log = $e->getMessage();
+            return false;
+        }
+
+        return true;
+    }
+
+    public function run(): bool
     {
         if ($this->isInstalled()) {
             throw new \Exception('CMS is already installed.');
+        }
+
+        if (!$this->isReady()) {
+            throw new \Exception(
+                'Database is not properly prepared to the CMS installation.' . PHP_EOL .
+                'Please check your configuration files and your database connection first.' . PHP_EOL .
+                PHP_EOL .
+                'ERROR:' . PHP_EOL .
+                $this->log
+            );
         }
 
         if (!file_exists(self::SQL_DUMP_FILE)) {
@@ -63,6 +87,8 @@ class Installer
 
         $this->phinx->setOption('configuration', '../phinx.php');
         $this->log .= $this->phinx->getMigrate();
+
+        return true;
     }
 
     public function getLog(): string

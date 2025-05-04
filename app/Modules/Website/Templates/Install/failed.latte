@@ -1,0 +1,12 @@
+{block title}Ready{/block}
+{block content}
+<div class="container mt-5">
+    <h1 class="text-danger">Lishack CMS 🦊 INSTALLATION FAILED!</h1>
+
+    <a n:href="Install:run" class="btn btn-warning mt-4">Retry Install</a>
+
+    <hr />
+
+    <h2>Error log:</h2>
+    <pre class="text-danger">{$error|noescape}</pre>
+</div>
