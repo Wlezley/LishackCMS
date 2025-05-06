@@ -45,6 +45,13 @@ class DatasetList extends BaseControl
         $this->template->render();
     }
 
+    public function handleDatalist(string $id): void
+    {
+        $this->presenter->redirect('Data:', [
+            'datasetId' => $id
+        ]);
+    }
+
     public function handleEdit(string $id): void
     {
         $this->presenter->redirect('Dataset:edit', [

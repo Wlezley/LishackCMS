@@ -14,7 +14,11 @@
     {foreach $datasetList as $id => $item}
         <tr>
             <td class="align-middle text-end id-col">{$id}</td>
-            <td class="align-middle">{$item['name']}</td>
+            <td class="align-middle">
+                <a n:href=":datalist, id: $id">
+                    {$item['name']}
+                </a>
+            </td>
             <td class="align-middle">{$item['slug']}</td>
             <td class="align-middle">{$item['component']}</td>
             <td class="align-middle">{$item['presenter']}</td>
