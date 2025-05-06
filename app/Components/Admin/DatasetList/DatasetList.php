@@ -6,7 +6,7 @@ namespace App\Components\Admin;
 
 use App\Components\BaseControl;
 use App\Models\Dataset\DatasetManager;
-use App\Modules\Admin\Presenters\DataPresenter;
+use App\Modules\Admin\Presenters\DatasetPresenter;
 use Nette\Utils\Json;
 
 class DatasetList extends BaseControl
@@ -33,7 +33,6 @@ class DatasetList extends BaseControl
             // TODO: Fix empty modal on second call of deletion method
             return Json::encode([
                 'id' => (string) $id,
-                // 'name' => (string) $name,
                 'modal' => [
                     'title' => $this->t('modal.title.confirm-delete'),
                     'body' => $this->tf('modal.body.delete-dataset', $name, $id)
@@ -66,7 +65,7 @@ class DatasetList extends BaseControl
 
     protected function createComponentPagination(): \App\Components\Pagination
     {
-        /** @var DataPresenter $presenter */
+        /** @var DatasetPresenter $presenter */
         $presenter = $this->getPresenter();
 
         $control = $presenter->paginationFactory->create();

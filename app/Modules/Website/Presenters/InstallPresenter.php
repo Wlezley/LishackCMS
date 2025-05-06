@@ -34,7 +34,6 @@ final class InstallPresenter extends Presenter
             $this->redirect('Install:failed', [
                 'error' => $e->getMessage()
             ]);
-            return;
         }
 
         $this->template->adminHomeUrl = ADMIN_HOME_URL;

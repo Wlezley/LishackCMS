@@ -10,8 +10,6 @@ use App\Models\Dataset\DatasetManager;
 
 class DataPresenter extends SecuredPresenter
 {
-    // TODO: We need DataManager....
-
     /** @var DatasetManager @inject */
     public DatasetManager $datasetManager;
 
@@ -21,9 +19,16 @@ class DataPresenter extends SecuredPresenter
     /** @var IDataEditorFactory @inject */
     public IDataEditorFactory $dataEditor;
 
-    public function renderDefault(int $datasetId, int $page = 1, ?string $search = null): void
+    public function renderDefault(int $datasetId = 0, int $page = 1, ?string $search = null): void
     {
-        $this->template->title .= " (dataset ID: $datasetId)";
+        if (!$this->datasetManager->loadDatasetById($datasetId, true)) {
+            $this->flashMessage($this->tf('dataset.id.not-found', (int) $datasetId), 'danger');
+            return;
+        }
+
+        $datasetName = $this->datasetManager->getDataset()->name;
+
+        $this->template->title .= " ($datasetName)";
         $this->template->datasetId = $datasetId;
         $this->template->search = $search;
     }
@@ -52,21 +57,22 @@ class DataPresenter extends SecuredPresenter
         $this->template->title .= " ($datasetName / $itemId)";
     }
 
-    /**
-     * @todo Create DataManager for data handling? (also usable for delete these dataset rows / items)
-     */
     public function handleDelete(): void
     {
         if (!$this->isAjax()) {
             $this->redirect('this');
         }
 
-        // $data = $this->getHttpRequest()->getPost();
+        $data = $this->getHttpRequest()->getPost();
 
         // TODO: Permission check
 
-        // $this->dataManager->deleteRow((int) $data['itemId']);
-        // $this->flashMessage("Řádek {$data['itemId']} z {$data['datasetId']} byl odstraněn.", 'info');
+        $this->datasetManager->deleteRow((int) $data['datasetId'], (int) $data['itemId']);
+
+        $this->flashMessage("Řádek s ID {$data['itemId']} byl odstraněn.", 'info');
+        $this->redirect(':default', [
+            'datasetId' => $data['datasetId']
+        ]);
     }
 
     // ##########################################

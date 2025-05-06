@@ -7,6 +7,7 @@ namespace App\Components\Admin;
 use App\Components\BaseControl;
 use App\Models\Dataset\DatasetManager;
 use App\Modules\Admin\Presenters\DataPresenter;
+use Nette\Utils\Json;
 
 class DataList extends BaseControl
 {
@@ -30,6 +31,18 @@ class DataList extends BaseControl
         $this->template->dataList = $this->datasetManager->getDataRepository()->getList($datasetId, $this->limit, $offset, $search);
         $this->template->listColumns = $this->datasetManager->getListedColumns();
         $this->template->datasetId = $datasetId;
+
+        $this->template->getJson = function($datasetId, $itemId) {
+            // TODO: Fix empty modal on second call of deletion method
+            return Json::encode([
+                'itemId' => (string) $itemId,
+                'datasetId' => (int) $datasetId,
+                'modal' => [
+                    'title' => $this->t('modal.title.confirm-delete'),
+                    'body' => $this->tf('modal.body.delete-dataset-data', $itemId)
+                ]
+            ]);
+        };
 
         $this->template->setFile(__DIR__ . '/DataList.latte');
         $this->template->render();

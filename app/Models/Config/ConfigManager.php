@@ -110,7 +110,7 @@ class ConfigManager
         $categories = [];
         foreach ($this->configuration as $item) {
             $category = $item['category'];
-            if ($categories[$category]) {
+            if (isset($categories[$category])) {
                 $categories[$category] += 1;
             } else {
                 $categories[$category] =  1;

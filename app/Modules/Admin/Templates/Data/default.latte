@@ -1,7 +1,12 @@
 {block content}
-<div class="row">
+<div class="row" n:if="isset($datasetId)">
     <div class="col">
         <div>
+            <a n:href="Dataset:edit, id: $datasetId" class="btn btn-primary float-start me-3">
+                <i class="fa-solid fa-cog pe-2"></i>
+                {$_('dataset.settings')}
+            </a>
+
             <form class="row g-3 float-end" name="searchForm">
                 <input type="hidden" name="datasetId" value="{$datasetId}">
                 <div class="col-auto">

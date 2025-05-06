@@ -13,13 +13,33 @@
         <tr>
             <td class="align-middle text-end id-col">{$item['id']}</td>
             {foreach $listColumns as $column}
-                <td class="align-middle">{$item[$column['key']]|truncate:50}</td>
+                {if $column['type'] == 'bool'}
+                    {if $item[$column['key']] == 1}
+                        <td class="text-success">
+                            <i class="fa-solid fa-check align-middle" style="font-size: 20px;"></i>
+                        </td>
+                    {else}
+                        <td class="text-danger">
+                            <i class="fa-solid fa-xmark align-middle" style="font-size: 20px;"></i>
+                        </td>
+                    {/if}
+                {elseif $column['type'] == 'wysiwyg'}
+                    <td class="align-middle fst-italic text-secondary">(TinyMCE)</td>
+                {elseif $column['type'] == 'json'}
+                    <td class="align-middle fst-italic text-secondary">&#123;JSON&#125;</td>
+                {elseif $column['type'] == 'html'}
+                    <td class="align-middle fst-italic text-secondary">&lt;HTML&gt;</td>
+                {else}
+                    <td class="align-middle">{$item[$column['key']]|truncate:50}</td>
+                {/if}
             {/foreach}
             <td class="align-middle text-end ps-0 py-1 action-col">
                 <a n:href=":edit, itemId: $item['id']" class="btn btn-sm btn-primary me-1">
                     <i class="fa-solid fa-pencil"></i>
                 </a>
-                {* TODO: Delete button *}
+                <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteDataConfirmModal" data-json="{$getJson($datasetId, $item['id'])}">
+                    <i class="fa-solid fa-eraser"></i>
+                </button>
             </td>
         </tr>
     {/foreach}
@@ -27,3 +47,30 @@
 </table>
 
 {control pagination}
+
+<script n:syntax="off">
+    document.addEventListener('DOMContentLoaded', () => {
+        const DataDeleteModal = new LishackCMS.AdminModal('#deleteDataConfirmModal', 'data-json');
+        DataDeleteModal.init();
+    });
+</script>
+
+{* {define modals} *}
+    <div class="modal fade" id="deleteDataConfirmModal" tabindex="-1" aria-labelledby="deleteDataConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered text-dark">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteDataConfirmModalLabel"><!-- MODAL TITLE --></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{$_('close')}"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- MODAL BODY -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{$_('cancel')}</button>
+                    <button type="submit" class="btn btn-danger" data-modal-action="delete">{$_('btn.delete')}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{* {/define} *}
