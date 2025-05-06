@@ -83,9 +83,10 @@ class DataEditor extends BaseControl
                 'int' => $form->addInteger($columnName, $c->slug),
                 'string' => $form->addText($columnName, $c->slug),
                 'text' => $form->addTextArea($columnName, $c->slug),
-                'wysiwyg' => $form->addTextArea($columnName, $c->slug)->setHtmlAttribute('class', 'tiny-mce'), // TODO !!!
+                'wysiwyg' => $form->addTextArea($columnName, $c->slug),
                 'bool' => $form->addCheckbox($columnName, $c->slug),
-                'json' => $form->addText($columnName, $c->slug)->setHtmlAttribute('class', 'json-editor'), // TODO !!!
+                'json' => $form->addTextArea($columnName, $c->slug),
+                'html' => $form->addTextArea($columnName, $c->slug),
                 default => null,
             };
 

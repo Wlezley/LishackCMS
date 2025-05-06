@@ -6,25 +6,52 @@ import { defaultHighlightStyle, syntaxHighlighting } from '@codemirror/language'
 
 // import { markdown, markdownKeymap } from '@codemirror/lang-markdown'
 import { html } from "@codemirror/lang-html"
+import { json } from "@codemirror/lang-json"
+import { cobalt } from 'thememirror'
 
-import { cobalt } from 'thememirror';
+document.querySelectorAll('.codemirror-editor').forEach((editorEl) => {
+  const wrapperEl = editorEl.closest('td')
+  if (!wrapperEl) return;
 
-const state = EditorState.create({
-	doc: '<p class="d-none">Test</p>',
-  lineNumbers: true,
-  styleActiveLine: true,
-  matchBrackets: true,
-	extensions: [
-    basicSetup,
-		cobalt,
-    html(),
-    history(),
-    syntaxHighlighting(defaultHighlightStyle),
-    keymap.of([defaultKeymap, historyKeymap]),
-	]
-});
+  const inputEl = wrapperEl.querySelector('.codemirror-input');
+  if (!inputEl) return;
 
-const view = new EditorView({
-	parent: document.querySelector('.codemirror-editor'),
-	state
-});
+  let lang;
+  let langKeymap;
+  switch(editorEl.dataset.lang) {
+    case 'json':
+      lang = json();
+      langKeymap = defaultKeymap;
+      break;
+
+    default:
+      lang = html();
+      langKeymap = defaultKeymap;
+      break;
+  }
+
+  const state = EditorState.create({
+    doc: inputEl.value || '',
+    lineNumbers: true,
+    styleActiveLine: true,
+    matchBrackets: true,
+    extensions: [
+      basicSetup,
+      cobalt,
+      lang,
+      history(),
+      syntaxHighlighting(defaultHighlightStyle),
+      keymap.of([langKeymap, historyKeymap]),
+      EditorView.updateListener.of((update) => {
+        if (update.docChanged) {
+          inputEl.value = update.state.doc.toString()
+        }
+      }),
+    ]
+  })
+
+  const view = new EditorView({
+    parent: editorEl,
+    state
+  })
+})

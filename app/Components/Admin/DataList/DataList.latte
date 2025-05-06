@@ -13,7 +13,7 @@
         <tr>
             <td class="align-middle text-end id-col">{$item['id']}</td>
             {foreach $listColumns as $column}
-                <td class="align-middle">{$item[$column['key']]}</td>
+                <td class="align-middle">{$item[$column['key']]|truncate:50}</td>
             {/foreach}
             <td class="align-middle text-end ps-0 py-1 action-col">
                 <a n:href=":edit, itemId: $item['id']" class="btn btn-sm btn-primary me-1">

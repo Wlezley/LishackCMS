@@ -25,8 +25,14 @@
                             <div class="form-check form-switch mt-2">
                                 <input n:name="$inputName" class="form-check-input" type="checkbox">
                             </div>
-                        {* {elseif $column['type'] == 'wysiwyg'} *}
-                        {* {elseif $column['type'] == 'json'} *}
+                        {elseif $column['type'] == 'wysiwyg'}
+                            {input $inputName, class => 'tinymce d-none'}
+                        {elseif $column['type'] == 'json'}
+                            <div class="codemirror-editor" data-lang="json"></div>
+                            {input $inputName, class => 'codemirror-input d-none'}
+                        {elseif $column['type'] == 'html'}
+                            <div class="codemirror-editor" data-lang="html"></div>
+                            {input $inputName, class => 'codemirror-input d-none'}
                         {else}
                             {input $inputName, class => 'form-control'}
                         {/if}

@@ -17,6 +17,7 @@ final class DatasetColumn
         'text',
         'wysiwyg',
         'json',
+        'html',
     ];
 
     public int $datasetId = 0;
@@ -83,7 +84,7 @@ final class DatasetColumn
             'int' => 'INT(11)',
             'string' => 'VARCHAR(255)',
             'bool' => 'TINYINT(1)',
-            'json', 'text', 'wysiwyg' => 'TEXT',
+            'json', 'text', 'html', 'wysiwyg' => 'TEXT',
             default => throw new DatasetException("Unknown SQL type for '{$this->type}'."),
         };
     }
@@ -94,7 +95,7 @@ final class DatasetColumn
 
         return match ($type) {
             'int' => $value ? (int) $value : null,
-            'string', 'text', 'wysiwyg' => (string) $value,
+            'string', 'text', 'html', 'wysiwyg' => (string) $value,
             'bool' => (bool) $value,
             'json' => (string) $value,
             default => $value,
@@ -132,7 +133,7 @@ final class DatasetColumn
     {
         return match ($this->type) {
             'int' => is_int($value),
-            'string', 'text', 'wysiwyg' => is_string($value),
+            'string', 'text', 'html', 'wysiwyg' => is_string($value),
             'bool' => is_bool($value),
             'json' => is_array($value) || is_object($value),
             default => false,
