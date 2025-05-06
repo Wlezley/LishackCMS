@@ -37,6 +37,7 @@ final class InstallPresenter extends Presenter
             return;
         }
 
+        $this->template->adminHomeUrl = ADMIN_HOME_URL;
         $this->template->phinxLog = $this->installer->getLog();
     }
 

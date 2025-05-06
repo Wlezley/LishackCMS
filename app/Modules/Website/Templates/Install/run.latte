@@ -3,7 +3,26 @@
 <div class="container mt-5">
     <h1 class="text-success">Lishack CMS 🦊 INSTALLATION COMPLETED!</h1>
 
-    <a n:href="Article:default" class="btn btn-primary mt-4">Show website home page</a>
+    <p>
+        You're all set!<br />
+        Now it's time to create your <strong class="text-success">administrator account</strong>.<br />
+        This step is done via the command line — grab your keyboard and choose a strong password.
+    </p>
+
+    <p class="text-white">
+        To create an admin user, simply run the following commands:
+    </p>
+
+    <pre class="text-primary">
+        php ./bin/console user:add admin
+        php ./bin/console user:role admin admin
+    </pre>
+
+    <p class="text-white">
+        After that, you can log in at <a href="{$adminHomeUrl}" target="_blank">/admin/</a> using the username <code>admin</code> and the password you chose.
+    </p>
+
+    <a n:href="Article:default" target="_blank" class="btn btn-primary mt-4">Go to Homepage</a>
 
     <hr />
 
