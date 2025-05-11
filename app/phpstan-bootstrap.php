@@ -1,8 +1,7 @@
 <?php
 
 define('VERSION', '');
-define('ROOT_DIR', '');
-define('ROOT_DIR_ABSOLUTE', '');
+define('PROJECT_DIR', '');
 define('APP_DIR', '');
 define('ASSETS_DIR', '');
 define('FILE_CACHE_DIR', '');

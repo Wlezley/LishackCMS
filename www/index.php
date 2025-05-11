@@ -17,11 +17,10 @@ if (isset($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
 }
 
 define('VERSION', '0.1a');
-define('ROOT_DIR', '../');
-define('ROOT_DIR_ABSOLUTE', __DIR__ . '/' . ROOT_DIR);
-define('APP_DIR', ROOT_DIR . 'app/');
+define('PROJECT_DIR', dirname(__DIR__) . '/');
+define('APP_DIR', PROJECT_DIR . 'app/');
 define('ASSETS_DIR', __DIR__ . '/assets/');
-define('FILE_CACHE_DIR', ROOT_DIR . 'temp/cache/');
+define('FILE_CACHE_DIR', PROJECT_DIR . 'temp/cache/');
 
 $configurator = App\Bootstrap::boot();
 $container = $configurator->createContainer();
