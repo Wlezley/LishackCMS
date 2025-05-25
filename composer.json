@@ -32,7 +32,8 @@
         "codeception/module-phpbrowser": "*",
         "codeception/module-asserts": "*",
         "contributte/console": "^0.10.1",
-        "ublaboo/datagrid": "^7.x-dev"
+        "ublaboo/datagrid": "^7.x-dev",
+        "samdark/sitemap": "^2.4"
     },
     "require-dev": {
         "nette/tester": "^2.5",

@@ -135,7 +135,10 @@ class ArticleManager extends BaseModel
             ->insert($data);
 
         if (!$newArticle) {
-            throw new ArticleException('Article creation failed.', 1);
+            throw new ArticleException(
+                'Article creation failed.',
+                \Nette\Http\IResponse::S500_InternalServerError
+            );
         }
 
         return (int) $newArticle['id'];
@@ -160,7 +163,10 @@ class ArticleManager extends BaseModel
             ->where('id', $id);
 
         if (!$query->fetch()) {
-            throw new ArticleException("Article (ID '$id') not found.", 1);
+            throw new ArticleException(
+                "Article (ID '$id') not found.",
+                \Nette\Http\IResponse::S404_NotFound
+            );
         }
 
         $query->update($data);

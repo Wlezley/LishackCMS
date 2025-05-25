@@ -24,7 +24,10 @@ class UrlGenerator extends BaseModel
         $categoryUrlList = array_values(array_filter($categoryUrlListRaw));
 
         if (!empty($categoryUrl) && count($categoryUrlListRaw) !== count($categoryUrlList)) {
-            throw new CategoryException('Broken Category URL', \Nette\Http\IResponse::S404_NotFound);
+            throw new CategoryException(
+                'Broken Category URL',
+                \Nette\Http\IResponse::S404_NotFound
+            );
         }
 
         return $categoryUrlList;
@@ -36,11 +39,11 @@ class UrlGenerator extends BaseModel
      * Traverses the category tree upward to construct a nested URL
      * from the root to the specified category.
      *
-     * @param int $id ID of the category.
+     * @param int $categoryId ID of the category.
      * @return string Complete category URL (e.g. "parent/sub/child/").
      * @throws CategoryException If the category or any of its parents cannot be found.
      */
-    public function generateCategoryUrl(int $id): string
+    public function generateCategoryUrl(int $categoryId): string
     {
         $result = $this->db->table(CategoryManager::TABLE_NAME)
             ->order('position')
@@ -48,13 +51,16 @@ class UrlGenerator extends BaseModel
 
         $categories = ArrayHelper::resultToArray($result);
 
-        $limit = $categories[$id]['level'];
-        $parent_id = $categories[$id]['id'];
-        $name_url = $categories[$id]['name_url'];
+        $limit = $categories[$categoryId]['level'];
+        $parent_id = $categories[$categoryId]['id'];
+        $name_url = $categories[$categoryId]['name_url'];
 
         for ($level = 1; $level < $limit; $level++) {
             if (!isset($categories[$parent_id])) {
-                throw new CategoryException("Category ID $parent_id not found.", 1);
+                throw new CategoryException(
+                    "Category (ID '$parent_id') not found.",
+                    \Nette\Http\IResponse::S404_NotFound
+                );
             }
 
             $parent_id = $categories[$parent_id]['parent_id'];
@@ -69,25 +75,28 @@ class UrlGenerator extends BaseModel
      *
      * Handles edge cases like articles in the root (main) category and the default page.
      *
-     * @param int $id ID of the article.
+     * @param int $articleId ID of the article.
      * @return string Full article URL (e.g. "category/sub/article/").
      * @throws ArticleException If the article cannot be found.
      */
-    public function generateArticleUrl(int $id): string
+    public function generateArticleUrl(int $articleId): string
     {
         $article = $this->db->table(ArticleManager::TABLE_NAME)
             ->select('name_url, category_id')
-            ->where('id', $id)
+            ->where('id', $articleId)
             ->fetch();
 
         if (!$article) {
-            throw new ArticleException("Article ID $id not found.", 1);
+            throw new ArticleException(
+                "Article (ID '$articleId') not found.",
+                \Nette\Http\IResponse::S404_NotFound
+            );
         }
 
         $name_url = $article['name_url'];
-        $cID = $article['category_id'];
+        $categoryId = $article['category_id'];
 
-        if ($cID == CategoryManager::MAIN_CATEGORY_ID) {
+        if ($categoryId == CategoryManager::MAIN_CATEGORY_ID) {
             if ($this->c('DEFAULT_PAGE') == $name_url) {
                 return '';
             } else {
@@ -96,7 +105,7 @@ class UrlGenerator extends BaseModel
         }
 
         try {
-            $category_name_url = $this->generateCategoryUrl($cID);
+            $category_name_url = $this->generateCategoryUrl($categoryId);
         } catch (CategoryException $e) {
             $category_name_url = '';
         }

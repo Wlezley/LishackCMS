@@ -50,6 +50,13 @@ class RouterFactory
     {
         $router->withModule('Website')
             ->addRoute('install/[<action>]', 'Install:default')
+
+            // SEO (robots.txt, sitemap.xml)
+            ->addRoute('robots.txt', 'Seo:robots')
+            ->addRoute('sitemap.xml', 'Seo:sitemap')
+            ])
+
+            // ArticlePresenter
             ->addRoute('[[<categoryUrl [0-9a-zA-Z_\-\/]+>/]<articleUrl>/]', [
                 'presenter' => 'Article',
                 'action' => 'default',

@@ -3,6 +3,7 @@
 define('VERSION', '');
 define('PROJECT_DIR', '');
 define('APP_DIR', '');
+define('WWW_DIR', '');
 define('ASSETS_DIR', '');
 define('FILE_CACHE_DIR', '');
 define('BASE_URL', '');

@@ -165,6 +165,7 @@ final class DataRepository
     /**
      * Retrieves a list of datasets with optional search and pagination.
      *
+     * @param int $datasetId Dataset ID.
      * @param int $limit Number of results to return (default: 50).
      * @param int $offset Offset for pagination (default: 0).
      * @param string|null $search Optional search query for name, slug, component, or presenter fields.

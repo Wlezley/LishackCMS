@@ -19,6 +19,7 @@ if (isset($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
 define('VERSION', '0.1a');
 define('PROJECT_DIR', dirname(__DIR__) . '/');
 define('APP_DIR', PROJECT_DIR . 'app/');
+define('WWW_DIR', __DIR__);
 define('ASSETS_DIR', __DIR__ . '/assets/');
 define('FILE_CACHE_DIR', PROJECT_DIR . 'temp/cache/');
 
