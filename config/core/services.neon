@@ -25,9 +25,9 @@ services:
     - App\Models\CategoryManager
     - App\Models\ConfigManager
     - App\Models\Files
-    - App\Models\Gallery
+    # - App\Models\Gallery
     - App\Models\Helpers\AssetsVersion
-    - App\Models\Images
+    # - App\Models\Images
     - App\Models\Installer
     - App\Models\RedirectManager
     - App\Models\SitemapGenerator
@@ -46,6 +46,11 @@ services:
     - App\Models\Dataset\Repository\ColumnRepository
     - App\Models\Dataset\Repository\DataRepository
     - App\Models\Dataset\Repository\DatasetRepository
+
+    # Media
+    - App\Models\Media\DummyImageGenerator
+    - App\Models\Media\ImageResizer
+    - App\Models\Media\MediaManager
 
     # Vendor
     - Phinx\Console\PhinxApplication

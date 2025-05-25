@@ -54,6 +54,16 @@ class RouterFactory
             // SEO (robots.txt, sitemap.xml)
             ->addRoute('robots.txt', 'Seo:robots')
             ->addRoute('sitemap.xml', 'Seo:sitemap')
+
+            // Media
+            ->addRoute('media/json/', 'Media:json')
+            ->addRoute('media/<fileName>', 'Media:default')
+            ->addRoute('media-<id>[-<width>[-<height>]]', [
+                'presenter' => 'Media',
+                'action' => 'show',
+                'id' => 0,
+                'width' => null,
+                'height' => null,
             ])
 
             // ArticlePresenter
