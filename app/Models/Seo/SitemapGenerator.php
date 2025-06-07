@@ -11,7 +11,7 @@ use Tracy\Debugger;
 
 final class SitemapGenerator extends BaseModel
 {
-    public const SITEMAP_PATH = WWW_DIR . '/sitemap.xml';
+    public const SITEMAP_PATH = PROJECT_DIR . '/sitemap.xml';
     private const DEFAULT_TTL_SECONDS = 3600;
 
     public function __construct(
@@ -40,15 +40,42 @@ final class SitemapGenerator extends BaseModel
             ->fetchAll();
 
         foreach ($articles as $article) {
+            $articleUrl = $this->urlGenerator->generateArticleUrl($article['id']);
             $sitemap->addItem(
-                HOME_URL . $this->urlGenerator->generateArticleUrl($article['id']),
+                HOME_URL . $articleUrl,
                 DateTime::from($article['updated_at'])->getTimestamp(),
                 Sitemap::DAILY,
-                '0.8'
+                $this->getPriorityByUrl($articleUrl)
             );
         }
 
         $sitemap->write();
+    }
+
+    /**
+     * The priority is determined based on the URL structure:
+     * - Root URL ("/") has priority 1.0
+     * - First-level categories have priority 0.8
+     * - Second-level and deeper categories have priority 0.6
+     *
+     * @param string $url The URL of the article.
+     * @return string|null The priority, or `null` if level is 0.
+     */
+    private function getPriorityByUrl(string $url): ?string
+    {
+        if (empty($url) || $url == '/') {
+            return '1.0';
+        }
+
+        $level = substr_count($url, '/');
+
+        if ($level == 1) {
+            return '0.8';
+        } elseif ($level >= 2) {
+            return '0.6';
+        }
+
+        return null;
     }
 
     /**
