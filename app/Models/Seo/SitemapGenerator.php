@@ -40,6 +40,10 @@ final class SitemapGenerator extends BaseModel
             ->fetchAll();
 
         foreach ($articles as $article) {
+            if ($article['name_url'] === '404') {
+                continue;
+            }
+
             $articleUrl = $this->urlGenerator->generateArticleUrl($article['id']);
             $sitemap->addItem(
                 HOME_URL . $articleUrl,
