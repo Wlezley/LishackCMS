@@ -6,9 +6,17 @@ namespace App\Models;
 
 use App\Models\Helpers\ArrayHelper;
 use App\Models\Helpers\StringHelper;
+use Nette\Database\Explorer;
 
-class UrlGenerator extends BaseModel
+class UrlGenerator
 {
+    use \App\Models\Config;
+
+    public function __construct(
+        protected Explorer $db,
+        protected ConfigManager $configManager
+    ) {}
+
     /**
      * Normalizes a raw category URL string into a clean array of slugs.
      *

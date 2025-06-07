@@ -9,15 +9,16 @@ use Nette\Utils\DateTime;
 use samdark\sitemap\Sitemap;
 use Tracy\Debugger;
 
-final class SitemapGenerator extends BaseModel
+final class SitemapGenerator
 {
+    use \App\Models\Config;
+
     public const SITEMAP_PATH = PROJECT_DIR . '/sitemap.xml';
     private const DEFAULT_TTL_SECONDS = 3600;
 
     public function __construct(
         protected Explorer $db,
         protected ConfigManager $configManager,
-        protected TranslationManager $translationManager,
         protected UrlGenerator $urlGenerator
     ) {}
 
