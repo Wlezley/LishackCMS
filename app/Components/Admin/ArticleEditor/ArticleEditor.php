@@ -91,9 +91,14 @@ class ArticleEditor extends BaseControl
             ->setValue($this->param['published_at'] ?? DateTime::from(null))
             ->setRequired();
 
-        $form->addDateTime('updated_at', $this->t('form.article.updated_at'))
+        $updated_at = 'N/A';
+        if ($this->param['updated_at']) {
+            $updated_at = DateTime::from($this->param['updated_at'])->format('d.m.Y h:i');
+        }
+        $form->addText('updated_at', $this->t('form.article.updated_at'))
             ->setHtmlAttribute('placeholder', $this->t('form.article.updated_at'))
-            ->setValue($this->param['updated_at'] ?? '');
+            ->setHtmlAttribute('readonly', true)
+            ->setValue($updated_at);
 
         // META TAGS / SEO
         $form->addText('robots', $this->t('form.article.robots'))
@@ -150,7 +155,7 @@ class ArticleEditor extends BaseControl
     public function processSave(Form $form, \Nette\Utils\ArrayHash $values): void
     {
         $data = (array)$values;
-        unset($data['user_name']);
+        unset($data['user_name'], $data['updated_at']);
 
         if (empty($data['name_url'])) {
             $data['name_url'] = StringHelper::webalize($data['title']);
