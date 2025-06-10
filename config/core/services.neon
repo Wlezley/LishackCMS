@@ -24,10 +24,7 @@ services:
     - App\Models\ArticleManager
     - App\Models\CategoryManager
     - App\Models\ConfigManager
-    - App\Models\Files
-    # - App\Models\Gallery
     - App\Models\Helpers\AssetsVersion
-    # - App\Models\Images
     - App\Models\Installer
     - App\Models\RedirectManager
     - App\Models\SitemapGenerator
@@ -35,7 +32,6 @@ services:
     - App\Models\TranslationLanguage
     - App\Models\TranslationLog
     - App\Models\TranslationManager
-    - App\Models\Upload
     - App\Models\UrlGenerator
     - App\Models\UserManager
 
