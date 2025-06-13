@@ -23,6 +23,8 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
         'Dataset' => 'CONFIG',
         'Debug' => 'CONFIG',
         'Email' => 'CONFIG',
+        'FileExplorer' => 'STORAGE',
+        'Gallery' => 'STORAGE',
         'Menu' => 'MENU',
         'Redirect' => 'CONFIG',
         'Translation' => 'CONFIG',

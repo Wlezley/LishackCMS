@@ -72,6 +72,33 @@
                 </ul>
             </li>
 
+            {* STORAGE *}
+            <li class="sidebar-item">
+                <a href="#" n:class="'sidebar-link collapsed', $activeMenu == 'STORAGE' ? active" data-bs-toggle="collapse" data-bs-target="#sidebar-storage" aria-expanded="false" aria-controls="sidebar-storage">
+                    <i class="fa-regular fa-floppy-disk"></i>
+                    {* {$_('admin.sidebar.main.storage')} *}
+                    Datové úložiště
+                </a>
+                <ul id="sidebar-storage" n:class="'sidebar-dropdown list-unstyled collapse', $activeMenu == 'STORAGE' ? show">
+                    <li class="sidebar-item">
+                        <a n:href="FileExplorer:" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('FileExplorer:*') ? active">
+                            <i class="fa-regular fa-folder-open"></i>
+                            {* {$_('admin.sidebar.main.storage.fileexplorer')} *}
+                            Správce souborů
+                        </a>
+                    </li>
+                </ul>
+                <ul id="sidebar-storage" n:class="'sidebar-dropdown list-unstyled collapse', $activeMenu == 'STORAGE' ? show">
+                    <li class="sidebar-item">
+                        <a n:href="Gallery:" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('Gallery:*') ? active">
+                            <i class="fa-regular fa-file-image"></i>
+                            {* {$_('admin.sidebar.main.storage.gallery')} *}
+                            Fotogalerie
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             {* CMS CONFIG *}
             <li class="sidebar-item">
                 <a n:href="Config:" n:class="'sidebar-link collapsed', $activeMenu == 'CONFIG' ? active" data-bs-toggle="collapse" data-bs-target="#sidebar-cms-config" aria-expanded="false" aria-controls="sidebar-cms-config">

@@ -11,5 +11,11 @@
             <p><strong>Deleted:</strong> {$userData[deleted] ? 'Yes' : 'No'}</p>
             <p class="mb-0"><strong>Enabled:</strong> {$userData[enabled] ? 'Yes' : 'No'}</p>
         </div>
+
+        <div class="col">
+            <form id="my-dropzone" class="dropzone" data-url="{link File:upload}">
+                <div class="dz-message">Přetáhni soubory sem nebo klikni</div>
+            </form>
+        </div>
     </div>
 </div>
