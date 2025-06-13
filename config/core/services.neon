@@ -43,6 +43,14 @@ services:
     - App\Models\Dataset\Repository\DataRepository
     - App\Models\Dataset\Repository\DatasetRepository
 
+    # StorageSystem
+    - App\Models\StorageSystem\Storage
+    - App\Models\StorageSystem\FileUploader
+    - App\Models\StorageSystem\FileManager
+    - App\Models\StorageSystem\TreeManager
+    - App\Models\StorageSystem\Repository\StorageFilesRepository
+    - App\Models\StorageSystem\Repository\StorageTreeRepository
+
     # Media
     - App\Models\Media\DummyImageGenerator
     - App\Models\Media\ImageResizer
