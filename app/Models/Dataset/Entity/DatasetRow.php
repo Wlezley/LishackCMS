@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models\Dataset\Entity;
 
 use App\Models\Dataset\DatasetException;
+use App\Models\Helpers\IntegerHelper;
 use Nette\Utils\Json;
 
 final class DatasetRow
@@ -24,7 +25,7 @@ final class DatasetRow
     public static function fromDatabaseRow(array $row, array $columns): self
     {
         $instance = new self();
-        $instance->id = isset($row['id']) ? (int) $row['id'] : null;
+        $instance->id = IntegerHelper::toIntOrNull($row['id']);
 
         /** @var DatasetColumn $column */
         foreach ($columns as $column) {

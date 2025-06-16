@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models\Dataset\Entity;
 
 use App\Models\Dataset\DatasetException;
+use App\Models\Helpers\IntegerHelper;
 use App\Models\Helpers\StringHelper;
 
 final class Dataset
@@ -26,7 +27,7 @@ final class Dataset
     public static function fromDatabaseRow(array $row): self
     {
         $dataset = new self();
-        $dataset->id = isset($row['id']) ? (int) $row['id'] : null;
+        $dataset->id = IntegerHelper::toIntOrNull($row['id']);
         $dataset->name = (string) ($row['name'] ?? '');
         $dataset->slug = (string) ($row['slug'] ?? '');
         $dataset->component = (string) ($row['component'] ?? '');

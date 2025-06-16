@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models\Dataset\Entity;
 
 use App\Models\Dataset\DatasetException;
+use App\Models\Helpers\IntegerHelper;
 use App\Models\Helpers\SqlHelper;
 use App\Models\Helpers\StringHelper;
 
@@ -41,7 +42,7 @@ final class DatasetColumn
     {
         $column = new self();
         $column->datasetId = (int) $row['dataset_id'] ?: 0;
-        $column->columnId = isset($row['column_id']) ? (int) $row['column_id'] : null;
+        $column->columnId = IntegerHelper::toIntOrNull($row['column_id']);
         $column->name = (string) ($row['name'] ?? '');
         $column->slug = (string) ($row['slug'] ?? '');
         $column->type = (string) ($row['type'] ?? 'string');
