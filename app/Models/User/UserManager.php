@@ -16,7 +16,7 @@ class UserManager extends BaseModel
     /** @var array<int,array<string,string|int|null>> $userList */
     protected mixed $userList = [];
 
-    public function loadList(): void
+    public function load(): void
     {
         $result = $this->db->table(self::TABLE_NAME)
             ->fetchAll();

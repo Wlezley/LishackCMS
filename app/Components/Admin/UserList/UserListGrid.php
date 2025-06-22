@@ -42,11 +42,12 @@ class UserListGrid extends BaseControl
         $columnEnabled_allowed = $this->userRole->isInArray(['manager', 'admin']);
 
         if ($userIsAdmin) {
-            $grid->setDataSource($this->db->table(UserManager::TABLE_NAME)->select('*'));
+            $grid->setDataSource($this->db->table(UserManager::TABLE_NAME)->select('*')->where('id != 0'));
         } else {
             $deletedFilter = $columnDeleted_allowed ? ['0', '1'] : '0';
             $enabledFilter = $columnEnabled_allowed ? ['1', '0'] : '1';
             $grid->setDataSource($this->db->table(UserManager::TABLE_NAME)->select('*')->where([
+                'id != 0',
                 'role' => $editableRoles,
                 'deleted' => $deletedFilter,
                 'enabled' => $enabledFilter,
