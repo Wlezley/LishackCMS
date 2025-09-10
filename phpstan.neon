@@ -2,7 +2,7 @@ parameters:
     level: 6
     inferPrivatePropertyTypeFromConstructor: true
     reportUnmatchedIgnoredErrors: false
-    phpVersion: 80200 # PHP 8.2
+    phpVersion: 80400 # PHP 8.4
 
     paths:
         - app

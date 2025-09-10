@@ -12,16 +12,16 @@
         "GPL-3.0"
     ],
     "require": {
-        "php": ">= 8.2",
+        "php": ">= 8.4",
         "nette/application": "^3.2",
         "nette/bootstrap": "^3.2",
-        "nette/caching": "^3.3",
+        "nette/caching": "^3.4",
         "nette/database": "^3.2",
         "nette/di": "^3.2",
         "nette/forms": "^3.2",
         "nette/http": "^3.3",
         "nette/mail": "^4.0",
-        "nette/robot-loader": "^4.0",
+        "nette/robot-loader": "^4.1",
         "nette/security": "^3.2",
         "nette/utils": "^4.0",
         "latte/latte": "^3.0",
@@ -32,7 +32,7 @@
         "codeception/module-phpbrowser": "*",
         "codeception/module-asserts": "*",
         "contributte/console": "^0.10.1",
-        "ublaboo/datagrid": "^7.x-dev",
+        "ublaboo/datagrid": "^7.1.x-dev",
         "samdark/sitemap": "^2.4"
     },
     "require-dev": {
@@ -51,7 +51,7 @@
             "symfony/thanks": false
         },
         "platform": {
-            "php": "8.2"
+            "php": "8.4"
         }
     }
 }
