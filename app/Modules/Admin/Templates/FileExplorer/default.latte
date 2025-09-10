@@ -1,6 +1,38 @@
 {block content}
 <div class="row">
     <div class="col">
-        <p>TODO...</p>
+
+        <div class="mb-3">
+            <form id="my-dropzone" class="dropzone bg-light bg-gradient text-black border-secondary rounded" data-url="{link File:upload}" style="border-style: dashed; border-width: 2px;">
+                <div class="dz-message">Přetáhni soubory sem nebo klikni</div>
+            </form>
+        </div>
+
+        {* <div>
+            <form class="row g-3 float-end" name="searchForm">
+                <div class="col-auto">
+                    <label for="search" class="visually-hidden">{$_('search.file')}</label>
+                    <input type="text" class="form-control" id="search" name="search" value="{$search}" placeholder="{$_('search.file')}">
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary mb-3"><i class="fa-solid fa-magnifying-glass"></i></button>
+                </div>
+            </form>
+        </div> *}
+
+        {control fileExplorer}
+
+        <hr class="my-3">
+
+        <div>
+            <span id="download-all-selected" class='btn btn-success me-2'><i class="fas fa-download"></i> STÁHNOUT</span>
+            <span id="delete-all-selected" class='btn btn-danger'><i class="fas fa-trash"></i> ODSTRANIT</span>
+
+            <a n:href="FileExplorer:upload" class="btn btn-primary float-end">
+                <i class="fa-solid fa-upload pe-2"></i>
+                {$_('upload')}
+            </a>
+        </div>
+
     </div>
 </div>

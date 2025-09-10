@@ -35,7 +35,7 @@ class FilePresenter extends SecuredPresenter
         $this->sendResponse($response);
     }
 
-    public function actionDownload(): void
+    public function actionDownload(int $id): void
     {
         $this->terminate();
     }

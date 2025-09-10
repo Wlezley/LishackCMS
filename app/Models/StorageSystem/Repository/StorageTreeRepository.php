@@ -29,9 +29,9 @@ class StorageTreeRepository
     public function getFoldersInFolder(int $parent_id = 0): array
     {
         $query = $this->db->table(self::TABLE_NAME)
-            ->where('parent_id', $parent_id);
-            // ->order('position')
-            // ->fetchAll();
+            ->where('parent_id', $parent_id)
+            ->order('position')
+            ->fetchAll();
 
         $result = [];
         foreach ($query as $row) {

@@ -1,0 +1,133 @@
+<style>
+.table-row-hover:hover {
+    background-color: #EEF;
+}
+.clickable-row {
+    cursor: pointer;
+}
+</style>
+
+<table id="fileExplorerTable" class="table table-responsive table-striped table-hover table-dark">
+    <thead>
+        <tr>
+            <th scope="col" class="text-warning text-start pe-0" style="width: 5px;">
+                <input type="checkbox" id="select-all-files" name="select-all-files">
+            </th>
+            <th scope="col" class="text-warning text-center" style="width: 55px;"><!-- FILE_ICON --></th>
+            <th scope="col" class="text-warning text-start">Jméno souboru</th>
+            <th scope="col" class="text-warning text-end" style="width: 120px;">Velikost</th>
+            <th scope="col" class="text-warning text-center" style="width: 150px;">Datum</th>
+            <th scope="col" class="text-warning text-center" style="width: 125px;">Vlastník</th>
+            <th scope="col" class="text-warning text-center px-0 action-col" style="width: 100px; min-width: 100px;">{$_('action')}</i></th>
+        </tr>
+    </thead>
+    <tbody>
+
+        {* FOLDERS *}
+        {foreach $treeList as $tree}
+            {capture $openFolderLink}{plink FileExplorer:directory $tree->id}{/capture}
+            {var $owner = $ownerList[$tree->owner_id]}
+            <tr class="table-row-hover">
+                <td class="align-middle text-center pe-0" style="width: 5px;">
+                    {* <input type="checkbox" class="file-selector" data-storageid="TREE_{$tree->name_url}" autocomplete="off"> *}
+                </td>
+                <td class="align-middle text-center">
+                    <img style="width:30px; height:30px;" src="{$baseUrl}/assets/icons/file-types/directory.png">
+                </td>
+                <td class="align-middle text-start clickable-row" data-href="{$openFolderLink}"><strong>{$tree->name}</strong></td>
+                <td class="align-middle text-end clickable-row" data-href="{$openFolderLink}"><strong>&lt;DIR&gt;</strong></td>
+                <td class="align-middle text-center clickable-row" data-href="{$openFolderLink}">{$tree->created_at|date:'d.m.Y H:i'}</td>
+                <td class="align-middle text-center clickable-row" data-href="{$openFolderLink}">{$owner['full_name']}</td>
+                <td class="align-middle text-end ps-0 py-1 action-col">
+                    <a n:href=":EditFolder, id: $tree->id" class="btn btn-sm btn-primary me-1">
+                        <i class="fa-solid fa-pencil"></i>
+                    </a>
+                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteFolderConfirmModal" data-json="{$getJsonTree($tree->id, $tree->name)}">
+                        <i class="fa-solid fa-eraser"></i>
+                    </button>
+                </td>
+            </tr>
+        {/foreach}
+
+        {* FILES *}
+        {foreach $fileList as $file}
+            {capture $downloadFileLink}{plink File:download $file->id}{/capture}
+            {var $owner = $ownerList[$file->owner_id]}
+            <tr class="table-row-hover">
+                <td class="align-middle text-center pe-0" style="width: 5px;">
+                    <input type="checkbox" class="file-selector" data-storageid="{$file->storage_id}">
+                </td>
+                <td class="align-middle text-center">
+                    <img style="width:30px; height:30px;" src="{$baseUrl}/assets/icons/file-types/{$file->icon}.png">
+                </td>
+                <td class="align-middle text-start clickable-row" data-href="{$downloadFileLink}">{$file->name}</td>
+                <td class="align-middle text-end clickable-row" data-href="{$downloadFileLink}">{$file->size|bytes:0}</td>
+                <td class="align-middle text-center clickable-row" data-href="{$downloadFileLink}">{$file->uploaded_at|date:'d.m.Y H:i'}</td>
+                <td class="align-middle text-center clickable-row" data-href="{$downloadFileLink}">{$owner['full_name']}</td>
+                <td class="align-middle text-end ps-0 py-1 action-col">
+                    <a n:href=":EditFile, id: $file->id" class="btn btn-sm btn-primary me-1">
+                        <i class="fa-solid fa-pencil"></i>
+                    </a>
+                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteFileConfirmModal" data-json="{$getJsonFile($file->id, $file->name)}">
+                        <i class="fa-solid fa-eraser"></i>
+                    </button>
+                </td>
+            </tr>
+        {/foreach}
+
+    </tbody>
+</table>
+
+<script n:syntax="off">
+    document.addEventListener('DOMContentLoaded', () => {
+        const FolderDeleteModal = new LishackCMS.AdminModal('#deleteFolderConfirmModal', 'data-json');
+        FolderDeleteModal.init();
+        const FileDeleteModal = new LishackCMS.AdminModal('#deleteFileConfirmModal', 'data-json');
+        FileDeleteModal.init();
+
+        $('.clickable-row').click(function() {
+            window.location = $(this).data('href');
+        });
+        $('#select-all-files').click(function(){
+            $('.file-selector').not(this).prop('checked', this.checked);
+        });
+    });
+</script>
+
+{* {define modals} *}
+    <div class="modal fade" id="deleteFolderConfirmModal" tabindex="-1" aria-labelledby="deleteFolderConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered text-dark">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteFolderConfirmModalLabel"><!-- MODAL TITLE --></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{$_('close')}"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- MODAL BODY -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{$_('cancel')}</button>
+                    <button type="submit" class="btn btn-danger" data-modal-action="fileExplorer-DeleteFolder">{$_('btn.delete')}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteFileConfirmModal" tabindex="-1" aria-labelledby="deleteFileConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered text-dark">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteFileConfirmModalLabel"><!-- MODAL TITLE --></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{$_('close')}"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- MODAL BODY -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{$_('cancel')}</button>
+                    <button type="submit" class="btn btn-danger" data-modal-action="fileExplorer-DeleteFile">{$_('btn.delete')}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{* {/define} *}

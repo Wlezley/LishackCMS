@@ -4,23 +4,24 @@ declare(strict_types=1);
 
 namespace App\Models\StorageSystem\Entity;
 
+use App\Models\Helpers\IntegerHelper;
+use App\Models\Helpers\StringHelper;
 use App\Models\StorageSystem\StorageSystemException;
-use Nette\Database\DateTime;
+use Nette\Utils\DateTime;
 
 final class StorageTree
 {
     public ?int $id = null;
     public int $parent_id = 0;
     public int $owner_id = 0;
-    // public int $position = 0; // TODO ...
+    public ?int $position = null;
     public string $name = '';
     public string $name_url = '';
     public ?DateTime $created_at = null;
     public ?DateTime $modified_at = null;
     public ?DateTime $deleted_at = null;
-
-    // public int $modified_by = 0; // TODO ...
-    // public int $deleted_by = 0; // TODO ...
+    // public int ?$modified_by = null; // TODO ...
+    // public int ?$deleted_by = null; // TODO ...
 
     /**
      * Create an instance from the database record
@@ -32,16 +33,16 @@ final class StorageTree
     {
         $file = new self();
 
-        $file->id = isset($row['id']) ? (int) $row['id'] : null;
+        $file->id = IntegerHelper::toIntOrNull($row['id']);
         $file->owner_id = (int) $row['owner_id'];
-        // $file->position = (int) $row['position'];
+        $file->position = IntegerHelper::toIntOrNull($row['position']);
         $file->name = (string) $row['name'];
         $file->name_url = (string) $row['name_url'];
-        $file->created_at = new DateTime($row['uploaded_at']);
-        $file->modified_at = new DateTime($row['modified_at']);
-        $file->deleted_at = new DateTime($row['deleted_at']);
-        // $file->modified_by = (int) $row['modified_by'];
-        // $file->deleted_by = (int) $row['deleted_by'];
+        $file->created_at = $row['created_at']; // new DateTime($row['created_at']);
+        $file->modified_at = $row['modified_at']; // new DateTime($row['modified_at']);
+        $file->deleted_at = $row['deleted_at']; // new DateTime($row['deleted_at']);
+        // $file->modified_by = IntegerHelper::toIntOrNull($row['modified_by']);
+        // $file->deleted_by = IntegerHelper::toIntOrNull($row['deleted_by']);
 
         return $file;
     }
@@ -56,7 +57,7 @@ final class StorageTree
         return [
             // 'id' => $this->id,
             'owner_id' => $this->owner_id,
-            // 'position' => $this->position,
+            'position' => $this->position,
             'name' => $this->name,
             'name_url' => $this->name_url,
             // 'created_at' => $this->created_at,
@@ -69,11 +70,11 @@ final class StorageTree
 
     public function validate(): void
     {
-        if (trim($this->name) === '') {
-            throw new StorageSystemException("The tree 'name' must not be empty.");
-        }
-        if (trim($this->name_url) === '') {
-            throw new StorageSystemException("The tree 'name_url' must not be empty.");
+        try {
+            StringHelper::assertEmpty($this->name, 'name');
+            StringHelper::assertEmpty($this->name_url, 'name_url');
+        } catch (\InvalidArgumentException $e) {
+            throw new StorageSystemException($e->getMessage());
         }
     }
 

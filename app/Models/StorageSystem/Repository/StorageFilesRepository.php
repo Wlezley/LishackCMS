@@ -29,9 +29,9 @@ class StorageFilesRepository
     public function getFilesInFolder(int $tree_id = 0): array
     {
         $query = $this->db->table(self::TABLE_NAME)
-            ->where('tree_id', $tree_id);
-            // ->order('position')
-            // ->fetchAll();
+            ->where('tree_id', $tree_id)
+            ->order('position')
+            ->fetchAll();
 
         $result = [];
         foreach ($query as $row) {

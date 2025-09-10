@@ -4,15 +4,36 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
-use App\Models\StorageSystem\FileManager;
+use App\Components\Admin\IFileExplorerFactory;
 
 class FileExplorerPresenter extends SecuredPresenter
 {
-    public function __construct(
-        // private FileManager $fileManager
-    ) {}
+    /** @var IFileExplorerFactory @inject */
+    public IFileExplorerFactory $fileExplorer;
 
     public function renderDefault(): void
     {
+    }
+
+    public function renderDirectory(int $id): void
+    {
+    }
+
+    // public function actionEditFolder(int $id): void
+    // {
+    // }
+
+    // public function actionEditFile(int $id): void
+    // {
+    // }
+
+    // ##########################################
+    // ###             COMPONENTS             ###
+    // ##########################################
+
+    protected function createComponentFileExplorer(): \App\Components\Admin\FileExplorer
+    {
+        $control = $this->fileExplorer->create();
+        return $control;
     }
 }

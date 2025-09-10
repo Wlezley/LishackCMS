@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Components\Admin;
 
 use App\Components\BaseControl;
+use App\Models\Translation;
+use App\Models\TranslationManager;
 use App\Models\UserManager;
 use App\Models\UserRole;
 use Contributte\Datagrid\Datagrid;
@@ -15,13 +17,16 @@ use Nette\Utils\Json;
 
 class UserListGrid extends BaseControl
 {
+    use Translation;
+
     protected UserRole $userRole;
     protected Presenter $presenter;
 
     public function __construct(
         public Explorer $db,
         private UserManager $userManager,
-        protected User $user
+        protected User $user,
+        public TranslationManager $translationManager,
     ) {
         $this->userRole = new UserRole($user);
     }
@@ -160,7 +165,6 @@ class UserListGrid extends BaseControl
             ->setIcon('pencil');
 
         // ACTION DELETE
-        // $deleteActionCallback = new \Ublaboo\DataGrid\Column\Action\Confirmation\CallbackConfirmation([$this, 'encodeData_Callback']); // Deprecated (?)
         $deleteActionCallback = new \Contributte\Datagrid\Column\Action\Confirmation\CallbackConfirmation([$this, 'encodeData_Callback']);
         $grid->addAction(':delete', '')
             ->setClass('btn btn-xs btn-danger')

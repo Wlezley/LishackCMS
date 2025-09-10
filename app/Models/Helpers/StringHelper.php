@@ -6,6 +6,8 @@ namespace App\Models\Helpers;
 
 use Nette\Utils\Strings;
 
+use function PHPUnit\Framework\isEmpty;
+
 class StringHelper
 {
     /**
@@ -110,5 +112,38 @@ class StringHelper
     {
         json_decode($value);
         return json_last_error() === JSON_ERROR_NONE;
+    }
+
+    /**
+     * Checks if string is empty. Trim function is aplied to the input $variable argument.
+     *
+     * @param string $value The string to validate.
+     * @param string $characters Optionally, the stripped characters can also be specified using the charlist parameter.
+     *                           Simply list all characters that you want to be stripped.
+     *                           With .. you can specify a range of characters.
+     */
+    public static function isEmpty(string $value, string $characters = " \n\r\t\v\0"): bool
+    {
+        return trim($value, $characters) === '';
+    }
+
+    /**
+     * Asserts that a string is not empty. Trim function is aplied to the input $variable argument.
+     *
+     * Throws an exception if the input string is not empty.
+     *
+     * @param string $value The string to validate.
+     * @param string $label A custom label for the variable in the error message. Defaults to 'variable'.
+     * @param string $characters Optionally, the stripped characters can also be specified using the charlist parameter.
+     *                           Simply list all characters that you want to be stripped.
+     *                           With .. you can specify a range of characters.
+     *
+     * @throws \InvalidArgumentException If the string is not webalized.
+     */
+    public static function assertEmpty(string $value, string $label = 'variable', string $characters = " \n\r\t\v\0"): void
+    {
+        if (self::isEmpty($value, $characters)) {
+            throw new \InvalidArgumentException("The $label string must not be empty.");
+        }
     }
 }

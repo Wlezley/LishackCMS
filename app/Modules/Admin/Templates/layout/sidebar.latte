@@ -69,6 +69,12 @@
                 </a>
                 <ul id="sidebar-database" n:class="'sidebar-dropdown list-unstyled collapse', $activeMenu == 'DATA' ? show">
                     {control datasetSidebar}
+                    <li class="sidebar-item"> {* TODO: Fix 'active' menu *}
+                        <a n:href="Dataset:create" n:class="sidebar-link, sidebar-sublink, $presenter->isLinkCurrent('Dataset:create') ? active">
+                            <i class="fa-solid fa-plus"></i>
+                            {$_('admin.sidebar.main.dataset.create')}
+                        </a>
+                    </li>
                 </ul>
             </li>
 
