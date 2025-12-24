@@ -34,7 +34,7 @@ abstract class BaseModel
 
     public function invalidate(): void
     {
-        unset($this->data);
+        $this->data = null;
     }
 
     public function setLang(?string $lang = null): void

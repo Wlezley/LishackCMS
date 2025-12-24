@@ -27,7 +27,7 @@ class BaseControl extends Control
     /** @var array<string,string> $cmsConfig */
     protected array $cmsConfig = [];
 
-    /** @var null|array<string,string> $param */
+    /** @var null|array<string,int|string> $param */
     protected ?array $param = [];
 
     /** @var string $templatePath */

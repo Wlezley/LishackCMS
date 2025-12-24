@@ -53,5 +53,8 @@
         "platform": {
             "php": "8.4"
         }
+    },
+    "scripts": {
+        "phpstan": "phpstan analyse --memory-limit 512M"
     }
 }

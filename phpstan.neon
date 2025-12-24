@@ -14,6 +14,7 @@ parameters:
         - config
         - tests
         - vendor
+        - node_modules
 
     bootstrapFiles:
         - app/phpstan-bootstrap.php
