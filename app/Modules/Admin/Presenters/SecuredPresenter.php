@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
-use App\Components\Admin\IDatasetSidebarFactory;
+use App\Components\Admin\DatasetSidebar\IDatasetSidebarFactory;
 use App\Components\Pagination\IPaginationFactory;
 use App\Models\UserRole;
 
@@ -66,7 +66,7 @@ class SecuredPresenter extends BasePresenter
     // ###             COMPONENTS             ###
     // ##########################################
 
-    protected function createComponentDatasetSidebar(): \App\Components\Admin\DatasetSidebar
+    protected function createComponentDatasetSidebar(): \App\Components\Admin\DatasetSidebar\DatasetSidebar
     {
         $control = $this->datasetSidebarFactory->create();
 

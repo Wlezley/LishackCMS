@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
-use App\Components\Admin\IArticleEditorFactory;
-use App\Components\Admin\IArticleListFactory;
+use App\Components\Admin\ArticleEditor\IArticleEditorFactory;
+use App\Components\Admin\ArticleList\IArticleListFactory;
 use App\Models\ArticleException;
 use App\Models\ArticleManager;
 use App\Models\CategoryManager;
@@ -96,7 +96,7 @@ class ArticlePresenter extends SecuredPresenter
     // ###             COMPONENTS             ###
     // ##########################################
 
-    protected function createComponentArticleList(): \App\Components\Admin\ArticleList
+    protected function createComponentArticleList(): \App\Components\Admin\ArticleList\ArticleList
     {
         $control = $this->articleList->create();
         $control->setParam([
@@ -107,7 +107,7 @@ class ArticlePresenter extends SecuredPresenter
         return $control;
     }
 
-    protected function createComponentArticleEditor(): \App\Components\Admin\ArticleEditor
+    protected function createComponentArticleEditor(): \App\Components\Admin\ArticleEditor\ArticleEditor
     {
         $form = $this->articleEditor->create();
         $id = (int) $this->getParameter('id');

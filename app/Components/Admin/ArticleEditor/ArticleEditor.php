@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Components\Admin;
+namespace App\Components\Admin\ArticleEditor;
 
 use App\Components\BaseControl;
 use App\Models\ArticleException;
@@ -19,8 +19,8 @@ use Webmozart\Assert\Assert;
 
 class ArticleEditor extends BaseControl
 {
-    public const OriginCreate = 'Create';
-    public const OriginEdit = 'Edit';
+    public const string OriginCreate = 'Create';
+    public const string OriginEdit = 'Edit';
 
     private ArticleManager $articleManager;
 

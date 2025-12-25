@@ -2,15 +2,17 @@
 
 declare(strict_types=1);
 
-namespace App\Components\Admin;
+namespace App\Components\Admin\ConfigWebsiteForm;
 
 use App\Components\BaseControl;
+use App\Models\ConfigException;
 use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
 
 class ConfigWebsiteForm extends BaseControl
 {
-    public const OriginCreate = 'Create';
-    public const OriginEdit = 'Edit';
+    public const string OriginCreate = 'Create';
+    public const string OriginEdit = 'Edit';
 
     /** @var callable(string): void */
     public $onSuccess;
@@ -83,8 +85,11 @@ class ConfigWebsiteForm extends BaseControl
         return $form;
     }
 
-    /** @param \Nette\Utils\ArrayHash<mixed> $values */
-    public function processSave(Form $form, \Nette\Utils\ArrayHash $values): void
+    /**
+     * @param ArrayHash<mixed> $values
+     * @throws ConfigException
+     */
+    public function processSave(Form $form, ArrayHash $values): void
     {
         $required = [
             ['name' => 'APP_NAME', 'label.key' => 'app.name'],

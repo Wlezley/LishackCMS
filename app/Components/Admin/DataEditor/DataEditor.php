@@ -2,19 +2,21 @@
 
 declare(strict_types=1);
 
-namespace App\Components\Admin;
+namespace App\Components\Admin\DataEditor;
 
 use App\Components\BaseControl;
+use App\Models\Dataset\DatasetException;
 use App\Models\Dataset\DatasetManager;
 use App\Models\Dataset\Entity\DatasetColumn;
 use App\Models\Dataset\Entity\DatasetRow;
 use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
 use Webmozart\Assert\Assert;
 
 class DataEditor extends BaseControl
 {
-    public const OriginCreate = 'Create';
-    public const OriginEdit = 'Edit';
+    public const string OriginCreate = 'Create';
+    public const string OriginEdit = 'Edit';
 
     private string $origin;
     private ?int $datasetId = null;
@@ -119,8 +121,10 @@ class DataEditor extends BaseControl
         return $form;
     }
 
-    /** @param \Nette\Utils\ArrayHash<mixed> $values */
-    public function processCreate(Form $form, \Nette\Utils\ArrayHash $values): void
+    /**
+     * @param ArrayHash<mixed> $values
+     */
+    public function processCreate(Form $form, ArrayHash $values): void
     {
         if (!$this->datasetManager->isReady() || $this->datasetId === null) {
             call_user_func($this->onError, $this->t('dataset.id.not-set'));
@@ -160,8 +164,11 @@ class DataEditor extends BaseControl
         call_user_func($this->onSuccess, $this->tf('dataset.item.created', $dataRow->id), $this->datasetId);
     }
 
-    /** @param \Nette\Utils\ArrayHash<mixed> $values */
-    public function processSave(Form $form, \Nette\Utils\ArrayHash $values): void
+    /**
+     * @param ArrayHash<mixed> $values
+     * @throws DatasetException
+     */
+    public function processSave(Form $form, ArrayHash $values): void
     {
         if (!$this->datasetManager->isReady() || $this->datasetId === null) {
             call_user_func($this->onError, $this->t('dataset.id.not-set'));

@@ -2,11 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Components\Admin;
+namespace App\Components\Admin\TranslationEditor;
 
 use App\Components\BaseControl;
+use App\Models\TranslationException;
 use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
 use Nette\Utils\Json;
+use Nette\Utils\JsonException;
 use Webmozart\Assert\Assert;
 
 class TranslationEditor extends BaseControl
@@ -34,8 +37,12 @@ class TranslationEditor extends BaseControl
         return $form;
     }
 
-    /** @param \Nette\Utils\ArrayHash<mixed> $values */
-    public function processSave(Form $form, \Nette\Utils\ArrayHash $values): void
+    /**
+     * @param ArrayHash<mixed> $values
+     * @throws JsonException
+     * @throws TranslationException
+     */
+    public function processSave(Form $form, ArrayHash $values): void
     {
         if (empty($values['translations'])) {
             call_user_func($this->onError, $this->t('error.form.empty-data'));

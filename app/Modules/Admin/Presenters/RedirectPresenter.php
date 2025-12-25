@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
-use App\Components\Admin\IRedirectFormFactory;
-use App\Components\Admin\IRedirectListFactory;
+use App\Components\Admin\RedirectForm\IRedirectFormFactory;
+use App\Components\Admin\RedirectList\IRedirectListFactory;
 use App\Models\RedirectManager;
 
 class RedirectPresenter extends SecuredPresenter
@@ -65,7 +65,7 @@ class RedirectPresenter extends SecuredPresenter
     // ###             COMPONENTS             ###
     // ##########################################
 
-    protected function createComponentRedirectList(): \App\Components\Admin\RedirectList
+    protected function createComponentRedirectList(): \App\Components\Admin\RedirectList\RedirectList
     {
         $control = $this->redirectList->create();
         $control->setParam([
@@ -76,7 +76,7 @@ class RedirectPresenter extends SecuredPresenter
         return $control;
     }
 
-    protected function createComponentRedirectForm(): \App\Components\Admin\RedirectForm
+    protected function createComponentRedirectForm(): \App\Components\Admin\RedirectForm\RedirectForm
     {
         $form = $this->redirectForm->create();
         $id = $this->getParameter('id');

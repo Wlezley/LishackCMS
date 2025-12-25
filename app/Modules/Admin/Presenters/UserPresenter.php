@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
-use App\Components\Admin\IUserFormFactory;
-use App\Components\Admin\UserListGrid;
+use App\Components\Admin\UserForm\IUserFormFactory;
+use App\Components\Admin\UserList\UserListGrid;
 use App\Models\UserException;
 use App\Models\UserManager;
 use Contributte\Datagrid\Datagrid;
@@ -96,7 +96,7 @@ class UserPresenter extends SecuredPresenter
         return $this->userListGrid->createGrid();
     }
 
-    protected function createComponentUserForm(): \App\Components\Admin\UserForm
+    protected function createComponentUserForm(): \App\Components\Admin\UserForm\UserForm
     {
         $form = $this->userForm->create();
         $id = $this->getParameter('id');

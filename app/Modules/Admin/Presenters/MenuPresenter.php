@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
-use App\Components\Admin\ICategoryFormFactory;
+use App\Components\Admin\CategoryForm\ICategoryFormFactory;
 use App\Models\CategoryException;
 use App\Models\CategoryManager;
 
@@ -147,7 +147,7 @@ class MenuPresenter extends SecuredPresenter
     // ###             COMPONENTS             ###
     // ##########################################
 
-    protected function createComponentCategoryForm(): \App\Components\Admin\CategoryForm
+    protected function createComponentCategoryForm(): \App\Components\Admin\CategoryForm\CategoryForm
     {
         $form = $this->categoryForm->create();
         $id = $this->getParameter('id');

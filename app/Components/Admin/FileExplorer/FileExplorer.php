@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Components\Admin;
+namespace App\Components\Admin\FileExplorer;
 
 use App\Components\BaseControl;
 use App\Models\StorageSystem\TreeManager;

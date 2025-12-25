@@ -2,19 +2,24 @@
 
 declare(strict_types=1);
 
-namespace App\Components\Admin;
+namespace App\Components\Admin\UserList;
 
 use AllowDynamicProperties;
 use App\Components\BaseControl;
 use App\Models\Translation;
 use App\Models\TranslationManager;
+use App\Models\UserException;
 use App\Models\UserManager;
 use App\Models\UserRole;
 use Contributte\Datagrid\Datagrid;
+use Contributte\Datagrid\Exception\DatagridColumnStatusException;
+use Contributte\Datagrid\Exception\DatagridException;
+use Nette\Application\InvalidPresenterException;
 use Nette\Application\UI\Presenter;
 use Nette\Database\Explorer;
 use Nette\Security\User;
 use Nette\Utils\Json;
+use Nette\Utils\JsonException;
 
 /**
  * @property string $id
@@ -47,6 +52,10 @@ class UserListGrid extends BaseControl
         $this->presenter = $presenter;
     }
 
+    /**
+     * @throws DatagridColumnStatusException
+     * @throws DatagridException
+     */
     public function createGrid(): Datagrid
     {
         $grid = new Datagrid();
@@ -244,6 +253,9 @@ class UserListGrid extends BaseControl
         return false;
     }
 
+    /**
+     * @throws JsonException
+     */
     public function encodeDataCallback(self $item): string
     {
         $data = Json::encode([
@@ -263,10 +275,14 @@ class UserListGrid extends BaseControl
         return $data;
     }
 
+    /**
+     * @throws UserException
+     * @throws InvalidPresenterException
+     */
     public function setRoleCallback(string $id, string $role): void
     {
         if (!isset($this->presenter)) {
-            throw new \Nette\Application\InvalidPresenterException('Presenter has not been set. Use the setPresenter first.', 1);
+            throw new InvalidPresenterException('Presenter has not been set. Use the setPresenter first.', 1);
         }
 
         if ($this->presenter->isAjax()) {
@@ -290,10 +306,14 @@ class UserListGrid extends BaseControl
         }
     }
 
+    /**
+     * @throws UserException
+     * @throws InvalidPresenterException
+     */
     public function setEnabledCallback(string $id, string $enabled): void
     {
         if (!isset($this->presenter)) {
-            throw new \Nette\Application\InvalidPresenterException('Presenter has not been set. Use the setPresenter first.', 1);
+            throw new InvalidPresenterException('Presenter has not been set. Use the setPresenter first.', 1);
         }
 
         if ($this->presenter->isAjax()) {
@@ -316,10 +336,14 @@ class UserListGrid extends BaseControl
         }
     }
 
+    /**
+     * @throws InvalidPresenterException
+     * @throws UserException
+     */
     public function setDeletedCallback(string $id, string $deleted): void
     {
         if (!isset($this->presenter)) {
-            throw new \Nette\Application\InvalidPresenterException('Presenter has not been set. Use the setPresenter first.', 1);
+            throw new InvalidPresenterException('Presenter has not been set. Use the setPresenter first.', 1);
         }
 
         if ($this->presenter->isAjax()) {

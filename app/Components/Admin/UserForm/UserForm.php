@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Components\Admin;
+namespace App\Components\Admin\UserForm;
 
 use App\Components\BaseControl;
 use App\Models\UserException;
@@ -10,12 +10,13 @@ use App\Models\UserManager;
 use App\Models\UserRole;
 use App\Models\UserValidator;
 use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
 use Webmozart\Assert\Assert;
 
 class UserForm extends BaseControl
 {
-    public const OriginCreate = 'Create';
-    public const OriginEdit = 'Edit';
+    public const string OriginCreate = 'Create';
+    public const string OriginEdit = 'Edit';
 
     private string $origin;
 
@@ -128,8 +129,10 @@ class UserForm extends BaseControl
         return $form;
     }
 
-    /** @param \Nette\Utils\ArrayHash<mixed> $values */
-    public function processCreate(Form $form, \Nette\Utils\ArrayHash $values): void
+    /**
+     * @param ArrayHash<mixed> $values
+     */
+    public function processCreate(Form $form, ArrayHash $values): void
     {
         if (empty($values['password'])) {
             call_user_func($this->onError, $this->t('error.form.fill-password'));
@@ -152,8 +155,10 @@ class UserForm extends BaseControl
         }
     }
 
-    /** @param \Nette\Utils\ArrayHash<mixed> $values */
-    public function processEdit(Form $form, \Nette\Utils\ArrayHash $values): void
+    /**
+     * @param ArrayHash<mixed> $values
+     */
+    public function processEdit(Form $form, ArrayHash $values): void
     {
         if ($values['change_password']) {
             if ($values['password'] !== $values['password2']) {
@@ -226,7 +231,9 @@ class UserForm extends BaseControl
         return false;
     }
 
-    /** @return array<string,string> */
+    /**
+     * @return array<string,string>
+     */
     private function getRoleSelectList(string $targetRole): array
     {
         $userRolesSelect = [];

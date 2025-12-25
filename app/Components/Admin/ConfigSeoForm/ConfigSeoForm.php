@@ -2,10 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Components\Admin;
+namespace App\Components\Admin\ConfigSeoForm;
 
 use App\Components\BaseControl;
+use App\Models\ConfigException;
 use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
 
 class ConfigSeoForm extends BaseControl
 {
@@ -55,8 +57,11 @@ class ConfigSeoForm extends BaseControl
         return $form;
     }
 
-    /** @param \Nette\Utils\ArrayHash<mixed> $values */
-    public function processSave(Form $form, \Nette\Utils\ArrayHash $values): void
+    /**
+     * @param ArrayHash<mixed> $values
+     * @throws ConfigException
+     */
+    public function processSave(Form $form, ArrayHash $values): void
     {
         $required = [
             ['name' => 'SEO_INDEX', 'label.key' => 'seo.index'],

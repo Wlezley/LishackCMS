@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
-use App\Components\Admin\ITranslationEditorFactory;
-use App\Components\Admin\ITranslationFormFactory;
-use App\Components\Admin\ITranslationListFactory;
+use App\Components\Admin\TranslationEditor\ITranslationEditorFactory;
+use App\Components\Admin\TranslationForm\ITranslationFormFactory;
+use App\Components\Admin\TranslationList\ITranslationListFactory;
 use App\Models\TranslationException;
 
 class TranslationPresenter extends SecuredPresenter
@@ -87,7 +87,7 @@ class TranslationPresenter extends SecuredPresenter
     // ###             COMPONENTS             ###
     // ##########################################
 
-    protected function createComponentTranslationList(): \App\Components\Admin\TranslationList
+    protected function createComponentTranslationList(): \App\Components\Admin\TranslationList\TranslationList
     {
         $control = $this->translationList->create();
         $control->setParam([
@@ -98,7 +98,7 @@ class TranslationPresenter extends SecuredPresenter
         return $control;
     }
 
-    protected function createComponentTranslationForm(): \App\Components\Admin\TranslationForm
+    protected function createComponentTranslationForm(): \App\Components\Admin\TranslationForm\TranslationForm
     {
         $form = $this->translationForm->create();
         $key = $this->getParameter('key');
@@ -132,7 +132,7 @@ class TranslationPresenter extends SecuredPresenter
         return $form;
     }
 
-    protected function createComponentTranslationEditor(): \App\Components\Admin\TranslationEditor
+    protected function createComponentTranslationEditor(): \App\Components\Admin\TranslationEditor\TranslationEditor
     {
         $control = $this->translationEditor->create();
         $lang = $this->getParameter('lang');

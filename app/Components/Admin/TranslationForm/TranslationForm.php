@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Components\Admin;
+namespace App\Components\Admin\TranslationForm;
 
 use App\Components\BaseControl;
 use App\Models\TranslationException;
@@ -11,8 +11,8 @@ use Nette\Utils\ArrayHash;
 
 class TranslationForm extends BaseControl
 {
-    public const OriginCreate = 'Create';
-    public const OriginEdit = 'Edit';
+    public const string OriginCreate = 'Create';
+    public const string OriginEdit = 'Edit';
 
     private string $origin;
 
@@ -124,13 +124,17 @@ class TranslationForm extends BaseControl
         $this->origin = $origin;
     }
 
-    /** @param array<string,array<string,mixed>> $languageList */
+    /**
+     * @param array<string,array<string,mixed>> $languageList
+     */
     public function setLanguageList(array $languageList): void
     {
         $this->languageList = $languageList;
     }
 
-    /** @param array<string,string> $queryParams */
+    /**
+     * @param array<string,string> $queryParams
+     */
     public function setQueryParams(array $queryParams): void
     {
         unset($queryParams['page']);

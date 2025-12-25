@@ -2,19 +2,20 @@
 
 declare(strict_types=1);
 
-namespace App\Components\Admin;
+namespace App\Components\Admin\CategoryForm;
 
 use App\Components\BaseControl;
 use App\Models\CategoryException;
 use App\Models\CategoryManager;
 use App\Models\Helpers\StringHelper;
 use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
 use Webmozart\Assert\Assert;
 
 class CategoryForm extends BaseControl
 {
-    public const OriginCreate = 'Create';
-    public const OriginEdit = 'Edit';
+    public const string OriginCreate = 'Create';
+    public const string OriginEdit = 'Edit';
 
     private string $origin;
 
@@ -76,8 +77,8 @@ class CategoryForm extends BaseControl
         return $form;
     }
 
-    /** @param \Nette\Utils\ArrayHash<mixed> $values */
-    public function process(Form $form, \Nette\Utils\ArrayHash $values): void
+    /** @param ArrayHash<mixed> $values */
+    public function process(Form $form, ArrayHash $values): void
     {
         $data = (array)$values;
         $data['hidden'] = $data['hidden'] ? '1' : '0';

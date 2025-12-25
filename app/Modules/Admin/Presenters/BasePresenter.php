@@ -6,6 +6,7 @@ namespace App\Modules\Admin\Presenters;
 
 use App\Models\ConfigManager;
 use App\Models\Helpers\AssetsVersion;
+use App\Models\TranslationException;
 use App\Models\TranslationManager;
 use Nette\Application\Helpers;
 use Nette\Database\Explorer;
@@ -16,7 +17,8 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
     use \App\Models\Config;
     use \App\Models\Translation;
 
-    private const CATEGORY_MAP = [
+    /** @var array<string,string> */
+    private const array CATEGORY_MAP = [
         'Admin' => 'HOME',
         'Article' => 'ARTICLE',
         'Config' => 'CONFIG',
@@ -44,6 +46,9 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
     protected string $lang;
     protected string $htmlLang;
 
+    /**
+     * @throws TranslationException
+     */
     public function startup(): void
     {
         parent::startup();
@@ -129,6 +134,7 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
      *
      * @param string|null $lang Optional language code (defaults to current language).
      * @return string The translated title.
+     * @throws TranslationException
      */
     protected function getPresenterTitle(?string $lang = null): string
     {
