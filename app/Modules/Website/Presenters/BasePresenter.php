@@ -15,6 +15,7 @@ use App\Models\RedirectManager;
 use App\Models\TranslationManager;
 use Nette;
 use Nette\Database\Explorer;
+use Webmozart\Assert\Assert;
 
 abstract class BasePresenter extends Nette\Application\UI\Presenter
 {
@@ -77,7 +78,9 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         }
 
         // Language
-        $this->lang = $this->c('DEFAULT_LANG'); // TODO: Get language from URL or session
+        $lang = $this->c('DEFAULT_LANG'); // TODO: Get language from URL or session
+        Assert::notNull($lang, 'Default language not found');
+        $this->lang = $lang;
         $this->translationManager->setCurrentLanguage($this->lang);
 
         // Default parameters
@@ -124,7 +127,9 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
         // JS + CSS code injecting
         $this->template->cssInject = $this->c('CSS_INJECT');
-        if (!IPValidator::ipInList($_SERVER['REMOTE_ADDR'], explode(',', $this->c('JS_IP_EXCEPTIONS')))) {
+        $jsIPExceptions = $this->c('JS_IP_EXCEPTIONS');
+        Assert::string($jsIPExceptions, 'JS_IP_EXCEPTIONS must be a string.');
+        if (!IPValidator::ipInList($_SERVER['REMOTE_ADDR'], explode(',', $jsIPExceptions))) {
             $this->template->jsInjectHead = $this->c('JS_INJECT_HEAD');
             $this->template->jsInjectBodyFirst = $this->c('JS_INJECT_BODY_FIRST');
             $this->template->jsInjectBodyLast = $this->c('JS_INJECT_BODY_LAST');

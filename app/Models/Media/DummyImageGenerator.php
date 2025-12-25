@@ -5,21 +5,24 @@ declare(strict_types=1);
 namespace App\Models\Media;
 
 use GdImage;
+use RuntimeException;
+use Webmozart\Assert\Assert;
 
 class DummyImageGenerator
 {
-    private const FONT_DIR = PROJECT_DIR . 'www/assets/fonts/';
-    private const FONT_FILE = 'Audiowide-Regular.ttf';
-    // private const FONT_LICENSE = self::FONT_DIR . 'Audiowide-LICENSE.md';
+    private const string FONT_DIR = PROJECT_DIR . 'www/assets/fonts/';
+    private const string FONT_FILE = 'Audiowide-Regular.ttf';
+//    private const string FONT_LICENSE = self::FONT_DIR . 'Audiowide-LICENSE.md';
 
-    private const CACHE_DIR = PROJECT_DIR . 'uploads/media/cache/';
-    private const CACHE_PREFIX = 'no-image';
+    private const string CACHE_DIR = PROJECT_DIR . 'uploads/media/cache/';
+    private const string CACHE_PREFIX = 'no-image';
 
-    private const SUPPORTED_FORMATS = ['png', 'jpg', 'jpeg', 'gif', 'webp'];
-    private const DEFAULT_FORMAT = 'png';
+    /** @var string[] */
+    private const array SUPPORTED_FORMATS = ['png', 'jpg', 'jpeg', 'gif', 'webp'];
+    private const string DEFAULT_FORMAT = 'png';
 
-    private const DEFAULT_BG_COLOR = '#ffc107';
-    private const DEFAULT_TEXT_COLOR = '#000000';
+    private const string DEFAULT_BG_COLOR = '#ffc107';
+    private const string DEFAULT_TEXT_COLOR = '#000000';
 
     private int $width;
     private ?int $height = null;
@@ -103,7 +106,7 @@ class DummyImageGenerator
      * Generates the image. Returns cached data if available, otherwise renders and caches the image.
      *
      * @return self
-     * @throws \RuntimeException If image generating fails.
+     * @throws RuntimeException If image generating fails.
      */
     public function generate(): self
     {
@@ -118,7 +121,7 @@ class DummyImageGenerator
                 $this->binaryData = $cached;
                 return $this;
             } else {
-                throw new \RuntimeException("Unable to read cache file: $cachePath");
+                throw new RuntimeException("Unable to read cache file: $cachePath");
             }
         }
 
@@ -129,7 +132,7 @@ class DummyImageGenerator
             $output = $this->renderImageToString($image);
         } catch (\Throwable $e) {
             imagedestroy($image);
-            throw new \RuntimeException('Failed to render image: ' . $e->getMessage(), 0, $e);
+            throw new RuntimeException('Failed to render image: ' . $e->getMessage(), 0, $e);
         }
 
         $this->saveToCache($cachePath, $output);
@@ -139,7 +142,7 @@ class DummyImageGenerator
     }
 
     /**
-     * Builds file name of cache file based on parameters and format.
+     * Builds file name of a cache file based on parameters and format.
      *
      * @return string Name of the cache file.
      */
@@ -208,15 +211,15 @@ class DummyImageGenerator
         $directory = dirname($path);
 
         if (!is_dir($directory)) {
-            throw new \RuntimeException("Cache directory does not exist: $directory");
+            throw new RuntimeException("Cache directory does not exist: $directory");
         }
 
         if (!is_writable($directory)) {
-            throw new \RuntimeException("Cache directory is not writable: $directory");
+            throw new RuntimeException("Cache directory is not writable: $directory");
         }
 
         if (file_put_contents($path, $data) === false) {
-            throw new \RuntimeException("Failed to write image cache file: $path");
+            throw new RuntimeException("Failed to write image cache file: $path");
         }
     }
 
@@ -241,11 +244,23 @@ class DummyImageGenerator
      */
     private function createImage(): GdImage
     {
+        Assert::range($this->width, 1, PHP_INT_MAX);
+        Assert::range($this->height, 1, PHP_INT_MAX);
+
         $image = imagecreatetruecolor($this->width, $this->height);
 
         $bgRGB = $this->hexToRgb($this->bgColor);
         $bg = imagecolorallocate($image, ...$bgRGB);
-        imagefilledrectangle($image, 0, 0, $this->width, $this->height, $bg);
+        Assert::integer($bg);
+
+        imagefilledrectangle(
+            image: $image,
+            x1: 0,
+            y1: 0,
+            x2: $this->width,
+            y2: $this->height,
+            color: $bg
+        );
 
         return $image;
     }
@@ -255,25 +270,26 @@ class DummyImageGenerator
      *
      * @param GdImage $image GD image resource.
      *
-     * @throws \RuntimeException If the font file is not found or text bounding box cannot be calculated.
+     * @throws RuntimeException If the font file is not found, or text bounding box cannot be calculated.
      */
     private function drawText(GdImage $image): void
     {
         $fontPath = self::FONT_DIR . self::FONT_FILE;
         if (!is_file($fontPath)) {
-            throw new \RuntimeException("Font file not found: $fontPath");
+            throw new RuntimeException("Font file not found: $fontPath");
         }
 
         $fontSize = (int) max(10, min($this->width, $this->height) / 10);
 
         $textRGB = $this->hexToRgb($this->textColor);
         $tc = imagecolorallocate($image, ...$textRGB);
+        Assert::integer($tc);
 
         $caption = $this->getSafeCaption();
 
         $bbox = imagettfbbox($fontSize, 0, $fontPath, $caption);
         if ($bbox === false) {
-            throw new \RuntimeException('Failed to calculate text bounding box.');
+            throw new RuntimeException('Failed to calculate text bounding box.');
         }
 
         $textWidth = abs($bbox[4] - $bbox[0]);
@@ -282,7 +298,16 @@ class DummyImageGenerator
         $x = (int) (($this->width - $textWidth) / 2);
         $y = (int) (($this->height + $textHeight) / 2);
 
-        imagettftext($image, $fontSize, 0, $x, $y, $tc, $fontPath, $caption);
+        imagettftext(
+            image: $image,
+            size: $fontSize,
+            angle: 0,
+            x: $x,
+            y: $y,
+            color: $tc,
+            font_filename: $fontPath,
+            text: $caption
+        );
     }
 
     /**
@@ -291,7 +316,7 @@ class DummyImageGenerator
      * @param GdImage $image GD image resource.
      * @return string Image data as binary string.
      *
-     * @throws \RuntimeException If rendering fails.
+     * @throws RuntimeException If rendering fails.
      */
     private function renderImageToString(GdImage $image): string
     {
@@ -301,13 +326,13 @@ class DummyImageGenerator
             'jpg', 'jpeg' => imagejpeg($image, null, 90),
             'gif'  => imagegif($image),
             'webp' => imagewebp($image),
-            default => throw new \RuntimeException("Unsupported image format: $this->format"),
+            default => throw new RuntimeException("Unsupported image format: $this->format"),
         };
         imagedestroy($image);
         $data = ob_get_clean();
 
         if ($data === false) {
-            throw new \RuntimeException("Failed to render image.");
+            throw new RuntimeException("Failed to render image.");
         }
 
         return $data;
@@ -317,7 +342,7 @@ class DummyImageGenerator
      * Converts a hexadecimal color string to an RGB array.
      *
      * @param string $hex Hexadecimal color code (e.g., "#ffffff" or "fff").
-     * @return array{0: int, 1: int, 2: int} RGB color as an indexed array. (0: red, 1: green, 2: blue)
+     * @return array{0: int<0, 255>, 1: int<0, 255>, 2: int<0, 255>} RGB color as an indexed array. (0: red, 1: green, 2: blue)
      *
      * @throws \InvalidArgumentException If the input is not a valid hex color.
      */
@@ -328,14 +353,19 @@ class DummyImageGenerator
             $hex = preg_replace('/(.)/', '$1$1', $hex);
         }
 
-        if (!preg_match('/^[0-9a-fA-F]{6}$/', $hex)) {
+        if (!is_string($hex) || !ctype_xdigit($hex)) {
             throw new \InvalidArgumentException('Invalid hex color value.');
         }
 
-        return [
-            hexdec(substr($hex, 0, 2)),
-            hexdec(substr($hex, 2, 2)),
-            hexdec(substr($hex, 4, 2)),
-        ];
+        $r = (int) hexdec(substr($hex, 0, 2));
+        Assert::range($r, 0, 255);
+
+        $g = (int) hexdec(substr($hex, 2, 2));
+        Assert::range($g, 0, 255);
+
+        $b = (int) hexdec(substr($hex, 4, 2));
+        Assert::range($b, 0, 255);
+
+        return [$r, $g, $b];
     }
 }

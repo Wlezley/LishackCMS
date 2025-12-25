@@ -8,6 +8,7 @@ use App\Models\Dataset\DatasetException;
 use App\Models\Dataset\Entity\Dataset;
 use App\Models\Helpers\ArrayHelper;
 use Nette\Database\Explorer;
+use Nette\Database\Table\ActiveRow;
 
 final class DatasetRepository
 {
@@ -44,6 +45,7 @@ final class DatasetRepository
 
     public function insert(Dataset $dataset): Dataset
     {
+        /** @var ActiveRow $row */
         $row = $this->db->table(self::TABLE_NAME)->insert($dataset->toDatabaseRow());
         $dataset->id = (int) $row->getPrimary();
         return $dataset;
@@ -113,12 +115,12 @@ final class DatasetRepository
     /**
      * Retrieves a list of datasets with optional search and pagination.
      *
-     * @param int $limit Number of results to return (default: 50).
-     * @param int $offset Offset for pagination (default: 0).
+     * @param int<0, max>|null $limit Number of results to return (default: 50).
+     * @param int<0, max>|null $offset Offset for pagination (default: 0).
      * @param string|null $search Optional search query for name, slug, component, or presenter fields.
      * @return array<int|string,array<string,string|int|null>>|null Array of datasets indexed by ID, or null if none found.
      */
-    public function getList(int $limit = 50, int $offset = 0, ?string $search = null): ?array
+    public function getList(?int $limit = 50, ?int $offset = 0, ?string $search = null): ?array
     {
         $query = $this->db->table(DatasetRepository::TABLE_NAME)
             ->where('deleted', 0)

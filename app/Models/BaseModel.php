@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Nette\SmartObject;
 use Nette\Database\Explorer;
+use Webmozart\Assert\Assert;
 
 abstract class BaseModel
 {
@@ -37,9 +38,13 @@ abstract class BaseModel
         $this->data = null;
     }
 
+    /**
+     * @throws TranslationException
+     */
     public function setLang(?string $lang = null): void
     {
         $lang = $lang ?? $this->configManager->get('DEFAULT_LANG');
+        Assert::notNull($lang, 'Default language is not set');
         $this->translationManager->setCurrentLanguage($lang);
     }
 

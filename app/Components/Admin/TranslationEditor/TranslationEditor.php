@@ -7,6 +7,7 @@ namespace App\Components\Admin;
 use App\Components\BaseControl;
 use Nette\Application\UI\Form;
 use Nette\Utils\Json;
+use Webmozart\Assert\Assert;
 
 class TranslationEditor extends BaseControl
 {
@@ -56,13 +57,14 @@ class TranslationEditor extends BaseControl
         $languageService = $this->translationManager->getLanguageService();
         $defaultLang = $languageService->getDefaultLang($this->c('DEFAULT_LANG'));
         $targetLang = $this->param['lang'] ?? $languageService->getSecondaryLang('en');
+        Assert::nullOrStringNotEmpty($targetLang, 'Target language is not set');
         $this->template->translations = $this->translationManager->getTranslations($targetLang);
 
         $this->template->defaultLang = $defaultLang;
         $this->template->targetLang = $targetLang;
         $this->template->languages = $languageService->getNames(false);
 
-        $this->template->setFile(__DIR__ . '/TranslationEditor.latte');
-        $this->template->render();
+        $this->getTemplate()->setFile(__DIR__ . '/TranslationEditor.latte');
+        $this->getTemplate()->render();
     }
 }

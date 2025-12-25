@@ -6,6 +6,8 @@ namespace App\Models;
 
 use App\Models\Helpers\ArrayHelper;
 use Nette\Database\Explorer;
+use Nette\Database\Table\ActiveRow;
+use Webmozart\Assert\Assert;
 
 class RedirectManager
 {
@@ -105,15 +107,16 @@ class RedirectManager
             throw new RedirectException("Duplicate redirect for source '$source' found, entry cannot be added", 1);
         }
 
-        $result = $this->db->table(self::TABLE_NAME)->insert([
+        /** @var ActiveRow $row */
+        $row = $this->db->table(self::TABLE_NAME)->insert([
             'source' => $source,
             'target' => $target,
             'code' => $code,
             'enabled' => $enabled ? 1 : 0
         ]);
 
-        if (is_numeric($result['id'])) {
-            return (int)$result['id'];
+        if (is_numeric($row['id'])) {
+            return (int) $row['id'];
         }
 
         return null;
@@ -197,12 +200,12 @@ class RedirectManager
     /**
      * Retrieves a list of redirects with optional search and pagination.
      *
-     * @param int $limit Number of results to return (default: 50).
-     * @param int $offset Offset for pagination (default: 0).
+     * @param int<0,max>|null $limit Number of results to return (default: 50).
+     * @param int<0,max>|null $offset Offset for pagination (default: 0).
      * @param string|null $search Optional search query for source or target URLs.
      * @return array<int|string,array<string,string|int|null>>|null Array of redirects indexed by source, or null if empty.
      */
-    public function getList(int $limit = 50, int $offset = 0, ?string $search = null): ?array
+    public function getList(?int $limit = 50, ?int $offset = 0, ?string $search = null): ?array
     {
         $query = $this->db->table(self::TABLE_NAME)
             ->limit($limit, $offset)
@@ -264,6 +267,7 @@ class RedirectManager
         $host = $parsed['host'] ?? null;
         $path = $parsed['path'] ?? '';
         $path = preg_replace('~//+~', '/', $path);
+        Assert::string($path, 'Invalid URL path');
 
         return ($scheme ? "$scheme://" : '') . ($host ? $host : '') . '/' . ltrim($path, '/');
     }

@@ -6,10 +6,12 @@ namespace App\Models;
 
 use Nette\Database\Explorer;
 use Nette\InvalidArgumentException;
+use ValueError;
+use Webmozart\Assert\Assert;
 
 class TranslationManager
 {
-    public const TABLE_NAME = 'translations';
+    public const string TABLE_NAME = 'translations';
 
     /** @var string Currently selected language */
     private string $currentLang;
@@ -20,14 +22,14 @@ class TranslationManager
     /**
      * @param Explorer $db Database explorer instance.
      * @param TranslationLanguage $languageService Service for handling language metadata.
-     * @param ConfigManager $configManager Manages configuration settings, including default language.
+     * @param ConfigManager $configManager Manages configuration settings, including the default language.
      * @param TranslationLog $log Handles logging of missing or problematic translations.
      */
     public function __construct(
-        private Explorer $db,
-        private TranslationLanguage $languageService,
-        private ConfigManager $configManager,
-        private TranslationLog $log
+        private readonly Explorer $db,
+        private readonly TranslationLanguage $languageService,
+        private readonly ConfigManager $configManager,
+        private readonly TranslationLog $log
     ) {
         $this->currentLang = $this->languageService->getDefaultLang(
             $this->configManager->get('DEFAULT_LANG')
@@ -48,14 +50,11 @@ class TranslationManager
      * Sets the current language for translations.
      *
      * @param string $lang The language code to set.
-     * @throws InvalidArgumentException If the language is not found.
+     * @throws TranslationException If the language is not found.
      */
     public function setCurrentLanguage(string $lang): void
     {
-        if (!$this->languageService->getLanguage($lang)) {
-            throw new InvalidArgumentException("Language with code '$lang' is not found.");
-        }
-
+        $this->languageService->checkLanguage($lang);
         $this->currentLang = $lang;
         $this->load($lang);
     }
@@ -114,10 +113,11 @@ class TranslationManager
      *
      * @param string $key The translation key.
      * @param string|null $lang The language code (defaults to the current language).
-     * @param bool $keyAsFallback Whether to return the key itself if no translation is found.
-     * @return string|null The translated text or if not found, returns `$key` as fallback or null if `$keyAsFallback` is false.
+     * @param bool $keyAsFallback True to return the key itself if the translation is not found, false to throw an exception.
+     * @return string The translated text or if not found, returns `$key` as fallback if `$keyAsFallback` is true.
+     * @throws TranslationException If the translation key is not found and `$keyAsFallback` is false.
      */
-    public function get(string $key, ?string $lang = null, bool $keyAsFallback = true): ?string
+    public function get(string $key, ?string $lang = null, bool $keyAsFallback = true): string
     {
         $lang = $lang ?? $this->currentLang;
 
@@ -129,7 +129,11 @@ class TranslationManager
                 $this->log->logMissingKey($key, $lang);
             }
 
-            return $keyAsFallback ? $key : null;
+            if ($keyAsFallback) {
+                return $key;
+            }
+
+            throw new TranslationException("Translation key '$key' not found for language '$lang'");
         }
 
         return $this->translations[$lang][$key];
@@ -149,25 +153,23 @@ class TranslationManager
      * @param array<mixed> $values Values to be formatted into the translation string.
      * @return string The formatted translated text. If translation is missing or formatting fails, returns the key as a fallback.
      */
-    public function getf(string $key, ?string $lang, array $values): ?string
+    public function getf(string $key, ?string $lang, array $values): string
     {
         $lang = $lang ?? $this->currentLang;
-        $format = $this->get($key, $lang, false);
-
-        if (!$format) {
-            return $key;
-        }
-
-        if (empty($values)) {
-            return $format;
-        }
 
         try {
+            $format = $this->get($key, $lang, false);
+            Assert::notEmpty($values);
             return vsprintf($format, $values);
-        } catch (\ValueError $e) {
+        } catch (TranslationException) {
+            return $key;
+        } catch (InvalidArgumentException) {
+            return $format;
+        } catch (ValueError $e) {
             if ($this->configManager->get('LOG_TRANSLATION_FALLBACK') == 1) {
                 $this->log->logMissingArguments($key, $lang, $values, $e->getMessage());
             }
+
             return $key;
         }
     }
@@ -291,12 +293,12 @@ class TranslationManager
      * Retrieves a paginated list of translations for a specific language.
      *
      * @param string $lang The language code.
-     * @param int $limit The maximum number of records to return.
-     * @param int $offset The number of records to skip.
+     * @param int<0,max>|null $limit The maximum number of records to return.
+     * @param int<0,max>|null $offset The number of records to skip.
      * @param string|null $search Optional search query to filter by key or text.
      * @return array<string,string> Associative array of translation keys and texts.
      */
-    public function getList(string $lang, int $limit = 50, int $offset = 0, ?string $search = null): array
+    public function getList(string $lang, ?int $limit = 50, ?int $offset = 0, ?string $search = null): array
     {
         $query = $this->db->table(self::TABLE_NAME)
             ->where('lang', $lang)
@@ -350,7 +352,7 @@ class TranslationManager
     // TRANSLATION EDITOR METHODS
 
     /**
-     * Saves multiple translations in batch.
+     * Saves multiple translations in a batch.
      *
      * Automatically inserts, updates, or deletes translations based on provided data.
      *
@@ -358,6 +360,7 @@ class TranslationManager
      *        Nested array where first-level keys are translation keys,
      *        second-level keys are language codes, and values are translated texts.
      *
+     * @throws TranslationException
      * @todo Optimize. see: https://doc.nette.org/en/database/explorer#toc-selection-insert
      */
     public function saveTranslations(array $translations): void

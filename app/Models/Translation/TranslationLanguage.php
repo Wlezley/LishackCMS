@@ -5,26 +5,24 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Nette\Database\Explorer;
+use Webmozart\Assert\Assert;
+use Webmozart\Assert\InvalidArgumentException;
 
 class TranslationLanguage
 {
-    public const TABLE_NAME = 'lang';
+    public const string TABLE_NAME = 'lang';
 
     /** @var array<string,array<string,mixed>> */
     private array $languages = [];
 
     public function __construct(
-        private Explorer $db
+        private readonly Explorer $db
     ) {
         $this->load();
     }
 
-    private function load(bool $reload = false): void
+    private function load(): void
     {
-        if ($reload) {
-            $this->languages = [];
-        }
-
         if (empty($this->languages)) {
             foreach ($this->db->table(self::TABLE_NAME)->fetchAll() as $row) {
                 $item = $row->toArray();
@@ -36,13 +34,30 @@ class TranslationLanguage
 
     public function reload(): void
     {
-        $this->load(true);
+        $this->languages = [];
+        $this->load();
     }
 
-    /** @return array<string,mixed>|null */
-    public function getLanguage(string $lang): ?array
+    /**
+     * @throws TranslationException If language is not found.
+     */
+    public function checkLanguage(string $lang): void
     {
-        return $this->languages[$lang] ?? null;
+        try {
+            Assert::keyExists($this->languages, $lang, "Language '$lang' not found.");
+        } catch (InvalidArgumentException $e) {
+            throw new TranslationException($e->getMessage(), $e->getCode(), $e);
+        }
+    }
+
+    /**
+     * @return array<string,mixed>
+     * @throws TranslationException If language is not found.
+     */
+    public function getLanguage(string $lang): array
+    {
+        $this->checkLanguage($lang);
+        return $this->languages[$lang];
     }
 
     /** @return array<string,array<string,mixed>> */
@@ -66,7 +81,7 @@ class TranslationLanguage
         return $names;
     }
 
-    public function getDefaultLang(?string $fallback = null): ?string
+    public function getDefaultLang(?string $fallback = null): string
     {
         foreach ($this->languages as $lang => $data) {
             if ($data['default'] == 1) {
@@ -74,16 +89,20 @@ class TranslationLanguage
             }
         }
 
+        Assert::notNull($fallback, 'No default language found');
+
         return $fallback;
     }
 
-    public function getSecondaryLang(?string $fallback = null): ?string
+    public function getSecondaryLang(?string $fallback = null): string
     {
         foreach ($this->languages as $lang => $data) {
             if ($data['default'] == 0 && $data['enabled'] == 1) {
                 return $lang;
             }
         }
+
+        Assert::notNull($fallback, 'No secondary language found');
 
         return $fallback;
     }

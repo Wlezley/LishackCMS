@@ -14,11 +14,11 @@ class CategoryManager extends BaseModel
     /** @todo Make this value configurable? */
     public const MAIN_CATEGORY_ID = 1;
 
-    /** @var array<int,array<string,string|int|null>> $categories */
+    /** @var array<int|string,array<string,string|int|null>> $categories */
     protected array $categories = [];
 
     /**
-     * Loads all categories from the database into internal cache.
+     * Loads all categories from the database into an internal cache.
      * Categories are indexed by their ID and ordered by `position`.
      */
     public function load(): void
@@ -54,7 +54,7 @@ class CategoryManager extends BaseModel
      *
      * @param int $id Category ID.
      * @return array<string,mixed> Category data.
-     * @throws CategoryException If category is not found.
+     * @throws CategoryException If a category is not found.
      */
     public function getById(int $id): array
     {
@@ -71,7 +71,6 @@ class CategoryManager extends BaseModel
      * Creates a new category in the database.
      *
      * @param array<string,string|int|null> $data Data to insert (must pass validation).
-     * @throws CategoryException If validation fails or DB insert fails.
      */
     public function create(array $data): void
     {
@@ -150,7 +149,7 @@ class CategoryManager extends BaseModel
     /**
      * Returns all cached categories indexed by ID.
      *
-     * @return array<int,array<string,string|int|null>> Category data.
+     * @return array<int|string,array<string,string|int|null>> Category data.
      */
     public function getData(): array
     {
@@ -172,7 +171,7 @@ class CategoryManager extends BaseModel
 
         foreach ($items as &$item) {
             if ($item['parent_id'] !== null && isset($items[$item['parent_id']])) {
-                $items[$item['parent_id']]['items'][] = &$item;
+                $items[$item['parent_id']]['items'][] = &$item; // @phpstan-ignore-line
             } else {
                 $tree[] = &$item;
             }
@@ -229,7 +228,7 @@ class CategoryManager extends BaseModel
             foreach ($this->categories as $category) {
                 if ($category['name_url'] == $nameUrl && $category['parent_id'] == $categoryId) {
                     $found = true;
-                    $categoryId = $category['id'];
+                    $categoryId = (int) $category['id'];
                     break;
                 }
             }
@@ -311,6 +310,7 @@ class CategoryManager extends BaseModel
             ->update(['parent_id' => $data['target_id']]);
 
         // Update positions
+        // TODO: Refactor SQL query construction
         $sql = "UPDATE `" . self::TABLE_NAME . "` SET `position` = CASE `id`\n";
         foreach ($data['order_list'] as $position => $id) {
             $sql .= "WHEN $id THEN $position\n";
@@ -318,7 +318,7 @@ class CategoryManager extends BaseModel
         $sql .= "ELSE `position` END\n";
         $sql .= "WHERE `id` IN (" . implode(',', $data['order_list']) . ");";
 
-        $this->db->query($sql);
+        $this->db->query($sql); // @phpstan-ignore-line
 
         // Update levels
         $this->updateChildLevels();
@@ -351,7 +351,7 @@ class CategoryManager extends BaseModel
                     ->where('id', $childId)
                     ->update(['level' => $newLevel]);
             }
-            $this->updateChildLevels($childId, $newLevel);
+            $this->updateChildLevels((int) $childId, $newLevel);
         }
     }
 

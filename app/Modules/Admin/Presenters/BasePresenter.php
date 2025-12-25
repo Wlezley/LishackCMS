@@ -9,6 +9,7 @@ use App\Models\Helpers\AssetsVersion;
 use App\Models\TranslationManager;
 use Nette\Application\Helpers;
 use Nette\Database\Explorer;
+use Webmozart\Assert\Assert;
 
 abstract class BasePresenter extends \Nette\Application\UI\Presenter
 {
@@ -48,8 +49,9 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
     {
         parent::startup();
 
-        // TODO: Get language from URL or session
-        $this->lang = $this->c('DEFAULT_LANG_ADMIN');
+        $lang = $this->c('DEFAULT_LANG_ADMIN'); // TODO: Get language from URL or session
+        Assert::notNull($lang, 'Default admin language not found');
+        $this->lang = $lang;
         $this->translationManager->setCurrentLanguage($this->lang);
         $this->htmlLang = $this->translationManager->getLanguageService()->getLanguage($this->lang)['html_lang'] ?? $this->lang;
     }
@@ -112,6 +114,7 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
      */
     protected function getPresenterCategory(): string
     {
+        Assert::stringNotEmpty($this->getName(), 'Presenter name cannot be empty');
         return self::CATEGORY_MAP[Helpers::splitName($this->getName())[1]] ?? '';
     }
 
@@ -130,7 +133,14 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
      */
     protected function getPresenterTitle(?string $lang = null): string
     {
-        $translationKey = strtolower('title.' . str_replace(':', '.', $this->getName()) . '.' . $this->getAction());
+        $name = $this->getName();
+        Assert::stringNotEmpty($name, 'Presenter name cannot be empty');
+
+        $action = $this->getAction();
+        Assert::stringNotEmpty($action, 'Presenter action cannot be empty');
+
+        $translationKey = 'title.' . str_replace(':', '.', $name) . '.' . $action;
+        $translationKey = strtolower($translationKey);
         return $this->translationManager->get($translationKey, $lang);
     }
 

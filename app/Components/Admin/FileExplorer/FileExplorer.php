@@ -49,8 +49,8 @@ class FileExplorer extends BaseControl
             ]);
         };
 
-        $this->template->setFile(__DIR__ . '/FileExplorer.latte');
-        $this->template->render();
+        $this->getTemplate()->setFile(__DIR__ . '/FileExplorer.latte');
+        $this->getTemplate()->render();
     }
 
     public function handleEditFolder(string $id): void

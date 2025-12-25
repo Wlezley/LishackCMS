@@ -9,6 +9,8 @@ use Carbon\Carbon;
 use Exception;
 use Nette\Database\Explorer;
 use Nette\Utils\Random;
+use SimpleXMLElement;
+use Webmozart\Assert\Assert;
 
 // https://www.smsbrana.cz/dokumentace
 class SmsGate
@@ -44,21 +46,21 @@ class SmsGate
 
         $query = http_build_query($params, '', '&', PHP_QUERY_RFC3986);
         $request = $this->apiURL . '?' . $query;
-        $response = false;
 
-        try {
-            $response = file_get_contents($request); // Todo: curl
-        } catch (Exception $e) {
-            throw $e;
-        }
+        $response = file_get_contents($request); // Todo: curl
+        Assert::string($response, 'Error processing request');
 
-        if ($response === false) {
-            throw new Exception('Error processing request', 1);
-        }
+        $xml = simplexml_load_string($response);
+        Assert::isInstanceOf($xml, SimpleXMLElement::class, 'Error processing request XML');
 
-        $responseData = json_decode(json_encode(simplexml_load_string($response)), TRUE);
+        $encodedResponse = json_encode($xml);
+        Assert::string($encodedResponse, 'Error processing request (encoding)');
+
+        $responseData = json_decode($encodedResponse, TRUE);
+        Assert::isArray($responseData, 'Error processing request (decoding)');
+        Assert::keyExists($responseData, 'err', 'Error processing request (missing err key)');
+
         $errorCode = $responseData['err'];
-
         $this->logSMS($phoneNumber, $message, $errorCode, $userID);
 
         if (DEBUG === true) {

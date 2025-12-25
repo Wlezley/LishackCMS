@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Components\Admin;
 
+use AllowDynamicProperties;
 use App\Components\BaseControl;
 use App\Models\Translation;
 use App\Models\TranslationManager;
@@ -15,6 +16,16 @@ use Nette\Database\Explorer;
 use Nette\Security\User;
 use Nette\Utils\Json;
 
+/**
+ * @property string $id
+ * @property string $name
+ * @property string $full_name
+ * @property string $email
+ * @property string $role
+ * @property string $deleted
+ * @property string $enabled
+ */
+#[AllowDynamicProperties]
 class UserListGrid extends BaseControl
 {
     use Translation;
@@ -182,7 +193,7 @@ class UserListGrid extends BaseControl
 
     // TODO: Move all of this logic below to the UserManager (?)
 
-    public function allowActionEdit_Callback(object $item): bool
+    public function allowActionEdit_Callback(self $item): bool
     {
         // Unable to edit SUPERADMIN
         if ($item->id == 1) {
@@ -205,7 +216,7 @@ class UserListGrid extends BaseControl
         return true;
     }
 
-    public function allowActionDelete_Callback(object $item): bool
+    public function allowActionDelete_Callback(self $item): bool
     {
         // Unable to delete SUPERADMIN
         if ($item->id == 1) {
@@ -231,7 +242,7 @@ class UserListGrid extends BaseControl
         return false;
     }
 
-    public function encodeData_Callback(object $item): string
+    public function encodeData_Callback(self $item): string
     {
         $data = Json::encode([
             'id' => $item->id,

@@ -8,6 +8,7 @@ use App\Models\Dataset\DatasetException;
 use App\Models\Dataset\Entity\DatasetColumn;
 use App\Models\Helpers\SqlHelper;
 use Nette\Database\Explorer;
+use Nette\Database\Table\ActiveRow;
 
 final class ColumnRepository
 {
@@ -79,6 +80,7 @@ final class ColumnRepository
         $column->columnId = $this->lastColumnId($column->datasetId);
         $column->columnId++;
 
+        /** @var ActiveRow $row */
         $row = $this->db->table(self::TABLE_NAME)->insert($column->toDatabaseRow());
         return DatasetColumn::fromDatabaseRow($row->toArray());
     }
@@ -157,8 +159,9 @@ final class ColumnRepository
         SqlHelper::assertSafeIdentifier($tableName);
         SqlHelper::assertSafeIdentifier($columnName);
 
+        // TODO: Refactor SQL query construction
         $sql = "SHOW COLUMNS FROM `$tableName` WHERE FIELD = ?";
-        $result = $this->db->fetch($sql, $columnName);
+        $result = $this->db->fetch($sql, $columnName); // @phpstan-ignore-line
 
         return $result !== null;
     }

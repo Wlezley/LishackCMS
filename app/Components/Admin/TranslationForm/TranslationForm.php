@@ -49,7 +49,7 @@ class TranslationForm extends BaseControl
 
         $form->addSubmit('save');
 
-        $form->onSuccess[] = [$this, 'process' . $this->origin];
+        $form->onSuccess[] = [$this, 'process' . $this->origin]; // @phpstan-ignore-line
 
         return $form;
     }
@@ -104,8 +104,8 @@ class TranslationForm extends BaseControl
     public function render(int|string|null $key = null): void
     {
         $this->template->languageList = $this->languageList;
-        $this->template->setFile(__DIR__ . '/TranslationForm.latte');
-        $this->template->render();
+        $this->getTemplate()->setFile(__DIR__ . '/TranslationForm.latte');
+        $this->getTemplate()->render();
     }
 
     public function setOrigin(string $origin): void

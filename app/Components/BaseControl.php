@@ -76,14 +76,14 @@ class BaseControl extends Control
         return $this->translationManager;
     }
 
-    /** @param null|array<string,string> $param */
+    /** @param null|array<string,int|string> $param */
     public function setParam(?array $param): void
     {
         $this->param = $param === null ? [] : $param;
     }
 
-    /** @return array<string,string> */
-    public function getParam(): array
+    /** @return null|array<string,int|string> */
+    public function getParam(): ?array
     {
         return $this->param;
     }

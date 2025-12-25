@@ -28,8 +28,8 @@ class FilePresenter extends SecuredPresenter
 
         $fileMeta = $this->fileManager->getFileById($id);
         $path = ''; // TODO !!!
-        $name = $fileMeta->name;
-        $type = $fileMeta->type;
+        $name = $fileMeta?->name;
+        $type = $fileMeta?->type;
 
         $response = new FileResponse($path, $name, $type, false);
         $this->sendResponse($response);

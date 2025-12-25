@@ -111,7 +111,7 @@ class ConfigWebsiteForm extends BaseControl
     {
         $this->template->configuration = $this->configManager->getConfigData();
 
-        $this->template->setFile(__DIR__ . '/ConfigWebsiteForm.latte');
-        $this->template->render();
+        $this->getTemplate()->setFile(__DIR__ . '/ConfigWebsiteForm.latte');
+        $this->getTemplate()->render();
     }
 }

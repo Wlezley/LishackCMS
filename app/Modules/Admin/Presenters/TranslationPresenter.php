@@ -7,6 +7,7 @@ namespace App\Modules\Admin\Presenters;
 use App\Components\Admin\ITranslationFormFactory;
 use App\Components\Admin\ITranslationEditorFactory;
 use App\Components\Admin\ITranslationListFactory;
+use App\Models\TranslationException;
 
 class TranslationPresenter extends SecuredPresenter
 {
@@ -23,9 +24,10 @@ class TranslationPresenter extends SecuredPresenter
     {
         $languageService = $this->translationManager->getLanguageService();
         $lang = $lang ?? $languageService->getDefaultLang($this->c('DEFAULT_LANG'));
-        $langData = $languageService->getLanguage($lang);
 
-        if ($langData === null) {
+        try {
+            $langData = $languageService->getLanguage($lang);
+        } catch (TranslationException) {
             $this->redirect('Translation:');
         }
 

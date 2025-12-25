@@ -32,8 +32,8 @@ class Pagination extends BaseControl
         $this->template->end = min($this->template->totalPages, $this->template->page + 2);
         $this->template->buildUrl = \Closure::fromCallable([$this, 'buildUrl']);
 
-        $this->template->setFile(__DIR__ . "/$template.latte");
-        $this->template->render();
+        $this->getTemplate()->setFile(__DIR__ . "/$template.latte");
+        $this->getTemplate()->render();
     }
 
     public function setItemsPerPage(int $itemsPerPage): void

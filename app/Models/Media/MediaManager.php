@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models\Media;
 
 use Nette\Database\Explorer;
+use Nette\Database\Table\ActiveRow;
 use Nette\Http\FileUpload;
 use Nette\Utils\Image;
 use Nette\Utils\Strings;
@@ -82,6 +83,7 @@ class MediaManager
         $image->save($thumbPath);
 
         // Save metadata to DB
+        /** @var ActiveRow $row */
         $row = $this->db->table(self::TABLE_NAME)->insert([
             'filename' => $filename,
             'path'     => self::UPLOAD_DIR,

@@ -8,6 +8,7 @@ use App\Components\BaseControl;
 use App\Models\RedirectManager;
 use App\Modules\Admin\Presenters\RedirectPresenter;
 use Nette\Utils\Json;
+use Webmozart\Assert\Assert;
 
 class RedirectList extends BaseControl
 {
@@ -20,11 +21,18 @@ class RedirectList extends BaseControl
 
     public function render(?int $limit = null): void
     {
-        $this->limit = $limit ?? (int)$this->c('PAGINATION_PAGE_ITEMS');
+        if ($limit === null) {
+            $limit = (int)$this->c('PAGINATION_PAGE_ITEMS');
+        }
+        Assert::range($limit, 0, PHP_INT_MAX, 'Limit must be a positive integer.');
+        $this->limit = $limit;
 
         $page = $this->param['page'] ?? 1;
+        Assert::integer($page, 'Page must be an integer.');
         $search = $this->param['search'] ?? null;
+        Assert::nullOrString($search, 'Search must be a string or null.');
         $offset = ($page - 1) * $this->limit;
+        Assert::range($offset, 0, PHP_INT_MAX, 'Offset must be a non-negative integer.');
 
         $this->totalItems = $this->redirectManager->getCount($search);
         $this->template->redirectList = $this->redirectManager->getList($this->limit, $offset, $search);
@@ -41,8 +49,8 @@ class RedirectList extends BaseControl
             ]);
         };
 
-        $this->template->setFile(__DIR__ . '/RedirectList.latte');
-        $this->template->render();
+        $this->getTemplate()->setFile(__DIR__ . '/RedirectList.latte');
+        $this->getTemplate()->render();
     }
 
     public function handleEdit(string $id): void
@@ -66,9 +74,12 @@ class RedirectList extends BaseControl
         $control->setTranslationManager($presenter->translationManager);
         $control->setConfigManager($presenter->configManager);
         $control->setQueryParams($presenter->getHttpRequest()->getQuery());
-        $control->setItemsPerPage($this->limit);
         $control->setTotalItems($this->totalItems);
         $control->setCurrentPage((int) $presenter->getParameter('page', 1));
+
+        if ($this->limit !== null) {
+            $control->setItemsPerPage($this->limit);
+        }
 
         return $control;
     }

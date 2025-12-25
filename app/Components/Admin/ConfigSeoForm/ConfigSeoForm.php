@@ -79,7 +79,7 @@ class ConfigSeoForm extends BaseControl
     {
         $this->template->configuration = $this->configManager->getConfigData();
 
-        $this->template->setFile(__DIR__ . '/ConfigSeoForm.latte');
-        $this->template->render();
+        $this->getTemplate()->setFile(__DIR__ . '/ConfigSeoForm.latte');
+        $this->getTemplate()->render();
     }
 }

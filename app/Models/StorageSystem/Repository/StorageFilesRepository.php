@@ -7,6 +7,7 @@ namespace App\Models\StorageSystem\Repository;
 use App\Models\StorageSystem\Entity\StorageFile;
 use App\Models\StorageSystem\StorageSystemException;
 use Nette\Database\Explorer;
+use Nette\Database\Table\ActiveRow;
 
 class StorageFilesRepository
 {
@@ -46,6 +47,7 @@ class StorageFilesRepository
         $file->setId(null);
         $file->validate();
 
+        /** @var ActiveRow $row */
         $row = $this->db->table(self::TABLE_NAME)->insert($file->toDatabaseRow());
         $file->id = (int) $row->getPrimary();
         return $file;

@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Models\Helpers\ArrayHelper;
 use Nette\Database\Explorer;
+use Webmozart\Assert\Assert;
 
 class ArticleManager extends BaseModel
 {
@@ -134,7 +135,10 @@ class ArticleManager extends BaseModel
         $newArticle = $this->db->table(self::TABLE_NAME)
             ->insert($data);
 
-        if (!$newArticle) {
+        try {
+            Assert::keyExists($newArticle, 'id');
+            Assert::numeric($newArticle['id']);
+        } catch (\Throwable) {
             throw new ArticleException(
                 'Article creation failed.',
                 \Nette\Http\IResponse::S500_InternalServerError
@@ -204,13 +208,13 @@ class ArticleManager extends BaseModel
     /**
      * Retrieves a list of articles with optional search and pagination.
      *
-     * @param int $limit Number of results to return (default: 50).
-     * @param int $offset Offset for pagination (default: 0).
+     * @param int<0,max>|null $limit Number of results to return (default: 50).
+     * @param int<0,max>|null $offset Offset for pagination (default: 0).
      * @param string|null $search Optional search query for article title and content.
-     * @param int $categoryId Category ID filter.
+     * @param int<0,max>|null $categoryId Category ID filter.
      * @return array<int|string,array<string,string|int|null>>|null Array of articles indexed by id, or null if empty.
      */
-    public function getList(int $limit = 50, int $offset = 0, ?string $search = null, ?int $categoryId = null): ?array
+    public function getList(?int $limit = 50, ?int $offset = 0, ?string $search = null, ?int $categoryId = null): ?array
     {
         $query = $this->db->table(self::TABLE_NAME)
             ->limit($limit, $offset)

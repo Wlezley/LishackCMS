@@ -7,6 +7,7 @@ namespace App\Models\StorageSystem\Repository;
 use App\Models\StorageSystem\Entity\StorageTree;
 use App\Models\StorageSystem\StorageSystemException;
 use Nette\Database\Explorer;
+use Nette\Database\Table\ActiveRow;
 
 class StorageTreeRepository
 {
@@ -46,6 +47,7 @@ class StorageTreeRepository
         $tree->setId(null);
         $tree->validate();
 
+        /** @var ActiveRow $row */
         $row = $this->db->table(self::TABLE_NAME)->insert($tree->toDatabaseRow());
         $tree->id = (int) $row->getPrimary();
         return $tree;

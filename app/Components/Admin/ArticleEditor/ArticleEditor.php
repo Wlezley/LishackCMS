@@ -13,7 +13,9 @@ use App\Models\UrlGenerator;
 use App\Models\UserException;
 use App\Models\UserManager;
 use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
 use Nette\Utils\DateTime;
+use Webmozart\Assert\Assert;
 
 class ArticleEditor extends BaseControl
 {
@@ -55,7 +57,8 @@ class ArticleEditor extends BaseControl
             }
         } else {
             try {
-                $this->param['user_name'] = $this->presenter->getUser()->getIdentity()->getData()['full_name'];
+                $this->param['user_name'] = $this->presenter->getUser()->getIdentity()?->getData()['full_name'];
+                Assert::notNull($this->param['user_name']);
             } catch (\Exception $e) {
                 $this->param['user_name'] = $this->t('author.system');
             }
@@ -142,17 +145,17 @@ class ArticleEditor extends BaseControl
             ? $this->t('form.article.create')
             : $this->t('form.article.save');
 
-        $form->addSubmit('save', $saveBtnName)
+        $form->addSubmit('save', $saveBtnName) // @phpstan-ignore-line
             ->onClick[] = [$this, 'processSave'];
 
-        $form->addSubmit('copy', $this->t('form.article.save-copy'))
+        $form->addSubmit('copy', $this->t('form.article.save-copy')) // @phpstan-ignore-line
             ->onClick[] = [$this, 'processSaveAsCopy'];
 
         return $form;
     }
 
-    /** @param \Nette\Utils\ArrayHash<mixed> $values */
-    public function processSave(Form $form, \Nette\Utils\ArrayHash $values): void
+    /** @param ArrayHash<mixed> $values */
+    public function processSave(Form $form, ArrayHash $values): void
     {
         $data = (array)$values;
         unset($data['user_name'], $data['updated_at']);
@@ -204,8 +207,8 @@ class ArticleEditor extends BaseControl
         }
     }
 
-    /** @param \Nette\Utils\ArrayHash<mixed> $values */
-    public function processSaveAsCopy(Form $form, \Nette\Utils\ArrayHash $values): void
+    /** @param ArrayHash<mixed> $values */
+    public function processSaveAsCopy(Form $form, ArrayHash $values): void
     {
         $this->setOrigin(self::OriginCreate);
         $this->processSave($form, $values);
@@ -214,8 +217,8 @@ class ArticleEditor extends BaseControl
     public function render(): void
     {
         $this->template->origin = $this->origin;
-        $this->template->setFile(__DIR__ . '/ArticleEditor.latte');
-        $this->template->render();
+        $this->getTemplate()->setFile(__DIR__ . '/ArticleEditor.latte');
+        $this->getTemplate()->render();
     }
 
     public function setOrigin(string $origin): void

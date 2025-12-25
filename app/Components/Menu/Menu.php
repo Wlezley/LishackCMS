@@ -20,7 +20,7 @@ class Menu extends BaseControl
         $this->template->activeList = $this->categoryManager->getActiveList($activeCategory);
         $this->template->menuItems = $this->categoryManager->getTree()[0]['items'];
 
-        $this->template->setFile(__DIR__ . '/' . $template . '.latte');
-        $this->template->render();
+        $this->getTemplate()->setFile(__DIR__ . '/' . $template . '.latte');
+        $this->getTemplate()->render();
     }
 }

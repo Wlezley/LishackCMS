@@ -44,7 +44,7 @@ class ConfigEditor extends BaseControl
     {
         $this->template->configuration = $this->configManager->getConfigData();
 
-        $this->template->setFile(__DIR__ . '/ConfigEditor.latte');
-        $this->template->render();
+        $this->getTemplate()->setFile(__DIR__ . '/ConfigEditor.latte');
+        $this->getTemplate()->render();
     }
 }

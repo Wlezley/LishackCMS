@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Webmozart\Assert\Assert;
+use Webmozart\Assert\InvalidArgumentException;
+
 class UserRole
 {
     public const USER_ROLES = [
@@ -274,14 +277,16 @@ class UserRole
     /**
      * Asserts that the given role name exists.
      *
-     * @param string $roleName Role name to validate
-     * @throws \InvalidArgumentException If the role name is invalid
+     * @param mixed $roleName Role name to validate
+     * @throws InvalidArgumentException If the role name is invalid
      */
-    public static function assertRoleName(string $roleName): void
+    public static function assertRoleName(mixed $roleName): void
     {
-        if (!in_array($roleName, self::USER_ROLES)) {
-            throw new \InvalidArgumentException("Role '$roleName' was not found.");
-        }
+        Assert::inArray(
+            value: $roleName,
+            values: self::USER_ROLES,
+            message: "Role '$roleName' was not found."
+        );
     }
 
     /**

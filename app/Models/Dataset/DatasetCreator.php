@@ -9,6 +9,7 @@ use App\Models\Dataset\Entity\DatasetColumn;
 use App\Models\Dataset\Repository\ColumnRepository;
 use App\Models\Dataset\Repository\DataRepository;
 use App\Models\Dataset\Repository\DatasetRepository;
+use Webmozart\Assert\Assert;
 
 class DatasetCreator
 {
@@ -114,9 +115,9 @@ class DatasetCreator
         }
 
         $this->dataset = $this->datasetRepository->insert($this->dataset);
+        Assert::notNull($this->dataset->id, 'Dataset ID must not be null.');
         $columnId = 0;
 
-        /** @var DatasetColumn $column */
         foreach ($this->columns as $column) {
             $column->setDatasetId($this->dataset->id);
             $column->setColumnId(++$columnId);

@@ -9,6 +9,7 @@ use App\Models\Dataset\DatasetManager;
 use App\Models\Dataset\Entity\DatasetColumn;
 use App\Models\Dataset\Entity\DatasetRow;
 use Nette\Application\UI\Form;
+use Webmozart\Assert\Assert;
 
 class DataEditor extends BaseControl
 {
@@ -45,6 +46,8 @@ class DataEditor extends BaseControl
         } else {
             $this->datasetId = $this->datasetManager->getDataset()->id;
         }
+
+        Assert::notNull($this->datasetId);
 
         $data = null;
         if ($this->origin == self::OriginEdit) {
@@ -119,7 +122,7 @@ class DataEditor extends BaseControl
     /** @param \Nette\Utils\ArrayHash<mixed> $values */
     public function processCreate(Form $form, \Nette\Utils\ArrayHash $values): void
     {
-        if (!$this->datasetManager->isReady()) {
+        if (!$this->datasetManager->isReady() || $this->datasetId === null) {
             call_user_func($this->onError, $this->t('dataset.id.not-set'));
             return;
         }
@@ -149,7 +152,7 @@ class DataEditor extends BaseControl
 
         $dataRow = $this->datasetManager->getDataRepository()->insert($this->datasetId, $dataRow);
 
-        if (!$dataRow->id) {
+        if ($dataRow->id !== null) {
             call_user_func($this->onError, $this->t('dataset.item.not-created'));
             return;
         }
@@ -160,7 +163,7 @@ class DataEditor extends BaseControl
     /** @param \Nette\Utils\ArrayHash<mixed> $values */
     public function processSave(Form $form, \Nette\Utils\ArrayHash $values): void
     {
-        if (!$this->datasetManager->isReady()) {
+        if (!$this->datasetManager->isReady() || $this->datasetId === null) {
             call_user_func($this->onError, $this->t('dataset.id.not-set'));
             return;
         }
@@ -189,6 +192,7 @@ class DataEditor extends BaseControl
             return;
         }
 
+        Assert::notNull($dataRow->id);
         $this->datasetManager->getDataRepository()->update($this->datasetId, $dataRow);
 
         call_user_func($this->onSuccess, $this->tf('dataset.item.saved', $dataRow->id), $this->datasetId);
@@ -198,8 +202,8 @@ class DataEditor extends BaseControl
     {
         $this->template->columnList = $this->datasetManager->getColumnsList();
 
-        $this->template->setFile(__DIR__ . '/DataEditor.latte');
-        $this->template->render();
+        $this->getTemplate()->setFile(__DIR__ . '/DataEditor.latte');
+        $this->getTemplate()->render();
     }
 
     public function setOrigin(string $origin): void

@@ -9,6 +9,7 @@ use App\Models\Dataset\Entity\DatasetColumn;
 use App\Models\Dataset\Repository\ColumnRepository;
 use App\Models\Dataset\Repository\DataRepository;
 use App\Models\Dataset\Repository\DatasetRepository;
+use Webmozart\Assert\Assert;
 
 final class DatasetManager
 {
@@ -29,7 +30,11 @@ final class DatasetManager
             return false;
         }
 
-        $this->dataset = $this->datasetRepository->findById($id);
+        $dataset = $this->datasetRepository->findById($id);
+        Assert::notNull($dataset, 'Dataset must not be null.');
+        $this->dataset = $dataset;
+        Assert::notNull($this->dataset->id, 'Dataset ID must not be null.');
+
         $this->columns = $this->columnRepository->findByDatasetId($this->dataset->id, $includeDeleted);
 
         return true;
@@ -59,8 +64,9 @@ final class DatasetManager
 
         $columnList = [];
 
-        /** @var DatasetColumn $column */
         foreach ($this->columns as $column) {
+            Assert::notNull($column->columnId, 'Column ID must not be null.');
+
             $columnList[$column->columnId] = [
                 'columnId' => $column->columnId,
                 'name' => $column->name,
@@ -86,11 +92,12 @@ final class DatasetManager
 
         $columnList = [];
 
-        /** @var DatasetColumn $column */
         foreach ($this->columns as $column) {
             if (!$column->listed) {
                 continue;
             }
+
+            Assert::notNull($column->columnId, 'Column ID must not be null.');
 
             $columnList[$column->columnId] = [
                 'columnId' => $column->columnId,
@@ -115,7 +122,10 @@ final class DatasetManager
             return 0;
         }
 
-        return (int) max(array_keys($this->getColumnsList()));
+        $columnList = $this->getColumnsList();
+        Assert::notEmpty($columnList, 'Dataset must have at least one column.');
+
+        return (int) max(array_keys($columnList));
     }
 
     public function deleteRow(int $datasetId, int $rowId): void

@@ -8,9 +8,11 @@ use App\Components\BaseControl;
 use App\Models\Dataset\DatasetManager;
 use App\Modules\Admin\Presenters\DataPresenter;
 use Nette\Utils\Json;
+use Webmozart\Assert\Assert;
 
 class DataList extends BaseControl
 {
+    /** @var int<0,max>|null $limit */
     private ?int $limit = null;
     private ?int $totalItems = null;
 
@@ -20,11 +22,18 @@ class DataList extends BaseControl
 
     public function render(int $datasetId, ?int $limit = null): void
     {
-        $this->limit = $limit ?? (int)$this->c('PAGINATION_PAGE_ITEMS');
+        if ($limit === null) {
+            $limit = (int)$this->c('PAGINATION_PAGE_ITEMS');
+        }
+        Assert::range($limit, 0, PHP_INT_MAX, 'Limit must be a positive integer.');
+        $this->limit = $limit;
 
         $page = $this->param['page'] ?? 1;
+        Assert::integer($page, 'Page must be an integer.');
         $search = $this->param['search'] ?? null;
+        Assert::nullOrString($search, 'Search must be a string or null.');
         $offset = ($page - 1) * $this->limit;
+        Assert::range($offset, 0, PHP_INT_MAX, 'Offset must be a non-negative integer.');
 
         $this->datasetManager->loadDatasetById($datasetId);
         $this->totalItems = $this->datasetManager->getDataRepository()->getCount($datasetId, $search);
@@ -44,8 +53,8 @@ class DataList extends BaseControl
             ]);
         };
 
-        $this->template->setFile(__DIR__ . '/DataList.latte');
-        $this->template->render();
+        $this->getTemplate()->setFile(__DIR__ . '/DataList.latte');
+        $this->getTemplate()->render();
     }
 
     public function handleEdit(string $itemId): void
@@ -70,9 +79,12 @@ class DataList extends BaseControl
         $control->setTranslationManager($presenter->translationManager);
         $control->setConfigManager($presenter->configManager);
         $control->setQueryParams($presenter->getHttpRequest()->getQuery());
-        $control->setItemsPerPage($this->limit);
         $control->setTotalItems($this->totalItems);
         $control->setCurrentPage((int) $presenter->getParameter('page', 1));
+
+        if ($this->limit !== null) {
+            $control->setItemsPerPage($this->limit);
+        }
 
         return $control;
     }

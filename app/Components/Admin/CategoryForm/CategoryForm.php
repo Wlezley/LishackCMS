@@ -9,6 +9,7 @@ use App\Models\CategoryException;
 use App\Models\CategoryManager;
 use App\Models\Helpers\StringHelper;
 use Nette\Application\UI\Form;
+use Webmozart\Assert\Assert;
 
 class CategoryForm extends BaseControl
 {
@@ -35,6 +36,7 @@ class CategoryForm extends BaseControl
         $form->setHtmlAttribute('autocomplete', 'off');
 
         if ($this->origin == self::OriginEdit) {
+            Assert::keyExists($param, 'id', 'Category ID must be set');
             $form->addHidden('id', $param['id']);
         }
 
@@ -121,8 +123,8 @@ class CategoryForm extends BaseControl
 
     public function render(): void
     {
-        $this->template->setFile(__DIR__ . '/CategoryForm.latte');
-        $this->template->render();
+        $this->getTemplate()->setFile(__DIR__ . '/CategoryForm.latte');
+        $this->getTemplate()->render();
     }
 
     public function setOrigin(string $origin): void

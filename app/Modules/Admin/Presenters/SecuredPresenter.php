@@ -45,7 +45,7 @@ class SecuredPresenter extends BasePresenter
                 $this->redirect('Sign:in');
             }
 
-            if ($this->user->getIdentity()->getData()['role'] !== $userData['role']) {
+            if ($this->user->getIdentity()?->getData()['role'] !== $userData['role']) {
                 $this->user->logout(true);
                 $this->flashMessage('Uživatel byl odhlášen: Změna role', 'danger');
                 $this->redirect('Sign:in');

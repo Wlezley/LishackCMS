@@ -17,8 +17,8 @@ class DatasetSidebar extends BaseControl
     {
         $this->template->datasetList = $this->datasetManager->getDatasetRepository()->getSidebarList();
 
-        $this->template->setFile(__DIR__ . '/DatasetSidebar.latte');
-        $this->template->render();
+        $this->getTemplate()->setFile(__DIR__ . '/DatasetSidebar.latte');
+        $this->getTemplate()->render();
     }
 
     public function handleEdit(string $datasetId): void

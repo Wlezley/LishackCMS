@@ -13,6 +13,15 @@
     ],
     "require": {
         "php": ">= 8.4",
+        "ext-fileinfo": "*",
+        "ext-gd": "*",
+        "ext-simplexml": "*",
+        "codeception/codeception": "^5.1",
+        "codeception/module-asserts": "*",
+        "codeception/module-phpbrowser": "*",
+        "contributte/console": "^0.10.1",
+        "latte/latte": "^3.0",
+        "nesbot/carbon": "^3.8",
         "nette/application": "^3.2",
         "nette/bootstrap": "^3.2",
         "nette/caching": "^3.4",
@@ -24,22 +33,18 @@
         "nette/robot-loader": "^4.1",
         "nette/security": "^3.2",
         "nette/utils": "^4.0",
-        "latte/latte": "^3.0",
-        "tracy/tracy": "^2.10",
-        "nesbot/carbon": "^3.8",
         "robmorgan/phinx": "^0.16.5",
-        "codeception/codeception": "^5.1",
-        "codeception/module-phpbrowser": "*",
-        "codeception/module-asserts": "*",
-        "contributte/console": "^0.10.1",
+        "samdark/sitemap": "^2.4",
+        "tracy/tracy": "^2.10",
         "ublaboo/datagrid": "^7.1.x-dev",
-        "samdark/sitemap": "^2.4"
+        "webmozart/assert": "^2.0"
     },
     "require-dev": {
         "nette/tester": "^2.5",
+        "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^2.0",
         "phpstan/phpstan-nette": "^2.0",
-        "phpstan/extension-installer": "^1.4"
+        "phpstan/phpstan-webmozart-assert": "^2.0"
     },
     "autoload": {
         "psr-4": {

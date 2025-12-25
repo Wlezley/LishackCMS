@@ -7,6 +7,7 @@ namespace App\Components\Admin;
 use App\Components\BaseControl;
 use App\Modules\Admin\Presenters\TranslationPresenter;
 use Nette\Utils\Json;
+use Webmozart\Assert\Assert;
 
 class TranslationList extends BaseControl
 {
@@ -15,11 +16,18 @@ class TranslationList extends BaseControl
 
     public function render(string $lang, ?int $limit = null): void
     {
-        $this->limit = $limit ?? (int)$this->c('PAGINATION_PAGE_ITEMS');
+        if ($limit === null) {
+            $limit = (int)$this->c('PAGINATION_PAGE_ITEMS');
+        }
+        Assert::range($limit, 0, PHP_INT_MAX, 'Limit must be a positive integer.');
+        $this->limit = $limit;
 
         $page = $this->param['page'] ?? 1;
+        Assert::integer($page, 'Page must be an integer.');
         $search = $this->param['search'] ?? null;
+        Assert::nullOrString($search, 'Search must be a string or null.');
         $offset = ($page - 1) * $this->limit;
+        Assert::range($offset, 0, PHP_INT_MAX, 'Offset must be a non-negative integer.');
 
         $this->totalItems = $this->translationManager->getCount($lang, $search);
 
@@ -36,8 +44,8 @@ class TranslationList extends BaseControl
         $this->template->lang = $lang;
         $this->template->translations = $this->translationManager->getList($lang, $this->limit, $offset, $search);
 
-        $this->template->setFile(__DIR__ . '/TranslationList.latte');
-        $this->template->render();
+        $this->getTemplate()->setFile(__DIR__ . '/TranslationList.latte');
+        $this->getTemplate()->render();
     }
 
     public function handleEdit(string $key, ?string $lang = null): void
@@ -58,9 +66,12 @@ class TranslationList extends BaseControl
         $control->setTranslationManager($presenter->translationManager);
         $control->setConfigManager($presenter->configManager);
         $control->setQueryParams($presenter->getHttpRequest()->getQuery());
-        $control->setItemsPerPage($this->limit);
         $control->setTotalItems($this->totalItems);
         $control->setCurrentPage((int) $presenter->getParameter('page', 1));
+
+        if ($this->limit !== null) {
+            $control->setItemsPerPage($this->limit);
+        }
 
         return $control;
     }

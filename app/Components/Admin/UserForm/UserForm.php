@@ -10,6 +10,7 @@ use App\Models\UserManager;
 use App\Models\UserRole;
 use App\Models\UserValidator;
 use Nette\Application\UI\Form;
+use Webmozart\Assert\Assert;
 
 class UserForm extends BaseControl
 {
@@ -54,6 +55,10 @@ class UserForm extends BaseControl
 
         $readOnly = false;
         if ($this->origin === self::OriginEdit) {
+            Assert::keyExists($param, 'id', 'User ID must be set');
+            Assert::keyExists($param, 'role', 'User role must be set');
+            Assert::string($param['role'], 'User role must be a string');
+            Assert::numeric($param['id'], 'User ID must be a number');
             $readOnly = $this->isReadOnly($param['id'], $param['role']);
         }
 
@@ -85,6 +90,8 @@ class UserForm extends BaseControl
             ->setHtmlAttribute('readonly', $readOnly)
             ->setValue($param['email']);
 
+        Assert::keyExists($param, 'role', 'User role must be set');
+        Assert::stringNotEmpty($param['role'], 'User role must be a string');
         $form->addSelect('role', $this->t('permissions'), $this->getRoleSelectList($param['role']))
             ->setValue($param['role'])
             ->setDisabled($this->readOnlyRole($param['role']))
@@ -116,7 +123,7 @@ class UserForm extends BaseControl
 
         $form->addSubmit('save', $this->origin === self::OriginEdit ? $this->t('save') : $this->t('create'));
 
-        $form->onSuccess[] = [$this, 'process' . $this->origin];
+        $form->onSuccess[] = [$this, 'process' . $this->origin]; // @phpstan-ignore-line
 
         return $form;
     }
@@ -192,8 +199,8 @@ class UserForm extends BaseControl
             call_user_func($this->onError, $e->getMessage());
         }
 
-        $this->template->setFile(__DIR__ . '/UserForm' . $this->origin . '.latte');
-        $this->template->render();
+        $this->getTemplate()->setFile(__DIR__ . '/UserForm' . $this->origin . '.latte');
+        $this->getTemplate()->render();
     }
 
     public function setOrigin(string $origin): void
@@ -220,7 +227,7 @@ class UserForm extends BaseControl
     }
 
     /** @return array<string,string> */
-    private function getRoleSelectList(?string $targetRole): array
+    private function getRoleSelectList(string $targetRole): array
     {
         $USER_ROLES_SELECT = [];
         foreach (UserRole::USER_ROLES as $role_name) {

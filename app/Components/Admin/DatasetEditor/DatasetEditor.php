@@ -186,8 +186,8 @@ class DatasetEditor extends BaseControl
         $this->template->datasetColumns = $columns;
         $this->template->columnTypeOptions = $this->getColumnTypeOptions();
 
-        $this->template->setFile(__DIR__ . '/DatasetEditor.latte');
-        $this->template->render();
+        $this->getTemplate()->setFile(__DIR__ . '/DatasetEditor.latte');
+        $this->getTemplate()->render();
     }
 
     public function setOrigin(string $origin): void

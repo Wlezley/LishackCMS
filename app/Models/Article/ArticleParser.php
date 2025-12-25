@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Presenter;
+use Webmozart\Assert\Assert;
 
 class ArticleParser
 {
@@ -19,11 +20,13 @@ class ArticleParser
      */
     public function parseComponents(string $text): string
     {
-        return preg_replace_callback(
+        $parsedBlock = preg_replace_callback(
             '#<nette-component([^>]*)>(.*?)</nette-component>#is',
             fn(array $matches) => $this->processTag($matches[1], trim($matches[2])),
             $text
         );
+        Assert::string($parsedBlock, 'Failed to parse components');
+        return $parsedBlock;
     }
 
     /**
@@ -88,13 +91,24 @@ class ArticleParser
 
             if (!$templatePath) {
                 $reflection = new \ReflectionClass($component);
-                $templatePath = dirname($reflection->getFileName()) . '/' . $component->getName() . '.latte';
+
+                $componentFile = $reflection->getFileName();
+                Assert::string($componentFile, 'Failed to get component file path');
+
+                $componentName = $component->getName();
+                Assert::string($componentName, 'Failed to get component name');
+
+                $templatePath = dirname($componentFile) . '/' . $componentName . '.latte';
             }
 
             bdump($templatePath, "Component '{$name}' Template Path");
 
             if (is_file($templatePath)) {
-                $template->setFile($templatePath);
+//                Assert::methodExists($template, 'setFile', 'Unable to set a template file for a component');
+
+                if (method_exists($template, 'setFile')) {
+                    $template->setFile($templatePath);
+                }
             } else {
                 return "<!-- Template file not found for '{$name}' -->";
             }

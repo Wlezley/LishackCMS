@@ -7,12 +7,14 @@ namespace App\Models;
 use App\Models\Helpers\ArrayHelper;
 use Nette\Database\Explorer;
 use Nette\Database\Table\ActiveRow;
+use Webmozart\Assert\Assert;
+use Webmozart\Assert\InvalidArgumentException;
 
 class ConfigManager
 {
     public const TABLE_NAME = 'cms_config';
 
-    /** @var array<string,array<string,string>> Configuration data indexed by setting key. */
+    /** @var array<string,array<string,string>> Configuration data indexed by a setting key. */
     private array $configuration = [];
 
     public function __construct(
@@ -25,10 +27,13 @@ class ConfigManager
     private function load(): void
     {
         if (empty($this->configuration)) {
-            $this->configuration = ArrayHelper::resultToArray(
-                $this->db->table(self::TABLE_NAME)->fetchAll(),
-                'key'
-            );
+            $result = $this->db->table(self::TABLE_NAME)->fetchAll();
+
+            foreach ($result as $row) {
+                /** @var array<string,string> $item */
+                $item = $row->toArray();
+                $this->configuration[$item['key']] = $item;
+            }
         }
     }
 
@@ -54,10 +59,12 @@ class ConfigManager
      *
      * @param string $key Configuration key.
      * @return string|null The configuration value, or null if not found.
+     * @throws InvalidArgumentException If the configuration key is empty
      */
     public function get(string $key): ?string
     {
         $this->load();
+        Assert::notEmpty($key, 'Configuration key cannot be empty');
         return $this->configuration[$key]['value'] ?? null;
     }
 
@@ -288,13 +295,13 @@ class ConfigManager
     /**
      * Retrieves a list of configuration entries with optional filtering.
      *
-     * @param int $limit Number of entries to retrieve.
-     * @param int $offset Offset for pagination.
+     * @param int<0,max>|null $limit Number of entries to retrieve.
+     * @param int<0,max>|null $offset Offset for pagination.
      * @param string|null $category Filter by category (optional).
      * @param string|null $search Search term for key or value (optional).
      * @return array<ActiveRow> List of configuration entries.
      */
-    public function getList(int $limit = 50, int $offset = 0, ?string $category = null, ?string $search = null): array
+    public function getList(?int $limit = 50, ?int $offset = 0, ?string $category = null, ?string $search = null): array
     {
         $query = $this->db->table(self::TABLE_NAME)
             ->limit($limit, $offset);

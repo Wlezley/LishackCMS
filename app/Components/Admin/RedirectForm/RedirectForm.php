@@ -8,6 +8,7 @@ use App\Components\BaseControl;
 use App\Models\RedirectException;
 use App\Models\RedirectManager;
 use Nette\Application\UI\Form;
+use Webmozart\Assert\Assert;
 
 class RedirectForm extends BaseControl
 {
@@ -35,6 +36,7 @@ class RedirectForm extends BaseControl
         $form->setHtmlAttribute('autocomplete', 'off');
 
         if ($this->origin == self::OriginEdit) {
+            Assert::keyExists($param, 'id', 'Redirect ID must be set');
             $form->addHidden('id', $param['id']);
             $form->addHidden('page', $param['page'] ?? 1);
         }
@@ -107,8 +109,8 @@ class RedirectForm extends BaseControl
 
     public function render(): void
     {
-        $this->template->setFile(__DIR__ . '/RedirectForm.latte');
-        $this->template->render();
+        $this->getTemplate()->setFile(__DIR__ . '/RedirectForm.latte');
+        $this->getTemplate()->render();
     }
 
     public function setOrigin(string $origin): void

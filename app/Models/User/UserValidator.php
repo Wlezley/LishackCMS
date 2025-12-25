@@ -9,6 +9,7 @@ use App\Models\Helpers\BoolHelper;
 use App\Models\Helpers\DatetimeHelper;
 use Nette\Security\Passwords;
 use Nette\Utils\Validators;
+use Webmozart\Assert\Assert;
 
 class UserValidator
 {
@@ -72,7 +73,9 @@ class UserValidator
         $password = $data['password'] ?? '';
 
         if ($createPasswordHash && !empty($password)) {
-            $password = (new Passwords(PASSWORD_BCRYPT, ['cost' => 12]))->hash($password);
+            Assert::stringNotEmpty($password, 'Password cannot be empty.');
+            $password = new Passwords(PASSWORD_BCRYPT, ['cost' => 12])
+                ->hash($password);
         }
 
         $preparedData = [
