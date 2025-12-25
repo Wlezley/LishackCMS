@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Components\Admin;
 
-use App\Models\TranslationManager;
+use App\Models\Translation\TranslationManager;
 use Nette\Application\UI\Form;
 use Nette\Security\User;
 

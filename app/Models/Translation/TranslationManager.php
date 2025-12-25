@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace App\Models\Translation;
 
 use App\Exception\TranslationException;
+use App\Models\Config\ConfigManager;
 use Nette\Database\Explorer;
 use Nette\InvalidArgumentException;
 use ValueError;

@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace App\Models\Translation;
+
+use App\Exception\TranslationException;
+use RuntimeException;
 
 /**
  * Provides shorthand methods for retrieving and formatting translations.
@@ -39,12 +42,13 @@ trait Translation
      * @param string $key The translation key.
      * @param string|null $lang Optional language code (defaults to current language).
      * @return string The translated text, or the key itself if not found.
-     * @throws \RuntimeException If TranslationManager is not available.
+     * @throws RuntimeException If TranslationManager is not available.
+     * @throws TranslationException
      */
     public function t(string $key, ?string $lang = null): string
     {
         if (!isset($this->translationManager)) {
-            throw new \RuntimeException('TranslationManager is not available in ' . static::class);
+            throw new RuntimeException('TranslationManager is not available in ' . static::class);
         }
 
         return $this->translationManager->get($key, $lang);
@@ -56,12 +60,12 @@ trait Translation
      * @param string $key The translation key.
      * @param mixed ...$values Values to be formatted into the translated string.
      * @return string The formatted translated text, or the key itself if translation is unavailable.
-     * @throws \RuntimeException If `TranslationManager` is not available.
+     * @throws RuntimeException If `TranslationManager` is not available.
      */
     public function tf(string $key, mixed ...$values): string
     {
         if (!isset($this->translationManager)) {
-            throw new \RuntimeException('TranslationManager is not available in ' . static::class);
+            throw new RuntimeException('TranslationManager is not available in ' . static::class);
         }
 
         return $this->translationManager->getf($key, null, $values);

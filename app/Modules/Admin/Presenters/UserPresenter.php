@@ -7,8 +7,10 @@ namespace App\Modules\Admin\Presenters;
 use App\Components\Admin\UserForm\IUserFormFactory;
 use App\Components\Admin\UserList\UserListGrid;
 use App\Exception\UserException;
-use App\Models\UserManager;
+use App\Models\User\UserManager;
 use Contributte\Datagrid\Datagrid;
+use Contributte\Datagrid\Exception\DatagridColumnStatusException;
+use Contributte\Datagrid\Exception\DatagridException;
 use Nette\Utils\Json;
 
 class UserPresenter extends SecuredPresenter
@@ -20,6 +22,7 @@ class UserPresenter extends SecuredPresenter
         private UserManager $userManager,
         private UserListGrid $userListGrid
     ) {
+        parent::__construct();
         $this->userListGrid->setPresenter($this);
     }
 
@@ -88,6 +91,10 @@ class UserPresenter extends SecuredPresenter
     // ###             COMPONENTS             ###
     // ##########################################
 
+    /**
+     * @throws DatagridColumnStatusException
+     * @throws DatagridException
+     */
     protected function createComponentUserList(): Datagrid
     {
         // $this->userListGrid->setPresenter($this);

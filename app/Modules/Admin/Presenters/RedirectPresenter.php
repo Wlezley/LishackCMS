@@ -6,7 +6,7 @@ namespace App\Modules\Admin\Presenters;
 
 use App\Components\Admin\RedirectForm\IRedirectFormFactory;
 use App\Components\Admin\RedirectList\IRedirectListFactory;
-use App\Models\RedirectManager;
+use App\Models\Redirect\RedirectManager;
 
 class RedirectPresenter extends SecuredPresenter
 {

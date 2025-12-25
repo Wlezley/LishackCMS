@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace App\Models\Category;
 
 use App\Models\Helpers\ArrayHelper;
 use App\Models\Helpers\StringHelper;
@@ -13,7 +13,8 @@ use Webmozart\Assert\Assert;
 
 class CategoryValidator
 {
-    public const COLUMNS = [
+    /** @var array<string> */
+    public const array COLUMNS = [
         'id',
         'parent_id',
         'position',

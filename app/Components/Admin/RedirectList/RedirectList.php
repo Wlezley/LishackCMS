@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Components\Admin\RedirectList;
 
 use App\Components\BaseControl;
-use App\Models\RedirectManager;
+use App\Models\Redirect\RedirectManager;
 use App\Modules\Admin\Presenters\RedirectPresenter;
 use Nette\Utils\Json;
 use Webmozart\Assert\Assert;

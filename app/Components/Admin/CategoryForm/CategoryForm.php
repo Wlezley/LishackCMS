@@ -6,7 +6,7 @@ namespace App\Components\Admin\CategoryForm;
 
 use App\Components\BaseControl;
 use App\Exception\CategoryException;
-use App\Models\CategoryManager;
+use App\Models\Category\CategoryManager;
 use App\Models\Helpers\StringHelper;
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;

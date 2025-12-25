@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace App\Models\User;
 
 use App\Models\Helpers\ArrayHelper;
 use App\Models\Helpers\BoolHelper;
@@ -12,7 +12,8 @@ use Webmozart\Assert\Assert;
 
 class UserValidator
 {
-    public const COLUMNS = [
+    /** @var array<string> */
+    public const array COLUMNS = [
         'id',
         'name',
         'password',

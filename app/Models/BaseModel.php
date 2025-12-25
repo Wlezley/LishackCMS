@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Exception\TranslationException;
+use App\Models\Config\ConfigManager;
+use App\Models\Translation\TranslationManager;
 use Nette\Database\Explorer;
 use Nette\SmartObject;
 use Webmozart\Assert\Assert;
@@ -13,8 +15,8 @@ abstract class BaseModel
 {
     use SmartObject;
 
-    use \App\Models\Config;
-    use \App\Models\Translation;
+    use \App\Models\Config\Config;
+    use \App\Models\Translation\Translation;
 
     protected mixed $data = null;
 

@@ -2,17 +2,20 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace App\Models\UrlGenerator;
 
 use App\Exception\ArticleException;
 use App\Exception\CategoryException;
+use App\Models\Article\ArticleManager;
+use App\Models\Category\CategoryManager;
+use App\Models\Config\ConfigManager;
 use App\Models\Helpers\ArrayHelper;
 use App\Models\Helpers\StringHelper;
 use Nette\Database\Explorer;
 
 class UrlGenerator
 {
-    use \App\Models\Config;
+    use \App\Models\Config\Config;
 
     public function __construct(
         protected Explorer $db,

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Components\Menu;
 
 use App\Components\BaseControl;
-use App\Models\CategoryManager;
+use App\Models\Category\CategoryManager;
 
 class Menu extends BaseControl
 {

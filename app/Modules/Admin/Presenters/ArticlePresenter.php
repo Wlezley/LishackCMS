@@ -7,10 +7,10 @@ namespace App\Modules\Admin\Presenters;
 use App\Components\Admin\ArticleEditor\IArticleEditorFactory;
 use App\Components\Admin\ArticleList\IArticleListFactory;
 use App\Exception\ArticleException;
-use App\Models\ArticleManager;
-use App\Models\CategoryManager;
-use App\Models\UrlGenerator;
-use App\Models\UserManager;
+use App\Models\Article\ArticleManager;
+use App\Models\Category\CategoryManager;
+use App\Models\UrlGenerator\UrlGenerator;
+use App\Models\User\UserManager;
 
 class ArticlePresenter extends SecuredPresenter
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace App\Models\Translation;
 
 use Nette\Database\Explorer;
 use Nette\Http\Request as HttpRequest;
@@ -10,11 +10,11 @@ use Nette\Utils\Json;
 
 class TranslationLog
 {
-    public const TABLE_NAME = 'translations_log';
+    public const string TABLE_NAME = 'translations_log';
 
-    public const TYPE_MISSING_KEY = 'key';
-    public const TYPE_MISSING_ARGUMENTS = 'arg';
-    public const TYPE_UNKNOWN = 'unk';
+    public const string TYPE_MISSING_KEY = 'key';
+    public const string TYPE_MISSING_ARGUMENTS = 'arg';
+    public const string TYPE_UNKNOWN = 'unk';
 
     /**
      * @param Explorer $db Database explorer instance.

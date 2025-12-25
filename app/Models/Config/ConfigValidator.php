@@ -2,16 +2,17 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace App\Models\Config;
 
 use App\Models\Helpers\ArrayHelper;
 use Nette\Utils\Validators;
 
 class ConfigValidator
 {
-    public const COLUMNS = [
+    /** @var array<string> */
+    public const array COLUMNS = [
         'key',
-        'caregory',
+        'category',
         'value',
     ];
 

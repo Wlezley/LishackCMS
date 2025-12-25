@@ -6,9 +6,9 @@ namespace App\Components\Admin\UserForm;
 
 use App\Components\BaseControl;
 use App\Exception\UserException;
-use App\Models\UserManager;
-use App\Models\UserRole;
-use App\Models\UserValidator;
+use App\Models\User\UserManager;
+use App\Models\User\UserRole;
+use App\Models\User\UserValidator;
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
 use Webmozart\Assert\Assert;

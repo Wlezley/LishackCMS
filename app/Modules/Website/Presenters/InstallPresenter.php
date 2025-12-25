@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Website\Presenters;
 
-use App\Models\Installer;
+use App\Models\Installer\Installer;
 use Nette\Application\UI\Presenter;
 
 final class InstallPresenter extends Presenter

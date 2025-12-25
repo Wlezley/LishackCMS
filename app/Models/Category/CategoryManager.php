@@ -2,17 +2,19 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace App\Models\Category;
 
 use App\Exception\CategoryException;
+use App\Models\Article\ArticleManager;
+use App\Models\BaseModel;
 use App\Models\Helpers\ArrayHelper;
 
 class CategoryManager extends BaseModel
 {
-    public const TABLE_NAME = 'category';
+    public const string TABLE_NAME = 'category';
 
     /** @todo Make this value configurable? */
-    public const MAIN_CATEGORY_ID = 1;
+    public const int MAIN_CATEGORY_ID = 1;
 
     /** @var array<int|string,array<string,string|int|null>> $categories */
     protected array $categories = [];

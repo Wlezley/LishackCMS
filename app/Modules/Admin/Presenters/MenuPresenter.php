@@ -6,7 +6,7 @@ namespace App\Modules\Admin\Presenters;
 
 use App\Components\Admin\CategoryForm\ICategoryFormFactory;
 use App\Exception\CategoryException;
-use App\Models\CategoryManager;
+use App\Models\Category\CategoryManager;
 
 class MenuPresenter extends SecuredPresenter
 {

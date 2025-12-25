@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace App\Models\Article;
 
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Presenter;

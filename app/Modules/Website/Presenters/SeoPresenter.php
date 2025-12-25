@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Website\Presenters;
 
-use App\Models\SitemapGenerator;
+use App\Models\Seo\SitemapGenerator;
 use Nette\Application\Responses\TextResponse;
 use Tracy\Debugger;
 

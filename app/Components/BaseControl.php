@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace App\Components;
 
-use App\Models\ConfigManager;
-use App\Models\TranslationManager;
-use App\Models\UrlGenerator;
+use App\Models\Config\ConfigManager;
+use App\Models\Translation\TranslationManager;
+use App\Models\UrlGenerator\UrlGenerator;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Template;
 use RuntimeException;
 
 class BaseControl extends Control
 {
-    use \App\Models\Config;
-    use \App\Models\Translation;
+    use \App\Models\Config\Config;
+    use \App\Models\Translation\Translation;
 
     /** @var ConfigManager @inject */
     public ConfigManager $configManager;

@@ -6,7 +6,7 @@ namespace App\Components\Admin\RedirectForm;
 
 use App\Components\BaseControl;
 use App\Exception\RedirectException;
-use App\Models\RedirectManager;
+use App\Models\Redirect\RedirectManager;
 use Nette\Application\UI\Form;
 use Webmozart\Assert\Assert;
 

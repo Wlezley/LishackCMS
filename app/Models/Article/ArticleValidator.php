@@ -2,13 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace App\Models\Article;
 
+use App\Models\BaseModel;
 use App\Models\Helpers\ArrayHelper;
 
 class ArticleValidator extends BaseModel
 {
-    public const COLUMNS = [
+    /** @var array<string> */
+    public const array COLUMNS = [
         'id',
         'title',
         'name_url',

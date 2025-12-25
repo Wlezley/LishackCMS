@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace App\Models\SmsGate;
 
 use App\Exception\SmsGateException;
 use Carbon\Carbon;

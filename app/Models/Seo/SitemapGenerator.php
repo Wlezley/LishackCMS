@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace App\Models\Seo;
 
+use App\Models\Config\ConfigManager;
+use App\Models\UrlGenerator\UrlGenerator;
 use Nette\Database\Explorer;
 use Nette\Utils\DateTime;
 use samdark\sitemap\Sitemap;
@@ -11,10 +13,10 @@ use Tracy\Debugger;
 
 final class SitemapGenerator
 {
-    use \App\Models\Config;
+    use \App\Models\Config\Config;
 
-    public const SITEMAP_PATH = PROJECT_DIR . '/sitemap.xml';
-    private const DEFAULT_TTL_SECONDS = 3600;
+    public const string SITEMAP_PATH = PROJECT_DIR . '/sitemap.xml';
+    private const int DEFAULT_TTL_SECONDS = 3600;
 
     public function __construct(
         protected Explorer $db,

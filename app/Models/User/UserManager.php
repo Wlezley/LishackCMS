@@ -2,16 +2,17 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace App\Models\User;
 
 use App\Exception\UserException;
+use App\Models\BaseModel;
 use App\Models\Helpers\ArrayHelper;
 use Nette\Security\Passwords;
 use Nette\Utils\Validators;
 
 class UserManager extends BaseModel
 {
-    public const TABLE_NAME = 'users';
+    public const string TABLE_NAME = 'users';
 
     /** @var array<int|string,array<string,string|int|null>> $userList */
     protected mixed $userList = [];

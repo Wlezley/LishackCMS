@@ -2,14 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace App\Models\User;
 
 use Webmozart\Assert\Assert;
 use Webmozart\Assert\InvalidArgumentException;
 
 class UserRole
 {
-    public const USER_ROLES = [
+    /** @var array<int,string> List of user roles */
+    public const array USER_ROLES = [
         0 => 'guest',
         1 => 'user',
         2 => 'redactor',
@@ -17,7 +18,7 @@ class UserRole
         4 => 'admin',
     ];
 
-    public const DEFAULT_ROLE = 'user';
+    public const string DEFAULT_ROLE = 'user';
 
     public int $level;
 

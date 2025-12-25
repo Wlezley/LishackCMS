@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Modules\Website\Presenters;
 
 use App\Exception\CategoryException;
-use App\Models\ArticleManager;
-use App\Models\ArticleParser;
-use App\Models\CategoryManager;
-use App\Models\UrlGenerator;
+use App\Models\Article\ArticleManager;
+use App\Models\Article\ArticleParser;
+use App\Models\Category\CategoryManager;
+use App\Models\UrlGenerator\UrlGenerator;
 use Nette;
 use Webmozart\Assert\Assert;
 use Webmozart\Assert\InvalidArgumentException;

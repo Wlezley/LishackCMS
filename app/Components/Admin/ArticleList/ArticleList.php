@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Components\Admin\ArticleList;
 
 use App\Components\BaseControl;
-use App\Models\ArticleManager;
+use App\Models\Article\ArticleManager;
 use App\Modules\Admin\Presenters\ArticlePresenter;
 use Nette\Utils\Json;
 use Webmozart\Assert\Assert;

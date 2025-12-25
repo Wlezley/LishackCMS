@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 require __DIR__ . '/../vendor/autoload.php';
 
+use App\Models\Installer\Installer;
+use Nette\Http\Request;
 use Tracy\Debugger;
 use Webmozart\Assert\Assert;
 
@@ -28,7 +30,10 @@ $configurator = App\Bootstrap::boot();
 $container = $configurator->createContainer();
 
 if (empty($baseUrl)) {
-    $baseUrl = 'http' . ($_SERVER['SERVER_PORT'] == 443 ? 's' : '') . '://' . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . '/';
+    $protocol = $_SERVER['SERVER_PORT'] == 443 ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'];
+    $path = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
+    $baseUrl = "{$protocol}://{$host}{$path}/";
 }
 $baseUrl = str_replace('admin/', '', $baseUrl);
 Assert::string($baseUrl, 'Base URL must be a string.');
@@ -42,10 +47,10 @@ define('PROJECT_SETTINGS', $container->getParameters());
 
 // Installer trigger
 if (DEBUG) {
-    $installer = $container->getByType(\App\Models\Installer::class);
+    $installer = $container->getByType(Installer::class);
 
     if (!$installer->isInstalled()) {
-        $httpRequest = $container->getByType(\Nette\Http\Request::class);
+        $httpRequest = $container->getByType(Request::class);
         $baseUrl = $httpRequest->getUrl()->getBaseUrl();
         $absUrl = $httpRequest->getUrl()->getAbsoluteUrl();
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace App\Models\Translation;
 
 use App\Exception\TranslationException;
 use Nette\Database\Explorer;

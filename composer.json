@@ -15,6 +15,7 @@
         "php": ">= 8.4",
         "ext-fileinfo": "*",
         "ext-gd": "*",
+        "ext-pdo": "*",
         "ext-simplexml": "*",
         "codeception/codeception": "^5.1",
         "codeception/module-asserts": "*",

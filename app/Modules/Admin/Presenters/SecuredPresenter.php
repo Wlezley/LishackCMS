@@ -6,7 +6,8 @@ namespace App\Modules\Admin\Presenters;
 
 use App\Components\Admin\DatasetSidebar\IDatasetSidebarFactory;
 use App\Components\Pagination\IPaginationFactory;
-use App\Models\UserRole;
+use App\Models\User\UserManager;
+use App\Models\User\UserRole;
 
 class SecuredPresenter extends BasePresenter
 {
@@ -35,7 +36,7 @@ class SecuredPresenter extends BasePresenter
         }
 
         if ($this->user->isLoggedIn()) {
-            $userData = $this->db->table(\App\Models\UserManager::TABLE_NAME)->select('deleted, enabled, role')->where([
+            $userData = $this->db->table(UserManager::TABLE_NAME)->select('deleted, enabled, role')->where([
                 'id' => $this->user->getId(),
             ])->fetch();
 

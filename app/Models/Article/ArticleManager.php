@@ -2,16 +2,20 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace App\Models\Article;
 
 use App\Exception\ArticleException;
+use App\Models\BaseModel;
+use App\Models\Category\CategoryManager;
+use App\Models\Config\ConfigManager;
 use App\Models\Helpers\ArrayHelper;
+use App\Models\Translation\TranslationManager;
 use Nette\Database\Explorer;
 use Webmozart\Assert\Assert;
 
 class ArticleManager extends BaseModel
 {
-    public const TABLE_NAME = 'article';
+    public const string TABLE_NAME = 'article';
 
     public function __construct(
         protected Explorer $db,

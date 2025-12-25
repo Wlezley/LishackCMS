@@ -6,7 +6,7 @@ namespace App\Components\Admin\FileExplorer;
 
 use App\Components\BaseControl;
 use App\Models\StorageSystem\TreeManager;
-use App\Models\UserManager;
+use App\Models\User\UserManager;
 use Nette\Utils\Json;
 
 class FileExplorer extends BaseControl

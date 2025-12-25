@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace App\Models\Config;
 
 use App\Exception\ConfigException;
 use Nette\Database\Explorer;

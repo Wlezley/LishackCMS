@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Commands;
 
 use App\Exception\UserException;
-use App\Models\UserManager;
-use App\Models\UserValidator;
+use App\Models\User\UserManager;
+use App\Models\User\UserValidator;
 use Nette\Database\Explorer;
 use Nette\Security\Passwords;
 use Symfony\Component\Console\Attribute\AsCommand;
