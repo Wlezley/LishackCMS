@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Components\Admin\RedirectForm;
 
 use App\Components\BaseControl;
-use App\Models\RedirectException;
+use App\Exception\RedirectException;
 use App\Models\RedirectManager;
 use Nette\Application\UI\Form;
 use Webmozart\Assert\Assert;

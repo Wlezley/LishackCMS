@@ -6,7 +6,7 @@ namespace App\Modules\Admin\Presenters;
 
 use App\Components\Admin\UserForm\IUserFormFactory;
 use App\Components\Admin\UserList\UserListGrid;
-use App\Models\UserException;
+use App\Exception\UserException;
 use App\Models\UserManager;
 use Contributte\Datagrid\Datagrid;
 use Nette\Utils\Json;

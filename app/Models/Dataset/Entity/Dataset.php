@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models\Dataset\Entity;
 
-use App\Models\Dataset\DatasetException;
+use App\Exception\DatasetException;
 use App\Models\Helpers\IntegerHelper;
 use App\Models\Helpers\StringHelper;
 

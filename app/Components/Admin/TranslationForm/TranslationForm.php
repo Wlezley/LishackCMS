@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Components\Admin\TranslationForm;
 
 use App\Components\BaseControl;
-use App\Models\TranslationException;
+use App\Exception\TranslationException;
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
 

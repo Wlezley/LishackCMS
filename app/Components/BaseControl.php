@@ -9,6 +9,7 @@ use App\Models\TranslationManager;
 use App\Models\UrlGenerator;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Template;
+use RuntimeException;
 
 class BaseControl extends Control
 {
@@ -32,17 +33,19 @@ class BaseControl extends Control
 
     protected ?string $templatePath = null;
 
-    /** @throws \RuntimeException If TranslationManager or ConfigManager is not available. */
+    /**
+     * @throws RuntimeException If TranslationManager or ConfigManager is not available.
+     */
     protected function createTemplate(?string $class = null): Template
     {
         $template = parent::createTemplate($class);
 
         if (!isset($this->translationManager)) {
-            throw new \RuntimeException('TranslationManager is not available in ' . static::class);
+            throw new RuntimeException('TranslationManager is not available in ' . static::class);
         }
 
         if (!isset($this->configManager)) {
-            throw new \RuntimeException('ConfigManager is not available in ' . static::class);
+            throw new RuntimeException('ConfigManager is not available in ' . static::class);
         }
 
         // Translations
@@ -75,6 +78,18 @@ class BaseControl extends Control
     public function getTranslationManager(): TranslationManager
     {
         return $this->translationManager;
+    }
+
+    /** @return array<string,string> */
+    public function getCmsConfig(): array
+    {
+        return $this->cmsConfig;
+    }
+
+    /** @param  array<string,string> $cmsConfig */
+    public function setCmsConfig(array $cmsConfig): void
+    {
+        $this->cmsConfig = $cmsConfig;
     }
 
     /** @param null|array<string,int|string> $param */

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Components\Admin\ConfigSeoForm;
 
 use App\Components\BaseControl;
-use App\Models\ConfigException;
+use App\Exception\ConfigException;
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
 

@@ -7,7 +7,7 @@ namespace App\Modules\Admin\Presenters;
 use App\Components\Admin\TranslationEditor\ITranslationEditorFactory;
 use App\Components\Admin\TranslationForm\ITranslationFormFactory;
 use App\Components\Admin\TranslationList\ITranslationListFactory;
-use App\Models\TranslationException;
+use App\Exception\TranslationException;
 
 class TranslationPresenter extends SecuredPresenter
 {

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models\StorageSystem\Entity;
 
+use App\Exception\StorageSystemException;
 use App\Models\Helpers\IntegerHelper;
 use App\Models\Helpers\StringHelper;
-use App\Models\StorageSystem\StorageSystemException;
 use Nette\Utils\DateTime;
 
 final class StorageFile

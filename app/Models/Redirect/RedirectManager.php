@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Exception\RedirectException;
 use App\Models\Helpers\ArrayHelper;
 use Nette\Database\Explorer;
 use Nette\Database\Table\ActiveRow;

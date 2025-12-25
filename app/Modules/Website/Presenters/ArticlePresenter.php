@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Modules\Website\Presenters;
 
+use App\Exception\CategoryException;
 use App\Models\ArticleManager;
 use App\Models\ArticleParser;
-use App\Models\CategoryException;
 use App\Models\CategoryManager;
 use App\Models\UrlGenerator;
 use Nette;

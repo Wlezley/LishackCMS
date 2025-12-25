@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models\StorageSystem;
 
+use App\Exception\StorageSystemException;
 use App\Models\Helpers\StringHelper;
 use App\Models\StorageSystem\Entity\StorageFile;
 use App\Models\StorageSystem\Entity\StorageTree;

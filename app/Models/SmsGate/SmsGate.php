@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\SmsGateException;
+use App\Exception\SmsGateException;
 use Carbon\Carbon;
 use Nette\Database\Explorer;
 use Nette\Utils\Random;
 use SimpleXMLElement;
 use Webmozart\Assert\Assert;
 
-// https://www.smsbrana.cz/dokumentace
+/**
+ * See: https://www.smsbrana.cz/dokumentace
+ */
 class SmsGate
 {
     public const TABLE_NAME = 'log_sms';

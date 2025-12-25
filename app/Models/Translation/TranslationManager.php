@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Exception\TranslationException;
 use Nette\Database\Explorer;
 use Nette\InvalidArgumentException;
 use ValueError;

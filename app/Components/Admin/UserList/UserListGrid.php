@@ -6,9 +6,9 @@ namespace App\Components\Admin\UserList;
 
 use AllowDynamicProperties;
 use App\Components\BaseControl;
+use App\Exception\UserException;
 use App\Models\Translation;
 use App\Models\TranslationManager;
-use App\Models\UserException;
 use App\Models\UserManager;
 use App\Models\UserRole;
 use Contributte\Datagrid\Datagrid;

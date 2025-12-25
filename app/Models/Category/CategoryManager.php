@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\CategoryException;
+use App\Exception\CategoryException;
 use App\Models\Helpers\ArrayHelper;
 
 class CategoryManager extends BaseModel

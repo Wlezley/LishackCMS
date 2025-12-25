@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Components\Admin\DataEditor;
 
 use App\Components\BaseControl;
-use App\Models\Dataset\DatasetException;
+use App\Exception\DatasetException;
 use App\Models\Dataset\DatasetManager;
 use App\Models\Dataset\Entity\DatasetColumn;
 use App\Models\Dataset\Entity\DatasetRow;

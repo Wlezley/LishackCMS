@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Components\Admin\UserForm;
 
 use App\Components\BaseControl;
-use App\Models\UserException;
+use App\Exception\UserException;
 use App\Models\UserManager;
 use App\Models\UserRole;
 use App\Models\UserValidator;

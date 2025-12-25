@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Exception\UserException;
 use App\Models\Helpers\ArrayHelper;
-use App\Models\UserException;
 use Nette\Security\Passwords;
 use Nette\Utils\Validators;
 

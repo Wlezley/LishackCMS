@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models\StorageSystem\Repository;
 
+use App\Exception\StorageSystemException;
 use App\Models\StorageSystem\Entity\StorageFile;
-use App\Models\StorageSystem\StorageSystemException;
 use Nette\Database\Explorer;
 use Nette\Database\Table\ActiveRow;
 

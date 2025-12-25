@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models\Dataset\Repository;
 
-use App\Models\Dataset\DatasetException;
+use App\Exception\DatasetException;
 use App\Models\Dataset\Entity\DatasetColumn;
 use App\Models\Dataset\Entity\DatasetRow;
 use App\Models\Helpers\ArrayHelper;

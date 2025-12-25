@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Commands;
 
-use App\Models\UserException;
+use App\Exception\UserException;
 use App\Models\UserManager;
 use App\Models\UserValidator;
 use Nette\Database\Explorer;

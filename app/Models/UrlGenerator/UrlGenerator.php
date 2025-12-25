@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Exception\ArticleException;
+use App\Exception\CategoryException;
 use App\Models\Helpers\ArrayHelper;
 use App\Models\Helpers\StringHelper;
 use Nette\Database\Explorer;

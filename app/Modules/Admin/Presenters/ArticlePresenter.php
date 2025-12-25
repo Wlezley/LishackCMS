@@ -6,7 +6,7 @@ namespace App\Modules\Admin\Presenters;
 
 use App\Components\Admin\ArticleEditor\IArticleEditorFactory;
 use App\Components\Admin\ArticleList\IArticleListFactory;
-use App\Models\ArticleException;
+use App\Exception\ArticleException;
 use App\Models\ArticleManager;
 use App\Models\CategoryManager;
 use App\Models\UrlGenerator;

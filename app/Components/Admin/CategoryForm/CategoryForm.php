@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Components\Admin\CategoryForm;
 
 use App\Components\BaseControl;
-use App\Models\CategoryException;
+use App\Exception\CategoryException;
 use App\Models\CategoryManager;
 use App\Models\Helpers\StringHelper;
 use Nette\Application\UI\Form;

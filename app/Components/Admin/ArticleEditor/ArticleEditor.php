@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Components\Admin\ArticleEditor;
 
 use App\Components\BaseControl;
-use App\Models\ArticleException;
+use App\Exception\ArticleException;
+use App\Exception\UserException;
 use App\Models\ArticleManager;
 use App\Models\CategoryManager;
 use App\Models\Helpers\StringHelper;
 use App\Models\UrlGenerator;
-use App\Models\UserException;
 use App\Models\UserManager;
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Exception\ConfigException;
 use Nette\Database\Explorer;
 use Nette\Database\Table\ActiveRow;
 use Webmozart\Assert\Assert;

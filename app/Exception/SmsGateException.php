@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace App\Exception;
 
 class SmsGateException extends \Exception
 {
-    public const ErrorCodes = [
+    /** @var array<int, string> */
+    public const array ErrorCodes = [
         -1 => 'Duplicate user_id - an SMS with the same mark was already sent in the past',
         0 => 'OK',
         1 => 'Unknown error',

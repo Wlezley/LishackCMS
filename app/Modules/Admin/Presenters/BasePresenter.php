@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
+use App\Exception\TranslationException;
 use App\Models\ConfigManager;
 use App\Models\Helpers\AssetsVersion;
-use App\Models\TranslationException;
 use App\Models\TranslationManager;
 use Nette\Application\Helpers;
 use Nette\Database\Explorer;
