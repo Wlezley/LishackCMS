@@ -48,6 +48,7 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/phar-io/manifest" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/phar-io/version" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/phpstan/phpstan" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/phpstan/phpstan-nette" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/phpunit/php-code-coverage" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/phpunit/php-file-iterator" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/phpunit/php-invoker" />
@@ -99,7 +100,6 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/property-info" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/service-contracts" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/string" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/thanks" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/translation" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/translation-contracts" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/type-info" />
@@ -108,6 +108,7 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/theseer/tokenizer" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/tracy/tracy" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/ublaboo/datagrid" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/phpstan/extension-installer" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

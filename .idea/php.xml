@@ -115,7 +115,8 @@
       <path value="$PROJECT_DIR$/vendor/sebastian/complexity" />
       <path value="$PROJECT_DIR$/vendor/sebastian/global-state" />
       <path value="$PROJECT_DIR$/vendor/sebastian/cli-parser" />
-      <path value="$PROJECT_DIR$/vendor/symfony/thanks" />
+      <path value="$PROJECT_DIR$/vendor/phpstan/phpstan-nette" />
+      <path value="$PROJECT_DIR$/vendor/phpstan/extension-installer" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.4">
@@ -124,6 +125,7 @@
   <component name="PhpStan">
     <PhpStan_settings>
       <PhpStanConfiguration tool_path="$PROJECT_DIR$/vendor/bin/phpstan" />
+      <phpstan_by_interpreter asDefaultInterpreter="true" interpreter_id="e96bca50-1b89-4c84-870d-02dcd1030963" tool_path="\\wsl.localhost\Ubuntu\home\lishack\projects\lishack-cms\vendor\bin\phpstan" timeout="60000" />
     </PhpStan_settings>
   </component>
   <component name="PhpStanOptionsConfiguration">
