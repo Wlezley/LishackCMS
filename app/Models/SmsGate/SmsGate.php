@@ -16,8 +16,8 @@ use Webmozart\Assert\Assert;
  */
 class SmsGate
 {
-    public const TABLE_NAME = 'log_sms';
-    public const SYSTEM_USER_ID = 0;
+    public const string TABLE_NAME = 'log_sms';
+    public const int SYSTEM_USER_ID = 0;
 
     public function __construct(
         private string $apiURL,
@@ -29,6 +29,9 @@ class SmsGate
     ) {
     }
 
+    /**
+     * @throws SmsGateException
+     */
     public function sendSMS(string $phoneNumber, string $message, int $userID = self::SYSTEM_USER_ID): void
     {
         $credentials = [];

@@ -18,7 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 final class DatasetAddCommand extends Command
 {
     public function __construct(
-        private DatasetCreator $datasetCreator
+        private readonly DatasetCreator $datasetCreator
     ) {
         parent::__construct();
     }

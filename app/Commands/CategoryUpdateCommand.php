@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 final class CategoryUpdateCommand extends Command
 {
     public function __construct(
-        private CategoryManager $categoryManager
+        private readonly CategoryManager $categoryManager
     ) {
         parent::__construct();
     }

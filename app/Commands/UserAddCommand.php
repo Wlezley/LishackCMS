@@ -20,7 +20,7 @@ use Symfony\Component\Console\Question\Question;
 final class UserAddCommand extends Command
 {
     public function __construct(
-        private UserManager $userManager
+        private readonly UserManager $userManager
     ) {
         parent::__construct();
     }

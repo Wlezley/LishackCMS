@@ -24,8 +24,8 @@ use Symfony\Component\Console\Question\Question;
 final class UserPasswordCommand extends Command
 {
     public function __construct(
-        private Explorer $db,
-        private UserManager $userManager
+        private readonly Explorer $db,
+        private readonly UserManager $userManager
     ) {
         parent::__construct();
     }
