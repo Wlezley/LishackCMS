@@ -10,18 +10,20 @@ use App\Components\Pagination\IPaginationFactory;
 use App\Exception\TranslationException;
 use App\Models\Category\CategoryManager;
 use App\Models\Config\ConfigManager;
+use App\Models\Config\ConfigTrait;
 use App\Models\Helpers\AssetsVersion;
 use App\Models\Helpers\IPValidator;
 use App\Models\Redirect\RedirectManager;
 use App\Models\Translation\TranslationManager;
+use App\Models\Translation\TranslationTrait;
 use Nette;
 use Nette\Database\Explorer;
 use Webmozart\Assert\Assert;
 
 abstract class BasePresenter extends Nette\Application\UI\Presenter
 {
-    use \App\Models\Config\Config;
-    use \App\Models\Translation\Translation;
+    use ConfigTrait;
+    use TranslationTrait;
 
     /** @var Explorer @inject */
     public Explorer $db;

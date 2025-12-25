@@ -6,16 +6,18 @@ namespace App\Modules\Admin\Presenters;
 
 use App\Exception\TranslationException;
 use App\Models\Config\ConfigManager;
+use App\Models\Config\ConfigTrait;
 use App\Models\Helpers\AssetsVersion;
 use App\Models\Translation\TranslationManager;
+use App\Models\Translation\TranslationTrait;
 use Nette\Application\Helpers;
 use Nette\Database\Explorer;
 use Webmozart\Assert\Assert;
 
 abstract class BasePresenter extends \Nette\Application\UI\Presenter
 {
-    use \App\Models\Config\Config;
-    use \App\Models\Translation\Translation;
+    use ConfigTrait;
+    use TranslationTrait;
 
     /** @var array<string,string> */
     private const array CATEGORY_MAP = [

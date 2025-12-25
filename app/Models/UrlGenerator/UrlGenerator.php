@@ -9,13 +9,14 @@ use App\Exception\CategoryException;
 use App\Models\Article\ArticleManager;
 use App\Models\Category\CategoryManager;
 use App\Models\Config\ConfigManager;
+use App\Models\Config\ConfigTrait;
 use App\Models\Helpers\ArrayHelper;
 use App\Models\Helpers\StringHelper;
 use Nette\Database\Explorer;
 
 class UrlGenerator
 {
-    use \App\Models\Config\Config;
+    use ConfigTrait;
 
     public function __construct(
         protected Explorer $db,

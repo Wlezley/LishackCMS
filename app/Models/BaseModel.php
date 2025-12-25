@@ -6,7 +6,9 @@ namespace App\Models;
 
 use App\Exception\TranslationException;
 use App\Models\Config\ConfigManager;
+use App\Models\Config\ConfigTrait;
 use App\Models\Translation\TranslationManager;
+use App\Models\Translation\TranslationTrait;
 use Nette\Database\Explorer;
 use Nette\SmartObject;
 use Webmozart\Assert\Assert;
@@ -15,8 +17,8 @@ abstract class BaseModel
 {
     use SmartObject;
 
-    use \App\Models\Config\Config;
-    use \App\Models\Translation\Translation;
+    use ConfigTrait;
+    use TranslationTrait;
 
     protected mixed $data = null;
 

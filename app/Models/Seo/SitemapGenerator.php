@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models\Seo;
 
 use App\Models\Config\ConfigManager;
+use App\Models\Config\ConfigTrait;
 use App\Models\UrlGenerator\UrlGenerator;
 use Nette\Database\Explorer;
 use Nette\Utils\DateTime;
@@ -13,7 +14,7 @@ use Tracy\Debugger;
 
 final class SitemapGenerator
 {
-    use \App\Models\Config\Config;
+    use ConfigTrait;
 
     public const string SITEMAP_PATH = PROJECT_DIR . '/sitemap.xml';
     private const int DEFAULT_TTL_SECONDS = 3600;

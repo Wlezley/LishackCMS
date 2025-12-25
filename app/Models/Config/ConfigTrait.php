@@ -34,7 +34,7 @@ use Webmozart\Assert\InvalidArgumentException;
  * }
  * ```
  */
-trait Config
+trait ConfigTrait
 {
     /**
      * Retrieves a configuration value for a given key

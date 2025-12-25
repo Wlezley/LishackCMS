@@ -34,7 +34,7 @@ use RuntimeException;
  * }
  * ```
  */
-trait Translation
+trait TranslationTrait
 {
     /**
      * Retrieves a translated text for a given key in a specified language.

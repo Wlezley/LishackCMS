@@ -7,8 +7,8 @@ namespace App\Components\Admin\UserList;
 use AllowDynamicProperties;
 use App\Components\BaseControl;
 use App\Exception\UserException;
-use App\Models\Translation\Translation;
 use App\Models\Translation\TranslationManager;
+use App\Models\Translation\TranslationTrait;
 use App\Models\User\UserManager;
 use App\Models\User\UserRole;
 use Contributte\Datagrid\Datagrid;
@@ -33,7 +33,7 @@ use Nette\Utils\JsonException;
 #[AllowDynamicProperties]
 class UserListGrid extends BaseControl
 {
-    use Translation;
+    use TranslationTrait;
 
     protected UserRole $userRole;
     protected Presenter $presenter;
