@@ -71,7 +71,7 @@ class DataList extends BaseControl
     // ###             PAGINATION             ###
     // ##########################################
 
-    protected function createComponentPagination(): \App\Components\Pagination
+    protected function createComponentPagination(): \App\Components\Pagination\Pagination
     {
         /** @var DataPresenter $presenter */
         $presenter = $this->getPresenter();

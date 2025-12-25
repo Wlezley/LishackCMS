@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Components;
+namespace App\Components\Menu;
 
+use App\Components\BaseControl;
 use App\Models\CategoryManager;
 
 class Menu extends BaseControl

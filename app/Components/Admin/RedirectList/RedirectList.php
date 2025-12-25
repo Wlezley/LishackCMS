@@ -66,7 +66,7 @@ class RedirectList extends BaseControl
     // ###             PAGINATION             ###
     // ##########################################
 
-    protected function createComponentPagination(): \App\Components\Pagination
+    protected function createComponentPagination(): \App\Components\Pagination\Pagination
     {
         /** @var RedirectPresenter $presenter */
         $presenter = $this->getPresenter();

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Admin\Presenters;
 
 use App\Components\Admin\IDatasetSidebarFactory;
-use App\Components\IPaginationFactory;
+use App\Components\Pagination\IPaginationFactory;
 use App\Models\UserRole;
 
 class SecuredPresenter extends BasePresenter
@@ -83,7 +83,7 @@ class SecuredPresenter extends BasePresenter
         $this->totalItems = $totalItems;
     }
 
-    protected function createComponentPagination(): \App\Components\Pagination
+    protected function createComponentPagination(): \App\Components\Pagination\Pagination
     {
         if ($this->itemsPerPage === null || $this->totalItems === null) {
             throw new \LogicException('Call setPagination() in the render method first.');

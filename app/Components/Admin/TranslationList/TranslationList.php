@@ -57,7 +57,7 @@ class TranslationList extends BaseControl
     // ###             PAGINATION             ###
     // ##########################################
 
-    protected function createComponentPagination(): \App\Components\Pagination
+    protected function createComponentPagination(): \App\Components\Pagination\Pagination
     {
         /** @var TranslationPresenter $presenter */
         $presenter = $this->getPresenter();

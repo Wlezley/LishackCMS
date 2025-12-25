@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Modules\Website\Presenters;
 
-use App\Components\IAdminButtonFactory;
-use App\Components\IMenuFactory;
-use App\Components\IPaginationFactory;
+use App\Components\AdminButton\IAdminButtonFactory;
+use App\Components\Menu\IMenuFactory;
+use App\Components\Pagination\IPaginationFactory;
 use App\Models\CategoryManager;
 use App\Models\ConfigManager;
 use App\Models\Helpers\AssetsVersion;
@@ -165,7 +165,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $this->totalItems = $totalItems;
     }
 
-    protected function createComponentPagination(): \App\Components\Pagination
+    protected function createComponentPagination(): \App\Components\Pagination\Pagination
     {
         if ($this->itemsPerPage === null || $this->totalItems === null) {
             throw new \LogicException('Call setPagination() in the render method first.');
@@ -196,14 +196,14 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         return $component;
     }
 
-    protected function createComponentAdminButton(): \App\Components\AdminButton
+    protected function createComponentAdminButton(): \App\Components\AdminButton\AdminButton
     {
         $control = $this->adminBarFactory->create();
         $control->setAdminUrl($this->template->adminUrl);
         return $control;
     }
 
-    protected function createComponentMenu(): \App\Components\Menu
+    protected function createComponentMenu(): \App\Components\Menu\Menu
     {
         $control = $this->menuFactory->create();
         return $control;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Modules\Api\Presenters;
+namespace App\Modules\API\Presenters;
 
 use Nette;
 use Tracy\Debugger;

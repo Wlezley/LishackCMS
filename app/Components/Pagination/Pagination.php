@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Components;
+namespace App\Components\Pagination;
 
+use App\Components\BaseControl;
 use Nette\Utils\Paginator;
 
 class Pagination extends BaseControl

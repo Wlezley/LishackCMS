@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Components;
+namespace App\Components\AdminButton;
 
+use App\Components\BaseControl;
 use Webmozart\Assert\Assert;
 
 class AdminButton extends BaseControl
