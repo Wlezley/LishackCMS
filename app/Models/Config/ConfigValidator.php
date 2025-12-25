@@ -12,15 +12,13 @@ class ConfigValidator
     public const COLUMNS = [
         'key',
         'caregory',
-        'value'
+        'value',
     ];
 
     /**
      * Builds a structured array of config data with default values.
      *
      * @param string $key The key of the config item
-     * @param string|null $category
-     * @param string|null $value
      *
      * @return array<string,string|int|null> An associative array containing config data
      */

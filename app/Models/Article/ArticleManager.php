@@ -47,19 +47,19 @@ class ArticleManager extends BaseModel
     /**
      * Retrieves an article by its unique `name_url` slug.
      *
-     * @param string $name_url Slug of the article.
+     * @param string $nameUrl Slug of the article.
      * @return array<string,mixed> Article data as an associative array.
      * @throws ArticleException If the article is not found.
      */
-    public function getByNameUrl(string $name_url): array
+    public function getByNameUrl(string $nameUrl): array
     {
         $article = $this->db->table(self::TABLE_NAME)
-            ->where('name_url', $name_url)
+            ->where('name_url', $nameUrl)
             ->fetch();
 
         if (!$article) {
             throw new ArticleException(
-                "Article (name_url: '$name_url') not found.",
+                "Article (name_url: '$nameUrl') not found.",
                 \Nette\Http\IResponse::S404_NotFound
             );
         }

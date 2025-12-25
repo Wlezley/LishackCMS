@@ -7,7 +7,6 @@ namespace App\Modules\Admin\Presenters;
 use App\Components\Admin\ICategoryFormFactory;
 use App\Models\CategoryException;
 use App\Models\CategoryManager;
-use Nette\Utils\Json;
 
 class MenuPresenter extends SecuredPresenter
 {
@@ -62,7 +61,7 @@ class MenuPresenter extends SecuredPresenter
         try {
             if ($this->userHavePermissionsTo('delete')) {
                 $this->categoryManager->delete((int) $data['id']);
-                $this->flashMessage("Menu ID: " . $data['id'] . " bylo odstraněno.", 'info');
+                $this->flashMessage('Menu ID: ' . $data['id'] . ' bylo odstraněno.', 'info');
             } else {
                 $this->flashMessage('K odstranění menu nemáte oprávnění.', 'danger');
                 $this->sendJson([
@@ -92,7 +91,7 @@ class MenuPresenter extends SecuredPresenter
         }
 
         $this->sendJson([
-            'nodes' => $this->categoryManager->getSortableTree()
+            'nodes' => $this->categoryManager->getSortableTree(),
         ]);
     }
 
@@ -169,12 +168,12 @@ class MenuPresenter extends SecuredPresenter
             $form->setParam($this->getHttpRequest()->getPost('param'));
         }
 
-        $form->onSuccess = function(string $message): void {
+        $form->onSuccess = function (string $message): void {
             $this->flashMessage($message, 'info');
             $this->redirect('Menu:');
         };
 
-        $form->onError = function(string $message): void {
+        $form->onError = function (string $message): void {
             $this->flashMessage($message, 'danger');
         };
 

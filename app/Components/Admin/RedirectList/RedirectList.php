@@ -17,7 +17,8 @@ class RedirectList extends BaseControl
 
     public function __construct(
         private RedirectManager $redirectManager
-    ) {}
+    ) {
+    }
 
     public function render(?int $limit = null): void
     {
@@ -37,15 +38,15 @@ class RedirectList extends BaseControl
         $this->totalItems = $this->redirectManager->getCount($search);
         $this->template->redirectList = $this->redirectManager->getList($this->limit, $offset, $search);
 
-        $this->template->getJson = function($id, $source) {
+        $this->template->getJson = function ($id, $source) {
             // TODO: Fix empty modal on second call of deletion method
             return Json::encode([
                 'id' => (string)$id,
                 // 'source' => (string)$source,
                 'modal' => [
                     'title' => $this->t('modal.title.confirm-delete'),
-                    'body' => $this->tf('modal.body.delete-redirect', $source)
-                ]
+                    'body' => $this->tf('modal.body.delete-redirect', $source),
+                ],
             ]);
         };
 
@@ -57,7 +58,7 @@ class RedirectList extends BaseControl
     {
         $this->presenter->redirect('Redirect:edit', [
             'id' => $id,
-            'page' => $this->getPresenter()->getParameter('page', 1)
+            'page' => $this->getPresenter()->getParameter('page', 1),
         ]);
     }
 

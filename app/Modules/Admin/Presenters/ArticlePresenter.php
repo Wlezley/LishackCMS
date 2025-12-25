@@ -130,12 +130,12 @@ class ArticlePresenter extends SecuredPresenter
             $form->setOrigin($form::OriginCreate);
         }
 
-        $form->onSuccess = function(string $message, $articleId): void {
+        $form->onSuccess = function (string $message, $articleId): void {
             $this->flashMessage($message, 'info');
             $this->redirect('Article:edit', ['id' => $articleId]);
         };
 
-        $form->onError = function(string $message): void {
+        $form->onError = function (string $message): void {
             $this->flashMessage($message, 'danger');
         };
 

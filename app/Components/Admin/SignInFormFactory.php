@@ -5,15 +5,16 @@ declare(strict_types=1);
 namespace App\Components\Admin;
 
 use App\Models\TranslationManager;
-use Nette\Security\User;
 use Nette\Application\UI\Form;
+use Nette\Security\User;
 
 class SignInFormFactory
 {
     public function __construct(
         protected User $user,
         protected TranslationManager $translationManager
-    ) {}
+    ) {
+    }
 
     public function create(): Form
     {
@@ -53,10 +54,8 @@ class SignInFormFactory
             } else {
                 $this->user->setExpiration('12 hours');
             }
-
-        } catch(\Nette\Security\AuthenticationException $e) {
+        } catch (\Nette\Security\AuthenticationException $e) {
             $form->addError($e->getMessage());
         }
     }
 }
-

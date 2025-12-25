@@ -66,7 +66,7 @@ class DataEditor extends BaseControl
             }
         }
 
-        $form = new Form;
+        $form = new Form();
 
         $form->setHtmlAttribute('autocomplete', 'off');
 
@@ -177,7 +177,7 @@ class DataEditor extends BaseControl
         }
 
         $dataRow = new DatasetRow();
-        $dataRow->id = $values['itemId'] ? (int) $values['itemId']: null;
+        $dataRow->id = $values['itemId'] ? (int) $values['itemId'] : null;
 
         foreach ($values as $key => $value) {
             if (!str_starts_with($key, 'data_')) {

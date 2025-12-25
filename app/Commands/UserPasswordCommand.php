@@ -1,4 +1,6 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Commands;
 
@@ -7,12 +9,12 @@ use App\Models\UserManager;
 use App\Models\UserValidator;
 use Nette\Database\Explorer;
 use Nette\Security\Passwords;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Question\Question;
 
 #[AsCommand(
@@ -72,7 +74,6 @@ final class UserPasswordCommand extends Command
 
             $output->writeln(\sprintf("🟢 Password for user '%s' has been successfully changed.", $username));
             return 0;
-
         } catch (\Exception $e) {
             $output->writeln(\sprintf('<error>🔴 Error occurred: %s</error>', $e->getMessage()));
             return 1;

@@ -22,13 +22,10 @@ class ArticleEditor extends BaseControl
     public const OriginCreate = 'Create';
     public const OriginEdit = 'Edit';
 
-    /** @var ArticleManager */
     private ArticleManager $articleManager;
 
-    /** @var CategoryManager */
     private CategoryManager $categoryManager;
 
-    /** @var UserManager */
     private UserManager $userManager;
 
     private string $origin;
@@ -94,14 +91,14 @@ class ArticleEditor extends BaseControl
             ->setValue($this->param['published_at'] ?? DateTime::from(null))
             ->setRequired();
 
-        $updated_at = 'N/A';
+        $updatedAt = 'N/A';
         if ($this->param['updated_at']) {
-            $updated_at = DateTime::from($this->param['updated_at'])->format('d.m.Y h:i');
+            $updatedAt = DateTime::from($this->param['updated_at'])->format('d.m.Y h:i');
         }
         $form->addText('updated_at', $this->t('form.article.updated_at'))
             ->setHtmlAttribute('placeholder', $this->t('form.article.updated_at'))
             ->setHtmlAttribute('readonly', true)
-            ->setValue($updated_at);
+            ->setValue($updatedAt);
 
         // META TAGS / SEO
         $form->addText('robots', $this->t('form.article.robots'))

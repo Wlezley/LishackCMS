@@ -6,8 +6,6 @@ namespace App\Models\Helpers;
 
 use Nette\Utils\Strings;
 
-use function PHPUnit\Framework\isEmpty;
-
 class StringHelper
 {
     /**

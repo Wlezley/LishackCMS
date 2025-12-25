@@ -42,7 +42,6 @@ final class MediaPresenter extends BasePresenter
      * @param int $id The ID of the image to be displayed. Defaults to 0.
      * @param int<1, max>|null $width Optional width to resize or crop the image. If null, no width resizing is applied.
      * @param int<1, max>|null $height Optional height to resize or crop the image. If null and width are provided, the image is resized proportionately to the width.
-     * @return void
      */
     public function actionShow(int $id = 0, ?int $width = null, ?int $height = null): void
     {

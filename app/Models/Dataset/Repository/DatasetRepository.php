@@ -16,7 +16,8 @@ final class DatasetRepository
 
     public function __construct(
         private Explorer $db
-    ) {}
+    ) {
+    }
 
     public function findById(int $id): ?Dataset
     {
@@ -128,7 +129,10 @@ final class DatasetRepository
             ->order('id ASC');
 
         if ($search !== null) {
-            $query->where('name LIKE ? OR slug LIKE ? OR component LIKE ? OR presenter LIKE ?', "%$search%", "%$search%", "%$search%", "%$search%");
+            $query->where(
+                condition: 'name LIKE ? OR slug LIKE ? OR component LIKE ? OR presenter LIKE ?',
+                params: ["%$search%", "%$search%", "%$search%", "%$search%"]
+            );
         }
 
         $data = $query->fetchAll();
@@ -142,7 +146,10 @@ final class DatasetRepository
             ->where('deleted', 0);
 
         if ($search !== null) {
-            $query->where('name LIKE ? OR slug LIKE ? OR component LIKE ? OR presenter LIKE ?', "%$search%", "%$search%", "%$search%", "%$search%");
+            $query->where(
+                condition: 'name LIKE ? OR slug LIKE ? OR component LIKE ? OR presenter LIKE ?',
+                params: ["%$search%", "%$search%", "%$search%", "%$search%"]
+            );
         }
 
         return $query->count('*');

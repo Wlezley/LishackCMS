@@ -15,7 +15,8 @@ class StorageFilesRepository
 
     public function __construct(
         private Explorer $db
-    ) {}
+    ) {
+    }
 
     public function findById(int $id): ?StorageFile
     {
@@ -27,10 +28,10 @@ class StorageFilesRepository
     }
 
     /** @return StorageFile[] */
-    public function getFilesInFolder(int $tree_id = 0): array
+    public function getFilesInFolder(int $treeId = 0): array
     {
         $query = $this->db->table(self::TABLE_NAME)
-            ->where('tree_id', $tree_id)
+            ->where('tree_id', $treeId)
             ->order('position')
             ->fetchAll();
 
@@ -87,10 +88,10 @@ class StorageFilesRepository
             ->update([$this->db::literal('deleted_at = NULL')]); // TODO: Check if this works
     }
 
-    public function moveToFolder(int $id, int $tree_id): int
+    public function moveToFolder(int $id, int $treeId): int
     {
         return $this->db->table(self::TABLE_NAME)
             ->where(['id' => $id])
-            ->update(['tree_id' => $tree_id]);
+            ->update(['tree_id' => $treeId]);
     }
 }

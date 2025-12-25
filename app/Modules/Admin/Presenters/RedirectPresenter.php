@@ -91,12 +91,12 @@ class RedirectPresenter extends SecuredPresenter
             $form->setParam($this->getHttpRequest()->getPost('param'));
         }
 
-        $form->onSuccess = function(string $message, int $page): void {
+        $form->onSuccess = function (string $message, int $page): void {
             $this->flashMessage($message, 'info');
             $this->redirect('Redirect:', ['page' => $page]);
         };
 
-        $form->onError = function(string $message): void {
+        $form->onError = function (string $message): void {
             $this->flashMessage($message, 'danger');
         };
 

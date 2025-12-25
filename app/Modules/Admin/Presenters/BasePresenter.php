@@ -41,7 +41,6 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
     /** @var TranslationManager @inject */
     public TranslationManager $translationManager;
 
-    /** @var string */
     protected string $lang;
     protected string $htmlLang;
 

@@ -18,7 +18,8 @@ class DatasetList extends BaseControl
 
     public function __construct(
         private DatasetManager $datasetManager
-    ) {}
+    ) {
+    }
 
     public function render(?int $limit = null): void
     {
@@ -38,14 +39,14 @@ class DatasetList extends BaseControl
         $this->totalItems = $this->datasetManager->getDatasetRepository()->getCount($search);
         $this->template->datasetList = $this->datasetManager->getDatasetRepository()->getList($this->limit, $offset, $search);
 
-        $this->template->getJson = function($id, $name) {
+        $this->template->getJson = function ($id, $name) {
             // TODO: Fix empty modal on second call of deletion method
             return Json::encode([
                 'id' => (string) $id,
                 'modal' => [
                     'title' => $this->t('modal.title.confirm-delete'),
-                    'body' => $this->tf('modal.body.delete-dataset', $name, $id)
-                ]
+                    'body' => $this->tf('modal.body.delete-dataset', $name, $id),
+                ],
             ]);
         };
 
@@ -56,7 +57,7 @@ class DatasetList extends BaseControl
     public function handleDatalist(string $id): void
     {
         $this->presenter->redirect('Data:', [
-            'datasetId' => $id
+            'datasetId' => $id,
         ]);
     }
 
@@ -64,7 +65,7 @@ class DatasetList extends BaseControl
     {
         $this->presenter->redirect('Dataset:edit', [
             'id' => $id,
-            'page' => $this->getPresenter()->getParameter('page', 1)
+            'page' => $this->getPresenter()->getParameter('page', 1),
         ]);
     }
 

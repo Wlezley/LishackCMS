@@ -193,7 +193,7 @@ class TranslationManager
         $this->db->table(self::TABLE_NAME)->insert([
             'key' => $key,
             'lang' => $lang,
-            'text' => $text
+            'text' => $text,
         ]);
 
         $this->translations[$lang][$key] = $text;
@@ -217,9 +217,9 @@ class TranslationManager
 
         $this->db->table(self::TABLE_NAME)->where([
             'key' => $key,
-            'lang' => $lang
+            'lang' => $lang,
         ])->update([
-            'text' => $text
+            'text' => $text,
         ]);
 
         $this->translations[$lang][$key] = $text;
@@ -247,9 +247,9 @@ class TranslationManager
 
         $this->db->table(self::TABLE_NAME)->where([
             'key' => $oldKey,
-            'lang' => $lang
+            'lang' => $lang,
         ])->update([
-            'key' => $newKey
+            'key' => $newKey,
         ]);
 
         $this->invalidate($lang);
@@ -307,7 +307,7 @@ class TranslationManager
         if ($search !== null) {
             $query->whereOr([
                 'key LIKE ?' => "%$search%",
-                'text LIKE ?' => "%$search%"
+                'text LIKE ?' => "%$search%",
             ]);
         }
 
@@ -329,7 +329,7 @@ class TranslationManager
         if ($search !== null) {
             $query->whereOr([
                 'key LIKE ?' => "%$search%",
-                'text LIKE ?' => "%$search%"
+                'text LIKE ?' => "%$search%",
             ]);
         }
 

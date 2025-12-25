@@ -16,7 +16,8 @@ final class ColumnRepository
 
     public function __construct(
         private Explorer $db
-    ) {}
+    ) {
+    }
 
     /** @return DatasetColumn[] */
     public function findByDatasetId(int $datasetId, bool $includeDeleted = false): array
@@ -119,9 +120,9 @@ final class ColumnRepository
         return $this->db->table(self::TABLE_NAME)
             ->where([
                 'dataset_id' => $datasetId,
-                'column_id' => $columnId
+                'column_id' => $columnId,
             ])->update([
-                'deleted' => 1
+                'deleted' => 1,
             ]);
     }
 

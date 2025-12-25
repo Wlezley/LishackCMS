@@ -6,7 +6,6 @@ namespace App\Models;
 
 use App\Models\SmsGateException;
 use Carbon\Carbon;
-use Exception;
 use Nette\Database\Explorer;
 use Nette\Utils\Random;
 use SimpleXMLElement;
@@ -25,7 +24,8 @@ class SmsGate
         private int $senderID,
         private bool $securedLogin,
         private Explorer $db
-    ) {}
+    ) {
+    }
 
     public function sendSMS(string $phoneNumber, string $message, int $userID = self::SYSTEM_USER_ID): void
     {
@@ -56,7 +56,7 @@ class SmsGate
         $encodedResponse = json_encode($xml);
         Assert::string($encodedResponse, 'Error processing request (encoding)');
 
-        $responseData = json_decode($encodedResponse, TRUE);
+        $responseData = json_decode($encodedResponse, true);
         Assert::isArray($responseData, 'Error processing request (decoding)');
         Assert::keyExists($responseData, 'err', 'Error processing request (missing err key)');
 
@@ -105,7 +105,7 @@ class SmsGate
             'user_id' => $userID,
             'phone_number' => $phoneNumber,
             'message' => $message,
-            'error_code' => $errorCode
+            'error_code' => $errorCode,
         ]);
     }
 }

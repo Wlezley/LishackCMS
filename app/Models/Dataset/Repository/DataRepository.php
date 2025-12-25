@@ -19,7 +19,8 @@ final class DataRepository
     public function __construct(
         private Explorer $db,
         private ColumnRepository $columnRepository
-    ) {}
+    ) {
+    }
 
     private function getTableName(int $datasetId): string
     {
@@ -53,7 +54,7 @@ final class DataRepository
     /** @param DatasetColumn[] $columns */
     public function createTable(int $datasetId, array $columns): void
     {
-        $parts = ["`id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY"];
+        $parts = ['`id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY'];
 
         /** @var DatasetColumn $column */
         foreach ($columns as $column) {
@@ -66,9 +67,9 @@ final class DataRepository
 
         // TODO: Refactor SQL query construction
         $sql = sprintf(
-            "CREATE TABLE IF NOT EXISTS `%s` (%s) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;",
+            'CREATE TABLE IF NOT EXISTS `%s` (%s) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;',
             $this->getTableName($datasetId),
-            implode(", ", $parts)
+            implode(', ', $parts)
         );
 
         $this->db->query($sql); // @phpstan-ignore-line
@@ -130,9 +131,9 @@ final class DataRepository
         // TODO: Refactor SQL query construction
         if (!empty($alterParts)) {
             $sql = sprintf(
-                "ALTER TABLE `%s` %s;",
+                'ALTER TABLE `%s` %s;',
                 $tableName,
-                implode(", ", $alterParts)
+                implode(', ', $alterParts)
             );
 
             $this->db->query($sql); // @phpstan-ignore-line

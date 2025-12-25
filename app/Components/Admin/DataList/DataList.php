@@ -18,7 +18,8 @@ class DataList extends BaseControl
 
     public function __construct(
         private DatasetManager $datasetManager
-    ) {}
+    ) {
+    }
 
     public function render(int $datasetId, ?int $limit = null): void
     {
@@ -41,15 +42,15 @@ class DataList extends BaseControl
         $this->template->listColumns = $this->datasetManager->getListedColumns();
         $this->template->datasetId = $datasetId;
 
-        $this->template->getJson = function($datasetId, $itemId) {
+        $this->template->getJson = function ($datasetId, $itemId) {
             // TODO: Fix empty modal on second call of deletion method
             return Json::encode([
                 'itemId' => (string) $itemId,
                 'datasetId' => (int) $datasetId,
                 'modal' => [
                     'title' => $this->t('modal.title.confirm-delete'),
-                    'body' => $this->tf('modal.body.delete-dataset-data', $itemId)
-                ]
+                    'body' => $this->tf('modal.body.delete-dataset-data', $itemId),
+                ],
             ]);
         };
 
@@ -62,7 +63,7 @@ class DataList extends BaseControl
         $this->presenter->redirect('Data:edit', [
             'datasetId' => $this->getPresenter()->getParameter('datasetId'),
             'itemId' => $itemId,
-            'page' => $this->getPresenter()->getParameter('page', 1)
+            'page' => $this->getPresenter()->getParameter('page', 1),
         ]);
     }
 

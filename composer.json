@@ -44,7 +44,8 @@
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^2.0",
         "phpstan/phpstan-nette": "^2.0",
-        "phpstan/phpstan-webmozart-assert": "^2.0"
+        "phpstan/phpstan-webmozart-assert": "^2.0",
+        "slevomat/coding-standard": "^8.26"
     },
     "autoload": {
         "psr-4": {
@@ -54,6 +55,7 @@
     "minimum-stability": "stable",
     "config": {
         "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
             "phpstan/extension-installer": true
         },
         "platform": {
@@ -61,6 +63,8 @@
         }
     },
     "scripts": {
+        "lint": "phpcs",
+        "lint-fix": "phpcbf",
         "phpstan": "phpstan analyse --memory-limit 512M"
     }
 }

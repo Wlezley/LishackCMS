@@ -53,53 +53,53 @@ class FilePresenter extends SecuredPresenter
                 'file' => array
                     'name' => 'coyote_knight_templar.jpg'
                     'full_path' => 'coyote_knight_templar.jpg'
-                    'type' => 'image/jpeg'                          // MAX 255 CHARACTERS
+                    'type' => 'image/jpeg' // MAX 255 CHARACTERS
                     'tmp_name' => 'C:\xampp82\tmp\php24B1.tmp'
                     'error' => 0
                     'size' => 202924
         */
 
-        // $target_dir = 'uploads/';
-        $target_dir = PROJECT_DIR . 'uploads/files/';
-        $target_file = $target_dir . basename($_FILES['file']['name']);
+        // $targetDir = 'uploads/';
+        $targetDir = PROJECT_DIR . 'uploads/files/';
+        $targetFile = $targetDir . basename($_FILES['file']['name']);
         $uploadOk = 1;
-        $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+        $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
 
-        // Check if image file is actual image or fake image
+        // Check if an image file is an actual image or fake image
         if (isset($_POST['submit'])) {
             $check = getimagesize($_FILES['file']['tmp_name']);
-            bdump($check, "TMP FILE IMAGE CHECK");
+            bdump($check, 'TMP FILE IMAGE CHECK');
 
             if ($check === false) {
                 $uploadOk = 0;
             }
         }
 
-        // Check if file already exists
-        if (file_exists($target_file)) {
-            bdump("File already exists.", "STATUS 1");
+        // Check if a file already exists
+        if (file_exists($targetFile)) {
+            bdump('File already exists.', 'STATUS 1');
             $uploadOk = 0;
         }
 
         // Check file size
         if ($_FILES['file']['size'] > 5000000) {
-            bdump("File is too large.", "STATUS 2");
+            bdump('File is too large.', 'STATUS 2');
             $uploadOk = 0;
         }
 
         // Allow certain file formats
         if (!in_array($imageFileType, ['jpg','jpeg','png','gif','webp'])) {
-            bdump("Only JPG, JPEG, PNG, GIF & WEBP files are allowed.", "STATUS 3");
+            bdump('Only JPG, JPEG, PNG, GIF & WEBP files are allowed.', 'STATUS 3');
             $uploadOk = 0;
         }
 
         if ($uploadOk == 0) {
-            bdump("File was not uploaded.", "STATUS 4");
+            bdump('File was not uploaded.', 'STATUS 4');
         } else {
-            if (move_uploaded_file($_FILES['file']['tmp_name'], $target_file)) {
-                bdump('File ' . basename($_FILES['file']['name']) . ' has been uploaded.', "STATUS 5");
+            if (move_uploaded_file($_FILES['file']['tmp_name'], $targetFile)) {
+                bdump('File ' . basename($_FILES['file']['name']) . ' has been uploaded.', 'STATUS 5');
             } else {
-                bdump("There was an error uploading your file.", "STATUS 6");
+                bdump('There was an error uploading your file.', 'STATUS 6');
             }
         }
 

@@ -23,7 +23,8 @@ class MediaManager
     public const THUMB_WIDTH = 300;
 
     public function __construct(private Explorer $db)
-    {}
+    {
+    }
 
     /**
      * Get all media files as array for JSON response

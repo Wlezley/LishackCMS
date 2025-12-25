@@ -25,7 +25,7 @@ class ArticleValidator extends BaseModel
         'og_url',
         'og_type',
         'meta_title',
-        'meta_description'
+        'meta_description',
     ];
 
     /**

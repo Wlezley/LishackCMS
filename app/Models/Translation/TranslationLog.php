@@ -23,7 +23,8 @@ class TranslationLog
     public function __construct(
         private Explorer $db,
         private HttpRequest $httpRequest
-    ) {}
+    ) {
+    }
 
     /**
      * Logs a missing translation key.

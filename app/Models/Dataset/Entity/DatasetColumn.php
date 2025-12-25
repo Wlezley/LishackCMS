@@ -114,7 +114,7 @@ final class DatasetColumn
     public function getColumnSqlDefinition(mixed $default = null, bool $isNullable = true): string
     {
         if (!$this->columnId) {
-            throw new DatasetException("Cannot get SQL definition without column ID.");
+            throw new DatasetException('Cannot get SQL definition without column ID.');
         }
 
         $columnName = $this->getDatabaseColumnName();
@@ -161,11 +161,11 @@ final class DatasetColumn
         }
 
         if (trim($this->name) === '') {
-            throw new DatasetException("The column name must not be empty.");
+            throw new DatasetException('The column name must not be empty.');
         }
 
         if (trim($this->slug) === '') {
-            throw new DatasetException("The column slug must not be empty.");
+            throw new DatasetException('The column slug must not be empty.');
         }
     }
 

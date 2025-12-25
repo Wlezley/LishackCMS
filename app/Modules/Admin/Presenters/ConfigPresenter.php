@@ -44,12 +44,12 @@ class ConfigPresenter extends SecuredPresenter
     {
         $control = $this->configEditor->create();
 
-        $control->onSuccess = function(string $message): void {
+        $control->onSuccess = function (string $message): void {
             $this->flashMessage($message, 'info');
             $this->redirect('Config:editor');
         };
 
-        $control->onError = function(string $message): void {
+        $control->onError = function (string $message): void {
             $this->flashMessage($message, 'danger');
         };
 
@@ -60,12 +60,12 @@ class ConfigPresenter extends SecuredPresenter
     {
         $form = $this->configWebsiteForm->create();
 
-        $form->onSuccess = function(string $message): void {
+        $form->onSuccess = function (string $message): void {
             $this->flashMessage($message, 'info');
             $this->redirect('Config:website');
         };
 
-        $form->onError = function(string $message): void {
+        $form->onError = function (string $message): void {
             $this->flashMessage($message, 'danger');
         };
 
@@ -76,12 +76,12 @@ class ConfigPresenter extends SecuredPresenter
     {
         $form = $this->configSeoForm->create();
 
-        $form->onSuccess = function(string $message): void {
+        $form->onSuccess = function (string $message): void {
             $this->flashMessage($message, 'info');
             $this->redirect('Config:seo');
         };
 
-        $form->onError = function(string $message): void {
+        $form->onError = function (string $message): void {
             $this->flashMessage($message, 'danger');
         };
 

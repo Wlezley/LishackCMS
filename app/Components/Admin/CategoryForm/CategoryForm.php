@@ -109,7 +109,7 @@ class CategoryForm extends BaseControl
                 unset($data['id']);
                 $this->categoryManager->create($data);
                 call_user_func($this->onSuccess, $this->t('success.form.category-created'), 1);
-            } else if ($this->origin == self::OriginEdit) {
+            } elseif ($this->origin == self::OriginEdit) {
                 $this->categoryManager->update((int) $data['id'], $data);
                 call_user_func($this->onSuccess, $this->t('success.form.category-saved'), $values['page'] ?? 1);
             } else {

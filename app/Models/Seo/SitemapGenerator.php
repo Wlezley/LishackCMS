@@ -20,7 +20,8 @@ final class SitemapGenerator
         protected Explorer $db,
         protected ConfigManager $configManager,
         protected UrlGenerator $urlGenerator
-    ) {}
+    ) {
+    }
 
     /**
      * Generates a sitemap.xml file with URLs of published articles.
@@ -115,13 +116,13 @@ final class SitemapGenerator
     public function getContent(): string
     {
         if (!is_file(self::SITEMAP_PATH)) {
-            throw new \RuntimeException("Sitemap file does not exist.");
+            throw new \RuntimeException('Sitemap file does not exist.');
         }
 
         $content = file_get_contents(self::SITEMAP_PATH);
 
         if ($content === false) {
-            throw new \RuntimeException("Failed to read sitemap file.");
+            throw new \RuntimeException('Failed to read sitemap file.');
         }
 
         return $content;

@@ -32,7 +32,7 @@ final class InstallPresenter extends Presenter
             $this->installer->run();
         } catch (\Exception $e) {
             $this->redirect('Install:failed', [
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
         }
 

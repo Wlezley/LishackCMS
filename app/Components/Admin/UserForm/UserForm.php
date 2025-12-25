@@ -147,7 +147,7 @@ class UserForm extends BaseControl
         try {
             $userID = $this->userManager->create((array)$values);
             call_user_func($this->onSuccess, $this->tf('success.form.user-created', $userID));
-        } catch(UserException $e) {
+        } catch (UserException $e) {
             call_user_func($this->onError, $e->getMessage());
         }
     }
@@ -177,7 +177,7 @@ class UserForm extends BaseControl
             $userData = UserValidator::prepareData((array)$values);
             $this->userManager->update((int)$values['id'], $userData);
             call_user_func($this->onSuccess, $this->t('success.form.user-saved'));
-        } catch(UserException $e) {
+        } catch (UserException $e) {
             call_user_func($this->onError, $e->getMessage());
         } catch (\InvalidArgumentException $e) {
             call_user_func($this->onError, $e->getMessage());
@@ -195,7 +195,7 @@ class UserForm extends BaseControl
                 $this->param = $this->userManager->get((int) $id);
                 $this->template->readOnly = $this->isReadOnly($id, $this->param['role']);
             }
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             call_user_func($this->onError, $e->getMessage());
         }
 
@@ -229,18 +229,18 @@ class UserForm extends BaseControl
     /** @return array<string,string> */
     private function getRoleSelectList(string $targetRole): array
     {
-        $USER_ROLES_SELECT = [];
-        foreach (UserRole::USER_ROLES as $role_name) {
-            $USER_ROLES_SELECT[$role_name] = $this->t('user.role.' . $role_name);
+        $userRolesSelect = [];
+        foreach (UserRole::USER_ROLES as $roleName) {
+            $userRolesSelect[$roleName] = $this->t('user.role.' . $roleName);
         }
 
         if ($this->origin === self::OriginEdit && $this->editorRole->isLessOrEqualsThan($targetRole)) {
-            return [$targetRole => $USER_ROLES_SELECT[$targetRole]];
+            return [$targetRole => $userRolesSelect[$targetRole]];
         } else {
             $roleListSelect = [];
 
             foreach ($this->editorRole->getLowerList() as $roleName) {
-                $roleListSelect[$roleName] = $USER_ROLES_SELECT[$roleName];
+                $roleListSelect[$roleName] = $userRolesSelect[$roleName];
             }
             return $roleListSelect;
         }

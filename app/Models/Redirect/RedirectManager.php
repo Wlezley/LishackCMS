@@ -28,7 +28,8 @@ class RedirectManager
 
     public function __construct(
         private Explorer $db
-    ) {}
+    ) {
+    }
 
     /**
      * Retrieves a redirect target URL (and HTTP code) for a given source URL.
@@ -92,7 +93,7 @@ class RedirectManager
         $target = $this->prepare($target);
 
         if ($source === $target) {
-            throw new RedirectException("Redirect source and target cannot be the same", 1);
+            throw new RedirectException('Redirect source and target cannot be the same', 1);
         }
 
         if (!$this->checkHttpCode($code)) {
@@ -112,7 +113,7 @@ class RedirectManager
             'source' => $source,
             'target' => $target,
             'code' => $code,
-            'enabled' => $enabled ? 1 : 0
+            'enabled' => $enabled ? 1 : 0,
         ]);
 
         if (is_numeric($row['id'])) {
@@ -144,15 +145,15 @@ class RedirectManager
         $target = $this->prepare($target);
 
         if ($source === $target) {
-            throw new RedirectException("Redirect source and target cannot be the same", 1);
+            throw new RedirectException('Redirect source and target cannot be the same', 1);
         }
 
         if ($source === null) {
-            throw new RedirectException("Redirect source cannot be empty", 1);
+            throw new RedirectException('Redirect source cannot be empty', 1);
         }
 
         if ($target === null) {
-            throw new RedirectException("Redirect target cannot be empty", 1);
+            throw new RedirectException('Redirect target cannot be empty', 1);
         }
 
         if (!$this->checkHttpCode($code)) {
@@ -176,7 +177,7 @@ class RedirectManager
             'source' => $source,
             'target' => $target,
             'code' => $code,
-            'enabled' => $enabled ? 1 : 0
+            'enabled' => $enabled ? 1 : 0,
         ]);
 
         return ($affectedRows == 1);
@@ -269,6 +270,6 @@ class RedirectManager
         $path = preg_replace('~//+~', '/', $path);
         Assert::string($path, 'Invalid URL path');
 
-        return ($scheme ? "$scheme://" : '') . ($host ? $host : '') . '/' . ltrim($path, '/');
+        return ($scheme ? "$scheme://" : '') . ($host ?: '') . '/' . ltrim($path, '/');
     }
 }

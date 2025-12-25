@@ -88,12 +88,12 @@ class DatasetPresenter extends SecuredPresenter
             $id ? $control::OriginEdit : $control::OriginCreate
         );
 
-        $control->onSuccess = function(string $message): void {
+        $control->onSuccess = function (string $message): void {
             $this->flashMessage($message, 'info');
             $this->redirect('Dataset:');
         };
 
-        $control->onError = function(string $message): void {
+        $control->onError = function (string $message): void {
             $this->flashMessage($message, 'danger');
         };
 

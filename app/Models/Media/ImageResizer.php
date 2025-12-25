@@ -9,14 +9,15 @@ use Webmozart\Assert\Assert;
 
 class ImageResizer
 {
-    private const SUPPORTED_FORMATS = [
+    /** @var array<string, int> */
+    private const array SUPPORTED_FORMATS = [
         'png' => IMAGETYPE_PNG,
         'jpg' => IMAGETYPE_JPEG,
         'jpeg' => IMAGETYPE_JPEG,
         'gif' => IMAGETYPE_GIF,
         'webp' => IMAGETYPE_WEBP,
     ];
-    private const DEFAULT_FORMAT = 'jpg';
+    private const string DEFAULT_FORMAT = 'jpg';
 
     /**
      * Resizes an image to fit the given width, maintaining an aspect ratio.
@@ -117,8 +118,13 @@ class ImageResizer
         return $this->resize($image, $targetWidth, $targetHeight);
     }
 
-    public function saveToFile(GdImage $image, string $path, string $format = self::DEFAULT_FORMAT, int $quality = 95, bool $overwrite = false): bool
-    {
+    public function saveToFile(
+        GdImage $image,
+        string $path,
+        string $format = self::DEFAULT_FORMAT,
+        int $quality = 95,
+        bool $overwrite = false
+    ): bool {
         if (!$overwrite && is_file($path)) {
             return true;
         }

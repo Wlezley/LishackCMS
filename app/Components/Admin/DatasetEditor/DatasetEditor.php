@@ -36,7 +36,7 @@ class DatasetEditor extends BaseControl
 
     protected function createComponentForm(): Form
     {
-        $form = new Form;
+        $form = new Form();
 
         $form->setHtmlAttribute('autocomplete', 'off');
 
@@ -166,7 +166,7 @@ class DatasetEditor extends BaseControl
         if (empty($columns)) {
             $this->template->lastColumnId = 2;
 
-            for ($i=1; $i <= $this->template->lastColumnId; $i++) {
+            for ($i = 1; $i <= $this->template->lastColumnId; $i++) {
                 $columns[$i] = [
                     'columnId' => $i,
                     'name' => "Data $i",

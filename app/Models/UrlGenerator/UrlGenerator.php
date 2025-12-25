@@ -15,7 +15,8 @@ class UrlGenerator
     public function __construct(
         protected Explorer $db,
         protected ConfigManager $configManager
-    ) {}
+    ) {
+    }
 
     /**
      * Normalizes a raw category URL string into a clean array of slugs.
@@ -60,22 +61,22 @@ class UrlGenerator
         $categories = ArrayHelper::resultToArray($result);
 
         $limit = $categories[$categoryId]['level'];
-        $parent_id = $categories[$categoryId]['id'];
-        $name_url = $categories[$categoryId]['name_url'];
+        $parentId = $categories[$categoryId]['id'];
+        $nameUrl = $categories[$categoryId]['name_url'];
 
         for ($level = 1; $level < $limit; $level++) {
-            if (!isset($categories[$parent_id])) {
+            if (!isset($categories[$parentId])) {
                 throw new CategoryException(
-                    "Category (ID '$parent_id') not found.",
+                    "Category (ID '$parentId') not found.",
                     \Nette\Http\IResponse::S404_NotFound
                 );
             }
 
-            $parent_id = $categories[$parent_id]['parent_id'];
-            $name_url = $categories[$parent_id]['name_url'] . '/' . $name_url;
+            $parentId = $categories[$parentId]['parent_id'];
+            $nameUrl = $categories[$parentId]['name_url'] . '/' . $nameUrl;
         }
 
-        return $name_url . '/';
+        return $nameUrl . '/';
     }
 
     /**
@@ -101,24 +102,24 @@ class UrlGenerator
             );
         }
 
-        $name_url = $article['name_url'];
+        $nameUrl = $article['name_url'];
         $categoryId = $article['category_id'];
 
         if ($categoryId == CategoryManager::MAIN_CATEGORY_ID) {
-            if ($this->c('DEFAULT_PAGE') == $name_url) {
+            if ($this->c('DEFAULT_PAGE') == $nameUrl) {
                 return '';
             } else {
-                return $name_url . '/';
+                return $nameUrl . '/';
             }
         }
 
         try {
-            $category_name_url = $this->generateCategoryUrl($categoryId);
+            $categoryNameUrl = $this->generateCategoryUrl($categoryId);
         } catch (CategoryException $e) {
-            $category_name_url = '';
+            $categoryNameUrl = '';
         }
 
-        return $category_name_url . $name_url . '/';
+        return $categoryNameUrl . $nameUrl . '/';
     }
 
     /**

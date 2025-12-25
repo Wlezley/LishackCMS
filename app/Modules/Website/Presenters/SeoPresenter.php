@@ -27,7 +27,7 @@ final class SeoPresenter extends BasePresenter
         if ($robots === null) {
             $robots = "User-agent: *\n"
                     . "Disallow: /\n"
-                    . "Sitemap: " . HOME_URL . "sitemap.xml?lang={$this->lang}\n";
+                    . 'Sitemap: ' . HOME_URL . "sitemap.xml?lang={$this->lang}\n";
         }
 
         $this->getHttpResponse()->setContentType('text/plain');

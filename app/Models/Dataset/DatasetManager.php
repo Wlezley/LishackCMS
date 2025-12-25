@@ -22,7 +22,8 @@ final class DatasetManager
         private DatasetRepository $datasetRepository,
         private ColumnRepository $columnRepository,
         private DataRepository $dataRepository
-    ) {}
+    ) {
+    }
 
     public function loadDatasetById(int $id, bool $includeDeleted = false): bool
     {

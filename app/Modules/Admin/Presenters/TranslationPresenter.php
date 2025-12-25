@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
-use App\Components\Admin\ITranslationFormFactory;
 use App\Components\Admin\ITranslationEditorFactory;
+use App\Components\Admin\ITranslationFormFactory;
 use App\Components\Admin\ITranslationListFactory;
 use App\Models\TranslationException;
 
@@ -120,12 +120,12 @@ class TranslationPresenter extends SecuredPresenter
 
         $form->setLanguageList($this->translationManager->getLanguageService()->getList(false));
 
-        $form->onSuccess = function(string $message): void {
+        $form->onSuccess = function (string $message): void {
             $this->flashMessage($message, 'info');
             $this->redirect('Translation:', ['lang' => $this->getParameter('lang')]);
         };
 
-        $form->onError = function(string $message): void {
+        $form->onError = function (string $message): void {
             $this->flashMessage($message, 'danger');
         };
 
@@ -138,12 +138,12 @@ class TranslationPresenter extends SecuredPresenter
         $lang = $this->getParameter('lang');
         $control->setParam(['lang' => $lang]);
 
-        $control->onSuccess = function(string $message, string $lang): void {
+        $control->onSuccess = function (string $message, string $lang): void {
             $this->flashMessage($message, 'info');
             $this->redirect('Translation:editor', ['lang' => $lang]);
         };
 
-        $control->onError = function(string $message): void {
+        $control->onError = function (string $message): void {
             $this->flashMessage($message, 'danger');
         };
 

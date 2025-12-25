@@ -22,7 +22,8 @@ class DatasetUpdater
         private DatasetRepository $datasetRepository,
         private ColumnRepository $columnRepository,
         private DataRepository $dataRepository
-    ) {}
+    ) {
+    }
 
     public function loadDatasetById(int $id): bool
     {
@@ -61,10 +62,15 @@ class DatasetUpdater
      * @param bool $active Whether the dataset is active.
      *
      * @throws DatasetException If the dataset has not loaded.
-     * @return self
      */
-    public function configure(string $name, string $slug = '', string $component = '', string $presenter = '', bool $active = true, bool $deleted = false): self
-    {
+    public function configure(
+        string $name,
+        string $slug = '',
+        string $component = '',
+        string $presenter = '',
+        bool $active = true,
+        bool $deleted = false
+    ): self {
         if (!isset($this->dataset)) {
             throw new DatasetException('Dataset is not loaded.');
         }
@@ -96,7 +102,6 @@ class DatasetUpdater
      * @param string|null $default Default value of the column.
      *
      * @throws DatasetException If the dataset has not loaded.
-     * @return self
      */
     public function addColumn(
         string $name,
@@ -107,8 +112,7 @@ class DatasetUpdater
         bool $hidden = false,
         bool $deleted = false,
         ?string $default = null
-    ): self
-    {
+    ): self {
         if (!isset($this->dataset)) {
             throw new DatasetException('Dataset is not loaded.');
         }
@@ -148,7 +152,6 @@ class DatasetUpdater
      * @param string|null $default Default value of the column.
      *
      * @throws DatasetException If the dataset has not loaded.
-     * @return self
      */
     public function updateColumn(
         int $columnId,
@@ -160,8 +163,7 @@ class DatasetUpdater
         bool $hidden = false,
         bool $deleted = false,
         ?string $default = null
-    ): self
-    {
+    ): self {
         if (!isset($this->dataset)) {
             throw new DatasetException('Dataset is not loaded.');
         }
@@ -252,7 +254,6 @@ class DatasetUpdater
      * Returns the configured dataset object.
      *
      * @throws DatasetException If dataset has not loaded.
-     * @return Dataset
      */
     public function getDataset(): Dataset
     {

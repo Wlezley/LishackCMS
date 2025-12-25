@@ -17,7 +17,8 @@ class Authenticator implements \Nette\Security\Authenticator
         protected Explorer $db,
         private Session $session,
         private Passwords $passwords
-    ) {}
+    ) {
+    }
 
     public function authenticate(string $username, #[\SensitiveParameter] string $password): SimpleIdentity
     {
@@ -38,7 +39,7 @@ class Authenticator implements \Nette\Security\Authenticator
 
         $user->update([
             'session_id' => $sessionId,
-            'last_login' => $lastLogin
+            'last_login' => $lastLogin,
         ]);
 
         $data = [
@@ -50,7 +51,7 @@ class Authenticator implements \Nette\Security\Authenticator
             'session_id' => $sessionId,
             'deleted' => $user['deleted'],
             'enabled' => $user['enabled'],
-            'last_login' => $lastLogin
+            'last_login' => $lastLogin,
         ];
 
         return new SimpleIdentity($user['id'], $user['role'], $data);

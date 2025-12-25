@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Components\Admin;
 
 use App\Components\BaseControl;
+use App\Models\TranslationException;
 use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
 
 class TranslationForm extends BaseControl
 {
@@ -54,12 +56,18 @@ class TranslationForm extends BaseControl
         return $form;
     }
 
-    /** @param \Nette\Utils\ArrayHash<mixed> $values */
-    public function processCreate(Form $form, \Nette\Utils\ArrayHash $values): void
+    /**
+     * @param ArrayHash<mixed> $values
+     * @throws TranslationException
+     */
+    public function processCreate(Form $form, ArrayHash $values): void
     {
         if (!empty($this->translationManager->getTextListByKey($values['key']))) {
             $editLink = $this->buildEditUrl($values['key']);
-            $editAnchor = '<a href="' . $editLink . '" target="_blank">' . $values['key'] . ' <sup><i class="fa fa-external-link"></i></sup></a>';
+            $editAnchor =
+                '<a href="' . $editLink . '" target="_blank">'
+                    . $values['key'] .
+                ' <sup><i class="fa fa-external-link"></i></sup></a>';
             call_user_func($this->onError, $this->tf('error.form.translation-duplicate-key', $values['key'], $editAnchor));
         } else {
             foreach ($this->languageList as $lang => $langData) {
@@ -80,8 +88,11 @@ class TranslationForm extends BaseControl
         }
     }
 
-    /** @param \Nette\Utils\ArrayHash<mixed> $values */
-    public function processEdit(Form $form, \Nette\Utils\ArrayHash $values): void
+    /**
+     * @param ArrayHash<mixed> $values
+     * @throws TranslationException
+     */
+    public function processEdit(Form $form, ArrayHash $values): void
     {
         $key = $values['key'];
         $textList = $this->translationManager->getTextListByKey($key);

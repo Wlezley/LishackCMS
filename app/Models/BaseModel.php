@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use Nette\SmartObject;
 use Nette\Database\Explorer;
+use Nette\SmartObject;
 use Webmozart\Assert\Assert;
 
 abstract class BaseModel
@@ -21,7 +21,8 @@ abstract class BaseModel
         protected Explorer $db,
         protected ConfigManager $configManager,
         protected TranslationManager $translationManager
-    ) {}
+    ) {
+    }
 
     public function load(): void
     {

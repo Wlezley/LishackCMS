@@ -31,13 +31,13 @@ class TranslationList extends BaseControl
 
         $this->totalItems = $this->translationManager->getCount($lang, $search);
 
-        $this->template->getJson = function($key) {
+        $this->template->getJson = function ($key) {
             return Json::encode([
                 'key' => (string)$key,
                 'modal' => [
                     'title' => $this->t('modal.title.confirm-delete'),
-                    'body' => $this->tf('modal.body.delete-translation', $key)
-                ]
+                    'body' => $this->tf('modal.body.delete-translation', $key),
+                ],
             ]);
         };
 

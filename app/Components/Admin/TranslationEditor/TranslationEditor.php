@@ -19,7 +19,7 @@ class TranslationEditor extends BaseControl
 
     protected function createComponentForm(): Form
     {
-        $form = new Form;
+        $form = new Form();
 
         $languageService = $this->translationManager->getLanguageService();
         $defaultLang = $languageService->getDefaultLang($this->c('DEFAULT_LANG'));

@@ -87,12 +87,12 @@ class SqlHelper
 
         if (is_string($value)) {
             if (preg_match('/[`;]/', $value)) {
-                throw new \InvalidArgumentException("Invalid characters in default value.");
+                throw new \InvalidArgumentException('Invalid characters in default value.');
             }
 
             return "'" . addslashes($value) . "'";
         }
 
-        throw new \InvalidArgumentException("Unsupported default value type.");
+        throw new \InvalidArgumentException('Unsupported default value type.');
     }
 }

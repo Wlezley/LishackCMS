@@ -37,7 +37,6 @@ class DummyImageGenerator
      *
      * @param int $width Width of the image in pixels.
      * @param int|null $height Height of the image in pixels. If null, same as width.
-     * @return self
      */
     public function setSize(int $width, ?int $height = null): self
     {
@@ -50,7 +49,6 @@ class DummyImageGenerator
      * Sets a custom caption to be displayed on the image.
      *
      * @param string $caption Text caption to display on the image.
-     * @return self
      */
     public function setCaption(string $caption): self
     {
@@ -62,7 +60,6 @@ class DummyImageGenerator
      * Sets the background color of the image in hexadecimal format.
      *
      * @param string $bgColor Background color as hex code (e.g., "#cccccc" or "#ccc").
-     * @return self
      */
     public function setBgColor(string $bgColor = self::DEFAULT_BG_COLOR): self
     {
@@ -74,7 +71,6 @@ class DummyImageGenerator
      * Sets the text color in hexadecimal format.
      *
      * @param string $textColor Text color as hex code (e.g., "#000000" or "#000").
-     * @return self
      */
     public function setTextColor(string $textColor = self::DEFAULT_TEXT_COLOR): self
     {
@@ -86,7 +82,6 @@ class DummyImageGenerator
      * Sets the output image format.
      *
      * @param string $format Output format. Supported formats: png, jpg, jpeg, gif, webp.
-     * @return self
      *
      * @throws \InvalidArgumentException If the format is not supported.
      */
@@ -105,7 +100,6 @@ class DummyImageGenerator
     /**
      * Generates the image. Returns cached data if available, otherwise renders and caches the image.
      *
-     * @return self
      * @throws RuntimeException If image generating fails.
      */
     public function generate(): self
@@ -166,7 +160,6 @@ class DummyImageGenerator
     /**
      * Gets image format MIME.
      *
-     * @return string
      */
     public function getFormatMime(): string
     {
@@ -176,7 +169,6 @@ class DummyImageGenerator
     /**
      * Gets binary data of generated (or cached) image.
      *
-     * @return string|null
      */
     public function getBinaryData(): ?string
     {
@@ -332,7 +324,7 @@ class DummyImageGenerator
         $data = ob_get_clean();
 
         if ($data === false) {
-            throw new RuntimeException("Failed to render image.");
+            throw new RuntimeException('Failed to render image.');
         }
 
         return $data;

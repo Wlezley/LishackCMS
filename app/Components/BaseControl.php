@@ -30,7 +30,6 @@ class BaseControl extends Control
     /** @var null|array<string,int|string> $param */
     protected ?array $param = [];
 
-    /** @var string $templatePath */
     protected ?string $templatePath = null;
 
     /** @throws \RuntimeException If TranslationManager or ConfigManager is not available. */
@@ -47,11 +46,13 @@ class BaseControl extends Control
         }
 
         // Translations
+        // phpcs:disable
         $template->_ = fn($key) => $this->translationManager->get($key); // @phpstan-ignore property.notFound
         $template->_F = fn($key, $values) => $this->translationManager->getf($key, null, $values); // @phpstan-ignore property.notFound
 
         // Configuration
         $template->_C = fn($key) => $this->configManager->get($key); // @phpstan-ignore property.notFound
+        // phpcs:enable
 
         return $template;
     }

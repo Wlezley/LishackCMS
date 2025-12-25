@@ -11,7 +11,8 @@ class DatasetSidebar extends BaseControl
 {
     public function __construct(
         private DatasetManager $datasetManager
-    ) {}
+    ) {
+    }
 
     public function render(): void
     {
@@ -24,7 +25,7 @@ class DatasetSidebar extends BaseControl
     public function handleEdit(string $datasetId): void
     {
         $this->presenter->redirect('Data:default', [
-            'datasetId' => $datasetId
+            'datasetId' => $datasetId,
         ]);
     }
 }

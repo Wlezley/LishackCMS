@@ -17,7 +17,8 @@ class ArticleList extends BaseControl
 
     public function __construct(
         private ArticleManager $articleManager
-    ) {}
+    ) {
+    }
 
     public function render(?int $limit = null): void
     {
@@ -37,14 +38,14 @@ class ArticleList extends BaseControl
         $this->totalItems = $this->articleManager->getCount($search);
         $this->template->articleList = $this->articleManager->getList($this->limit, $offset, $search);
 
-        $this->template->getJson = function($id, $title) {
+        $this->template->getJson = function ($id, $title) {
             // TODO: Fix empty modal on second call of deletion method
             return Json::encode([
                 'id' => (string)$id,
                 'modal' => [
                     'title' => $this->t('modal.title.confirm-delete'),
-                    'body' => $this->tf('modal.body.delete-article', $title)
-                ]
+                    'body' => $this->tf('modal.body.delete-article', $title),
+                ],
             ]);
         };
 
@@ -56,7 +57,7 @@ class ArticleList extends BaseControl
     {
         $this->presenter->redirect('Article:edit', [
             'id' => $id,
-            'page' => $this->getPresenter()->getParameter('page')
+            'page' => $this->getPresenter()->getParameter('page'),
         ]);
     }
 

@@ -22,7 +22,7 @@ class CategoryValidator
         'title',
         'description',
         'body',
-        'hidden'
+        'hidden',
     ];
 
     /**
@@ -39,8 +39,16 @@ class CategoryValidator
      *
      * @return array<string,string|int|null> An associative array containing category data
      */
-    public static function buildData(string $name, int $parentID = 1, int $position = 0, ?string $nameURL = null, ?string $title = null, ?string $description = null, ?string $body = null, bool $hidden = false): array
-    {
+    public static function buildData(
+        string $name,
+        int $parentID = 1,
+        int $position = 0,
+        ?string $nameURL = null,
+        ?string $title = null,
+        ?string $description = null,
+        ?string $body = null,
+        bool $hidden = false
+    ): array {
         return [
             // 'id' => $id, // ID is not included in the built data
             'parent_id' => $parentID,

@@ -36,7 +36,7 @@ class SecuredPresenter extends BasePresenter
 
         if ($this->user->isLoggedIn()) {
             $userData = $this->db->table(\App\Models\UserManager::TABLE_NAME)->select('deleted, enabled, role')->where([
-                'id' => $this->user->getId()
+                'id' => $this->user->getId(),
             ])->fetch();
 
             if (!$userData || $userData['deleted'] == 1 || $userData['enabled'] != 1) {

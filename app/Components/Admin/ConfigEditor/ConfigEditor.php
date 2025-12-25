@@ -18,7 +18,7 @@ class ConfigEditor extends BaseControl
 
     protected function createComponentForm(): Form
     {
-        $form = new Form;
+        $form = new Form();
 
         $form->addHidden('configuration', '');
         $form->addSubmit('save', $this->t('save.config'));

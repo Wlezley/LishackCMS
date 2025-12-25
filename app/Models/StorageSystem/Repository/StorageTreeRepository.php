@@ -15,7 +15,8 @@ class StorageTreeRepository
 
     public function __construct(
         private Explorer $db
-    ) {}
+    ) {
+    }
 
     public function findById(int $id): ?StorageTree
     {
@@ -27,10 +28,10 @@ class StorageTreeRepository
     }
 
     /** @return StorageTree[] */
-    public function getFoldersInFolder(int $parent_id = 0): array
+    public function getFoldersInFolder(int $parentId = 0): array
     {
         $query = $this->db->table(self::TABLE_NAME)
-            ->where('parent_id', $parent_id)
+            ->where('parent_id', $parentId)
             ->order('position')
             ->fetchAll();
 
@@ -87,10 +88,10 @@ class StorageTreeRepository
             ->update([$this->db::literal('deleted_at = NULL')]); // TODO: Check if this works
     }
 
-    public function moveToFolder(int $id, int $parent_id): int
+    public function moveToFolder(int $id, int $parentId): int
     {
         return $this->db->table(self::TABLE_NAME)
             ->where(['id' => $id])
-            ->update(['parent_id' => $parent_id]);
+            ->update(['parent_id' => $parentId]);
     }
 }

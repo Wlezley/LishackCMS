@@ -14,7 +14,7 @@ class UserRole
         1 => 'user',
         2 => 'redactor',
         3 => 'manager',
-        4 => 'admin'
+        4 => 'admin',
     ];
 
     public const DEFAULT_ROLE = 'user';

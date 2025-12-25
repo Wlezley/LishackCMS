@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\Helpers\ArrayHelper;
 use Nette\Database\Explorer;
 use Nette\Database\Table\ActiveRow;
 use Webmozart\Assert\Assert;
@@ -19,7 +18,8 @@ class ConfigManager
 
     public function __construct(
         private Explorer $db
-    ) {}
+    ) {
+    }
 
     /**
      * Loads configuration data from the database if not already loaded.
@@ -143,16 +143,16 @@ class ConfigManager
 
         if (isset($this->configuration[$key])) {
             $this->db->table(self::TABLE_NAME)->where([
-                'key' => $key
+                'key' => $key,
             ])->update([
                 'category' => $category,
-                'value' => $value
+                'value' => $value,
             ]);
         } else {
             $this->db->table(self::TABLE_NAME)->insert([
                 'key' => $key,
                 'category' => $category,
-                'value' => $value
+                'value' => $value,
             ]);
         }
 
@@ -206,10 +206,10 @@ class ConfigManager
         $item = ['key' => $key, 'category' => $category, 'value' => $value];
 
         $this->db->table(self::TABLE_NAME)->where([
-            'key' => $key
+            'key' => $key,
         ])->update([
             'category' => $category,
-            'value' => $value
+            'value' => $value,
         ]);
 
         $this->configuration[$key] = $item;
@@ -233,9 +233,9 @@ class ConfigManager
         }
 
         $this->db->table(self::TABLE_NAME)->where([
-            'key' => $key
+            'key' => $key,
         ])->update([
-            'value' => $value
+            'value' => $value,
         ]);
 
         $this->configuration[$key]['value'] = $value;
@@ -263,9 +263,9 @@ class ConfigManager
         }
 
         $this->db->table(self::TABLE_NAME)->where([
-            'key' => $oldKey
+            'key' => $oldKey,
         ])->update([
-            'key' => $newKey
+            'key' => $newKey,
         ]);
 
         $this->invalidate();
@@ -313,7 +313,7 @@ class ConfigManager
         if ($search !== null) {
             $query->whereOr([
                 'key LIKE ?' => "%$search%",
-                'value LIKE ?' => "%$search%"
+                'value LIKE ?' => "%$search%",
             ]);
         }
 
@@ -341,7 +341,7 @@ class ConfigManager
         if ($search !== null) {
             $query->whereOr([
                 'key LIKE ?' => "%$search%",
-                'value LIKE ?' => "%$search%"
+                'value LIKE ?' => "%$search%",
             ]);
         }
 
@@ -351,12 +351,13 @@ class ConfigManager
     // CONFIG EDITOR METHODS
 
     /**
-     * Saves multiple configuration values in batch.
+     * Saves multiple configuration values in a batch.
      *
      * Updates existing configuration entries if their value or category has changed.
      * Otherwise, inserts new configuration entries.
      *
      * @param array<string, array{category: string, value: string}> $configuration Associative array of configuration items.
+     * @throws ConfigException
      */
     public function saveConfig(array $configuration): void
     {
@@ -371,7 +372,7 @@ class ConfigManager
                 if (empty($item['category']) && empty($item['value'])) {
                     $this->delete($key);
                 }
-            } else if ($item['category'] || $item['value']) {
+            } elseif ($item['category'] || $item['value']) {
                 $this->add($key, $item['category'], $item['value']);
             }
         }
@@ -396,12 +397,13 @@ class ConfigManager
     // VALUE UPDATE FORMS
 
     /**
-     * Updates multiple configuration values in batch.
+     * Updates multiple configuration values in a batch.
      *
      * This function updates only existing configuration entries if their value has changed.
      * It does not create new entries or delete any keys.
      *
      * @param array<string,string> $configuration List of configuration items.
+     * @throws ConfigException
      */
     public function saveConfigValues(array $configuration): void
     {

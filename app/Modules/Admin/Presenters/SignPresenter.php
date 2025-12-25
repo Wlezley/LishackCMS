@@ -10,7 +10,7 @@ use Nette\Application\UI\Form;
 class SignPresenter extends UnsecuredPresenter
 {
     /** @var SignInFormFactory @inject */
-    public $signInForm;
+    public SignInFormFactory $signInForm;
 
     public function beforeRender(): void
     {
@@ -36,11 +36,11 @@ class SignPresenter extends UnsecuredPresenter
     {
         $form = $this->signInForm->create();
 
-        $form->onSuccess[] = function () {
+        $form->onSuccess[] = function (): void {
             $this->redirect('Admin:default');
         };
 
-        $form->onError[] = function () {
+        $form->onError[] = function (): void {
             $this->flashMessage('Nesprávné přihlašovací údaje', 'danger');
         };
 

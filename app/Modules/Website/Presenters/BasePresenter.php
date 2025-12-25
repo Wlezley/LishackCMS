@@ -12,6 +12,7 @@ use App\Models\ConfigManager;
 use App\Models\Helpers\AssetsVersion;
 use App\Models\Helpers\IPValidator;
 use App\Models\RedirectManager;
+use App\Models\TranslationException;
 use App\Models\TranslationManager;
 use Nette;
 use Nette\Database\Explorer;
@@ -59,7 +60,9 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     /** @var array<string,mixed> $defaultParams */
     protected array $defaultParams = [];
 
-
+    /**
+     * @throws TranslationException
+     */
     public function startup(): void
     {
         parent::startup();
@@ -101,7 +104,8 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
             'og_description' => $this->c('OG_DESCRIPTION'),
             'og_image' => $this->c('OG_IMAGE'),
             'og_show_locale' => ($this->c('OG_SHOW_LOCALE') == 1),
-            'og_locale' => $this->translationManager->getLanguageService()->getLanguage($this->lang)['locale'] ?? $this->c('DEFAULT_LOCALE'),
+            'og_locale' => $this->translationManager->getLanguageService()
+                    ->getLanguage($this->lang)['locale'] ?? $this->c('DEFAULT_LOCALE'),
         ];
     }
 

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models\Helpers;
 
-use Nette\InvalidArgumentException;
 use Webmozart\Assert\Assert;
 
 class IPValidator
@@ -71,11 +70,10 @@ class IPValidator
         }
 
         // Calculate subnet mask in binary
-        $mask = str_repeat("1", $subnetMask) . str_repeat("0", (strlen($needleIp) * 8) - $subnetMask);
-        $maskBin = pack("H*", str_pad(base_convert($mask, 2, 16), strlen($needleIp) * 2, "0", STR_PAD_LEFT));
+        $mask = str_repeat('1', $subnetMask) . str_repeat('0', (strlen($needleIp) * 8) - $subnetMask);
+        $maskBin = pack('H*', str_pad(base_convert($mask, 2, 16), strlen($needleIp) * 2, '0', STR_PAD_LEFT));
 
         // Apply the subnet mask and compare
         return ($needleIp & $maskBin) === ($subnetIp & $maskBin);
     }
-
 }

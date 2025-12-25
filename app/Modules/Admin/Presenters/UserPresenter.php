@@ -44,7 +44,7 @@ class UserPresenter extends SecuredPresenter
                 'name' => $item['name'],
                 'modal' => [
                     'title' => $this->t('modal.title.confirm-delete'),
-                    'body' => $this->tf('modal.body.delete-user', $item['name'])
+                    'body' => $this->tf('modal.body.delete-user', $item['name']),
                 ],
             ]);
         } catch (\Exception $e) {
@@ -75,7 +75,7 @@ class UserPresenter extends SecuredPresenter
         $data = $this->getHttpRequest()->getPost();
 
         try {
-            $this->userListGrid->setDeleted_Callback($data['id'], '1'); // TODO: Move to UserManager (?)
+            $this->userListGrid->setDeletedCallback($data['id'], '1'); // TODO: Move to UserManager (?)
         } catch (UserException $e) {
             $this->sendJson([
                 'status' => 'error',
@@ -114,12 +114,12 @@ class UserPresenter extends SecuredPresenter
             $form->setOrigin($form::OriginCreate);
         }
 
-        $form->onSuccess = function(string $message): void {
+        $form->onSuccess = function (string $message): void {
             $this->flashMessage($message, 'info');
             $this->redirect('User:default');
         };
 
-        $form->onError = function(string $message): void {
+        $form->onError = function (string $message): void {
             $this->flashMessage($message, 'danger');
         };
 

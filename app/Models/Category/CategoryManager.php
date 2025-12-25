@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\Helpers\ArrayHelper;
 use App\Models\CategoryException;
+use App\Models\Helpers\ArrayHelper;
 
 class CategoryManager extends BaseModel
 {
@@ -160,7 +160,7 @@ class CategoryManager extends BaseModel
     /**
      * Builds and returns a hierarchical tree of categories.
      *
-     * @return list<array> Nested category tree.
+     * @return list<array<mixed>> Nested category tree.
      */
     public function getTree(): array
     {
@@ -194,27 +194,27 @@ class CategoryManager extends BaseModel
         $activeList = [];
 
         $limit = $this->categories[$activeCategory]['level'];
-        $parent_id = $this->categories[$activeCategory]['id'];
-        $activeList[] = (int) $parent_id;
+        $parentId = $this->categories[$activeCategory]['id'];
+        $activeList[] = (int) $parentId;
 
         for ($level = 1; $level < $limit; $level++) {
-            if (!isset($this->categories[$parent_id])) {
-                throw new CategoryException("Category ID $parent_id not found.", 1);
+            if (!isset($this->categories[$parentId])) {
+                throw new CategoryException("Category ID $parentId not found.", 1);
             }
 
-            $parent_id = $this->categories[$parent_id]['parent_id'];
-            $activeList[] = (int) $parent_id;
+            $parentId = $this->categories[$parentId]['parent_id'];
+            $activeList[] = (int) $parentId;
         }
 
         return $activeList;
     }
 
     /**
-     * Resolves a full category URL path (as list of slugs) into a category ID.
+     * Resolves a full category URL path (as a list of slugs) into a category ID.
      *
      * @param array<string> $categoryUrlList List of category `name_url` parts (e.g. ['blog', 'tech']).
      * @return int Resolved category ID.
-     * @throws CategoryException If path is invalid or category not found.
+     * @throws CategoryException If a path is invalid or category not found.
      */
     public function resolveCategoryId(array $categoryUrlList): int
     {
@@ -247,7 +247,7 @@ class CategoryManager extends BaseModel
     /**
      * Returns a nested tree of categories formatted for drag-and-drop sorting.
      *
-     * @return list<array> Nested sortable category data.
+     * @return list<array<mixed>> Nested sortable category data.
      */
     public function getSortableTree(): array
     {
@@ -259,9 +259,9 @@ class CategoryManager extends BaseModel
      * Recursively formats a category tree for sorting purposes.
      * Builds a nested structure with metadata (id, name, url, etc.) for each node.
      *
-     * @param list<array> $items List of category items (from getTree()).
+     * @param list<array<mixed>> $items List of category items (from getTree()).
      * @param string $url URL prefix built recursively (default: '').
-     * @return list<array> Formatted tree suitable for sortable UI components.
+     * @return list<array<mixed>> Formatted tree suitable for sortable UI components.
      */
     private function sortableTreeFormat(array $items, string $url = ''): array
     {
@@ -287,14 +287,14 @@ class CategoryManager extends BaseModel
     /**
      * Updates category positions and parent relationships based on drag-and-drop data.
      *
-     * @param array<mixed> $data Reordering data, must contain keys:
+     * @param array<mixed> $data Reordering data must contain keys:
      *   - node_id
      *   - source_id
      *   - target_id
      *   - order_list (ordered array of category IDs).
      *
      * @throws CategoryException If data is empty.
-     * @throws \InvalidArgumentException If required keys are missing.
+     * @throws \InvalidArgumentException If required, keys are missing.
      */
     public function updatePosition(array $data): void
     {
@@ -311,12 +311,12 @@ class CategoryManager extends BaseModel
 
         // Update positions
         // TODO: Refactor SQL query construction
-        $sql = "UPDATE `" . self::TABLE_NAME . "` SET `position` = CASE `id`\n";
+        $sql = 'UPDATE `' . self::TABLE_NAME . "` SET `position` = CASE `id`\n";
         foreach ($data['order_list'] as $position => $id) {
             $sql .= "WHEN $id THEN $position\n";
         }
         $sql .= "ELSE `position` END\n";
-        $sql .= "WHERE `id` IN (" . implode(',', $data['order_list']) . ");";
+        $sql .= 'WHERE `id` IN (' . implode(',', $data['order_list']) . ');';
 
         $this->db->query($sql); // @phpstan-ignore-line
 
@@ -330,7 +330,7 @@ class CategoryManager extends BaseModel
      * Recursively updates the `level` field of child categories based on the parent category.
      *
      * @param int $parentId Parent category ID (default: MAIN_CATEGORY_ID).
-     * @param int $parentLevel Nesting level of parent category (default: 0).
+     * @param int $parentLevel Nesting level of the parent category (default: 0).
      */
     public function updateChildLevels(int $parentId = self::MAIN_CATEGORY_ID, int $parentLevel = 0): void
     {
@@ -369,7 +369,7 @@ class CategoryManager extends BaseModel
     /**
      * Helper for building a flat, indented category list from a nested tree.
      *
-     * @param list<array> $items Category tree.
+     * @param list<array<mixed>> $items Category tree.
      * @param int $level Current nesting level (default: 0).
      * @return array<int,string> Format: [id => '— Category Name']
      */

@@ -12,11 +12,11 @@ class ArticleParser
 {
     public function __construct(
         private Presenter $presenter
-    ) {}
+    ) {
+    }
 
     /**
      * @param string $text Catch the component tag in the format "<nette-component param-PARAMNAME="VALUE">COMPONENT_NAME</nette-component>"
-     * @return string
      */
     public function parseComponents(string $text): string
     {
@@ -29,11 +29,6 @@ class ArticleParser
         return $parsedBlock;
     }
 
-    /**
-     * @param string $attributeString
-     * @param string $fallbackName
-     * @return string
-     */
     private function processTag(string $attributeString, string $fallbackName): string
     {
         $attrs = $this->parseAttributes($attributeString);
@@ -52,7 +47,6 @@ class ArticleParser
     }
 
     /**
-     * @param string $attributeString
      * @return array<string,string>
      */
     private function parseAttributes(string $attributeString): array
@@ -66,9 +60,7 @@ class ArticleParser
     }
 
     /**
-     * @param string $name
      * @param array<string,mixed> $params
-     * @return string
      */
     public function renderComponent(string $name, array $params = []): string
     {

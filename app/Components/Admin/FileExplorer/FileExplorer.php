@@ -14,7 +14,8 @@ class FileExplorer extends BaseControl
     public function __construct(
         private UserManager $userManager,
         private TreeManager $treeManager
-    ) {}
+    ) {
+    }
 
     public function render(int $id = 0): void
     {
@@ -27,25 +28,25 @@ class FileExplorer extends BaseControl
         $this->template->ownerList = $this->userManager->getList(true);
         bdump($this->template->ownerList);
 
-        $this->template->getJsonTree = function($id, $treeName) {
+        $this->template->getJsonTree = function ($id, $treeName) {
             // TODO: Fix empty modal on second call of deletion method
             return Json::encode([
                 'id' => (string)$id,
                 'modal' => [
                     'title' => $this->t('modal.title.confirm-delete'),
-                    'body' => $this->tf('modal.body.delete-folder', $treeName)
-                ]
+                    'body' => $this->tf('modal.body.delete-folder', $treeName),
+                ],
             ]);
         };
 
-        $this->template->getJsonFile = function($id, $fileName) {
+        $this->template->getJsonFile = function ($id, $fileName) {
             // TODO: Fix empty modal on second call of deletion method
             return Json::encode([
                 'id' => (string)$id,
                 'modal' => [
                     'title' => $this->t('modal.title.confirm-delete'),
-                    'body' => $this->tf('modal.body.delete-file', $fileName)
-                ]
+                    'body' => $this->tf('modal.body.delete-file', $fileName),
+                ],
             ]);
         };
 
@@ -55,7 +56,7 @@ class FileExplorer extends BaseControl
 
     public function handleEditFolder(string $id): void
     {
-        bdump($id, "handleEditFolder ID");
+        bdump($id, 'handleEditFolder ID');
 
         // $this->presenter->redirect('FileExplorer:editFolder', [
         //     'id' => $id
@@ -64,7 +65,7 @@ class FileExplorer extends BaseControl
 
     public function handleEditFile(string $id): void
     {
-        bdump($id, "handleEditFile ID");
+        bdump($id, 'handleEditFile ID');
 
         // $this->presenter->redirect('FileExplorer:editFile', [
         //     'id' => $id

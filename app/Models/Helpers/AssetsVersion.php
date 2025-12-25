@@ -42,6 +42,6 @@ class AssetsVersion
             $version = filemtime($fileName);
         }
 
-        return $version ? $version : 0;
+        return $version ?: 0;
     }
 }

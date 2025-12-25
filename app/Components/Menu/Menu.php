@@ -10,9 +10,10 @@ class Menu extends BaseControl
 {
     public function __construct(
         protected CategoryManager $categoryManager
-    ) {}
+    ) {
+    }
 
-    public function render(?int $activeCategory = null, string $template = "Menu"): void
+    public function render(?int $activeCategory = null, string $template = 'Menu'): void
     {
         $activeCategory = $activeCategory ?? CategoryManager::MAIN_CATEGORY_ID;
 
