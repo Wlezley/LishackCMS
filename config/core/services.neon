@@ -9,9 +9,9 @@ extensions:
     console: Contributte\Console\DI\ConsoleExtension(%consoleMode%)
 
 services:
-    router: App\RouterFactory::createRouter
+    router: App\Router\RouterFactory::createRouter
     security.passwords: Nette\Security\Passwords(::PASSWORD_BCRYPT, [cost: 12])
-    authenticator: App\Models\Authenticator
+    authenticator: App\Models\User\Authenticator
 
     # Commands
     - App\Commands\CategoryUpdateCommand
@@ -21,19 +21,19 @@ services:
     - App\Commands\UserRoleCommand
 
     # Models
-    - App\Models\ArticleManager
-    - App\Models\CategoryManager
-    - App\Models\ConfigManager
+    - App\Models\Article\ArticleManager
+    - App\Models\Category\CategoryManager
+    - App\Models\Config\ConfigManager
     - App\Models\Helpers\AssetsVersion
-    - App\Models\Installer
-    - App\Models\RedirectManager
-    - App\Models\SitemapGenerator
+    - App\Models\Installer\Installer
+    - App\Models\Redirect\RedirectManager
+    - App\Models\Seo\SitemapGenerator
     - App\Models\SmsGate(%smsgate.url%, %smsgate.login%, %smsgate.password%, %smsgate.sender_id%, %smsgate.secured_login%)
-    - App\Models\TranslationLanguage
-    - App\Models\TranslationLog
-    - App\Models\TranslationManager
-    - App\Models\UrlGenerator
-    - App\Models\UserManager
+    - App\Models\Translation\TranslationLanguage
+    - App\Models\Translation\TranslationLog
+    - App\Models\Translation\TranslationManager
+    - App\Models\UrlGenerator\UrlGenerator
+    - App\Models\User\UserManager
 
     # Dataset
     - App\Models\Dataset\DatasetCreator
@@ -61,4 +61,4 @@ services:
     - Phinx\Wrapper\TextWrapper(@Phinx\Console\PhinxApplication)
 
     # Components
-    - App\Components\Admin\UserListGrid
+    - App\Components\Admin\UserList\UserListGrid
