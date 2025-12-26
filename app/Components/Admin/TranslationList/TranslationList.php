@@ -22,10 +22,8 @@ class TranslationList extends BaseControl
         Assert::range($limit, 0, PHP_INT_MAX, 'Limit must be a positive integer.');
         $this->limit = $limit;
 
-        $page = $this->param['page'] ?? 1;
-        Assert::integer($page, 'Page must be an integer.');
-        $search = $this->param['search'] ?? null;
-        Assert::nullOrString($search, 'Search must be a string or null.');
+        $page = $this->getIntParam('page') ?? 1;
+        $search = $this->getStringParam('search');
         $offset = ($page - 1) * $this->limit;
         Assert::range($offset, 0, PHP_INT_MAX, 'Offset must be a non-negative integer.');
 

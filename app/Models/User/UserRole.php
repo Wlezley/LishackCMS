@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models\User;
 
+use Nette\Security\User as NetteUser;
 use Webmozart\Assert\Assert;
 use Webmozart\Assert\InvalidArgumentException;
 
@@ -26,12 +27,12 @@ class UserRole
      * Constructor for the UserRole class.
      * Converts a user object, role name, or role ID into the corresponding role level.
      *
-     * @param \Nette\Security\User|string|int $value User object, role name, or role ID
+     * @param NetteUser|string|int $value Nette User object, role name, or role ID
      * @throws \InvalidArgumentException If the provided role name or ID is invalid
      */
-    public function __construct(\Nette\Security\User|string|int $value)
+    public function __construct(NetteUser|string|int $value)
     {
-        if ($value instanceof \Nette\Security\User) {
+        if ($value instanceof NetteUser) {
             $value = $value->getRoles()[0];
         }
 
@@ -204,19 +205,19 @@ class UserRole
     /**
      * Compares two roles using a given operator.
      *
-     * @param \Nette\Security\User|string|int $left Left operand (user object, role name, or role ID)
+     * @param NetteUser|string|int $left Left operand (NetteUser object, role name, or role ID)
      * @param string $operator Comparison operator (e.g., '==', '!=', '>', '>=', '<', '<=', '<>')
-     * @param \Nette\Security\User|string|int $right Right operand (user object, role name, or role ID)
+     * @param NetteUser|string|int $right Right operand (NetteUser object, role name, or role ID)
      * @return bool Result of the comparison
      * @throws \InvalidArgumentException If the operator is not supported
      */
-    public static function compare(\Nette\Security\User|string|int $left, string $operator, \Nette\Security\User|string|int $right): bool
+    public static function compare(NetteUser|string|int $left, string $operator, NetteUser|string|int $right): bool
     {
-        if ($left instanceof \Nette\Security\User) {
+        if ($left instanceof NetteUser) {
             $left = $left->getRoles()[0];
         }
 
-        if ($right instanceof \Nette\Security\User) {
+        if ($right instanceof NetteUser) {
             $right = $right->getRoles()[0];
         }
 

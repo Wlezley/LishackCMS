@@ -12,6 +12,7 @@ use App\Models\UrlGenerator\UrlGenerator;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Template;
 use RuntimeException;
+use Webmozart\Assert\Assert;
 
 class BaseControl extends Control
 {
@@ -100,10 +101,58 @@ class BaseControl extends Control
         $this->param = $param === null ? [] : $param;
     }
 
-    /** @return null|array<string,int|string> */
-    public function getParam(): ?array
+    public function getMixedParam(string $key): mixed
     {
-        return $this->param;
+        if (!isset($this->param[$key])) {
+            return null;
+        }
+        return $this->param[$key];
+    }
+
+    public function getIntParam(string $key): ?int
+    {
+        if (!isset($this->param[$key])) {
+            return null;
+        }
+        Assert::numeric($this->param[$key], "Parameter '$key' must be numeric");
+        return (int) $this->param[$key];
+    }
+
+    /** @return int<0, max>|null */
+    public function getPositiveIntParam(string $key): ?int
+    {
+        if (!isset($this->param[$key])) {
+            return null;
+        }
+        Assert::numeric($this->param[$key], "Parameter '$key' must be numeric");
+        Assert::range($this->param[$key], 0, PHP_INT_MAX, "Parameter '$key' must be positive integer");
+
+        /** @var int<0, max> $value */
+        $value = $this->param[$key];
+        return $value;
+    }
+
+    /** @return int<min, -1>|null */
+    public function getNegativeIntParam(string $key): ?int
+    {
+        if (!isset($this->param[$key])) {
+            return null;
+        }
+        Assert::numeric($this->param[$key], "Parameter '$key' must be numeric");
+        Assert::range($this->param[$key], PHP_INT_MIN, -1, "Parameter '$key' must be negative integer");
+
+        /** @var int<min, -1> $value */
+        $value = $this->param[$key];
+        return $value;
+    }
+
+    public function getStringParam(string $key): ?string
+    {
+        if (!isset($this->param[$key])) {
+            return null;
+        }
+        Assert::string($this->param[$key], "Parameter '$key' must be string");
+        return (string) $this->param[$key];
     }
 
     public function getTemplatePath(): ?string

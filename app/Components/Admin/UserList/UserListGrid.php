@@ -6,6 +6,7 @@ namespace App\Components\Admin\UserList;
 
 use AllowDynamicProperties;
 use App\Components\BaseControl;
+use App\Exception\TranslationException;
 use App\Exception\UserException;
 use App\Models\Translation\TranslationManager;
 use App\Models\Translation\TranslationTrait;
@@ -17,6 +18,7 @@ use Contributte\Datagrid\Exception\DatagridException;
 use Nette\Application\InvalidPresenterException;
 use Nette\Application\UI\Presenter;
 use Nette\Database\Explorer;
+use Nette\Database\Table\ActiveRow;
 use Nette\Security\User;
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
@@ -204,7 +206,7 @@ class UserListGrid extends BaseControl
 
     // TODO: Move all of this logic below to the UserManager (?)
 
-    public function allowActionEditCallback(self $item): bool
+    public function allowActionEditCallback(ActiveRow $item): bool
     {
         // Unable to edit SUPERADMIN
         if ($item->id == 1) {
@@ -227,7 +229,7 @@ class UserListGrid extends BaseControl
         return true;
     }
 
-    public function allowActionDeleteCallback(self $item): bool
+    public function allowActionDeleteCallback(ActiveRow $item): bool
     {
         // Unable to delete SUPERADMIN
         if ($item->id == 1) {
@@ -255,10 +257,11 @@ class UserListGrid extends BaseControl
 
     /**
      * @throws JsonException
+     * @throws TranslationException
      */
-    public function encodeDataCallback(self $item): string
+    public function encodeDataCallback(ActiveRow $item): string
     {
-        $data = Json::encode([
+        return Json::encode([
             'id' => $item->id,
             'name' => $item->name,
             'full_name' => $item->full_name, // phpcs:ignore
@@ -271,13 +274,12 @@ class UserListGrid extends BaseControl
                 'body' => $this->tf('modal.body.delete-user', $item->name),
             ],
         ]);
-
-        return $data;
     }
 
     /**
      * @throws UserException
      * @throws InvalidPresenterException
+     * @throws TranslationException
      */
     public function setRoleCallback(string $id, string $role): void
     {
@@ -309,6 +311,7 @@ class UserListGrid extends BaseControl
     /**
      * @throws UserException
      * @throws InvalidPresenterException
+     * @throws TranslationException
      */
     public function setEnabledCallback(string $id, string $enabled): void
     {
@@ -339,6 +342,7 @@ class UserListGrid extends BaseControl
     /**
      * @throws InvalidPresenterException
      * @throws UserException
+     * @throws TranslationException
      */
     public function setDeletedCallback(string $id, string $deleted): void
     {
