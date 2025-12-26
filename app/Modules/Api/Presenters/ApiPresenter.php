@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Modules\API\Presenters;
+namespace App\Modules\Api\Presenters;
 
 use Nette;
 use Tracy\Debugger;
@@ -16,7 +16,7 @@ final class ApiPresenter extends Nette\Application\UI\Presenter
 
     public function beforeRender(): void
     {
-        $this->getTemplate()->setFile(__DIR__ . '/../Templates/default.latte');
+        $this->getTemplate()->setFile(__DIR__ . '/../templates/default.latte');
 
         if (!isset($this->template->render)) {
             $this->template->render = '';

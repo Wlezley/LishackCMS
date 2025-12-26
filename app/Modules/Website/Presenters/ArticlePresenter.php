@@ -103,7 +103,7 @@ final class ArticlePresenter extends BasePresenter
 
             $this->template->adminUrl = $this->template->adminUrl . "menu/edit?id={$category['id']}";
 
-            $this->getTemplate()->setFile(__DIR__ . '/../Templates/Article/list.latte');
+            $this->getTemplate()->setFile(__DIR__ . '/../templates/Article/list.latte');
         } else {
             // PAGE TITLE
             $this->template->title = $this->titlePrefix . $this->article['title'] . $this->titleSuffix;
@@ -133,7 +133,7 @@ final class ArticlePresenter extends BasePresenter
             // ADMIN URL
             $this->template->adminUrl = $this->template->adminUrl . "article/edit?id={$this->article['id']}";
 
-            $this->getTemplate()->setFile(__DIR__ . '/../Templates/Article/detail.latte');
+            $this->getTemplate()->setFile(__DIR__ . '/../templates/Article/detail.latte');
 
             // DEBUG ONLY
             // bdump($this->article, "ARTICLE DATA");
