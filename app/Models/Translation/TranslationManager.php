@@ -7,6 +7,7 @@ namespace App\Models\Translation;
 use App\Exception\TranslationException;
 use App\Models\Config\ConfigManager;
 use Nette\Database\Explorer;
+use Nette\Database\Table\ActiveRow;
 use Nette\InvalidArgumentException;
 use ValueError;
 use Webmozart\Assert\Assert;
@@ -104,9 +105,9 @@ class TranslationManager
     public function invalidate(?string $lang = null): void
     {
         if ($lang) {
-            unset($this->translations[$lang]);
+            $this->translations[$lang] = [];
         } else {
-            unset($this->translations);
+            $this->translations = [];
         }
     }
 
@@ -176,6 +177,15 @@ class TranslationManager
         }
     }
 
+    public function exists(string $key, ?string $lang = null): bool
+    {
+        $lang = $lang ?? $this->currentLang;
+        $this->load($lang);
+        return isset($this->translations[$lang][$key]);
+    }
+
+    // TRANSLATION MANAGEMENT METHODS
+
     /**
      * Adds a new translation entry.
      *
@@ -239,11 +249,11 @@ class TranslationManager
     {
         $this->load($lang);
 
-        if (!isset($this->configuration[$oldKey])) {
+        if (!isset($this->translations[$oldKey])) {
             throw new TranslationException("Translation (key:'$oldKey', lang:'$lang') not found, key cannot be changed", 1);
         }
 
-        if (isset($this->configuration[$newKey])) {
+        if (isset($this->translations[$newKey])) {
             throw new TranslationException("Duplicate translation (key:'$newKey', lang:'$lang') found, key cannot be changed", 1);
         }
 
@@ -277,7 +287,7 @@ class TranslationManager
         $this->invalidate($lang);
     }
 
-    public function exists(string $key, ?string $lang = null): bool
+    public function existsInDB(string $key, ?string $lang = null): bool
     {
         $query = $this->db->table(self::TABLE_NAME)
             ->where('key', $key);
@@ -377,7 +387,7 @@ class TranslationManager
                     $lang = $defaultLang;
                 }
 
-                if ($this->get($key, $lang, false)) {
+                if ($this->exists($key, $lang)) {
                     if (!empty($text)) {
                         $this->update($key, $lang, $text); // UPDATE
                     } else {
@@ -414,7 +424,7 @@ class TranslationManager
             // ->order('key, lang') // TODO: Add sort order option
             ->fetchAll();
 
-        /** @var \Nette\Database\Table\ActiveRow $row */
+        /** @var ActiveRow $row */
         foreach ($rows as $row) {
             $lang = $row['lang'] == $defaultLang ? 'default' : $row['lang'];
             $translations[$row['key']][$lang] = $row['text'];

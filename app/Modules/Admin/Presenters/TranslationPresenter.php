@@ -62,7 +62,7 @@ class TranslationPresenter extends SecuredPresenter
 
     public function renderEdit(string $key, string $lang = ''): void
     {
-        if (!$this->translationManager->exists($key)) {
+        if (!$this->translationManager->existsInDB($key, null)) {
             $this->flashMessage($this->tf('translation.key.not-found', $key), 'danger');
             $this->redirect(':default');
         }
