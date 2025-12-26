@@ -85,7 +85,7 @@ final class DatasetColumn
             'int' => 'INT(11)',
             'string' => 'VARCHAR(255)',
             'bool' => 'TINYINT(1)',
-            'json', 'text', 'html', 'wysiwyg' => 'TEXT',
+            'json', 'text', 'html', 'wysiwyg' => 'LONGTEXT',
             default => throw new DatasetException("Unknown SQL type for '{$this->type}'."),
         };
     }

@@ -156,7 +156,7 @@ class DataEditor extends BaseControl
 
         $dataRow = $this->datasetManager->getDataRepository()->insert($this->datasetId, $dataRow);
 
-        if ($dataRow->id !== null) {
+        if ($dataRow->id === null) {
             call_user_func($this->onError, $this->t('dataset.item.not-created'));
             return;
         }
