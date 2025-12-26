@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Components\Admin\TranslationEditor;
 
 use App\Components\BaseControl;
-use App\Exception\TranslationException;
+use App\Exception\TranslatorException;
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
 use Nette\Utils\Json;
@@ -24,12 +24,11 @@ class TranslationEditor extends BaseControl
     {
         $form = new Form();
 
-        $languageService = $this->translationManager->getLanguageService();
-        $defaultLang = $languageService->getDefaultLang($this->c('DEFAULT_LANG'));
-        $languages = $languageService->getNames(false);
+        $defaultLang = $this->languageService->getDefaultLanguage($this->c('DEFAULT_LANG'));
+        $languages = $this->languageService->getLanguageNames(false);
         unset($languages[$defaultLang]);
 
-        $form->addHidden('target_lang', $this->param['lang'] ?? $languageService->getSecondaryLang('en'));
+        $form->addHidden('target_lang', $this->param['lang'] ?? $this->languageService->getSecondaryLanguage());
         $form->addHidden('translations', '');
         $form->addSubmit('save', $this->t('save.translations'));
 
@@ -40,7 +39,7 @@ class TranslationEditor extends BaseControl
     /**
      * @param ArrayHash<mixed> $values
      * @throws JsonException
-     * @throws TranslationException
+     * @throws TranslatorException
      */
     public function processSave(Form $form, ArrayHash $values): void
     {
@@ -55,21 +54,20 @@ class TranslationEditor extends BaseControl
         }
 
         $translations = Json::decode($values['translations'], true);
-        $this->translationManager->saveTranslations($translations);
+        $this->translator->saveTranslations($translations);
         call_user_func($this->onSuccess, $this->t('success.form.translations-saved'), $values['target_lang']);
     }
 
     public function render(): void
     {
-        $languageService = $this->translationManager->getLanguageService();
-        $defaultLang = $languageService->getDefaultLang($this->c('DEFAULT_LANG'));
-        $targetLang = $this->param['lang'] ?? $languageService->getSecondaryLang('en');
+        $defaultLang = $this->languageService->getDefaultLanguage($this->c('DEFAULT_LANG'));
+        $targetLang = $this->param['lang'] ?? $this->languageService->getSecondaryLanguage();
         Assert::nullOrStringNotEmpty($targetLang, 'Target language is not set');
-        $this->template->translations = $this->translationManager->getTranslations($targetLang);
+        $this->template->translations = $this->translator->getTranslations($targetLang);
 
         $this->template->defaultLang = $defaultLang;
         $this->template->targetLang = $targetLang;
-        $this->template->languages = $languageService->getNames(false);
+        $this->template->languages = $this->languageService->getLanguageNames(false);
 
         $this->getTemplate()->setFile(__DIR__ . '/TranslationEditor.latte');
         $this->getTemplate()->render();

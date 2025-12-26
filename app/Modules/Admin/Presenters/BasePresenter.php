@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
-use App\Exception\TranslationException;
+use App\Exception\TranslatorException;
 use App\Models\Config\ConfigManager;
 use App\Models\Config\ConfigTrait;
 use App\Models\Helpers\AssetsVersion;
-use App\Models\Translation\TranslationManager;
-use App\Models\Translation\TranslationTrait;
+use App\Models\Translation\LanguageService;
+use App\Models\Translation\Translator;
+use App\Models\Translation\TranslatorTrait;
 use Nette\Application\Helpers;
 use Nette\Database\Explorer;
 use Webmozart\Assert\Assert;
@@ -17,7 +18,7 @@ use Webmozart\Assert\Assert;
 abstract class BasePresenter extends \Nette\Application\UI\Presenter
 {
     use ConfigTrait;
-    use TranslationTrait;
+    use TranslatorTrait;
 
     /** @var array<string,string> */
     private const array CATEGORY_MAP = [
@@ -42,14 +43,17 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
     /** @var ConfigManager @inject */
     public ConfigManager $configManager;
 
-    /** @var TranslationManager @inject */
-    public TranslationManager $translationManager;
+    /** @var LanguageService @inject */
+    public LanguageService $languageService;
+
+    /** @var Translator @inject */
+    public Translator $translator;
 
     protected string $lang;
     protected string $htmlLang;
 
     /**
-     * @throws TranslationException
+     * @throws TranslatorException
      */
     public function startup(): void
     {
@@ -58,20 +62,20 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
         $lang = $this->c('DEFAULT_LANG_ADMIN'); // TODO: Get language from URL or session
         Assert::notNull($lang, 'Default admin language not found');
         $this->lang = $lang;
-        $this->translationManager->setCurrentLanguage($this->lang);
-        $this->htmlLang = $this->translationManager->getLanguageService()->getLanguage($this->lang)['html_lang'] ?? $this->lang;
+        $this->languageService->setCurrentLanguage($this->lang);
+        $this->htmlLang = $this->languageService->getLanguage($this->lang)['html_lang'] ?? $this->lang;
     }
 
     public function beforeRender(): void
     {
         parent::beforeRender();
 
-        // Configuration
+        // CONFIGURATOR
         $this->template->_C = fn($key) => $this->configManager->get($key);
 
-        // Translations
-        $this->template->_ = fn($key) => $this->translationManager->get($key, $this->lang);
-        $this->template->_F = fn($key, $values) => $this->translationManager->getf($key, $this->lang, $values);
+        // TRANSLATOR
+        $this->template->_ = fn($key) => $this->translator->translate($key, $this->lang);
+        $this->template->_F = fn($key, $values) => $this->translator->translateFormat($key, $this->lang, $values);
 
         // Translated Title
         $this->template->title = $this->getPresenterTitle();
@@ -136,7 +140,7 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
      *
      * @param string|null $lang Optional language code (defaults to current language).
      * @return string The translated title.
-     * @throws TranslationException
+     * @throws TranslatorException
      */
     protected function getPresenterTitle(?string $lang = null): string
     {
@@ -148,7 +152,7 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
 
         $translationKey = 'title.' . str_replace(':', '.', $name) . '.' . $action;
         $translationKey = strtolower($translationKey);
-        return $this->translationManager->get($translationKey, $lang);
+        return $this->translator->translate($translationKey, $lang);
     }
 
     // ##########################################
@@ -160,7 +164,7 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
         $component = parent::createComponent($name);
 
         if ($component instanceof \App\Components\BaseControl) {
-            $component->setTranslationManager($this->translationManager);
+            $component->setTranslator($this->translator);
             $component->setConfigManager($this->configManager);
         }
 

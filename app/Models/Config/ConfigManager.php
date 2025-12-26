@@ -10,6 +10,9 @@ use Nette\Database\Table\ActiveRow;
 use Webmozart\Assert\Assert;
 use Webmozart\Assert\InvalidArgumentException;
 
+/**
+ * @todo Rename to Configurator
+ */
 class ConfigManager
 {
     public const TABLE_NAME = 'cms_config';

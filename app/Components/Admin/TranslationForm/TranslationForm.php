@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Components\Admin\TranslationForm;
 
 use App\Components\BaseControl;
-use App\Exception\TranslationException;
+use App\Exception\TranslatorException;
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
 
@@ -58,11 +58,11 @@ class TranslationForm extends BaseControl
 
     /**
      * @param ArrayHash<mixed> $values
-     * @throws TranslationException
+     * @throws TranslatorException
      */
     public function processCreate(Form $form, ArrayHash $values): void
     {
-        if (!empty($this->translationManager->getTextListByKey($values['key']))) {
+        if (!empty($this->translator->getTextListByKey($values['key']))) {
             $editLink = $this->buildEditUrl($values['key']);
             $editAnchor =
                 '<a href="' . $editLink . '" target="_blank">'
@@ -76,11 +76,11 @@ class TranslationForm extends BaseControl
                         continue;
                     }
 
-                    $this->translationManager->add($values['key'], $lang, $values["text_$lang"]);
+                    $this->translator->add($values['key'], $lang, $values["text_$lang"]);
                 }
             }
 
-            if (!empty($this->translationManager->getTextListByKey($values['key']))) {
+            if (!empty($this->translator->getTextListByKey($values['key']))) {
                 call_user_func($this->onSuccess, $this->tf('success.form.translation-created.named', $values['key']));
             } else {
                 call_user_func($this->onError, $this->t('error.form.translation-create'));
@@ -90,22 +90,22 @@ class TranslationForm extends BaseControl
 
     /**
      * @param ArrayHash<mixed> $values
-     * @throws TranslationException
+     * @throws TranslatorException
      */
     public function processEdit(Form $form, ArrayHash $values): void
     {
         $key = $values['key'];
-        $textList = $this->translationManager->getTextListByKey($key);
+        $textList = $this->translator->getTextListByKey($key);
 
         foreach ($this->languageList as $lang => $langName) {
             if (isset($textList[$lang])) {
                 if (empty($values["text_$lang"])) {
-                    $this->translationManager->delete($key, $lang);
+                    $this->translator->delete($key, $lang);
                 } else {
-                    $this->translationManager->update($key, $lang, $values["text_$lang"]);
+                    $this->translator->update($key, $lang, $values["text_$lang"]);
                 }
             } elseif (!empty($values["text_$lang"])) {
-                $this->translationManager->add($key, $lang, $values["text_$lang"]);
+                $this->translator->add($key, $lang, $values["text_$lang"]);
             }
         }
 

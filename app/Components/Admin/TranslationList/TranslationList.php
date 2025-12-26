@@ -27,7 +27,7 @@ class TranslationList extends BaseControl
         $offset = ($page - 1) * $this->limit;
         Assert::range($offset, 0, PHP_INT_MAX, 'Offset must be a non-negative integer.');
 
-        $this->totalItems = $this->translationManager->getCount($lang, $search);
+        $this->totalItems = $this->translator->getCount($lang, $search);
 
         $this->template->getJson = function ($key) {
             return Json::encode([
@@ -40,7 +40,7 @@ class TranslationList extends BaseControl
         };
 
         $this->template->lang = $lang;
-        $this->template->translations = $this->translationManager->getList($lang, $this->limit, $offset, $search);
+        $this->template->translations = $this->translator->getList($lang, $this->limit, $offset, $search);
 
         $this->getTemplate()->setFile(__DIR__ . '/TranslationList.latte');
         $this->getTemplate()->render();
@@ -61,7 +61,7 @@ class TranslationList extends BaseControl
         $presenter = $this->getPresenter();
 
         $control = $presenter->paginationFactory->create();
-        $control->setTranslationManager($presenter->translationManager);
+        $control->setTranslator($presenter->translator);
         $control->setConfigManager($presenter->configManager);
         $control->setQueryParams($presenter->getHttpRequest()->getQuery());
         $control->setTotalItems($this->totalItems);

@@ -71,7 +71,7 @@ class ArticleList extends BaseControl
         $presenter = $this->getPresenter();
 
         $control = $presenter->paginationFactory->create();
-        $control->setTranslationManager($presenter->translationManager);
+        $control->setTranslator($presenter->translator);
         $control->setConfigManager($presenter->configManager);
         $control->setQueryParams($presenter->getHttpRequest()->getQuery());
         $control->setTotalItems($this->totalItems);

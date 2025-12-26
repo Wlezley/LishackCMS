@@ -7,7 +7,7 @@ namespace App\Modules\Admin\Presenters;
 use App\Components\Admin\TranslationEditor\ITranslationEditorFactory;
 use App\Components\Admin\TranslationForm\ITranslationFormFactory;
 use App\Components\Admin\TranslationList\ITranslationListFactory;
-use App\Exception\TranslationException;
+use App\Exception\TranslatorException;
 
 class TranslationPresenter extends SecuredPresenter
 {
@@ -22,31 +22,28 @@ class TranslationPresenter extends SecuredPresenter
 
     public function renderDefault(int $page = 1, ?string $lang = null, ?string $search = null): void
     {
-        $languageService = $this->translationManager->getLanguageService();
-        $lang = $lang ?? $languageService->getDefaultLang($this->c('DEFAULT_LANG'));
+        $lang = $lang ?? $this->languageService->getDefaultLanguage($this->c('DEFAULT_LANG'));
 
         try {
-            $langData = $languageService->getLanguage($lang);
-        } catch (TranslationException) {
+            $langData = $this->languageService->getLanguage($lang);
+        } catch (TranslatorException) {
             $this->redirect('Translation:');
         }
 
         $this->template->title .= ' - ' . $langData['name'] . ($langData['default'] ? ' (' . $this->t('default') . ')' : '');
 
         $this->template->lang = $lang;
-        $this->template->langList = $languageService->getList(false);
+        $this->template->langList = $this->languageService->getAvailableLanguages(false);
         $this->template->search = $search;
     }
 
     public function renderEditor(string $lang = ''): void
     {
-        $languageService = $this->translationManager->getLanguageService();
-
-        $langList = $languageService->getList(false);
-        $defaultLang = $languageService->getDefaultLang($this->c('DEFAULT_LANG'));
+        $langList = $this->languageService->getAvailableLanguages(false);
+        $defaultLang = $this->languageService->getDefaultLanguage($this->c('DEFAULT_LANG'));
 
         if (empty($lang) || $lang == $defaultLang || !array_key_exists($lang, $langList)) {
-            $redirLang = $languageService->getSecondaryLang();
+            $redirLang = $this->languageService->getSecondaryLanguage();
 
             if ($redirLang) {
                 $this->redirect('Translation:editor', ['lang' => $redirLang]);
@@ -62,7 +59,7 @@ class TranslationPresenter extends SecuredPresenter
 
     public function renderEdit(string $key, string $lang = ''): void
     {
-        if (!$this->translationManager->existsInDB($key, null)) {
+        if (!$this->translator->existsInDB($key, null)) {
             $this->flashMessage($this->tf('translation.key.not-found', $key), 'danger');
             $this->redirect(':default');
         }
@@ -80,7 +77,7 @@ class TranslationPresenter extends SecuredPresenter
 
         // TODO: Permission check
 
-        $this->translationManager->delete($data['key']);
+        $this->translator->delete($data['key']);
     }
 
     // ##########################################
@@ -107,7 +104,7 @@ class TranslationPresenter extends SecuredPresenter
             $form->setOrigin($form::OriginEdit);
 
             $param['key'] = $key;
-            foreach ($this->translationManager->getTextListByKey($key) as $lang => $text) {
+            foreach ($this->translator->getTextListByKey($key) as $lang => $text) {
                 $param["text_$lang"] = $text;
             }
 
@@ -118,7 +115,7 @@ class TranslationPresenter extends SecuredPresenter
             $form->setParam($this->getHttpRequest()->getPost('param'));
         }
 
-        $form->setLanguageList($this->translationManager->getLanguageService()->getList(false));
+        $form->setLanguageList($this->languageService->getAvailableLanguages(false));
 
         $form->onSuccess = function (string $message): void {
             $this->flashMessage($message, 'info');
@@ -137,6 +134,9 @@ class TranslationPresenter extends SecuredPresenter
         $control = $this->translationEditor->create();
         $lang = $this->getParameter('lang');
         $control->setParam(['lang' => $lang]);
+
+        $control->setTranslator($this->translator);
+        $control->setLanguageService($this->languageService);
 
         $control->onSuccess = function (string $message, string $lang): void {
             $this->flashMessage($message, 'info');

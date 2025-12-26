@@ -22,7 +22,7 @@ class ConfigWebsiteForm extends BaseControl
 
     public function createComponentForm(): Form
     {
-        $langList = $this->translationManager->getLanguageService()->getNames();
+        $langList = $this->languageService->getLanguageNames();
 
         $form = new Form();
         $form->setHtmlAttribute('autocomplete', 'off');

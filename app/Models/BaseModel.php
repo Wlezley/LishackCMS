@@ -4,28 +4,24 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Exception\TranslationException;
 use App\Models\Config\ConfigManager;
 use App\Models\Config\ConfigTrait;
-use App\Models\Translation\TranslationManager;
-use App\Models\Translation\TranslationTrait;
+use App\Models\Translation\TranslatorTrait;
 use Nette\Database\Explorer;
 use Nette\SmartObject;
-use Webmozart\Assert\Assert;
 
 abstract class BaseModel
 {
     use SmartObject;
 
     use ConfigTrait;
-    use TranslationTrait;
+    use TranslatorTrait;
 
     protected mixed $data = null;
 
     public function __construct(
         protected Explorer $db,
         protected ConfigManager $configManager,
-        protected TranslationManager $translationManager
     ) {
     }
 
@@ -44,18 +40,16 @@ abstract class BaseModel
         $this->data = null;
     }
 
-    /**
-     * @throws TranslationException
-     */
-    public function setLang(?string $lang = null): void
-    {
-        $lang = $lang ?? $this->configManager->get('DEFAULT_LANG');
-        Assert::notNull($lang, 'Default language is not set');
-        $this->translationManager->setCurrentLanguage($lang);
-    }
-
-    public function getLang(): string
-    {
-        return $this->translationManager->getCurrentLanguage();
-    }
+    // TODO: Implement language support
+//    public function setLang(?string $lang = null): void
+//    {
+//        $lang = $lang ?? $this->configManager->get('DEFAULT_LANG');
+//        Assert::notNull($lang, 'Default language is not set');
+//        $this->languageService->setCurrentLanguage($lang);
+//    }
+//
+//    public function getLang(): string
+//    {
+//        return $this->languageService->getCurrentLanguage();
+//    }
 }

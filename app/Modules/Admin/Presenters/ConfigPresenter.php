@@ -60,6 +60,8 @@ class ConfigPresenter extends SecuredPresenter
     {
         $form = $this->configWebsiteForm->create();
 
+        $form->setLanguageService($this->languageService);
+
         $form->onSuccess = function (string $message): void {
             $this->flashMessage($message, 'info');
             $this->redirect('Config:website');

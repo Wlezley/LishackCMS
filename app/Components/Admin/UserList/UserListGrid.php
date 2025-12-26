@@ -6,10 +6,9 @@ namespace App\Components\Admin\UserList;
 
 use AllowDynamicProperties;
 use App\Components\BaseControl;
-use App\Exception\TranslationException;
+use App\Exception\TranslatorException;
 use App\Exception\UserException;
-use App\Models\Translation\TranslationManager;
-use App\Models\Translation\TranslationTrait;
+use App\Models\Translation\TranslatorTrait;
 use App\Models\User\UserManager;
 use App\Models\User\UserRole;
 use Contributte\Datagrid\Datagrid;
@@ -35,7 +34,7 @@ use Nette\Utils\JsonException;
 #[AllowDynamicProperties]
 class UserListGrid extends BaseControl
 {
-    use TranslationTrait;
+    use TranslatorTrait;
 
     protected UserRole $userRole;
     protected Presenter $presenter;
@@ -44,7 +43,6 @@ class UserListGrid extends BaseControl
         public Explorer $db,
         private UserManager $userManager,
         protected User $user,
-        public TranslationManager $translationManager,
     ) {
         $this->userRole = new UserRole($user);
     }
@@ -257,7 +255,7 @@ class UserListGrid extends BaseControl
 
     /**
      * @throws JsonException
-     * @throws TranslationException
+     * @throws TranslatorException
      */
     public function encodeDataCallback(ActiveRow $item): string
     {
@@ -279,7 +277,7 @@ class UserListGrid extends BaseControl
     /**
      * @throws UserException
      * @throws InvalidPresenterException
-     * @throws TranslationException
+     * @throws TranslatorException
      */
     public function setRoleCallback(string $id, string $role): void
     {
@@ -311,7 +309,7 @@ class UserListGrid extends BaseControl
     /**
      * @throws UserException
      * @throws InvalidPresenterException
-     * @throws TranslationException
+     * @throws TranslatorException
      */
     public function setEnabledCallback(string $id, string $enabled): void
     {
@@ -342,7 +340,7 @@ class UserListGrid extends BaseControl
     /**
      * @throws InvalidPresenterException
      * @throws UserException
-     * @throws TranslationException
+     * @throws TranslatorException
      */
     public function setDeletedCallback(string $id, string $deleted): void
     {

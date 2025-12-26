@@ -6,8 +6,9 @@ namespace App\Components;
 
 use App\Models\Config\ConfigManager;
 use App\Models\Config\ConfigTrait;
-use App\Models\Translation\TranslationManager;
-use App\Models\Translation\TranslationTrait;
+use App\Models\Translation\LanguageService;
+use App\Models\Translation\Translator;
+use App\Models\Translation\TranslatorTrait;
 use App\Models\UrlGenerator\UrlGenerator;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Template;
@@ -17,13 +18,16 @@ use Webmozart\Assert\Assert;
 class BaseControl extends Control
 {
     use ConfigTrait;
-    use TranslationTrait;
+    use TranslatorTrait;
 
     /** @var ConfigManager @inject */
     public ConfigManager $configManager;
 
-    /** @var TranslationManager @inject */
-    public TranslationManager $translationManager;
+    /** @var LanguageService @inject */
+    public LanguageService $languageService;
+
+    /** @var Translator @inject */
+    public Translator $translator;
 
     /** @var UrlGenerator @inject */
     public UrlGenerator $urlGenerator;
@@ -37,27 +41,28 @@ class BaseControl extends Control
     protected ?string $templatePath = null;
 
     /**
-     * @throws RuntimeException If TranslationManager or ConfigManager is not available.
+     * @throws RuntimeException If Translator or ConfigManager is not available.
      */
     protected function createTemplate(?string $class = null): Template
     {
         $template = parent::createTemplate($class);
 
-        if (!isset($this->translationManager)) {
-            throw new RuntimeException('TranslationManager is not available in ' . static::class);
-        }
-
+        // CONFIGURATOR
         if (!isset($this->configManager)) {
             throw new RuntimeException('ConfigManager is not available in ' . static::class);
         }
 
-        // Translations
-        // phpcs:disable
-        $template->_ = fn($key) => $this->translationManager->get($key); // @phpstan-ignore property.notFound
-        $template->_F = fn($key, $values) => $this->translationManager->getf($key, null, $values); // @phpstan-ignore property.notFound
-
-        // Configuration
+        // phpcs:ignore
         $template->_C = fn($key) => $this->configManager->get($key); // @phpstan-ignore property.notFound
+
+        // TRANSLATOR
+        if (!isset($this->translator)) {
+            throw new RuntimeException('Translator is not available in ' . static::class);
+        }
+
+        // phpcs:disable
+        $template->_ = fn($key) => $this->translator->translate($key); // @phpstan-ignore property.notFound
+        $template->_F = fn($key, $values) => $this->translator->translateFormat($key, null, $values); // @phpstan-ignore property.notFound
         // phpcs:enable
 
         return $template;
@@ -73,14 +78,24 @@ class BaseControl extends Control
         return $this->configManager;
     }
 
-    public function setTranslationManager(TranslationManager $translationManager): void
+    public function getLanguageService(): LanguageService
     {
-        $this->translationManager = $translationManager;
+        return $this->languageService;
     }
 
-    public function getTranslationManager(): TranslationManager
+    public function setLanguageService(LanguageService $languageService): void
     {
-        return $this->translationManager;
+        $this->languageService = $languageService;
+    }
+
+    public function getTranslator(): Translator
+    {
+        return $this->translator;
+    }
+
+    public function setTranslator(Translator $translator): void
+    {
+        $this->translator = $translator;
     }
 
     /** @return array<string,string> */

@@ -9,8 +9,8 @@ use App\Models\BaseModel;
 use App\Models\Category\CategoryManager;
 use App\Models\Config\ConfigManager;
 use App\Models\Helpers\ArrayHelper;
-use App\Models\Translation\TranslationManager;
 use Nette\Database\Explorer;
+use Nette\Database\Table\ActiveRow;
 use Webmozart\Assert\Assert;
 
 class ArticleManager extends BaseModel
@@ -20,10 +20,9 @@ class ArticleManager extends BaseModel
     public function __construct(
         protected Explorer $db,
         protected ConfigManager $configManager,
-        protected TranslationManager $translationManager,
         public CategoryManager $categoryManager
     ) {
-        parent::__construct($db, $configManager, $translationManager);
+        parent::__construct($db, $configManager);
     }
 
     /**
@@ -141,11 +140,11 @@ class ArticleManager extends BaseModel
             ->insert($data);
 
         try {
-            Assert::keyExists($newArticle, 'id');
-            Assert::numeric($newArticle['id']);
-        } catch (\Throwable) {
+            Assert::isInstanceOf($newArticle, ActiveRow::class, 'Article not created.');
+            Assert::numeric($newArticle['id'], 'Article ID must be numeric.');
+        } catch (\Throwable $e) {
             throw new ArticleException(
-                'Article creation failed.',
+                'Article creation failed: ' . $e->getMessage(),
                 \Nette\Http\IResponse::S500_InternalServerError
             );
         }

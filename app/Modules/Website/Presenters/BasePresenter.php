@@ -7,15 +7,16 @@ namespace App\Modules\Website\Presenters;
 use App\Components\AdminButton\IAdminButtonFactory;
 use App\Components\Menu\IMenuFactory;
 use App\Components\Pagination\IPaginationFactory;
-use App\Exception\TranslationException;
+use App\Exception\TranslatorException;
 use App\Models\Category\CategoryManager;
 use App\Models\Config\ConfigManager;
 use App\Models\Config\ConfigTrait;
 use App\Models\Helpers\AssetsVersion;
 use App\Models\Helpers\IPValidator;
 use App\Models\Redirect\RedirectManager;
-use App\Models\Translation\TranslationManager;
-use App\Models\Translation\TranslationTrait;
+use App\Models\Translation\LanguageService;
+use App\Models\Translation\Translator;
+use App\Models\Translation\TranslatorTrait;
 use Nette;
 use Nette\Database\Explorer;
 use Webmozart\Assert\Assert;
@@ -23,7 +24,7 @@ use Webmozart\Assert\Assert;
 abstract class BasePresenter extends Nette\Application\UI\Presenter
 {
     use ConfigTrait;
-    use TranslationTrait;
+    use TranslatorTrait;
 
     /** @var Explorer @inject */
     public Explorer $db;
@@ -31,8 +32,11 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     /** @var ConfigManager @inject */
     public ConfigManager $configManager;
 
-    /** @var TranslationManager @inject */
-    public TranslationManager $translationManager;
+    /** @var LanguageService @inject */
+    public LanguageService $languageService;
+
+    /** @var Translator @inject */
+    public Translator $translator;
 
     /** @var RedirectManager @inject */
     public RedirectManager $redirectManager;
@@ -63,7 +67,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     protected array $defaultParams = [];
 
     /**
-     * @throws TranslationException
+     * @throws TranslatorException
      */
     public function startup(): void
     {
@@ -86,12 +90,12 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $lang = $this->c('DEFAULT_LANG'); // TODO: Get language from URL or session
         Assert::notNull($lang, 'Default language not found');
         $this->lang = $lang;
-        $this->translationManager->setCurrentLanguage($this->lang);
+        $this->languageService->setCurrentLanguage($this->lang);
 
         // Default parameters
         $this->defaultParams = [
             'lang' => $this->lang, // TODO: Get language from URL or session
-            'HTML_LANG' => $this->translationManager->getLanguageService()->getLanguage($this->lang)['html_lang'] ?? $this->lang,
+            'HTML_LANG' => $this->languageService->getLanguage($this->lang)['html_lang'] ?? $this->lang,
             'DEFAULT_LANG' => $this->c('DEFAULT_LANG'),
             'page' => $this->c('DEFAULT_PAGE'),
             'title' => $this->c('SITE_TITLE'), // TODO: Use SEO_TITLE instead?
@@ -106,8 +110,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
             'og_description' => $this->c('OG_DESCRIPTION'),
             'og_image' => $this->c('OG_IMAGE'),
             'og_show_locale' => ($this->c('OG_SHOW_LOCALE') == 1),
-            'og_locale' => $this->translationManager->getLanguageService()
-                    ->getLanguage($this->lang)['locale'] ?? $this->c('DEFAULT_LOCALE'),
+            'og_locale' => $this->languageService->getLanguage($this->lang)['locale'] ?? $this->c('DEFAULT_LOCALE'),
         ];
     }
 
@@ -115,12 +118,12 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     {
         parent::beforeRender();
 
-        // Configuration
+        // CONFIGURATOR
         $this->template->_C = fn($key) => $this->configManager->get($key);
 
-        // Translations
-        $this->template->_ = fn($key) => $this->translationManager->get($key, $this->lang);
-        $this->template->_F = fn($key, $values) => $this->translationManager->getf($key, $this->lang, $values);
+        // TRANSLATOR
+        $this->template->_ = fn($key) => $this->translator->translate($key, $this->lang);
+        $this->template->_F = fn($key, $values) => $this->translator->translateFormat($key, $this->lang, $values);
 
         // Default parameters
         $this->template->setParameters($this->defaultParams);
@@ -191,7 +194,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $component = parent::createComponent($name);
 
         if ($component instanceof \App\Components\BaseControl) {
-            $component->setTranslationManager($this->translationManager);
+            $component->setTranslator($this->translator);
             $component->setConfigManager($this->configManager);
         }
 

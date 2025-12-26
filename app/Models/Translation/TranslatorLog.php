@@ -8,21 +8,21 @@ use Nette\Database\Explorer;
 use Nette\Http\Request as HttpRequest;
 use Nette\Utils\Json;
 
-class TranslationLog
+class TranslatorLog
 {
     public const string TABLE_NAME = 'translations_log';
 
+    // TODO: Enum
     public const string TYPE_MISSING_KEY = 'key';
     public const string TYPE_MISSING_ARGUMENTS = 'arg';
-    public const string TYPE_UNKNOWN = 'unk';
 
     /**
      * @param Explorer $db Database explorer instance.
-     * @param HttpRequest $httpRequest HTTP request instance for retrieving current URL.
+     * @param HttpRequest $httpRequest HTTP request instance for retrieving the current URL.
      */
     public function __construct(
-        private Explorer $db,
-        private HttpRequest $httpRequest
+        private readonly Explorer $db,
+        private readonly HttpRequest $httpRequest
     ) {
     }
 
@@ -72,6 +72,8 @@ class TranslationLog
      * @param string $lang The language code.
      * @param string $type The type of issue (missing key, argument mismatch, etc.).
      * @param string $message Additional information about the issue.
+     *
+     * @todo Optimize for large number of entries
      */
     private function log(string $key, string $lang, string $type, string $message): void
     {
