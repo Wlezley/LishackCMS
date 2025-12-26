@@ -46,7 +46,7 @@ define('DEBUG', Debugger::$productionMode === Debugger::Development);
 define('PROJECT_SETTINGS', $container->getParameters());
 
 // Installer trigger
-if (DEBUG) {
+if (DEBUG === true) {
     $installer = $container->getByType(Installer::class);
 
     if (!$installer->isInstalled()) {
