@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models\Dataset\Entity;
 
-use App\Models\Dataset\DatasetException;
+use App\Exception\DatasetException;
 use App\Models\Helpers\IntegerHelper;
 use App\Models\Helpers\StringHelper;
 
@@ -65,11 +65,11 @@ final class Dataset
     public function validate(): void
     {
         if (trim($this->name) === '') {
-            throw new DatasetException("The dataset name must not be empty.");
+            throw new DatasetException('The dataset name must not be empty.');
         }
 
         if (trim($this->slug) === '') {
-            throw new DatasetException("The dataset slug must not be empty.");
+            throw new DatasetException('The dataset slug must not be empty.');
         }
     }
 

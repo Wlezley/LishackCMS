@@ -2,17 +2,23 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace App\Models\Redirect;
 
+use App\Exception\RedirectException;
 use App\Models\Helpers\ArrayHelper;
 use Nette\Database\Explorer;
+use Nette\Database\Table\ActiveRow;
+use Webmozart\Assert\Assert;
 
 class RedirectManager
 {
-    public const TABLE_NAME = 'redirect';
+    public const string TABLE_NAME = 'redirect';
 
-    // TODO: Use Nette\Http\IRsponse instead
-    public const REDIRECT_HTTP_CODES = [
+    /**
+     * @var array<int,string> List of valid HTTP redirect codes.
+     * @todo Use Nette\Http\IResponse instead
+     */
+    public const array REDIRECT_HTTP_CODES = [
         // 300 => '300 Multiple Choices', // Choices are listed in an HTML page in the body. Machine-readable choices are encouraged to be sent as Link headers with rel=alternate.
         301 => '301 Moved Permanently', // Reorganization of a website.
         302 => '302 Found', // The Web page is temporarily unavailable for unforeseen reasons.
@@ -26,7 +32,8 @@ class RedirectManager
 
     public function __construct(
         private Explorer $db
-    ) {}
+    ) {
+    }
 
     /**
      * Retrieves a redirect target URL (and HTTP code) for a given source URL.
@@ -90,7 +97,7 @@ class RedirectManager
         $target = $this->prepare($target);
 
         if ($source === $target) {
-            throw new RedirectException("Redirect source and target cannot be the same", 1);
+            throw new RedirectException('Redirect source and target cannot be the same', 1);
         }
 
         if (!$this->checkHttpCode($code)) {
@@ -105,15 +112,16 @@ class RedirectManager
             throw new RedirectException("Duplicate redirect for source '$source' found, entry cannot be added", 1);
         }
 
-        $result = $this->db->table(self::TABLE_NAME)->insert([
+        /** @var ActiveRow $row */
+        $row = $this->db->table(self::TABLE_NAME)->insert([
             'source' => $source,
             'target' => $target,
             'code' => $code,
-            'enabled' => $enabled ? 1 : 0
+            'enabled' => $enabled ? 1 : 0,
         ]);
 
-        if (is_numeric($result['id'])) {
-            return (int)$result['id'];
+        if (is_numeric($row['id'])) {
+            return (int) $row['id'];
         }
 
         return null;
@@ -141,15 +149,15 @@ class RedirectManager
         $target = $this->prepare($target);
 
         if ($source === $target) {
-            throw new RedirectException("Redirect source and target cannot be the same", 1);
+            throw new RedirectException('Redirect source and target cannot be the same', 1);
         }
 
         if ($source === null) {
-            throw new RedirectException("Redirect source cannot be empty", 1);
+            throw new RedirectException('Redirect source cannot be empty', 1);
         }
 
         if ($target === null) {
-            throw new RedirectException("Redirect target cannot be empty", 1);
+            throw new RedirectException('Redirect target cannot be empty', 1);
         }
 
         if (!$this->checkHttpCode($code)) {
@@ -173,7 +181,7 @@ class RedirectManager
             'source' => $source,
             'target' => $target,
             'code' => $code,
-            'enabled' => $enabled ? 1 : 0
+            'enabled' => $enabled ? 1 : 0,
         ]);
 
         return ($affectedRows == 1);
@@ -197,12 +205,12 @@ class RedirectManager
     /**
      * Retrieves a list of redirects with optional search and pagination.
      *
-     * @param int $limit Number of results to return (default: 50).
-     * @param int $offset Offset for pagination (default: 0).
+     * @param int<0,max>|null $limit Number of results to return (default: 50).
+     * @param int<0,max>|null $offset Offset for pagination (default: 0).
      * @param string|null $search Optional search query for source or target URLs.
      * @return array<int|string,array<string,string|int|null>>|null Array of redirects indexed by source, or null if empty.
      */
-    public function getList(int $limit = 50, int $offset = 0, ?string $search = null): ?array
+    public function getList(?int $limit = 50, ?int $offset = 0, ?string $search = null): ?array
     {
         $query = $this->db->table(self::TABLE_NAME)
             ->limit($limit, $offset)
@@ -264,7 +272,8 @@ class RedirectManager
         $host = $parsed['host'] ?? null;
         $path = $parsed['path'] ?? '';
         $path = preg_replace('~//+~', '/', $path);
+        Assert::string($path, 'Invalid URL path');
 
-        return ($scheme ? "$scheme://" : '') . ($host ? $host : '') . '/' . ltrim($path, '/');
+        return ($scheme ? "$scheme://" : '') . ($host ?: '') . '/' . ltrim($path, '/');
     }
 }

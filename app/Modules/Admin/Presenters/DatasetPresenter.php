@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
-use App\Components\Admin\IDatasetEditorFactory;
-use App\Components\Admin\IDatasetListFactory;
+use App\Components\Admin\DatasetEditor\IDatasetEditorFactory;
+use App\Components\Admin\DatasetList\IDatasetListFactory;
 use App\Models\Dataset\DatasetCreator;
 use App\Models\Dataset\DatasetManager;
 use App\Models\Dataset\DatasetUpdater;
@@ -64,7 +64,7 @@ class DatasetPresenter extends SecuredPresenter
     // ###             COMPONENTS             ###
     // ##########################################
 
-    protected function createComponentDatasetList(): \App\Components\Admin\DatasetList
+    protected function createComponentDatasetList(): \App\Components\Admin\DatasetList\DatasetList
     {
         $control = $this->datasetList->create();
         $control->setParam([
@@ -75,7 +75,7 @@ class DatasetPresenter extends SecuredPresenter
         return $control;
     }
 
-    protected function createComponentDatasetEditor(): \App\Components\Admin\DatasetEditor
+    protected function createComponentDatasetEditor(): \App\Components\Admin\DatasetEditor\DatasetEditor
     {
         $control = $this->datasetEditor->create();
         $id = $this->getParameter('id');
@@ -88,12 +88,12 @@ class DatasetPresenter extends SecuredPresenter
             $id ? $control::OriginEdit : $control::OriginCreate
         );
 
-        $control->onSuccess = function(string $message): void {
+        $control->onSuccess = function (string $message): void {
             $this->flashMessage($message, 'info');
             $this->redirect('Dataset:');
         };
 
-        $control->onError = function(string $message): void {
+        $control->onError = function (string $message): void {
             $this->flashMessage($message, 'danger');
         };
 

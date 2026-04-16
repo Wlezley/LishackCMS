@@ -1,10 +1,10 @@
 parameters:
     database:
-        host: 127.0.0.1
+        host: mysqldb
         port: 3306
-        name: ""
-        user: ""
-        password: ""
+        name: "lishack_cms"
+        user: "root"
+        password: "devstack"
 
     smsgate:
         url: https://api.smsbrana.cz/smsconnect/http.php

@@ -2,35 +2,33 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace App\Models\Article;
 
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Presenter;
+use Webmozart\Assert\Assert;
 
 class ArticleParser
 {
     public function __construct(
         private Presenter $presenter
-    ) {}
+    ) {
+    }
 
     /**
      * @param string $text Catch the component tag in the format "<nette-component param-PARAMNAME="VALUE">COMPONENT_NAME</nette-component>"
-     * @return string
      */
     public function parseComponents(string $text): string
     {
-        return preg_replace_callback(
+        $parsedBlock = preg_replace_callback(
             '#<nette-component([^>]*)>(.*?)</nette-component>#is',
             fn(array $matches) => $this->processTag($matches[1], trim($matches[2])),
             $text
         );
+        Assert::string($parsedBlock, 'Failed to parse components');
+        return $parsedBlock;
     }
 
-    /**
-     * @param string $attributeString
-     * @param string $fallbackName
-     * @return string
-     */
     private function processTag(string $attributeString, string $fallbackName): string
     {
         $attrs = $this->parseAttributes($attributeString);
@@ -49,7 +47,6 @@ class ArticleParser
     }
 
     /**
-     * @param string $attributeString
      * @return array<string,string>
      */
     private function parseAttributes(string $attributeString): array
@@ -63,9 +60,7 @@ class ArticleParser
     }
 
     /**
-     * @param string $name
      * @param array<string,mixed> $params
-     * @return string
      */
     public function renderComponent(string $name, array $params = []): string
     {
@@ -88,13 +83,24 @@ class ArticleParser
 
             if (!$templatePath) {
                 $reflection = new \ReflectionClass($component);
-                $templatePath = dirname($reflection->getFileName()) . '/' . $component->getName() . '.latte';
+
+                $componentFile = $reflection->getFileName();
+                Assert::string($componentFile, 'Failed to get component file path');
+
+                $componentName = $component->getName();
+                Assert::string($componentName, 'Failed to get component name');
+
+                $templatePath = dirname($componentFile) . '/' . $componentName . '.latte';
             }
 
             bdump($templatePath, "Component '{$name}' Template Path");
 
             if (is_file($templatePath)) {
-                $template->setFile($templatePath);
+//                Assert::methodExists($template, 'setFile', 'Unable to set a template file for a component');
+
+                if (method_exists($template, 'setFile')) {
+                    $template->setFile($templatePath);
+                }
             } else {
                 return "<!-- Template file not found for '{$name}' -->";
             }

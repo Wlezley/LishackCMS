@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace App\Models\Installer;
 
 use Nette\Database\ConnectionException;
 use Nette\Database\DriverException;
@@ -12,8 +12,8 @@ use Phinx\Wrapper\TextWrapper;
 
 class Installer
 {
-    private const TABLE_TO_CHECK = 'cms_config';
-    private const SQL_DUMP_FILE = PROJECT_DIR . 'db/cms_database_setup.sql';
+    private const string TABLE_TO_CHECK = 'cms_config';
+    private const string SQL_DUMP_FILE = PROJECT_DIR . 'db/cms_database_setup.sql';
 
     private string $log;
 

@@ -2,31 +2,30 @@
 
 declare(strict_types=1);
 
-namespace App\Components\Admin;
+namespace App\Components\Admin\ArticleEditor;
 
 use App\Components\BaseControl;
-use App\Models\ArticleException;
-use App\Models\ArticleManager;
-use App\Models\CategoryManager;
+use App\Exception\ArticleException;
+use App\Exception\UserException;
+use App\Models\Article\ArticleManager;
+use App\Models\Category\CategoryManager;
 use App\Models\Helpers\StringHelper;
-use App\Models\UrlGenerator;
-use App\Models\UserException;
-use App\Models\UserManager;
+use App\Models\UrlGenerator\UrlGenerator;
+use App\Models\User\UserManager;
 use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
 use Nette\Utils\DateTime;
+use Webmozart\Assert\Assert;
 
 class ArticleEditor extends BaseControl
 {
-    public const OriginCreate = 'Create';
-    public const OriginEdit = 'Edit';
+    public const string OriginCreate = 'Create';
+    public const string OriginEdit = 'Edit';
 
-    /** @var ArticleManager */
     private ArticleManager $articleManager;
 
-    /** @var CategoryManager */
     private CategoryManager $categoryManager;
 
-    /** @var UserManager */
     private UserManager $userManager;
 
     private string $origin;
@@ -55,7 +54,8 @@ class ArticleEditor extends BaseControl
             }
         } else {
             try {
-                $this->param['user_name'] = $this->presenter->getUser()->getIdentity()->getData()['full_name'];
+                $this->param['user_name'] = $this->presenter->getUser()->getIdentity()?->getData()['full_name'];
+                Assert::notNull($this->param['user_name']);
             } catch (\Exception $e) {
                 $this->param['user_name'] = $this->t('author.system');
             }
@@ -91,14 +91,14 @@ class ArticleEditor extends BaseControl
             ->setValue($this->param['published_at'] ?? DateTime::from(null))
             ->setRequired();
 
-        $updated_at = 'N/A';
+        $updatedAt = 'N/A';
         if ($this->param['updated_at']) {
-            $updated_at = DateTime::from($this->param['updated_at'])->format('d.m.Y h:i');
+            $updatedAt = DateTime::from($this->param['updated_at'])->format('d.m.Y h:i');
         }
         $form->addText('updated_at', $this->t('form.article.updated_at'))
             ->setHtmlAttribute('placeholder', $this->t('form.article.updated_at'))
             ->setHtmlAttribute('readonly', true)
-            ->setValue($updated_at);
+            ->setValue($updatedAt);
 
         // META TAGS / SEO
         $form->addText('robots', $this->t('form.article.robots'))
@@ -142,17 +142,17 @@ class ArticleEditor extends BaseControl
             ? $this->t('form.article.create')
             : $this->t('form.article.save');
 
-        $form->addSubmit('save', $saveBtnName)
+        $form->addSubmit('save', $saveBtnName) // @phpstan-ignore-line
             ->onClick[] = [$this, 'processSave'];
 
-        $form->addSubmit('copy', $this->t('form.article.save-copy'))
+        $form->addSubmit('copy', $this->t('form.article.save-copy')) // @phpstan-ignore-line
             ->onClick[] = [$this, 'processSaveAsCopy'];
 
         return $form;
     }
 
-    /** @param \Nette\Utils\ArrayHash<mixed> $values */
-    public function processSave(Form $form, \Nette\Utils\ArrayHash $values): void
+    /** @param ArrayHash<mixed> $values */
+    public function processSave(Form $form, ArrayHash $values): void
     {
         $data = (array)$values;
         unset($data['user_name'], $data['updated_at']);
@@ -204,8 +204,8 @@ class ArticleEditor extends BaseControl
         }
     }
 
-    /** @param \Nette\Utils\ArrayHash<mixed> $values */
-    public function processSaveAsCopy(Form $form, \Nette\Utils\ArrayHash $values): void
+    /** @param ArrayHash<mixed> $values */
+    public function processSaveAsCopy(Form $form, ArrayHash $values): void
     {
         $this->setOrigin(self::OriginCreate);
         $this->processSave($form, $values);
@@ -214,8 +214,8 @@ class ArticleEditor extends BaseControl
     public function render(): void
     {
         $this->template->origin = $this->origin;
-        $this->template->setFile(__DIR__ . '/ArticleEditor.latte');
-        $this->template->render();
+        $this->getTemplate()->setFile(__DIR__ . '/ArticleEditor.latte');
+        $this->getTemplate()->render();
     }
 
     public function setOrigin(string $origin): void

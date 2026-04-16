@@ -2,25 +2,24 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace App\Models\Config;
 
 use App\Models\Helpers\ArrayHelper;
 use Nette\Utils\Validators;
 
 class ConfigValidator
 {
-    public const COLUMNS = [
+    /** @var array<string> */
+    public const array COLUMNS = [
         'key',
-        'caregory',
-        'value'
+        'category',
+        'value',
     ];
 
     /**
      * Builds a structured array of config data with default values.
      *
      * @param string $key The key of the config item
-     * @param string|null $category
-     * @param string|null $value
      *
      * @return array<string,string|int|null> An associative array containing config data
      */

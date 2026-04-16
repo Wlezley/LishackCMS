@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models\Helpers;
 
-use Nette\InvalidArgumentException;
+use Webmozart\Assert\Assert;
 
 class IPValidator
 {
@@ -35,20 +35,22 @@ class IPValidator
      * Parses an IP address and mask from a given string.
      *
      * @param string $ipMaskString The input string (e.g., "192.168.0.1" or "192.168.0.0/24").
-     * @return array{string|false,int} An array with two elements: binary IP and integer mask.
+     * @return array{string,int} An array with two elements: binary IP and integer mask.
      */
     public static function parseIpAndMask(string $ipMaskString): array
     {
         $ipMaskString = trim($ipMaskString);
         $parts = explode('/', $ipMaskString);
+
         $ip = $parts[0];
-        $mask = isset($parts[1]) ? (int)$parts[1] : (strpos($ip, ':') === false ? 32 : 128);
+        Assert::ip($ip, "Invalid IP address: $ip");
 
-        if (filter_var($ip, FILTER_VALIDATE_IP) === false) {
-            throw new InvalidArgumentException("Invalid IP address: $ip");
-        }
+        $mask = isset($parts[1]) ? (int)$parts[1] : (str_contains($ip, ':') ? 128 : 32);
 
-        return [inet_pton($ip), $mask];
+        $binaryIp = inet_pton($ip);
+        Assert::string($binaryIp, "Failed to convert IP address to binary: $ip");
+
+        return [$binaryIp, $mask];
     }
 
     /**
@@ -68,11 +70,10 @@ class IPValidator
         }
 
         // Calculate subnet mask in binary
-        $mask = str_repeat("1", $subnetMask) . str_repeat("0", (strlen($needleIp) * 8) - $subnetMask);
-        $maskBin = pack("H*", str_pad(base_convert($mask, 2, 16), strlen($needleIp) * 2, "0", STR_PAD_LEFT));
+        $mask = str_repeat('1', $subnetMask) . str_repeat('0', (strlen($needleIp) * 8) - $subnetMask);
+        $maskBin = pack('H*', str_pad(base_convert($mask, 2, 16), strlen($needleIp) * 2, '0', STR_PAD_LEFT));
 
         // Apply the subnet mask and compare
         return ($needleIp & $maskBin) === ($subnetIp & $maskBin);
     }
-
 }

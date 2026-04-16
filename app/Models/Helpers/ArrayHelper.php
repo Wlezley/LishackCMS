@@ -54,7 +54,7 @@ class ArrayHelper
     {
         $missingKeys = self::getMissingKeys($keys, $data);
         if (!empty($missingKeys)) {
-            throw new \InvalidArgumentException("Required keys [" . implode(', ', $missingKeys) . "] are missing in the $label array.");
+            throw new \InvalidArgumentException('Required keys [' . implode(', ', $missingKeys) . "] are missing in the $label array.");
         }
     }
 
@@ -82,7 +82,7 @@ class ArrayHelper
     {
         $extraKeys = self::getExtraKeys($keys, $data);
         if (!empty($extraKeys)) {
-            throw new \InvalidArgumentException("There are unknown keys [" . implode(', ', $extraKeys) . "] in the $label array.");
+            throw new \InvalidArgumentException('There are unknown keys [' . implode(', ', $extraKeys) . "] in the $label array.");
         }
     }
 }

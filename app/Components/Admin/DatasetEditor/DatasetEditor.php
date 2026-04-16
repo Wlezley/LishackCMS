@@ -2,20 +2,23 @@
 
 declare(strict_types=1);
 
-namespace App\Components\Admin;
+namespace App\Components\Admin\DatasetEditor;
 
 use App\Components\BaseControl;
+use App\Exception\DatasetException;
 use App\Models\Dataset\DatasetCreator;
 use App\Models\Dataset\DatasetManager;
 use App\Models\Dataset\DatasetUpdater;
 use App\Models\Dataset\Entity\DatasetColumn;
 use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
 use Nette\Utils\Json;
+use Nette\Utils\JsonException;
 
 class DatasetEditor extends BaseControl
 {
-    public const OriginCreate = 'Create';
-    public const OriginEdit = 'Edit';
+    public const string OriginCreate = 'Create';
+    public const string OriginEdit = 'Edit';
 
     private string $origin;
 
@@ -36,7 +39,7 @@ class DatasetEditor extends BaseControl
 
     protected function createComponentForm(): Form
     {
-        $form = new Form;
+        $form = new Form();
 
         $form->setHtmlAttribute('autocomplete', 'off');
 
@@ -82,8 +85,12 @@ class DatasetEditor extends BaseControl
         return $form;
     }
 
-    /** @param \Nette\Utils\ArrayHash<mixed> $values */
-    public function processCreate(Form $form, \Nette\Utils\ArrayHash $values): void
+    /**
+     * @param ArrayHash<mixed> $values
+     * @throws JsonException
+     * @throws DatasetException
+     */
+    public function processCreate(Form $form, ArrayHash $values): void
     {
         if (empty($values['columns'])) {
             call_user_func($this->onError, $this->t('error.form.empty-data'));
@@ -119,8 +126,12 @@ class DatasetEditor extends BaseControl
         call_user_func($this->onSuccess, "Dataset ID: $datasetId byl vytvořen.");
     }
 
-    /** @param \Nette\Utils\ArrayHash<mixed> $values */
-    public function processSave(Form $form, \Nette\Utils\ArrayHash $values): void
+    /**
+     * @param ArrayHash<mixed> $values
+     * @throws JsonException
+     * @throws DatasetException
+     */
+    public function processSave(Form $form, ArrayHash $values): void
     {
         if (empty($values['columns'])) {
             call_user_func($this->onError, $this->t('error.form.empty-data'));
@@ -166,7 +177,7 @@ class DatasetEditor extends BaseControl
         if (empty($columns)) {
             $this->template->lastColumnId = 2;
 
-            for ($i=1; $i <= $this->template->lastColumnId; $i++) {
+            for ($i = 1; $i <= $this->template->lastColumnId; $i++) {
                 $columns[$i] = [
                     'columnId' => $i,
                     'name' => "Data $i",
@@ -186,8 +197,8 @@ class DatasetEditor extends BaseControl
         $this->template->datasetColumns = $columns;
         $this->template->columnTypeOptions = $this->getColumnTypeOptions();
 
-        $this->template->setFile(__DIR__ . '/DatasetEditor.latte');
-        $this->template->render();
+        $this->getTemplate()->setFile(__DIR__ . '/DatasetEditor.latte');
+        $this->getTemplate()->render();
     }
 
     public function setOrigin(string $origin): void
@@ -210,7 +221,9 @@ class DatasetEditor extends BaseControl
         $this->datasetUpdater = $datasetUpdater;
     }
 
-    /** @return array<string,string> */
+    /**
+     * @return array<string,string>
+     */
     public function getColumnTypeOptions(): array
     {
         $options = [];

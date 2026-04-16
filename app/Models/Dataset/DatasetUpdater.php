@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Models\Dataset;
 
+use App\Exception\DatasetException;
 use App\Models\Dataset\Entity\Dataset;
 use App\Models\Dataset\Entity\DatasetColumn;
 use App\Models\Dataset\Repository\ColumnRepository;
 use App\Models\Dataset\Repository\DataRepository;
 use App\Models\Dataset\Repository\DatasetRepository;
+use Webmozart\Assert\Assert;
 
 class DatasetUpdater
 {
@@ -21,7 +23,8 @@ class DatasetUpdater
         private DatasetRepository $datasetRepository,
         private ColumnRepository $columnRepository,
         private DataRepository $dataRepository
-    ) {}
+    ) {
+    }
 
     public function loadDatasetById(int $id): bool
     {
@@ -30,6 +33,9 @@ class DatasetUpdater
         }
 
         $this->dataset = $this->datasetRepository->findById($id);
+        Assert::notNull($this->dataset, 'Dataset must not be null.');
+        Assert::notNull($this->dataset->id, 'Dataset ID must not be null.');
+
         $this->columns = $this->columnRepository->findByDatasetId($this->dataset->id, true);
 
         return true;
@@ -56,11 +62,16 @@ class DatasetUpdater
      * @param string $presenter Optional presenter routing value.
      * @param bool $active Whether the dataset is active.
      *
-     * @throws DatasetException If dataset has not loaded.
-     * @return self
+     * @throws DatasetException If the dataset has not loaded.
      */
-    public function configure(string $name, string $slug = '', string $component = '', string $presenter = '', bool $active = true, bool $deleted = false): self
-    {
+    public function configure(
+        string $name,
+        string $slug = '',
+        string $component = '',
+        string $presenter = '',
+        bool $active = true,
+        bool $deleted = false
+    ): self {
         if (!isset($this->dataset)) {
             throw new DatasetException('Dataset is not loaded.');
         }
@@ -86,13 +97,12 @@ class DatasetUpdater
      * @param string $slug Optional slug identifier.
      * @param string $type Column data type (e.g., 'string', 'int').
      * @param bool $required The column is required.
-     * @param bool $listed The column is listed in DataList.
-     * @param bool $hidden The column is editable only with an user in the admin role.
+     * @param bool $listed The column is listed in the DataList.
+     * @param bool $hidden The column is editable only with a user in the admin role.
      * @param bool $deleted The column is marked as deleted.
      * @param string|null $default Default value of the column.
      *
-     * @throws DatasetException If dataset has not loaded.
-     * @return self
+     * @throws DatasetException If the dataset has not loaded.
      */
     public function addColumn(
         string $name,
@@ -103,8 +113,7 @@ class DatasetUpdater
         bool $hidden = false,
         bool $deleted = false,
         ?string $default = null
-    ): self
-    {
+    ): self {
         if (!isset($this->dataset)) {
             throw new DatasetException('Dataset is not loaded.');
         }
@@ -138,13 +147,12 @@ class DatasetUpdater
      * @param string $slug Optional slug identifier.
      * @param string $type Column data type (e.g., 'string', 'int').
      * @param bool $required The column is required.
-     * @param bool $listed The column is listed in DataList.
-     * @param bool $hidden The column is editable only with an user in the admin role.
+     * @param bool $listed The column is listed in the DataList.
+     * @param bool $hidden The column is editable only with a user in the admin role.
      * @param bool $deleted The column is marked as deleted.
      * @param string|null $default Default value of the column.
      *
-     * @throws DatasetException If dataset has not loaded.
-     * @return self
+     * @throws DatasetException If the dataset has not loaded.
      */
     public function updateColumn(
         int $columnId,
@@ -156,8 +164,7 @@ class DatasetUpdater
         bool $hidden = false,
         bool $deleted = false,
         ?string $default = null
-    ): self
-    {
+    ): self {
         if (!isset($this->dataset)) {
             throw new DatasetException('Dataset is not loaded.');
         }
@@ -183,7 +190,7 @@ class DatasetUpdater
     }
 
     /**
-     * Returns last column ID or '0' if columns array is empty.
+     * Returns last column ID or '0' if the columns array is empty.
      *
      * @return int The ID of the last column.
      */
@@ -202,34 +209,35 @@ class DatasetUpdater
      * This will insert dataset metadata, store column definitions,
      * and create a dedicated table for data storage.
      *
-     * @throws DatasetException If dataset is not configured or has no columns.
+     * @throws DatasetException If the dataset is not configured or has no columns.
      * @return int The ID of the created dataset.
      */
     public function commit(): int
     {
-        if (!isset($this->dataset)) {
-            throw new DatasetException('Dataset is not configured.');
-        }
+        try {
+            Assert::notEmpty($this->columns, 'Dataset must have at least one column.');
+            Assert::notNull($this->dataset, 'Dataset must be configured.');
 
-        if (empty($this->columns)) {
-            throw new DatasetException('Dataset must have at least one column.');
+            $datasetId = $this->dataset->id;
+            Assert::notNull($datasetId, 'Dataset ID must not be null.');
+        } catch (\Throwable $e) {
+            throw new DatasetException($e->getMessage(), 0, $e);
         }
 
         $this->datasetRepository->update($this->dataset);
 
-        /** @var DatasetColumn $column */
         foreach ($this->columns as $column) {
             if ($column->datasetId == 0) {
-                $column->setDatasetId($this->dataset->id);
+                $column->setDatasetId($datasetId);
                 $this->columnRepository->insert($column);
             } else {
                 $this->columnRepository->update($column);
             }
         }
 
-        $this->dataRepository->updateTable($this->dataset->id, $this->columns);
+        $this->dataRepository->updateTable($datasetId, $this->columns);
 
-        return $this->dataset->id;
+        return $datasetId;
     }
 
     /**
@@ -247,7 +255,6 @@ class DatasetUpdater
      * Returns the configured dataset object.
      *
      * @throws DatasetException If dataset has not loaded.
-     * @return Dataset
      */
     public function getDataset(): Dataset
     {

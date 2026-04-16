@@ -2,18 +2,19 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace App\Models\User;
 
+use App\Exception\UserException;
+use App\Models\BaseModel;
 use App\Models\Helpers\ArrayHelper;
-use App\Models\UserException;
 use Nette\Security\Passwords;
 use Nette\Utils\Validators;
 
 class UserManager extends BaseModel
 {
-    public const TABLE_NAME = 'users';
+    public const string TABLE_NAME = 'users';
 
-    /** @var array<int,array<string,string|int|null>> $userList */
+    /** @var array<int|string,array<string,string|int|null>> $userList */
     protected mixed $userList = [];
 
     public function load(): void
@@ -24,7 +25,7 @@ class UserManager extends BaseModel
         $this->userList = ArrayHelper::resultToArray($result);
     }
 
-    /** @return array<int,array<string,string|int|null>> */
+    /** @return array<int|string,array<string,string|int|null>> */
     public function getList(bool $forceReload = false): array
     {
         if (empty($this->userList) || $forceReload) {
@@ -84,8 +85,10 @@ class UserManager extends BaseModel
         if (Validators::isNone($data['password'])) {
             throw new UserException('Password is empty.');
         }
-        if (!empty($data['email']) && !Validators::isEmail($data['email'])) {
-            throw new UserException('Invalid email format.');
+        if (!empty($data['email'])) {
+            if (!is_string($data['email']) || !Validators::isEmail($data['email'])) {
+                throw new UserException('Invalid email format.');
+            }
         }
         if ($this->db->table(self::TABLE_NAME)->select('id')->where(['name' => $data['name']])->count() > 0) {
             throw new UserException('Duplicate user name.');

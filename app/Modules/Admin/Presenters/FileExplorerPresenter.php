@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
-use App\Components\Admin\IFileExplorerFactory;
+use App\Components\Admin\FileExplorer\IFileExplorerFactory;
 
 class FileExplorerPresenter extends SecuredPresenter
 {
@@ -31,7 +31,7 @@ class FileExplorerPresenter extends SecuredPresenter
     // ###             COMPONENTS             ###
     // ##########################################
 
-    protected function createComponentFileExplorer(): \App\Components\Admin\FileExplorer
+    protected function createComponentFileExplorer(): \App\Components\Admin\FileExplorer\FileExplorer
     {
         $control = $this->fileExplorer->create();
         return $control;

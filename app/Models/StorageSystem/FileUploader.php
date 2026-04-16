@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models\StorageSystem;
 
-use App\Models\StorageSystem\Repository\StorageFilesRepository;
-
 class FileUploader
 {
     // public const UPLOAD_DIR = 'uploads/files/';
@@ -14,7 +12,8 @@ class FileUploader
     public function __construct(
         // private Storage $storage,
         // private StorageFilesRepository $repository,
-    ) {}
+    ) {
+    }
 
     // /**
     //  * Save uploaded file and create DB entry.

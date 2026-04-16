@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Components\Admin;
+namespace App\Components\Admin\RedirectForm;
 
 use App\Components\BaseControl;
-use App\Models\RedirectException;
-use App\Models\RedirectManager;
+use App\Exception\RedirectException;
+use App\Models\Redirect\RedirectManager;
 use Nette\Application\UI\Form;
+use Webmozart\Assert\Assert;
 
 class RedirectForm extends BaseControl
 {
@@ -24,7 +25,8 @@ class RedirectForm extends BaseControl
 
     public function __construct(
         private RedirectManager $redirectManager
-    ) {}
+    ) {
+    }
 
     public function createComponentForm(): Form
     {
@@ -35,6 +37,7 @@ class RedirectForm extends BaseControl
         $form->setHtmlAttribute('autocomplete', 'off');
 
         if ($this->origin == self::OriginEdit) {
+            Assert::keyExists($param, 'id', 'Redirect ID must be set');
             $form->addHidden('id', $param['id']);
             $form->addHidden('page', $param['page'] ?? 1);
         }
@@ -91,10 +94,21 @@ class RedirectForm extends BaseControl
 
         try {
             if ($this->origin == self::OriginCreate) {
-                $this->redirectManager->add($values['source'], $values['target'], $values['code'], $values['enabled'] == 1);
+                $this->redirectManager->add(
+                    source: $values['source'],
+                    target: $values['target'],
+                    code: $values['code'],
+                    enabled: $values['enabled'] == 1
+                );
                 call_user_func($this->onSuccess, $this->t('success.form.redirect-created'), 1);
-            } else if ($this->origin == self::OriginEdit) {
-                $this->redirectManager->update($values['id'], $values['source'], $values['target'], $values['code'], $values['enabled'] == 1);
+            } elseif ($this->origin == self::OriginEdit) {
+                $this->redirectManager->update(
+                    id: $values['id'],
+                    source: $values['source'],
+                    target: $values['target'],
+                    code: $values['code'],
+                    enabled: $values['enabled'] == 1
+                );
                 call_user_func($this->onSuccess, $this->t('success.form.redirect-saved'), $values['page'] ?? 1);
             } else {
                 call_user_func($this->onError, $this->t('error.form.unknown-origin'));
@@ -107,8 +121,8 @@ class RedirectForm extends BaseControl
 
     public function render(): void
     {
-        $this->template->setFile(__DIR__ . '/RedirectForm.latte');
-        $this->template->render();
+        $this->getTemplate()->setFile(__DIR__ . '/RedirectForm.latte');
+        $this->getTemplate()->render();
     }
 
     public function setOrigin(string $origin): void

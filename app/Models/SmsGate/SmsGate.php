@@ -2,19 +2,22 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace App\Models\SmsGate;
 
-use App\Models\SmsGateException;
+use App\Exception\SmsGateException;
 use Carbon\Carbon;
-use Exception;
 use Nette\Database\Explorer;
 use Nette\Utils\Random;
+use SimpleXMLElement;
+use Webmozart\Assert\Assert;
 
-// https://www.smsbrana.cz/dokumentace
+/**
+ * See: https://www.smsbrana.cz/dokumentace
+ */
 class SmsGate
 {
-    public const TABLE_NAME = 'log_sms';
-    public const SYSTEM_USER_ID = 0;
+    public const string TABLE_NAME = 'log_sms';
+    public const int SYSTEM_USER_ID = 0;
 
     public function __construct(
         private string $apiURL,
@@ -23,8 +26,12 @@ class SmsGate
         private int $senderID,
         private bool $securedLogin,
         private Explorer $db
-    ) {}
+    ) {
+    }
 
+    /**
+     * @throws SmsGateException
+     */
     public function sendSMS(string $phoneNumber, string $message, int $userID = self::SYSTEM_USER_ID): void
     {
         $credentials = [];
@@ -44,21 +51,21 @@ class SmsGate
 
         $query = http_build_query($params, '', '&', PHP_QUERY_RFC3986);
         $request = $this->apiURL . '?' . $query;
-        $response = false;
 
-        try {
-            $response = file_get_contents($request); // Todo: curl
-        } catch (Exception $e) {
-            throw $e;
-        }
+        $response = file_get_contents($request); // Todo: curl
+        Assert::string($response, 'Error processing request');
 
-        if ($response === false) {
-            throw new Exception('Error processing request', 1);
-        }
+        $xml = simplexml_load_string($response);
+        Assert::isInstanceOf($xml, SimpleXMLElement::class, 'Error processing request XML');
 
-        $responseData = json_decode(json_encode(simplexml_load_string($response)), TRUE);
+        $encodedResponse = json_encode($xml);
+        Assert::string($encodedResponse, 'Error processing request (encoding)');
+
+        $responseData = json_decode($encodedResponse, true);
+        Assert::isArray($responseData, 'Error processing request (decoding)');
+        Assert::keyExists($responseData, 'err', 'Error processing request (missing err key)');
+
         $errorCode = $responseData['err'];
-
         $this->logSMS($phoneNumber, $message, $errorCode, $userID);
 
         if (DEBUG === true) {
@@ -103,7 +110,7 @@ class SmsGate
             'user_id' => $userID,
             'phone_number' => $phoneNumber,
             'message' => $message,
-            'error_code' => $errorCode
+            'error_code' => $errorCode,
         ]);
     }
 }

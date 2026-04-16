@@ -4,22 +4,27 @@ declare(strict_types=1);
 
 namespace App\Modules\Website\Presenters;
 
-use App\Components\IAdminButtonFactory;
-use App\Components\IMenuFactory;
-use App\Components\IPaginationFactory;
-use App\Models\CategoryManager;
-use App\Models\ConfigManager;
+use App\Components\AdminButton\IAdminButtonFactory;
+use App\Components\Menu\IMenuFactory;
+use App\Components\Pagination\IPaginationFactory;
+use App\Exception\TranslatorException;
+use App\Models\Category\CategoryManager;
+use App\Models\Config\ConfigManager;
+use App\Models\Config\ConfigTrait;
 use App\Models\Helpers\AssetsVersion;
 use App\Models\Helpers\IPValidator;
-use App\Models\RedirectManager;
-use App\Models\TranslationManager;
+use App\Models\Redirect\RedirectManager;
+use App\Models\Translation\LanguageService;
+use App\Models\Translation\Translator;
+use App\Models\Translation\TranslatorTrait;
 use Nette;
 use Nette\Database\Explorer;
+use Webmozart\Assert\Assert;
 
 abstract class BasePresenter extends Nette\Application\UI\Presenter
 {
-    use \App\Models\Config;
-    use \App\Models\Translation;
+    use ConfigTrait;
+    use TranslatorTrait;
 
     /** @var Explorer @inject */
     public Explorer $db;
@@ -27,8 +32,11 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     /** @var ConfigManager @inject */
     public ConfigManager $configManager;
 
-    /** @var TranslationManager @inject */
-    public TranslationManager $translationManager;
+    /** @var LanguageService @inject */
+    public LanguageService $languageService;
+
+    /** @var Translator @inject */
+    public Translator $translator;
 
     /** @var RedirectManager @inject */
     public RedirectManager $redirectManager;
@@ -58,7 +66,9 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     /** @var array<string,mixed> $defaultParams */
     protected array $defaultParams = [];
 
-
+    /**
+     * @throws TranslatorException
+     */
     public function startup(): void
     {
         parent::startup();
@@ -77,13 +87,15 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         }
 
         // Language
-        $this->lang = $this->c('DEFAULT_LANG'); // TODO: Get language from URL or session
-        $this->translationManager->setCurrentLanguage($this->lang);
+        $lang = $this->c('DEFAULT_LANG'); // TODO: Get language from URL or session
+        Assert::notNull($lang, 'Default language not found');
+        $this->lang = $lang;
+        $this->languageService->setCurrentLanguage($this->lang);
 
         // Default parameters
         $this->defaultParams = [
             'lang' => $this->lang, // TODO: Get language from URL or session
-            'HTML_LANG' => $this->translationManager->getLanguageService()->getLanguage($this->lang)['html_lang'] ?? $this->lang,
+            'HTML_LANG' => $this->languageService->getLanguage($this->lang)['html_lang'] ?? $this->lang,
             'DEFAULT_LANG' => $this->c('DEFAULT_LANG'),
             'page' => $this->c('DEFAULT_PAGE'),
             'title' => $this->c('SITE_TITLE'), // TODO: Use SEO_TITLE instead?
@@ -98,7 +110,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
             'og_description' => $this->c('OG_DESCRIPTION'),
             'og_image' => $this->c('OG_IMAGE'),
             'og_show_locale' => ($this->c('OG_SHOW_LOCALE') == 1),
-            'og_locale' => $this->translationManager->getLanguageService()->getLanguage($this->lang)['locale'] ?? $this->c('DEFAULT_LOCALE'),
+            'og_locale' => $this->languageService->getLanguage($this->lang)['locale'] ?? $this->c('DEFAULT_LOCALE'),
         ];
     }
 
@@ -106,12 +118,12 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     {
         parent::beforeRender();
 
-        // Configuration
+        // CONFIGURATOR
         $this->template->_C = fn($key) => $this->configManager->get($key);
 
-        // Translations
-        $this->template->_ = fn($key) => $this->translationManager->get($key, $this->lang);
-        $this->template->_F = fn($key, $values) => $this->translationManager->getf($key, $this->lang, $values);
+        // TRANSLATOR
+        $this->template->_ = fn($key) => $this->translator->translate($key, $this->lang);
+        $this->template->_F = fn($key, $values) => $this->translator->translateFormat($key, $this->lang, $values);
 
         // Default parameters
         $this->template->setParameters($this->defaultParams);
@@ -124,7 +136,9 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
         // JS + CSS code injecting
         $this->template->cssInject = $this->c('CSS_INJECT');
-        if (!IPValidator::ipInList($_SERVER['REMOTE_ADDR'], explode(',', $this->c('JS_IP_EXCEPTIONS')))) {
+        $jsIPExceptions = $this->c('JS_IP_EXCEPTIONS');
+        Assert::string($jsIPExceptions, 'JS_IP_EXCEPTIONS must be a string.');
+        if (!IPValidator::ipInList($_SERVER['REMOTE_ADDR'], explode(',', $jsIPExceptions))) {
             $this->template->jsInjectHead = $this->c('JS_INJECT_HEAD');
             $this->template->jsInjectBodyFirst = $this->c('JS_INJECT_BODY_FIRST');
             $this->template->jsInjectBodyLast = $this->c('JS_INJECT_BODY_LAST');
@@ -138,7 +152,9 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
             ->addFile('website/dist/styles-main.css', 'css_version')
             ->addFile('website/dist/styles-print.css', 'css_version_print');
 
-        bdump($this->template->getParameters(), 'TEMPLATE PARAMS');
+        /** @var array<string, mixed> $templateParams */
+        $templateParams = $this->template->getParameters();
+        bdump($templateParams, 'TEMPLATE PARAMS');
 
         // Ajax
         if ($this->isAjax() && !$this->isControlInvalid()) {
@@ -156,7 +172,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $this->totalItems = $totalItems;
     }
 
-    protected function createComponentPagination(): \App\Components\Pagination
+    protected function createComponentPagination(): \App\Components\Pagination\Pagination
     {
         if ($this->itemsPerPage === null || $this->totalItems === null) {
             throw new \LogicException('Call setPagination() in the render method first.');
@@ -180,21 +196,21 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $component = parent::createComponent($name);
 
         if ($component instanceof \App\Components\BaseControl) {
-            $component->setTranslationManager($this->translationManager);
+            $component->setTranslator($this->translator);
             $component->setConfigManager($this->configManager);
         }
 
         return $component;
     }
 
-    protected function createComponentAdminButton(): \App\Components\AdminButton
+    protected function createComponentAdminButton(): \App\Components\AdminButton\AdminButton
     {
         $control = $this->adminBarFactory->create();
         $control->setAdminUrl($this->template->adminUrl);
         return $control;
     }
 
-    protected function createComponentMenu(): \App\Components\Menu
+    protected function createComponentMenu(): \App\Components\Menu\Menu
     {
         $control = $this->menuFactory->create();
         return $control;

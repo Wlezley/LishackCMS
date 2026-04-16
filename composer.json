@@ -12,33 +12,41 @@
         "GPL-3.0"
     ],
     "require": {
-        "php": ">= 8.2",
+        "php": ">= 8.4",
+        "ext-fileinfo": "*",
+        "ext-gd": "*",
+        "ext-pdo": "*",
+        "ext-simplexml": "*",
+        "codeception/codeception": "^5.1",
+        "codeception/module-asserts": "*",
+        "codeception/module-phpbrowser": "*",
+        "contributte/console": "^0.10.1",
+        "latte/latte": "^3.0",
+        "nesbot/carbon": "^3.8",
         "nette/application": "^3.2",
         "nette/bootstrap": "^3.2",
-        "nette/caching": "^3.3",
+        "nette/caching": "^3.4",
         "nette/database": "^3.2",
         "nette/di": "^3.2",
         "nette/forms": "^3.2",
         "nette/http": "^3.3",
         "nette/mail": "^4.0",
-        "nette/robot-loader": "^4.0",
+        "nette/robot-loader": "^4.1",
         "nette/security": "^3.2",
         "nette/utils": "^4.0",
-        "latte/latte": "^3.0",
-        "tracy/tracy": "^2.10",
-        "nesbot/carbon": "^3.8",
         "robmorgan/phinx": "^0.16.5",
-        "codeception/codeception": "^5.1",
-        "codeception/module-phpbrowser": "*",
-        "codeception/module-asserts": "*",
-        "contributte/console": "^0.10.1",
-        "ublaboo/datagrid": "^7.x-dev",
-        "samdark/sitemap": "^2.4"
+        "samdark/sitemap": "^2.4",
+        "tracy/tracy": "^2.10",
+        "ublaboo/datagrid": "^7.1.x-dev",
+        "webmozart/assert": "^2.0"
     },
     "require-dev": {
         "nette/tester": "^2.5",
-        "symfony/thanks": "^1",
-        "phpstan/phpstan": "^2.0"
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan": "^2.0",
+        "phpstan/phpstan-nette": "^2.0",
+        "phpstan/phpstan-webmozart-assert": "^2.0",
+        "slevomat/coding-standard": "^8.26"
     },
     "autoload": {
         "psr-4": {
@@ -48,10 +56,16 @@
     "minimum-stability": "stable",
     "config": {
         "allow-plugins": {
-            "symfony/thanks": false
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "phpstan/extension-installer": true
         },
         "platform": {
-            "php": "8.2"
+            "php": "8.4"
         }
+    },
+    "scripts": {
+        "lint": "phpcs",
+        "lint-fix": "phpcbf",
+        "phpstan": "phpstan analyse --memory-limit 512M"
     }
 }

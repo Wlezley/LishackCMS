@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
-use App\Components\Admin\IConfigEditorFactory;
-use App\Components\Admin\IConfigSeoFormFactory;
-use App\Components\Admin\IConfigWebsiteFormFactory;
+use App\Components\Admin\ConfigEditor\IConfigEditorFactory;
+use App\Components\Admin\ConfigSeoForm\IConfigSeoFormFactory;
+use App\Components\Admin\ConfigWebsiteForm\IConfigWebsiteFormFactory;
 
 class ConfigPresenter extends SecuredPresenter
 {
@@ -40,48 +40,50 @@ class ConfigPresenter extends SecuredPresenter
     // ###             COMPONENTS             ###
     // ##########################################
 
-    protected function createComponentConfigEditor(): \App\Components\Admin\ConfigEditor
+    protected function createComponentConfigEditor(): \App\Components\Admin\ConfigEditor\ConfigEditor
     {
         $control = $this->configEditor->create();
 
-        $control->onSuccess = function(string $message): void {
+        $control->onSuccess = function (string $message): void {
             $this->flashMessage($message, 'info');
             $this->redirect('Config:editor');
         };
 
-        $control->onError = function(string $message): void {
+        $control->onError = function (string $message): void {
             $this->flashMessage($message, 'danger');
         };
 
         return $control;
     }
 
-    protected function createComponentConfigWebsiteForm(): \App\Components\Admin\ConfigWebsiteForm
+    protected function createComponentConfigWebsiteForm(): \App\Components\Admin\ConfigWebsiteForm\ConfigWebsiteForm
     {
         $form = $this->configWebsiteForm->create();
 
-        $form->onSuccess = function(string $message): void {
+        $form->setLanguageService($this->languageService);
+
+        $form->onSuccess = function (string $message): void {
             $this->flashMessage($message, 'info');
             $this->redirect('Config:website');
         };
 
-        $form->onError = function(string $message): void {
+        $form->onError = function (string $message): void {
             $this->flashMessage($message, 'danger');
         };
 
         return $form;
     }
 
-    protected function createComponentConfigSeoForm(): \App\Components\Admin\ConfigSeoForm
+    protected function createComponentConfigSeoForm(): \App\Components\Admin\ConfigSeoForm\ConfigSeoForm
     {
         $form = $this->configSeoForm->create();
 
-        $form->onSuccess = function(string $message): void {
+        $form->onSuccess = function (string $message): void {
             $this->flashMessage($message, 'info');
             $this->redirect('Config:seo');
         };
 
-        $form->onError = function(string $message): void {
+        $form->onError = function (string $message): void {
             $this->flashMessage($message, 'danger');
         };
 

@@ -2,19 +2,21 @@
 
 declare(strict_types=1);
 
-namespace App\Components\Admin;
+namespace App\Components\Admin\UserForm;
 
 use App\Components\BaseControl;
-use App\Models\UserException;
-use App\Models\UserManager;
-use App\Models\UserRole;
-use App\Models\UserValidator;
+use App\Exception\UserException;
+use App\Models\User\UserManager;
+use App\Models\User\UserRole;
+use App\Models\User\UserValidator;
 use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
+use Webmozart\Assert\Assert;
 
 class UserForm extends BaseControl
 {
-    public const OriginCreate = 'Create';
-    public const OriginEdit = 'Edit';
+    public const string OriginCreate = 'Create';
+    public const string OriginEdit = 'Edit';
 
     private string $origin;
 
@@ -54,6 +56,10 @@ class UserForm extends BaseControl
 
         $readOnly = false;
         if ($this->origin === self::OriginEdit) {
+            Assert::keyExists($param, 'id', 'User ID must be set');
+            Assert::keyExists($param, 'role', 'User role must be set');
+            Assert::string($param['role'], 'User role must be a string');
+            Assert::numeric($param['id'], 'User ID must be a number');
             $readOnly = $this->isReadOnly($param['id'], $param['role']);
         }
 
@@ -85,6 +91,8 @@ class UserForm extends BaseControl
             ->setHtmlAttribute('readonly', $readOnly)
             ->setValue($param['email']);
 
+        Assert::keyExists($param, 'role', 'User role must be set');
+        Assert::stringNotEmpty($param['role'], 'User role must be a string');
         $form->addSelect('role', $this->t('permissions'), $this->getRoleSelectList($param['role']))
             ->setValue($param['role'])
             ->setDisabled($this->readOnlyRole($param['role']))
@@ -116,13 +124,15 @@ class UserForm extends BaseControl
 
         $form->addSubmit('save', $this->origin === self::OriginEdit ? $this->t('save') : $this->t('create'));
 
-        $form->onSuccess[] = [$this, 'process' . $this->origin];
+        $form->onSuccess[] = [$this, 'process' . $this->origin]; // @phpstan-ignore-line
 
         return $form;
     }
 
-    /** @param \Nette\Utils\ArrayHash<mixed> $values */
-    public function processCreate(Form $form, \Nette\Utils\ArrayHash $values): void
+    /**
+     * @param ArrayHash<mixed> $values
+     */
+    public function processCreate(Form $form, ArrayHash $values): void
     {
         if (empty($values['password'])) {
             call_user_func($this->onError, $this->t('error.form.fill-password'));
@@ -140,13 +150,15 @@ class UserForm extends BaseControl
         try {
             $userID = $this->userManager->create((array)$values);
             call_user_func($this->onSuccess, $this->tf('success.form.user-created', $userID));
-        } catch(UserException $e) {
+        } catch (UserException $e) {
             call_user_func($this->onError, $e->getMessage());
         }
     }
 
-    /** @param \Nette\Utils\ArrayHash<mixed> $values */
-    public function processEdit(Form $form, \Nette\Utils\ArrayHash $values): void
+    /**
+     * @param ArrayHash<mixed> $values
+     */
+    public function processEdit(Form $form, ArrayHash $values): void
     {
         if ($values['change_password']) {
             if ($values['password'] !== $values['password2']) {
@@ -170,7 +182,7 @@ class UserForm extends BaseControl
             $userData = UserValidator::prepareData((array)$values);
             $this->userManager->update((int)$values['id'], $userData);
             call_user_func($this->onSuccess, $this->t('success.form.user-saved'));
-        } catch(UserException $e) {
+        } catch (UserException $e) {
             call_user_func($this->onError, $e->getMessage());
         } catch (\InvalidArgumentException $e) {
             call_user_func($this->onError, $e->getMessage());
@@ -188,12 +200,12 @@ class UserForm extends BaseControl
                 $this->param = $this->userManager->get((int) $id);
                 $this->template->readOnly = $this->isReadOnly($id, $this->param['role']);
             }
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             call_user_func($this->onError, $e->getMessage());
         }
 
-        $this->template->setFile(__DIR__ . '/UserForm' . $this->origin . '.latte');
-        $this->template->render();
+        $this->getTemplate()->setFile(__DIR__ . '/UserForm' . $this->origin . '.latte');
+        $this->getTemplate()->render();
     }
 
     public function setOrigin(string $origin): void
@@ -219,21 +231,23 @@ class UserForm extends BaseControl
         return false;
     }
 
-    /** @return array<string,string> */
-    private function getRoleSelectList(?string $targetRole): array
+    /**
+     * @return array<string,string>
+     */
+    private function getRoleSelectList(string $targetRole): array
     {
-        $USER_ROLES_SELECT = [];
-        foreach (UserRole::USER_ROLES as $role_name) {
-            $USER_ROLES_SELECT[$role_name] = $this->t('user.role.' . $role_name);
+        $userRolesSelect = [];
+        foreach (UserRole::USER_ROLES as $roleName) {
+            $userRolesSelect[$roleName] = $this->t('user.role.' . $roleName);
         }
 
         if ($this->origin === self::OriginEdit && $this->editorRole->isLessOrEqualsThan($targetRole)) {
-            return [$targetRole => $USER_ROLES_SELECT[$targetRole]];
+            return [$targetRole => $userRolesSelect[$targetRole]];
         } else {
             $roleListSelect = [];
 
             foreach ($this->editorRole->getLowerList() as $roleName) {
-                $roleListSelect[$roleName] = $USER_ROLES_SELECT[$roleName];
+                $roleListSelect[$roleName] = $userRolesSelect[$roleName];
             }
             return $roleListSelect;
         }

@@ -10,10 +10,15 @@ class Bootstrap
 {
     public static function boot(): Configurator
     {
-        $configurator = new Configurator;
+        $configurator = new Configurator();
         $appDir = dirname(__DIR__);
 
-        //$configurator->setDebugMode('secret@23.75.345.200'); // enable for your remote IP
+        match (getenv('APP_ENV')) {
+            'dev',
+            'local' => $configurator->setDebugMode(true),
+            default => $configurator->setDebugMode(false), // production mode
+        };
+
         $configurator->enableTracy($appDir . '/log');
         // error_reporting(E_ERROR);
 

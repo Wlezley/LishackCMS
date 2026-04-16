@@ -2,7 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace App\Models\Config;
+
+use RuntimeException;
+use Webmozart\Assert\Assert;
+use Webmozart\Assert\InvalidArgumentException;
 
 /**
  * Provides a shortcut method for accessing configuration values.
@@ -30,19 +34,22 @@ namespace App\Models;
  * }
  * ```
  */
-trait Config
+trait ConfigTrait
 {
     /**
-     * Retrieves a configuration value for a given key.
+     * Retrieves a configuration value for a given key
      *
-     * @param string $key The configuration key.
-     * @return string|null The configuration value, or null if not found.
-     * @throws \RuntimeException If ConfigManager is not available.
+     * @param string $key The configuration key
+     * @return string|null The configuration value or null if not found
+     * @throws RuntimeException If ConfigManager is not available
+     * @throws InvalidArgumentException If the configuration key is empty
      */
     public function c(string $key): ?string
     {
-        if (!isset($this->configManager)) {
-            throw new \RuntimeException('ConfigManager is not available in ' . static::class);
+        try {
+            Assert::isInitialized($this, 'configManager', 'ConfigManager is not available in ' . static::class);
+        } catch (InvalidArgumentException $e) {
+            throw new RuntimeException('ConfigManager is not available in ' . static::class, 0, $e);
         }
 
         return $this->configManager->get($key);

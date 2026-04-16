@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Models\Dataset;
 
+use App\Exception\DatasetException;
 use App\Models\Dataset\Entity\Dataset;
 use App\Models\Dataset\Entity\DatasetColumn;
 use App\Models\Dataset\Repository\ColumnRepository;
 use App\Models\Dataset\Repository\DataRepository;
 use App\Models\Dataset\Repository\DatasetRepository;
+use Webmozart\Assert\Assert;
 
 class DatasetCreator
 {
@@ -21,7 +23,8 @@ class DatasetCreator
         private DatasetRepository $datasetRepository,
         private ColumnRepository $columnRepository,
         private DataRepository $dataRepository
-    ) {}
+    ) {
+    }
 
     /**
      * Configures the base dataset metadata.
@@ -33,11 +36,19 @@ class DatasetCreator
      * @param string $component Optional frontend component binding.
      * @param string $presenter Optional presenter routing value.
      * @param bool $active Whether the dataset is active.
-     * @return self
+     * @param bool $deleted Whether the dataset is marked as deleted.
+     * @return DatasetCreator
+     * @throws DatasetException If the dataset is already configured.
      */
-    public function configure(string $name, string $slug = '', string $component = '', string $presenter = '', bool $active = true, bool $deleted = false): self
-    {
-        $this->dataset = (new Dataset())
+    public function configure(
+        string $name,
+        string $slug = '',
+        string $component = '',
+        string $presenter = '',
+        bool $active = true,
+        bool $deleted = false
+    ): self {
+        $this->dataset = new Dataset()
             ->setId(null)
             ->setName($name)
             ->setSlug($slug)
@@ -59,11 +70,11 @@ class DatasetCreator
      * @param string $slug Optional slug identifier.
      * @param string $type Column data type (e.g., 'string', 'int').
      * @param bool $required The column is required.
-     * @param bool $listed The column is listed in DataList.
-     * @param bool $hidden The column is editable only with an user in the admin role.
+     * @param bool $listed The column is listed in the DataList.
+     * @param bool $hidden The column is editable only with a user in the admin role.
      * @param bool $deleted The column is marked as deleted.
      * @param string|null $default Default value of the column.
-     * @return self
+     * @throws DatasetException
      */
     public function addColumn(
         string $name,
@@ -74,9 +85,8 @@ class DatasetCreator
         bool $hidden = false,
         bool $deleted = false,
         ?string $default = null
-    ): self
-    {
-        $column = (new DatasetColumn())
+    ): self {
+        $column = new DatasetColumn()
             ->setName($name)
             ->setSlug($slug)
             ->setType($type)
@@ -100,8 +110,8 @@ class DatasetCreator
      * This will insert dataset metadata, store column definitions,
      * and create a dedicated table for data storage.
      *
-     * @throws DatasetException If dataset is not configured or has no columns.
      * @return int The ID of the created dataset.
+     * @throws DatasetException If the dataset is not configured or has no columns.
      */
     public function commit(): int
     {
@@ -114,9 +124,9 @@ class DatasetCreator
         }
 
         $this->dataset = $this->datasetRepository->insert($this->dataset);
+        Assert::notNull($this->dataset->id, 'Dataset ID must not be null.');
         $columnId = 0;
 
-        /** @var DatasetColumn $column */
         foreach ($this->columns as $column) {
             $column->setDatasetId($this->dataset->id);
             $column->setColumnId(++$columnId);
@@ -142,8 +152,7 @@ class DatasetCreator
     /**
      * Returns the configured dataset object.
      *
-     * @throws DatasetException If dataset has not been configured yet.
-     * @return Dataset
+     * @throws DatasetException If the dataset has not been configured yet.
      */
     public function getDataset(): Dataset
     {

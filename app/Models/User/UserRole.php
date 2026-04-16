@@ -2,19 +2,24 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace App\Models\User;
+
+use Nette\Security\User as NetteUser;
+use Webmozart\Assert\Assert;
+use Webmozart\Assert\InvalidArgumentException;
 
 class UserRole
 {
-    public const USER_ROLES = [
+    /** @var array<int,string> List of user roles */
+    public const array USER_ROLES = [
         0 => 'guest',
         1 => 'user',
         2 => 'redactor',
         3 => 'manager',
-        4 => 'admin'
+        4 => 'admin',
     ];
 
-    public const DEFAULT_ROLE = 'user';
+    public const string DEFAULT_ROLE = 'user';
 
     public int $level;
 
@@ -22,12 +27,12 @@ class UserRole
      * Constructor for the UserRole class.
      * Converts a user object, role name, or role ID into the corresponding role level.
      *
-     * @param \Nette\Security\User|string|int $value User object, role name, or role ID
+     * @param NetteUser|string|int $value Nette User object, role name, or role ID
      * @throws \InvalidArgumentException If the provided role name or ID is invalid
      */
-    public function __construct(\Nette\Security\User|string|int $value)
+    public function __construct(NetteUser|string|int $value)
     {
-        if ($value instanceof \Nette\Security\User) {
+        if ($value instanceof NetteUser) {
             $value = $value->getRoles()[0];
         }
 
@@ -200,19 +205,19 @@ class UserRole
     /**
      * Compares two roles using a given operator.
      *
-     * @param \Nette\Security\User|string|int $left Left operand (user object, role name, or role ID)
+     * @param NetteUser|string|int $left Left operand (NetteUser object, role name, or role ID)
      * @param string $operator Comparison operator (e.g., '==', '!=', '>', '>=', '<', '<=', '<>')
-     * @param \Nette\Security\User|string|int $right Right operand (user object, role name, or role ID)
+     * @param NetteUser|string|int $right Right operand (NetteUser object, role name, or role ID)
      * @return bool Result of the comparison
      * @throws \InvalidArgumentException If the operator is not supported
      */
-    public static function compare(\Nette\Security\User|string|int $left, string $operator, \Nette\Security\User|string|int $right): bool
+    public static function compare(NetteUser|string|int $left, string $operator, NetteUser|string|int $right): bool
     {
-        if ($left instanceof \Nette\Security\User) {
+        if ($left instanceof NetteUser) {
             $left = $left->getRoles()[0];
         }
 
-        if ($right instanceof \Nette\Security\User) {
+        if ($right instanceof NetteUser) {
             $right = $right->getRoles()[0];
         }
 
@@ -274,14 +279,16 @@ class UserRole
     /**
      * Asserts that the given role name exists.
      *
-     * @param string $roleName Role name to validate
-     * @throws \InvalidArgumentException If the role name is invalid
+     * @param mixed $roleName Role name to validate
+     * @throws InvalidArgumentException If the role name is invalid
      */
-    public static function assertRoleName(string $roleName): void
+    public static function assertRoleName(mixed $roleName): void
     {
-        if (!in_array($roleName, self::USER_ROLES)) {
-            throw new \InvalidArgumentException("Role '$roleName' was not found.");
-        }
+        Assert::inArray(
+            value: $roleName,
+            values: self::USER_ROLES,
+            message: "Role '$roleName' was not found."
+        );
     }
 
     /**

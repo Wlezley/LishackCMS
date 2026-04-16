@@ -8,8 +8,9 @@ use Nette\Http\FileUpload;
 
 class Storage
 {
-    public function __construct(
-    ) {}
+    public function __construct()
+    {
+    }
 
     public function storeFile(FileUpload $file): string
     {

@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 require __DIR__ . '/../vendor/autoload.php';
 
+use App\Models\Installer\Installer;
+use Nette\Http\Request;
 use Tracy\Debugger;
+use Webmozart\Assert\Assert;
 
 if (isset($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
     if ($_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https' && isset($_SERVER['SERVER_PORT']) && in_array($_SERVER['SERVER_PORT'], [80, 82])) {
@@ -16,7 +19,7 @@ if (isset($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
     }
 }
 
-define('VERSION', '0.1a');
+define('VERSION', '0.2');
 define('PROJECT_DIR', dirname(__DIR__) . '/');
 define('APP_DIR', PROJECT_DIR . 'app/');
 define('WWW_DIR', __DIR__);
@@ -27,9 +30,13 @@ $configurator = App\Bootstrap::boot();
 $container = $configurator->createContainer();
 
 if (empty($baseUrl)) {
-    $baseUrl = 'http' . ($_SERVER['SERVER_PORT'] == 443 ? 's' : '') . '://' . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . '/';
+    $protocol = $_SERVER['SERVER_PORT'] == 443 ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'];
+    $path = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
+    $baseUrl = "{$protocol}://{$host}{$path}/";
 }
 $baseUrl = str_replace('admin/', '', $baseUrl);
+Assert::string($baseUrl, 'Base URL must be a string.');
 $homeUrl = str_replace('www/', '', $baseUrl);
 
 define('BASE_URL', $baseUrl);
@@ -39,11 +46,11 @@ define('DEBUG', Debugger::$productionMode === Debugger::Development);
 define('PROJECT_SETTINGS', $container->getParameters());
 
 // Installer trigger
-if (DEBUG) {
-    $installer = $container->getByType(\App\Models\Installer::class);
+if (DEBUG === true) {
+    $installer = $container->getByType(Installer::class);
 
     if (!$installer->isInstalled()) {
-        $httpRequest = $container->getByType(\Nette\Http\Request::class);
+        $httpRequest = $container->getByType(Request::class);
         $baseUrl = $httpRequest->getUrl()->getBaseUrl();
         $absUrl = $httpRequest->getUrl()->getAbsoluteUrl();
 

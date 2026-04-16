@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Models\Dataset\Repository;
 
-use App\Models\Dataset\DatasetException;
+use App\Exception\DatasetException;
 use App\Models\Dataset\Entity\DatasetColumn;
 use App\Models\Helpers\SqlHelper;
 use Nette\Database\Explorer;
+use Nette\Database\Table\ActiveRow;
 
 final class ColumnRepository
 {
@@ -15,7 +16,8 @@ final class ColumnRepository
 
     public function __construct(
         private Explorer $db
-    ) {}
+    ) {
+    }
 
     /** @return DatasetColumn[] */
     public function findByDatasetId(int $datasetId, bool $includeDeleted = false): array
@@ -79,6 +81,7 @@ final class ColumnRepository
         $column->columnId = $this->lastColumnId($column->datasetId);
         $column->columnId++;
 
+        /** @var ActiveRow $row */
         $row = $this->db->table(self::TABLE_NAME)->insert($column->toDatabaseRow());
         return DatasetColumn::fromDatabaseRow($row->toArray());
     }
@@ -117,9 +120,9 @@ final class ColumnRepository
         return $this->db->table(self::TABLE_NAME)
             ->where([
                 'dataset_id' => $datasetId,
-                'column_id' => $columnId
+                'column_id' => $columnId,
             ])->update([
-                'deleted' => 1
+                'deleted' => 1,
             ]);
     }
 
@@ -157,8 +160,9 @@ final class ColumnRepository
         SqlHelper::assertSafeIdentifier($tableName);
         SqlHelper::assertSafeIdentifier($columnName);
 
+        // TODO: Refactor SQL query construction
         $sql = "SHOW COLUMNS FROM `$tableName` WHERE FIELD = ?";
-        $result = $this->db->fetch($sql, $columnName);
+        $result = $this->db->fetch($sql, $columnName); // @phpstan-ignore-line
 
         return $result !== null;
     }

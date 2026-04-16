@@ -2,15 +2,19 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace App\Models\Category;
 
 use App\Models\Helpers\ArrayHelper;
 use App\Models\Helpers\StringHelper;
+use InvalidArgumentException;
+use Nette\Utils\AssertionException;
 use Nette\Utils\Validators;
+use Webmozart\Assert\Assert;
 
 class CategoryValidator
 {
-    public const COLUMNS = [
+    /** @var array<string> */
+    public const array COLUMNS = [
         'id',
         'parent_id',
         'position',
@@ -19,7 +23,7 @@ class CategoryValidator
         'title',
         'description',
         'body',
-        'hidden'
+        'hidden',
     ];
 
     /**
@@ -36,8 +40,16 @@ class CategoryValidator
      *
      * @return array<string,string|int|null> An associative array containing category data
      */
-    public static function buildData(string $name, int $parentID = 1, int $position = 0, ?string $nameURL = null, ?string $title = null, ?string $description = null, ?string $body = null, bool $hidden = false): array
-    {
+    public static function buildData(
+        string $name,
+        int $parentID = 1,
+        int $position = 0,
+        ?string $nameURL = null,
+        ?string $title = null,
+        ?string $description = null,
+        ?string $body = null,
+        bool $hidden = false
+    ): array {
         return [
             // 'id' => $id, // ID is not included in the built data
             'parent_id' => $parentID,
@@ -60,6 +72,7 @@ class CategoryValidator
     public static function prepareData(array $data): array
     {
         $name = $data['name'] ?? '';
+        Assert::string($name, 'Name must be a string.');
         $nameURL = $data['name_url'] ?? (!empty($name) ? StringHelper::webalize($name) : '');
 
         return [
@@ -79,7 +92,7 @@ class CategoryValidator
      * Validates category data against expected formats and constraints.
      *
      * @param array<string,string|int|null> $data The data to validate
-     * @throws \InvalidArgumentException If any validation rule fails
+     * @throws InvalidArgumentException|AssertionException If any validation rule fails
      */
     public static function validateData(array $data): void
     {
@@ -99,7 +112,7 @@ class CategoryValidator
         }
         if (isset($data['name_url'])) {
             Validators::assert($data['name_url'], 'string:1..255', 'Name URL');
-            StringHelper::assertWebalized($data['name_url']);
+            StringHelper::assertWebalized((string) $data['name_url']);
         }
         if (isset($data['title'])) {
             Validators::assert($data['title'], 'string:0..255', 'Title');
@@ -111,7 +124,7 @@ class CategoryValidator
             Validators::assert($data['body'], 'string', 'Body');
         }
         if (isset($data['hidden']) && !in_array($data['hidden'], ['0', '1'], true)) {
-            throw new \InvalidArgumentException('Hidden must be either "0" or "1".');
+            throw new InvalidArgumentException('Hidden must be either "0" or "1".');
         }
     }
 }

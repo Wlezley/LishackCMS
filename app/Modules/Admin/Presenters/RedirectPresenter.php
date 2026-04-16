@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
-use App\Components\Admin\IRedirectFormFactory;
-use App\Components\Admin\IRedirectListFactory;
-use App\Models\RedirectManager;
+use App\Components\Admin\RedirectForm\IRedirectFormFactory;
+use App\Components\Admin\RedirectList\IRedirectListFactory;
+use App\Models\Redirect\RedirectManager;
 
 class RedirectPresenter extends SecuredPresenter
 {
@@ -65,7 +65,7 @@ class RedirectPresenter extends SecuredPresenter
     // ###             COMPONENTS             ###
     // ##########################################
 
-    protected function createComponentRedirectList(): \App\Components\Admin\RedirectList
+    protected function createComponentRedirectList(): \App\Components\Admin\RedirectList\RedirectList
     {
         $control = $this->redirectList->create();
         $control->setParam([
@@ -76,7 +76,7 @@ class RedirectPresenter extends SecuredPresenter
         return $control;
     }
 
-    protected function createComponentRedirectForm(): \App\Components\Admin\RedirectForm
+    protected function createComponentRedirectForm(): \App\Components\Admin\RedirectForm\RedirectForm
     {
         $form = $this->redirectForm->create();
         $id = $this->getParameter('id');
@@ -91,12 +91,12 @@ class RedirectPresenter extends SecuredPresenter
             $form->setParam($this->getHttpRequest()->getPost('param'));
         }
 
-        $form->onSuccess = function(string $message, int $page): void {
+        $form->onSuccess = function (string $message, int $page): void {
             $this->flashMessage($message, 'info');
             $this->redirect('Redirect:', ['page' => $page]);
         };
 
-        $form->onError = function(string $message): void {
+        $form->onError = function (string $message): void {
             $this->flashMessage($message, 'danger');
         };
 
