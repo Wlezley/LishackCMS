@@ -4,9 +4,11 @@
 /www/assets/**/dist/*
 /**/log/*
 /**/temp/*
+/.idea/*
 
 !.gitignore
 !.htaccess
+.env.local
 notes.md
 todo.md
 sitemap.xml
