@@ -152,7 +152,9 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
             ->addFile('website/dist/styles-main.css', 'css_version')
             ->addFile('website/dist/styles-print.css', 'css_version_print');
 
-        bdump($this->template->getParameters(), 'TEMPLATE PARAMS');
+        /** @var array<string, mixed> $templateParams */
+        $templateParams = $this->template->getParameters();
+        bdump($templateParams, 'TEMPLATE PARAMS');
 
         // Ajax
         if ($this->isAjax() && !$this->isControlInvalid()) {
