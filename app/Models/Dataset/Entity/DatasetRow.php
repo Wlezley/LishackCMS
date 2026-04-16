@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models\Dataset\Entity;
 
-use App\Models\Dataset\DatasetException;
+use App\Exception\DatasetException;
+use App\Models\Dataset\Repository\DataRepository;
 use App\Models\Helpers\IntegerHelper;
 use Nette\Utils\Json;
 
@@ -12,13 +13,13 @@ final class DatasetRow
 {
     public ?int $id = null;
 
-    /** @var array<int,mixed> $values */
+    /** @var array<int|string,mixed> $values */
     public array $values = [];
 
     /**
      * Create an instance from the database record
      *
-     * @param array<string,mixed> $row
+     * @param array<int|string,mixed> $row
      * @param DatasetColumn[] $columns
      * @return DatasetRow
      */
@@ -27,9 +28,8 @@ final class DatasetRow
         $instance = new self();
         $instance->id = IntegerHelper::toIntOrNull($row['id']);
 
-        /** @var DatasetColumn $column */
         foreach ($columns as $column) {
-            $key = \App\Models\Dataset\Repository\DataRepository::DATA_COLUMN_PREFIX . $column->columnId;
+            $key = DataRepository::DATA_COLUMN_PREFIX . $column->columnId;
 
             if (!array_key_exists($key, $row)) {
                 continue;
@@ -57,7 +57,7 @@ final class DatasetRow
 
         // TODO: Use column ID, or column slug? Which one has higher priority?
         foreach ($this->values as $columnId => $value) {
-            $key = \App\Models\Dataset\Repository\DataRepository::DATA_COLUMN_PREFIX . $columnId;
+            $key = DataRepository::DATA_COLUMN_PREFIX . $columnId;
 
             if (is_array($value)) {
                 $data[$key] = Json::encode($value);
@@ -87,7 +87,7 @@ final class DatasetRow
         }
     }
 
-    /** @return array<int,mixed> */
+    /** @return array<int|string,mixed> */
     public function getValues(): array
     {
         return $this->values;

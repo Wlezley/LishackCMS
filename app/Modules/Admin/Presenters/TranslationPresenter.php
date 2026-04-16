@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
-use App\Components\Admin\ITranslationFormFactory;
-use App\Components\Admin\ITranslationEditorFactory;
-use App\Components\Admin\ITranslationListFactory;
+use App\Components\Admin\TranslationEditor\ITranslationEditorFactory;
+use App\Components\Admin\TranslationForm\ITranslationFormFactory;
+use App\Components\Admin\TranslationList\ITranslationListFactory;
+use App\Exception\TranslatorException;
 
 class TranslationPresenter extends SecuredPresenter
 {
@@ -21,30 +22,28 @@ class TranslationPresenter extends SecuredPresenter
 
     public function renderDefault(int $page = 1, ?string $lang = null, ?string $search = null): void
     {
-        $languageService = $this->translationManager->getLanguageService();
-        $lang = $lang ?? $languageService->getDefaultLang($this->c('DEFAULT_LANG'));
-        $langData = $languageService->getLanguage($lang);
+        $lang = $lang ?? $this->languageService->getDefaultLanguage($this->c('DEFAULT_LANG'));
 
-        if ($langData === null) {
+        try {
+            $langData = $this->languageService->getLanguage($lang);
+        } catch (TranslatorException) {
             $this->redirect('Translation:');
         }
 
         $this->template->title .= ' - ' . $langData['name'] . ($langData['default'] ? ' (' . $this->t('default') . ')' : '');
 
         $this->template->lang = $lang;
-        $this->template->langList = $languageService->getList(false);
+        $this->template->langList = $this->languageService->getAvailableLanguages(false);
         $this->template->search = $search;
     }
 
     public function renderEditor(string $lang = ''): void
     {
-        $languageService = $this->translationManager->getLanguageService();
-
-        $langList = $languageService->getList(false);
-        $defaultLang = $languageService->getDefaultLang($this->c('DEFAULT_LANG'));
+        $langList = $this->languageService->getAvailableLanguages(false);
+        $defaultLang = $this->languageService->getDefaultLanguage($this->c('DEFAULT_LANG'));
 
         if (empty($lang) || $lang == $defaultLang || !array_key_exists($lang, $langList)) {
-            $redirLang = $languageService->getSecondaryLang();
+            $redirLang = $this->languageService->getSecondaryLanguage();
 
             if ($redirLang) {
                 $this->redirect('Translation:editor', ['lang' => $redirLang]);
@@ -60,7 +59,7 @@ class TranslationPresenter extends SecuredPresenter
 
     public function renderEdit(string $key, string $lang = ''): void
     {
-        if (!$this->translationManager->exists($key)) {
+        if (!$this->translator->existsInDB($key, null)) {
             $this->flashMessage($this->tf('translation.key.not-found', $key), 'danger');
             $this->redirect(':default');
         }
@@ -78,14 +77,14 @@ class TranslationPresenter extends SecuredPresenter
 
         // TODO: Permission check
 
-        $this->translationManager->delete($data['key']);
+        $this->translator->delete($data['key']);
     }
 
     // ##########################################
     // ###             COMPONENTS             ###
     // ##########################################
 
-    protected function createComponentTranslationList(): \App\Components\Admin\TranslationList
+    protected function createComponentTranslationList(): \App\Components\Admin\TranslationList\TranslationList
     {
         $control = $this->translationList->create();
         $control->setParam([
@@ -96,7 +95,7 @@ class TranslationPresenter extends SecuredPresenter
         return $control;
     }
 
-    protected function createComponentTranslationForm(): \App\Components\Admin\TranslationForm
+    protected function createComponentTranslationForm(): \App\Components\Admin\TranslationForm\TranslationForm
     {
         $form = $this->translationForm->create();
         $key = $this->getParameter('key');
@@ -105,7 +104,7 @@ class TranslationPresenter extends SecuredPresenter
             $form->setOrigin($form::OriginEdit);
 
             $param['key'] = $key;
-            foreach ($this->translationManager->getTextListByKey($key) as $lang => $text) {
+            foreach ($this->translator->getTextListByKey($key) as $lang => $text) {
                 $param["text_$lang"] = $text;
             }
 
@@ -116,32 +115,35 @@ class TranslationPresenter extends SecuredPresenter
             $form->setParam($this->getHttpRequest()->getPost('param'));
         }
 
-        $form->setLanguageList($this->translationManager->getLanguageService()->getList(false));
+        $form->setLanguageList($this->languageService->getAvailableLanguages(false));
 
-        $form->onSuccess = function(string $message): void {
+        $form->onSuccess = function (string $message): void {
             $this->flashMessage($message, 'info');
             $this->redirect('Translation:', ['lang' => $this->getParameter('lang')]);
         };
 
-        $form->onError = function(string $message): void {
+        $form->onError = function (string $message): void {
             $this->flashMessage($message, 'danger');
         };
 
         return $form;
     }
 
-    protected function createComponentTranslationEditor(): \App\Components\Admin\TranslationEditor
+    protected function createComponentTranslationEditor(): \App\Components\Admin\TranslationEditor\TranslationEditor
     {
         $control = $this->translationEditor->create();
         $lang = $this->getParameter('lang');
         $control->setParam(['lang' => $lang]);
 
-        $control->onSuccess = function(string $message, string $lang): void {
+        $control->setTranslator($this->translator);
+        $control->setLanguageService($this->languageService);
+
+        $control->onSuccess = function (string $message, string $lang): void {
             $this->flashMessage($message, 'info');
             $this->redirect('Translation:editor', ['lang' => $lang]);
         };
 
-        $control->onError = function(string $message): void {
+        $control->onError = function (string $message): void {
             $this->flashMessage($message, 'danger');
         };
 

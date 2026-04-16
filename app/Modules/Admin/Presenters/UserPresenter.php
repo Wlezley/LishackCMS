@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
-use App\Components\Admin\IUserFormFactory;
-use App\Components\Admin\UserListGrid;
-use App\Models\UserException;
-use App\Models\UserManager;
+use App\Components\Admin\UserForm\IUserFormFactory;
+use App\Components\Admin\UserList\UserListGrid;
+use App\Exception\UserException;
+use App\Models\User\UserManager;
 use Contributte\Datagrid\Datagrid;
+use Contributte\Datagrid\Exception\DatagridColumnStatusException;
+use Contributte\Datagrid\Exception\DatagridException;
 use Nette\Utils\Json;
 
 class UserPresenter extends SecuredPresenter
@@ -20,6 +22,7 @@ class UserPresenter extends SecuredPresenter
         private UserManager $userManager,
         private UserListGrid $userListGrid
     ) {
+        parent::__construct();
         $this->userListGrid->setPresenter($this);
     }
 
@@ -44,7 +47,7 @@ class UserPresenter extends SecuredPresenter
                 'name' => $item['name'],
                 'modal' => [
                     'title' => $this->t('modal.title.confirm-delete'),
-                    'body' => $this->tf('modal.body.delete-user', $item['name'])
+                    'body' => $this->tf('modal.body.delete-user', $item['name']),
                 ],
             ]);
         } catch (\Exception $e) {
@@ -75,7 +78,7 @@ class UserPresenter extends SecuredPresenter
         $data = $this->getHttpRequest()->getPost();
 
         try {
-            $this->userListGrid->setDeleted_Callback($data['id'], '1'); // TODO: Move to UserManager (?)
+            $this->userListGrid->setDeletedCallback($data['id'], '1'); // TODO: Move to UserManager (?)
         } catch (UserException $e) {
             $this->sendJson([
                 'status' => 'error',
@@ -88,15 +91,19 @@ class UserPresenter extends SecuredPresenter
     // ###             COMPONENTS             ###
     // ##########################################
 
+    /**
+     * @throws DatagridColumnStatusException
+     * @throws DatagridException
+     */
     protected function createComponentUserList(): Datagrid
     {
         // $this->userListGrid->setPresenter($this);
-        $this->userListGrid->setTranslationManager($this->translationManager);
+        $this->userListGrid->setTranslator($this->translator);
         $this->userListGrid->setConfigManager($this->configManager);
         return $this->userListGrid->createGrid();
     }
 
-    protected function createComponentUserForm(): \App\Components\Admin\UserForm
+    protected function createComponentUserForm(): \App\Components\Admin\UserForm\UserForm
     {
         $form = $this->userForm->create();
         $id = $this->getParameter('id');
@@ -114,12 +121,12 @@ class UserPresenter extends SecuredPresenter
             $form->setOrigin($form::OriginCreate);
         }
 
-        $form->onSuccess = function(string $message): void {
+        $form->onSuccess = function (string $message): void {
             $this->flashMessage($message, 'info');
             $this->redirect('User:default');
         };
 
-        $form->onError = function(string $message): void {
+        $form->onError = function (string $message): void {
             $this->flashMessage($message, 'danger');
         };
 

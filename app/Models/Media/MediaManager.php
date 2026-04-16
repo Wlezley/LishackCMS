@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models\Media;
 
 use Nette\Database\Explorer;
+use Nette\Database\Table\ActiveRow;
 use Nette\Http\FileUpload;
 use Nette\Utils\Image;
 use Nette\Utils\Strings;
@@ -22,7 +23,8 @@ class MediaManager
     public const THUMB_WIDTH = 300;
 
     public function __construct(private Explorer $db)
-    {}
+    {
+    }
 
     /**
      * Get all media files as array for JSON response
@@ -82,6 +84,7 @@ class MediaManager
         $image->save($thumbPath);
 
         // Save metadata to DB
+        /** @var ActiveRow $row */
         $row = $this->db->table(self::TABLE_NAME)->insert([
             'filename' => $filename,
             'path'     => self::UPLOAD_DIR,

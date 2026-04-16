@@ -2,11 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Components\Admin;
+namespace App\Components\Admin\ConfigEditor;
 
 use App\Components\BaseControl;
+use App\Exception\ConfigException;
 use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
 use Nette\Utils\Json;
+use Nette\Utils\JsonException;
 
 class ConfigEditor extends BaseControl
 {
@@ -18,7 +21,7 @@ class ConfigEditor extends BaseControl
 
     protected function createComponentForm(): Form
     {
-        $form = new Form;
+        $form = new Form();
 
         $form->addHidden('configuration', '');
         $form->addSubmit('save', $this->t('save.config'));
@@ -27,8 +30,12 @@ class ConfigEditor extends BaseControl
         return $form;
     }
 
-    /** @param \Nette\Utils\ArrayHash<mixed> $values */
-    public function processSave(Form $form, \Nette\Utils\ArrayHash $values): void
+    /**
+     * @param ArrayHash<mixed> $values
+     * @throws ConfigException
+     * @throws JsonException
+     */
+    public function processSave(Form $form, ArrayHash $values): void
     {
         if (empty($values['configuration'])) {
             call_user_func($this->onError, $this->t('error.form.empty-data'));
@@ -44,7 +51,7 @@ class ConfigEditor extends BaseControl
     {
         $this->template->configuration = $this->configManager->getConfigData();
 
-        $this->template->setFile(__DIR__ . '/ConfigEditor.latte');
-        $this->template->render();
+        $this->getTemplate()->setFile(__DIR__ . '/ConfigEditor.latte');
+        $this->getTemplate()->render();
     }
 }

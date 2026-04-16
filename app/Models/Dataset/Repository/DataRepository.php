@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Models\Dataset\Repository;
 
-use App\Models\Dataset\DatasetException;
+use App\Exception\DatasetException;
 use App\Models\Dataset\Entity\DatasetColumn;
 use App\Models\Dataset\Entity\DatasetRow;
 use App\Models\Helpers\ArrayHelper;
 use Nette\Database\Explorer;
+use Nette\Database\Table\ActiveRow;
 
 final class DataRepository
 {
@@ -18,7 +19,8 @@ final class DataRepository
     public function __construct(
         private Explorer $db,
         private ColumnRepository $columnRepository
-    ) {}
+    ) {
+    }
 
     private function getTableName(int $datasetId): string
     {
@@ -52,7 +54,7 @@ final class DataRepository
     /** @param DatasetColumn[] $columns */
     public function createTable(int $datasetId, array $columns): void
     {
-        $parts = ["`id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY"];
+        $parts = ['`id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY'];
 
         /** @var DatasetColumn $column */
         foreach ($columns as $column) {
@@ -63,13 +65,14 @@ final class DataRepository
             $parts[] = $column->getColumnSqlDefinition();
         }
 
+        // TODO: Refactor SQL query construction
         $sql = sprintf(
-            "CREATE TABLE IF NOT EXISTS `%s` (%s) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;",
+            'CREATE TABLE IF NOT EXISTS `%s` (%s) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;',
             $this->getTableName($datasetId),
-            implode(", ", $parts)
+            implode(', ', $parts)
         );
 
-        $this->db->query($sql);
+        $this->db->query($sql); // @phpstan-ignore-line
     }
 
     /**
@@ -81,7 +84,9 @@ final class DataRepository
     public function updateTable(int $datasetId, array $columns): void
     {
         $tableName = $this->getTableName($datasetId);
-        $existingColumns = $this->db->fetchAll("SHOW COLUMNS FROM `$tableName`");
+
+        // TODO: Refactor SQL query construction
+        $existingColumns = $this->db->fetchAll("SHOW COLUMNS FROM `$tableName`"); // @phpstan-ignore-line
 
         if (!$existingColumns) {
             throw new DatasetException("Dataset table '$tableName' does not exist.");
@@ -123,19 +128,21 @@ final class DataRepository
         //     }
         // }
 
+        // TODO: Refactor SQL query construction
         if (!empty($alterParts)) {
             $sql = sprintf(
-                "ALTER TABLE `%s` %s;",
+                'ALTER TABLE `%s` %s;',
                 $tableName,
-                implode(", ", $alterParts)
+                implode(', ', $alterParts)
             );
 
-            $this->db->query($sql);
+            $this->db->query($sql); // @phpstan-ignore-line
         }
     }
 
     public function insert(int $datasetId, DatasetRow $row): DatasetRow
     {
+        /** @var ActiveRow $dbRow */
         $dbRow = $this->db->table($this->getTableName($datasetId))
             ->insert($row->toDatabaseRow());
 
@@ -166,12 +173,12 @@ final class DataRepository
      * Retrieves a list of datasets with optional search and pagination.
      *
      * @param int $datasetId Dataset ID.
-     * @param int $limit Number of results to return (default: 50).
-     * @param int $offset Offset for pagination (default: 0).
+     * @param int<0, max>|null $limit Number of results to return (default: 50).
+     * @param int<0, max>|null $offset Offset for pagination (default: 0).
      * @param string|null $search Optional search query for name, slug, component, or presenter fields.
      * @return array<int|string,array<string,string|int|null>>|null Array of datasets indexed by ID, or null if none found.
      */
-    public function getList(int $datasetId, int $limit = 50, int $offset = 0, ?string $search = null): ?array
+    public function getList(int $datasetId, ?int $limit = 50, ?int $offset = 0, ?string $search = null): ?array
     {
         $query = $this->db->table($this->getTableName($datasetId))
             ->limit($limit, $offset)

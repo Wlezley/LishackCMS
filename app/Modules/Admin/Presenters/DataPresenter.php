@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
-use App\Components\Admin\IDataListFactory;
-use App\Components\Admin\IDataEditorFactory;
+use App\Components\Admin\DataEditor\IDataEditorFactory;
+use App\Components\Admin\DataList\IDataListFactory;
 use App\Models\Dataset\DatasetManager;
 
 class DataPresenter extends SecuredPresenter
@@ -71,7 +71,7 @@ class DataPresenter extends SecuredPresenter
 
         $this->flashMessage("Řádek s ID {$data['itemId']} byl odstraněn.", 'info');
         $this->redirect(':default', [
-            'datasetId' => $data['datasetId']
+            'datasetId' => $data['datasetId'],
         ]);
     }
 
@@ -79,7 +79,7 @@ class DataPresenter extends SecuredPresenter
     // ###             COMPONENTS             ###
     // ##########################################
 
-    protected function createComponentDataList(): \App\Components\Admin\DataList
+    protected function createComponentDataList(): \App\Components\Admin\DataList\DataList
     {
         $control = $this->dataList->create();
         $control->setParam([
@@ -90,7 +90,7 @@ class DataPresenter extends SecuredPresenter
         return $control;
     }
 
-    protected function createComponentDataEditor(): \App\Components\Admin\DataEditor
+    protected function createComponentDataEditor(): \App\Components\Admin\DataEditor\DataEditor
     {
         $control = $this->dataEditor->create();
 
@@ -100,12 +100,12 @@ class DataPresenter extends SecuredPresenter
             $this->getParameter('itemId') ? $control::OriginEdit : $control::OriginCreate
         );
 
-        $control->onSuccess = function(string $message, int $datasetId): void {
+        $control->onSuccess = function (string $message, int $datasetId): void {
             $this->flashMessage($message, 'info');
             $this->redirect('Data:', ['datasetId' => $datasetId]);
         };
 
-        $control->onError = function(string $message): void {
+        $control->onError = function (string $message): void {
             $this->flashMessage($message, 'danger');
         };
 

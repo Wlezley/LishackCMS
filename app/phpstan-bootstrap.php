@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 define('VERSION', '');
 define('PROJECT_DIR', '');
 define('APP_DIR', '');

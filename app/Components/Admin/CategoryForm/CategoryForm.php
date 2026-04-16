@@ -2,18 +2,20 @@
 
 declare(strict_types=1);
 
-namespace App\Components\Admin;
+namespace App\Components\Admin\CategoryForm;
 
 use App\Components\BaseControl;
-use App\Models\CategoryException;
-use App\Models\CategoryManager;
+use App\Exception\CategoryException;
+use App\Models\Category\CategoryManager;
 use App\Models\Helpers\StringHelper;
 use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
+use Webmozart\Assert\Assert;
 
 class CategoryForm extends BaseControl
 {
-    public const OriginCreate = 'Create';
-    public const OriginEdit = 'Edit';
+    public const string OriginCreate = 'Create';
+    public const string OriginEdit = 'Edit';
 
     private string $origin;
 
@@ -35,6 +37,7 @@ class CategoryForm extends BaseControl
         $form->setHtmlAttribute('autocomplete', 'off');
 
         if ($this->origin == self::OriginEdit) {
+            Assert::keyExists($param, 'id', 'Category ID must be set');
             $form->addHidden('id', $param['id']);
         }
 
@@ -74,8 +77,8 @@ class CategoryForm extends BaseControl
         return $form;
     }
 
-    /** @param \Nette\Utils\ArrayHash<mixed> $values */
-    public function process(Form $form, \Nette\Utils\ArrayHash $values): void
+    /** @param ArrayHash<mixed> $values */
+    public function process(Form $form, ArrayHash $values): void
     {
         $data = (array)$values;
         $data['hidden'] = $data['hidden'] ? '1' : '0';
@@ -107,7 +110,7 @@ class CategoryForm extends BaseControl
                 unset($data['id']);
                 $this->categoryManager->create($data);
                 call_user_func($this->onSuccess, $this->t('success.form.category-created'), 1);
-            } else if ($this->origin == self::OriginEdit) {
+            } elseif ($this->origin == self::OriginEdit) {
                 $this->categoryManager->update((int) $data['id'], $data);
                 call_user_func($this->onSuccess, $this->t('success.form.category-saved'), $values['page'] ?? 1);
             } else {
@@ -121,8 +124,8 @@ class CategoryForm extends BaseControl
 
     public function render(): void
     {
-        $this->template->setFile(__DIR__ . '/CategoryForm.latte');
-        $this->template->render();
+        $this->getTemplate()->setFile(__DIR__ . '/CategoryForm.latte');
+        $this->getTemplate()->render();
     }
 
     public function setOrigin(string $origin): void

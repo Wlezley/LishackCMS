@@ -2,22 +2,27 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace App\Models\Article;
 
+use App\Exception\ArticleException;
+use App\Models\BaseModel;
+use App\Models\Category\CategoryManager;
+use App\Models\Config\ConfigManager;
 use App\Models\Helpers\ArrayHelper;
 use Nette\Database\Explorer;
+use Nette\Database\Table\ActiveRow;
+use Webmozart\Assert\Assert;
 
 class ArticleManager extends BaseModel
 {
-    public const TABLE_NAME = 'article';
+    public const string TABLE_NAME = 'article';
 
     public function __construct(
         protected Explorer $db,
         protected ConfigManager $configManager,
-        protected TranslationManager $translationManager,
         public CategoryManager $categoryManager
     ) {
-        parent::__construct($db, $configManager, $translationManager);
+        parent::__construct($db, $configManager);
     }
 
     /**
@@ -46,19 +51,19 @@ class ArticleManager extends BaseModel
     /**
      * Retrieves an article by its unique `name_url` slug.
      *
-     * @param string $name_url Slug of the article.
+     * @param string $nameUrl Slug of the article.
      * @return array<string,mixed> Article data as an associative array.
      * @throws ArticleException If the article is not found.
      */
-    public function getByNameUrl(string $name_url): array
+    public function getByNameUrl(string $nameUrl): array
     {
         $article = $this->db->table(self::TABLE_NAME)
-            ->where('name_url', $name_url)
+            ->where('name_url', $nameUrl)
             ->fetch();
 
         if (!$article) {
             throw new ArticleException(
-                "Article (name_url: '$name_url') not found.",
+                "Article (name_url: '$nameUrl') not found.",
                 \Nette\Http\IResponse::S404_NotFound
             );
         }
@@ -134,9 +139,12 @@ class ArticleManager extends BaseModel
         $newArticle = $this->db->table(self::TABLE_NAME)
             ->insert($data);
 
-        if (!$newArticle) {
+        try {
+            Assert::isInstanceOf($newArticle, ActiveRow::class, 'Article not created.');
+            Assert::numeric($newArticle['id'], 'Article ID must be numeric.');
+        } catch (\Throwable $e) {
             throw new ArticleException(
-                'Article creation failed.',
+                'Article creation failed: ' . $e->getMessage(),
                 \Nette\Http\IResponse::S500_InternalServerError
             );
         }
@@ -204,13 +212,13 @@ class ArticleManager extends BaseModel
     /**
      * Retrieves a list of articles with optional search and pagination.
      *
-     * @param int $limit Number of results to return (default: 50).
-     * @param int $offset Offset for pagination (default: 0).
+     * @param int<0,max>|null $limit Number of results to return (default: 50).
+     * @param int<0,max>|null $offset Offset for pagination (default: 0).
      * @param string|null $search Optional search query for article title and content.
-     * @param int $categoryId Category ID filter.
+     * @param int<0,max>|null $categoryId Category ID filter.
      * @return array<int|string,array<string,string|int|null>>|null Array of articles indexed by id, or null if empty.
      */
-    public function getList(int $limit = 50, int $offset = 0, ?string $search = null, ?int $categoryId = null): ?array
+    public function getList(?int $limit = 50, ?int $offset = 0, ?string $search = null, ?int $categoryId = null): ?array
     {
         $query = $this->db->table(self::TABLE_NAME)
             ->limit($limit, $offset)

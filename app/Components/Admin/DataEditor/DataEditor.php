@@ -2,18 +2,21 @@
 
 declare(strict_types=1);
 
-namespace App\Components\Admin;
+namespace App\Components\Admin\DataEditor;
 
 use App\Components\BaseControl;
+use App\Exception\DatasetException;
 use App\Models\Dataset\DatasetManager;
 use App\Models\Dataset\Entity\DatasetColumn;
 use App\Models\Dataset\Entity\DatasetRow;
 use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
+use Webmozart\Assert\Assert;
 
 class DataEditor extends BaseControl
 {
-    public const OriginCreate = 'Create';
-    public const OriginEdit = 'Edit';
+    public const string OriginCreate = 'Create';
+    public const string OriginEdit = 'Edit';
 
     private string $origin;
     private ?int $datasetId = null;
@@ -46,6 +49,8 @@ class DataEditor extends BaseControl
             $this->datasetId = $this->datasetManager->getDataset()->id;
         }
 
+        Assert::notNull($this->datasetId);
+
         $data = null;
         if ($this->origin == self::OriginEdit) {
             $itemId = $this->getPresenter()->getParameter('itemId');
@@ -63,7 +68,7 @@ class DataEditor extends BaseControl
             }
         }
 
-        $form = new Form;
+        $form = new Form();
 
         $form->setHtmlAttribute('autocomplete', 'off');
 
@@ -116,10 +121,12 @@ class DataEditor extends BaseControl
         return $form;
     }
 
-    /** @param \Nette\Utils\ArrayHash<mixed> $values */
-    public function processCreate(Form $form, \Nette\Utils\ArrayHash $values): void
+    /**
+     * @param ArrayHash<mixed> $values
+     */
+    public function processCreate(Form $form, ArrayHash $values): void
     {
-        if (!$this->datasetManager->isReady()) {
+        if (!$this->datasetManager->isReady() || $this->datasetId === null) {
             call_user_func($this->onError, $this->t('dataset.id.not-set'));
             return;
         }
@@ -149,7 +156,7 @@ class DataEditor extends BaseControl
 
         $dataRow = $this->datasetManager->getDataRepository()->insert($this->datasetId, $dataRow);
 
-        if (!$dataRow->id) {
+        if ($dataRow->id === null) {
             call_user_func($this->onError, $this->t('dataset.item.not-created'));
             return;
         }
@@ -157,10 +164,13 @@ class DataEditor extends BaseControl
         call_user_func($this->onSuccess, $this->tf('dataset.item.created', $dataRow->id), $this->datasetId);
     }
 
-    /** @param \Nette\Utils\ArrayHash<mixed> $values */
-    public function processSave(Form $form, \Nette\Utils\ArrayHash $values): void
+    /**
+     * @param ArrayHash<mixed> $values
+     * @throws DatasetException
+     */
+    public function processSave(Form $form, ArrayHash $values): void
     {
-        if (!$this->datasetManager->isReady()) {
+        if (!$this->datasetManager->isReady() || $this->datasetId === null) {
             call_user_func($this->onError, $this->t('dataset.id.not-set'));
             return;
         }
@@ -174,7 +184,7 @@ class DataEditor extends BaseControl
         }
 
         $dataRow = new DatasetRow();
-        $dataRow->id = $values['itemId'] ? (int) $values['itemId']: null;
+        $dataRow->id = $values['itemId'] ? (int) $values['itemId'] : null;
 
         foreach ($values as $key => $value) {
             if (!str_starts_with($key, 'data_')) {
@@ -189,6 +199,7 @@ class DataEditor extends BaseControl
             return;
         }
 
+        Assert::notNull($dataRow->id);
         $this->datasetManager->getDataRepository()->update($this->datasetId, $dataRow);
 
         call_user_func($this->onSuccess, $this->tf('dataset.item.saved', $dataRow->id), $this->datasetId);
@@ -198,8 +209,8 @@ class DataEditor extends BaseControl
     {
         $this->template->columnList = $this->datasetManager->getColumnsList();
 
-        $this->template->setFile(__DIR__ . '/DataEditor.latte');
-        $this->template->render();
+        $this->getTemplate()->setFile(__DIR__ . '/DataEditor.latte');
+        $this->getTemplate()->render();
     }
 
     public function setOrigin(string $origin): void

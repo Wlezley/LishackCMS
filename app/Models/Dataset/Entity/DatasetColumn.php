@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models\Dataset\Entity;
 
-use App\Models\Dataset\DatasetException;
+use App\Exception\DatasetException;
 use App\Models\Helpers\IntegerHelper;
 use App\Models\Helpers\SqlHelper;
 use App\Models\Helpers\StringHelper;
@@ -85,7 +85,7 @@ final class DatasetColumn
             'int' => 'INT(11)',
             'string' => 'VARCHAR(255)',
             'bool' => 'TINYINT(1)',
-            'json', 'text', 'html', 'wysiwyg' => 'TEXT',
+            'json', 'text', 'html', 'wysiwyg' => 'LONGTEXT',
             default => throw new DatasetException("Unknown SQL type for '{$this->type}'."),
         };
     }
@@ -114,7 +114,7 @@ final class DatasetColumn
     public function getColumnSqlDefinition(mixed $default = null, bool $isNullable = true): string
     {
         if (!$this->columnId) {
-            throw new DatasetException("Cannot get SQL definition without column ID.");
+            throw new DatasetException('Cannot get SQL definition without column ID.');
         }
 
         $columnName = $this->getDatabaseColumnName();
@@ -161,11 +161,11 @@ final class DatasetColumn
         }
 
         if (trim($this->name) === '') {
-            throw new DatasetException("The column name must not be empty.");
+            throw new DatasetException('The column name must not be empty.');
         }
 
         if (trim($this->slug) === '') {
-            throw new DatasetException("The column slug must not be empty.");
+            throw new DatasetException('The column slug must not be empty.');
         }
     }
 

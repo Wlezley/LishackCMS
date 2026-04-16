@@ -8,6 +8,9 @@ use App\Models\Media\DummyImageGenerator;
 use App\Models\Media\ImageResizer;
 use App\Models\Media\MediaManager;
 use Nette\Application\Responses\FileResponse;
+use Nette\Http\IResponse;
+use Webmozart\Assert\Assert;
+use Webmozart\Assert\InvalidArgumentException;
 
 final class MediaPresenter extends BasePresenter
 {
@@ -29,6 +32,17 @@ final class MediaPresenter extends BasePresenter
         $this->sendResponse($response);
     }
 
+    /**
+     * Handles the request to display or generate an image based on the provided parameters.
+     *
+     * If the image with the specified ID exists, it is processed and returned.
+     * If resizing dimensions are provided (width, height), the image is resized or cropped accordingly.
+     * If the image does not exist, a placeholder image is generated and returned.
+     *
+     * @param int $id The ID of the image to be displayed. Defaults to 0.
+     * @param int<1, max>|null $width Optional width to resize or crop the image. If null, no width resizing is applied.
+     * @param int<1, max>|null $height Optional height to resize or crop the image. If null and width are provided, the image is resized proportionately to the width.
+     */
     public function actionShow(int $id = 0, ?int $width = null, ?int $height = null): void
     {
         $imageMetadata = $this->mediaManager->getById($id);
@@ -38,11 +52,18 @@ final class MediaPresenter extends BasePresenter
             $absoluteFilePath = $imageMetadata['filepath'];
             $contentType = mime_content_type($absoluteFilePath);
 
-            if ($width || $height) {
-                if (!$height) {
+            try {
+                Assert::string($contentType);
+            } catch (InvalidArgumentException $e) {
+                $this->error('Invalid content type for media file', IResponse::S400_BadRequest);
+            }
+
+            if ($width !== null || $height !== null) {
+                if ($height === null) {
                     $thumbPath = PROJECT_DIR . MediaManager::THUMB_DIR . "$id-$width.png";
                     $image = $this->imageResizer->resizeToWidth($absoluteFilePath, $width);
                 } else {
+                    Assert::integer($width);
                     $thumbPath = PROJECT_DIR . MediaManager::THUMB_DIR . "$id-$width-$height.png";
                     $image = $this->imageResizer->resizeAndCrop($absoluteFilePath, $width, $height);
                 }

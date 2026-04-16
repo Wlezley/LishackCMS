@@ -4,18 +4,24 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
-use App\Models\ConfigManager;
+use App\Exception\TranslatorException;
+use App\Models\Config\ConfigManager;
+use App\Models\Config\ConfigTrait;
 use App\Models\Helpers\AssetsVersion;
-use App\Models\TranslationManager;
+use App\Models\Translation\LanguageService;
+use App\Models\Translation\Translator;
+use App\Models\Translation\TranslatorTrait;
 use Nette\Application\Helpers;
 use Nette\Database\Explorer;
+use Webmozart\Assert\Assert;
 
 abstract class BasePresenter extends \Nette\Application\UI\Presenter
 {
-    use \App\Models\Config;
-    use \App\Models\Translation;
+    use ConfigTrait;
+    use TranslatorTrait;
 
-    private const CATEGORY_MAP = [
+    /** @var array<string,string> */
+    private const array CATEGORY_MAP = [
         'Admin' => 'HOME',
         'Article' => 'ARTICLE',
         'Config' => 'CONFIG',
@@ -37,33 +43,39 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
     /** @var ConfigManager @inject */
     public ConfigManager $configManager;
 
-    /** @var TranslationManager @inject */
-    public TranslationManager $translationManager;
+    /** @var LanguageService @inject */
+    public LanguageService $languageService;
 
-    /** @var string */
+    /** @var Translator @inject */
+    public Translator $translator;
+
     protected string $lang;
     protected string $htmlLang;
 
+    /**
+     * @throws TranslatorException
+     */
     public function startup(): void
     {
         parent::startup();
 
-        // TODO: Get language from URL or session
-        $this->lang = $this->c('DEFAULT_LANG_ADMIN');
-        $this->translationManager->setCurrentLanguage($this->lang);
-        $this->htmlLang = $this->translationManager->getLanguageService()->getLanguage($this->lang)['html_lang'] ?? $this->lang;
+        $lang = $this->c('DEFAULT_LANG_ADMIN'); // TODO: Get language from URL or session
+        Assert::notNull($lang, 'Default admin language not found');
+        $this->lang = $lang;
+        $this->languageService->setCurrentLanguage($this->lang);
+        $this->htmlLang = $this->languageService->getLanguage($this->lang)['html_lang'] ?? $this->lang;
     }
 
     public function beforeRender(): void
     {
         parent::beforeRender();
 
-        // Configuration
+        // CONFIGURATOR
         $this->template->_C = fn($key) => $this->configManager->get($key);
 
-        // Translations
-        $this->template->_ = fn($key) => $this->translationManager->get($key, $this->lang);
-        $this->template->_F = fn($key, $values) => $this->translationManager->getf($key, $this->lang, $values);
+        // TRANSLATOR
+        $this->template->_ = fn($key) => $this->translator->translate($key, $this->lang);
+        $this->template->_F = fn($key, $values) => $this->translator->translateFormat($key, $this->lang, $values);
 
         // Translated Title
         $this->template->title = $this->getPresenterTitle();
@@ -112,6 +124,7 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
      */
     protected function getPresenterCategory(): string
     {
+        Assert::stringNotEmpty($this->getName(), 'Presenter name cannot be empty');
         return self::CATEGORY_MAP[Helpers::splitName($this->getName())[1]] ?? '';
     }
 
@@ -127,11 +140,19 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
      *
      * @param string|null $lang Optional language code (defaults to current language).
      * @return string The translated title.
+     * @throws TranslatorException
      */
     protected function getPresenterTitle(?string $lang = null): string
     {
-        $translationKey = strtolower('title.' . str_replace(':', '.', $this->getName()) . '.' . $this->getAction());
-        return $this->translationManager->get($translationKey, $lang);
+        $name = $this->getName();
+        Assert::stringNotEmpty($name, 'Presenter name cannot be empty');
+
+        $action = $this->getAction();
+        Assert::stringNotEmpty($action, 'Presenter action cannot be empty');
+
+        $translationKey = 'title.' . str_replace(':', '.', $name) . '.' . $action;
+        $translationKey = strtolower($translationKey);
+        return $this->translator->translate($translationKey, $lang);
     }
 
     // ##########################################
@@ -143,7 +164,7 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
         $component = parent::createComponent($name);
 
         if ($component instanceof \App\Components\BaseControl) {
-            $component->setTranslationManager($this->translationManager);
+            $component->setTranslator($this->translator);
             $component->setConfigManager($this->configManager);
         }
 

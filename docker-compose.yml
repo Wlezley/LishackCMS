@@ -1,0 +1,29 @@
+services:
+    web:
+        image: jakubboucek/lamp-devstack-php:8.4
+        environment:
+            # APACHE_DOCUMENT_ROOT: "/var/www/html/www"
+            APP_DEBUG: 1
+            TZ: Europe/Prague
+        env_file:
+          - path: ./.env
+            required: true # default
+          - path: ./.env.local
+            required: false
+        ports:
+            - "127.0.0.1:80:80"
+        restart: always
+        volumes:
+            - ".:/var/www/html"
+
+    mysqldb:
+        image: jakubboucek/lamp-devstack-mysql
+        environment:
+            MARIADB_DATABASE: lishack_cms
+            MARIADB_ROOT_PASSWORD: devstack
+            TZ: Europe/Prague
+        ports:
+            - "127.0.0.1:33060:3306"
+        restart: always
+        volumes:
+            - "./.docker/mysql/data:/var/lib/mysql"

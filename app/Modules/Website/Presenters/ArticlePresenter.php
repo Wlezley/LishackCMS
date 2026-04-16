@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Modules\Website\Presenters;
 
-use App\Models\ArticleManager;
-use App\Models\ArticleParser;
-use App\Models\CategoryException;
-use App\Models\CategoryManager;
-use App\Models\UrlGenerator;
+use App\Exception\CategoryException;
+use App\Models\Article\ArticleManager;
+use App\Models\Article\ArticleParser;
+use App\Models\Category\CategoryManager;
+use App\Models\UrlGenerator\UrlGenerator;
 use Nette;
+use Webmozart\Assert\Assert;
+use Webmozart\Assert\InvalidArgumentException;
 
 final class ArticlePresenter extends BasePresenter
 {
@@ -29,13 +31,15 @@ final class ArticlePresenter extends BasePresenter
     private string $titleSuffix = '';
 
     private bool $isCategory = false;
+
+    /** @var int<0,max>|null $activeCategory */
     private ?int $activeCategory = null;
 
     public function actionDefault(string $articleUrl = '', string $categoryUrl = ''): void
     {
         try {
             $categoryUrlList = $this->urlGenerator->normalizeCategoryUrl($categoryUrl);
-        } catch (CategoryException $e) {
+        } catch (CategoryException) {
             $this->article = $this->articleManager->getByNameUrl('404');
             $this->getHttpResponse()->setCode(Nette\Http\IResponse::S404_NotFound);
             return;
@@ -50,18 +54,22 @@ final class ArticlePresenter extends BasePresenter
         $articleUrl = $articleUrl ?: $this->c('DEFAULT_PAGE');
 
         try {
+            Assert::notNull($articleUrl, 'Article URL cannot be null');
             $categoryId = $this->categoryManager->resolveCategoryId($categoryUrlList);
+            Assert::range($categoryId, 0, PHP_INT_MAX, 'Invalid category ID');
             $articleId = $this->articleManager->getIdByUrlAndCategory($articleUrl, $categoryId);
             $this->article = $this->articleManager->getById($articleId);
             $this->activeCategory = $categoryId;
-        } catch (\Exception $e) {
+        } catch (\Throwable) {
             try {
+                Assert::notNull($articleUrl, 'Article URL cannot be null');
                 $categoryUrlList[] = $articleUrl;
                 $categoryId = $this->categoryManager->resolveCategoryId($categoryUrlList);
+                Assert::range($categoryId, 0, PHP_INT_MAX, 'Invalid category ID');
                 $this->isCategory = true;
                 $this->activeCategory = $categoryId;
                 $this->titlePrefix = 'Kategorie: ';
-            } catch (CategoryException $e) {
+            } catch (CategoryException | InvalidArgumentException) {
                 $this->article = $this->articleManager->getByNameUrl('404');
                 $this->getHttpResponse()->setCode(Nette\Http\IResponse::S404_NotFound);
                 return;
@@ -75,14 +83,17 @@ final class ArticlePresenter extends BasePresenter
             } else {
                 $this->article = $this->articleManager->getByNameUrl('404');
                 $this->getHttpResponse()->setCode(Nette\Http\IResponse::S404_NotFound);
-                return;
             }
         }
     }
 
+    /**
+     * @throws CategoryException
+     */
     public function renderDefault(): void
     {
-        if ($this->isCategory) {
+        if ($this->isCategory && $this->activeCategory !== null) {
+            Assert::range($this->activeCategory, 0, PHP_INT_MAX, 'Invalid category ID');
             $category = $this->categoryManager->getById($this->activeCategory);
             $this->template->title = $this->titlePrefix . $category['name'] . $this->titleSuffix;
 
@@ -92,7 +103,7 @@ final class ArticlePresenter extends BasePresenter
 
             $this->template->adminUrl = $this->template->adminUrl . "menu/edit?id={$category['id']}";
 
-            $this->template->setFile(__DIR__ . '/../Templates/Article/list.latte');
+            $this->getTemplate()->setFile(__DIR__ . '/../templates/Article/list.latte');
         } else {
             // PAGE TITLE
             $this->template->title = $this->titlePrefix . $this->article['title'] . $this->titleSuffix;
@@ -117,12 +128,12 @@ final class ArticlePresenter extends BasePresenter
             $articleContent = $articleParser->parseComponents($this->article['content']); // PARSED TEXT
             $this->template->article[] = $articleContent;
             $this->template->have_custom_h1 = (strpos(strtolower($articleContent), '<h1') !== false);
-            $this->template->activeCategory = $this->activeCategory;
+            $this->template->activeCategory = $this->activeCategory; // TODO: This is maybe always null
 
             // ADMIN URL
             $this->template->adminUrl = $this->template->adminUrl . "article/edit?id={$this->article['id']}";
 
-            $this->template->setFile(__DIR__ . '/../Templates/Article/detail.latte');
+            $this->getTemplate()->setFile(__DIR__ . '/../templates/Article/detail.latte');
 
             // DEBUG ONLY
             // bdump($this->article, "ARTICLE DATA");

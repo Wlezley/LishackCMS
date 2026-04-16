@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Website\Presenters;
 
-use App\Models\Installer;
+use App\Models\Installer\Installer;
 use Nette\Application\UI\Presenter;
 
 final class InstallPresenter extends Presenter
@@ -32,7 +32,7 @@ final class InstallPresenter extends Presenter
             $this->installer->run();
         } catch (\Exception $e) {
             $this->redirect('Install:failed', [
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
         }
 

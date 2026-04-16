@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App;
+namespace App\Router;
 
 use Nette;
 use Nette\Application\Routers\RouteList;
@@ -13,7 +13,7 @@ class RouterFactory
 
     public static function createRouter(): RouteList
     {
-        $router = new RouteList;
+        $router = new RouteList();
 
         self::createAdminRouter($router);
         self::createApiRouter($router);

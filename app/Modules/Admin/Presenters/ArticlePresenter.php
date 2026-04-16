@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
-use App\Components\Admin\IArticleEditorFactory;
-use App\Components\Admin\IArticleListFactory;
-use App\Models\ArticleException;
-use App\Models\ArticleManager;
-use App\Models\CategoryManager;
-use App\Models\UrlGenerator;
-use App\Models\UserManager;
+use App\Components\Admin\ArticleEditor\IArticleEditorFactory;
+use App\Components\Admin\ArticleList\IArticleListFactory;
+use App\Exception\ArticleException;
+use App\Models\Article\ArticleManager;
+use App\Models\Category\CategoryManager;
+use App\Models\UrlGenerator\UrlGenerator;
+use App\Models\User\UserManager;
 
 class ArticlePresenter extends SecuredPresenter
 {
@@ -96,7 +96,7 @@ class ArticlePresenter extends SecuredPresenter
     // ###             COMPONENTS             ###
     // ##########################################
 
-    protected function createComponentArticleList(): \App\Components\Admin\ArticleList
+    protected function createComponentArticleList(): \App\Components\Admin\ArticleList\ArticleList
     {
         $control = $this->articleList->create();
         $control->setParam([
@@ -107,7 +107,7 @@ class ArticlePresenter extends SecuredPresenter
         return $control;
     }
 
-    protected function createComponentArticleEditor(): \App\Components\Admin\ArticleEditor
+    protected function createComponentArticleEditor(): \App\Components\Admin\ArticleEditor\ArticleEditor
     {
         $form = $this->articleEditor->create();
         $id = (int) $this->getParameter('id');
@@ -130,12 +130,12 @@ class ArticlePresenter extends SecuredPresenter
             $form->setOrigin($form::OriginCreate);
         }
 
-        $form->onSuccess = function(string $message, $articleId): void {
+        $form->onSuccess = function (string $message, $articleId): void {
             $this->flashMessage($message, 'info');
             $this->redirect('Article:edit', ['id' => $articleId]);
         };
 
-        $form->onError = function(string $message): void {
+        $form->onError = function (string $message): void {
             $this->flashMessage($message, 'danger');
         };
 
