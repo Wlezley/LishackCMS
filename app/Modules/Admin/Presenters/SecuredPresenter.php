@@ -8,6 +8,7 @@ use App\Components\Admin\DatasetSidebar\IDatasetSidebarFactory;
 use App\Components\Pagination\IPaginationFactory;
 use App\Models\User\UserManager;
 use App\Models\User\UserRole;
+use Webmozart\Assert\Assert;
 
 class SecuredPresenter extends BasePresenter
 {
@@ -60,7 +61,15 @@ class SecuredPresenter extends BasePresenter
     {
         parent::afterRender();
 
-        $this->template->userData = $this->user->identity->getData();
+        try {
+            $userIdentity = $this->getUser()->getIdentity();
+            Assert::notNull($userIdentity, 'User identity is null.');
+
+            $this->template->userData = $userIdentity->getData();
+//            $this->getTemplate()->userData = $userIdentity->getData(); // TODO: Check if this works, instead of above
+        } catch (\Exception $e) {
+            // TODO: Log error or handle it gracefully
+        }
     }
 
     // ##########################################
