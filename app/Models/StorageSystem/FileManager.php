@@ -58,7 +58,7 @@ class FileManager
     public function deleteFile(int $id): void
     {
         // $this->storageFilesRepository->delete($id); // Hard delete
-        $this->storageFilesRepository->setDeleted($id); // Soft delete
+        $this->storageFilesRepository->setDeleted($id, true); // Soft-delete
     }
 
     /**
