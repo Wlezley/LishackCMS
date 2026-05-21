@@ -74,18 +74,15 @@ class StorageTreeRepository
             ->delete();
     }
 
-    public function setDeleted(int $id): int
+    public function setDeleted(int $id, bool $isDeleted): int
     {
         return $this->db->table(self::TABLE_NAME)
             ->where('id', $id)
-            ->update([$this->db::literal('deleted_at = NOW()')]); // TODO: Check if this works
-    }
-
-    public function setUndelete(int $id): int
-    {
-        return $this->db->table(self::TABLE_NAME)
-            ->where('id', $id)
-            ->update([$this->db::literal('deleted_at = NULL')]); // TODO: Check if this works
+            ->update([
+                'deleted_at' => $isDeleted
+                    ? $this->db::literal('NOW()')
+                    : null,
+            ]);
     }
 
     public function moveToFolder(int $id, int $parentId): int

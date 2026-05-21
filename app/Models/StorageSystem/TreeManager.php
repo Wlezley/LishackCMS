@@ -81,7 +81,7 @@ class TreeManager
     public function deleteFolder(int $id): void
     {
         // $this->storageTreeRepository->delete($id); // Hard delete
-        $this->storageTreeRepository->setDeleted($id); // Soft delete
+        $this->storageTreeRepository->setDeleted($id, true); // Soft-delete
     }
 
     /**
@@ -114,13 +114,11 @@ class TreeManager
      * @param int $treeId The ID of the folder to move.
      * @param int $parentId The ID of the target virtual folder.
      * @param bool $recursive Option to move data recursive (with its content).
-     *
-     * @todo Add option to move folder content recursively
      */
     public function moveToFolder(int $treeId, int $parentId, bool $recursive = true): void
     {
         if ($recursive) {
-            // ...
+            // TODO: Add option to move folder content recursively
         }
 
         $this->storageTreeRepository->moveToFolder($treeId, $parentId);
