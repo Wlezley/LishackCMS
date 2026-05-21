@@ -95,7 +95,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         // Default parameters
         $this->defaultParams = [
             'lang' => $this->lang, // TODO: Get language from URL or session
-            'HTML_LANG' => $this->languageService->getLanguage($this->lang)['html_lang'] ?? $this->lang,
+            'HTML_LANG' => $this->languageService->getLanguage($this->lang)->htmlLang ?? $this->lang,
             'DEFAULT_LANG' => $this->c('DEFAULT_LANG'),
             'page' => $this->c('DEFAULT_PAGE'),
             'title' => $this->c('SITE_TITLE'), // TODO: Use SEO_TITLE instead?
@@ -110,7 +110,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
             'og_description' => $this->c('OG_DESCRIPTION'),
             'og_image' => $this->c('OG_IMAGE'),
             'og_show_locale' => ($this->c('OG_SHOW_LOCALE') == 1),
-            'og_locale' => $this->languageService->getLanguage($this->lang)['locale'] ?? $this->c('DEFAULT_LOCALE'),
+            'og_locale' => $this->languageService->getLanguage($this->lang)->locale ?? $this->c('DEFAULT_LOCALE'),
         ];
     }
 

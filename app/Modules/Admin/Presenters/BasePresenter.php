@@ -63,7 +63,7 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
         Assert::notNull($lang, 'Default admin language not found');
         $this->lang = $lang;
         $this->languageService->setCurrentLanguage($this->lang);
-        $this->htmlLang = $this->languageService->getLanguage($this->lang)['html_lang'] ?? $this->lang;
+        $this->htmlLang = $this->languageService->getLanguage($this->lang)->htmlLang ?? $this->lang;
     }
 
     public function beforeRender(): void

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Components\Admin\TranslationForm;
 
 use App\Components\BaseControl;
+use App\Dto\Localization\LanguageDto;
 use App\Exception\TranslatorException;
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
@@ -16,7 +17,7 @@ class TranslationForm extends BaseControl
 
     private string $origin;
 
-    /** @var array<string,array<string,mixed>> */
+    /** @var array<string, LanguageDto> */
     private array $languageList;
 
     /** @var array<string,string> $queryParams */
@@ -41,12 +42,11 @@ class TranslationForm extends BaseControl
             ->setValue($param['key'] ?? '')
             ->setRequired();
 
-        foreach ($this->languageList as $key => $langData) {
-            $required = $langData['default'] == 1;
-            $form->addTextArea("text_$key", $this->t('text') . " ($langData[name])", null, 1)
+        foreach ($this->languageList as $languageCode => $languageDto) {
+            $form->addTextArea("text_$languageCode", $this->t('text') . " ($languageDto->name)", null, 1)
                 ->setHtmlAttribute('autocomplete', 'off')
-                ->setValue($param["text_$key"] ?? '')
-                ->setRequired($required);
+                ->setValue($param["text_$languageCode"] ?? '')
+                ->setRequired($languageDto->default);
         }
 
         $form->addSubmit('save');
@@ -70,13 +70,13 @@ class TranslationForm extends BaseControl
                 ' <sup><i class="fa fa-external-link"></i></sup></a>';
             call_user_func($this->onError, $this->tf('error.form.translation-duplicate-key', $values['key'], $editAnchor));
         } else {
-            foreach ($this->languageList as $lang => $langData) {
-                if (isset($values["text_$lang"])) {
-                    if (empty($values["text_$lang"])) {
+            foreach ($this->languageList as $languageCode => $languageDto) {
+                if (isset($values["text_$languageCode"])) {
+                    if (empty($values["text_$languageCode"])) {
                         continue;
                     }
 
-                    $this->translator->add($values['key'], $lang, $values["text_$lang"]);
+                    $this->translator->add($values['key'], $languageCode, $values["text_$languageCode"]);
                 }
             }
 
@@ -97,15 +97,15 @@ class TranslationForm extends BaseControl
         $key = $values['key'];
         $textList = $this->translator->getTextListByKey($key);
 
-        foreach ($this->languageList as $lang => $langName) {
-            if (isset($textList[$lang])) {
-                if (empty($values["text_$lang"])) {
-                    $this->translator->delete($key, $lang);
+        foreach ($this->languageList as $languageCode => $languageDto) {
+            if (isset($textList[$languageCode])) {
+                if (empty($values["text_$languageCode"])) {
+                    $this->translator->delete($key, $languageCode);
                 } else {
-                    $this->translator->update($key, $lang, $values["text_$lang"]);
+                    $this->translator->update($key, $languageCode, $values["text_$languageCode"]);
                 }
-            } elseif (!empty($values["text_$lang"])) {
-                $this->translator->add($key, $lang, $values["text_$lang"]);
+            } elseif (!empty($values["text_$languageCode"])) {
+                $this->translator->add($key, $languageCode, $values["text_$languageCode"]);
             }
         }
 
@@ -125,7 +125,7 @@ class TranslationForm extends BaseControl
     }
 
     /**
-     * @param array<string,array<string,mixed>> $languageList
+     * @param array<string, LanguageDto> $languageList
      */
     public function setLanguageList(array $languageList): void
     {

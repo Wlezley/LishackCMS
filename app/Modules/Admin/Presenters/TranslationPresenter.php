@@ -8,7 +8,12 @@ use App\Components\Admin\TranslationEditor\ITranslationEditorFactory;
 use App\Components\Admin\TranslationForm\ITranslationFormFactory;
 use App\Components\Admin\TranslationList\ITranslationListFactory;
 use App\Exception\TranslatorException;
+use Nette\Application\UI\Template;
+use Nette\Bridges\ApplicationLatte\DefaultTemplate;
 
+/**
+ * @property-read Template|DefaultTemplate|\stdClass $template
+ */
 class TranslationPresenter extends SecuredPresenter
 {
     /** @var ITranslationListFactory @inject */
@@ -25,12 +30,12 @@ class TranslationPresenter extends SecuredPresenter
         $lang = $lang ?? $this->languageService->getDefaultLanguage($this->c('DEFAULT_LANG'));
 
         try {
-            $langData = $this->languageService->getLanguage($lang);
+            $languageDto = $this->languageService->getLanguage($lang);
         } catch (TranslatorException) {
             $this->redirect('Translation:');
         }
 
-        $this->template->title .= ' - ' . $langData['name'] . ($langData['default'] ? ' (' . $this->t('default') . ')' : '');
+        $this->template->title .= ' - ' . $languageDto->name . ($languageDto->default ? ' (' . $this->t('default') . ')' : '');
 
         $this->template->lang = $lang;
         $this->template->langList = $this->languageService->getAvailableLanguages(false);
@@ -39,18 +44,18 @@ class TranslationPresenter extends SecuredPresenter
 
     public function renderEditor(string $lang = ''): void
     {
-        $langList = $this->languageService->getAvailableLanguages(false);
-        $defaultLang = $this->languageService->getDefaultLanguage($this->c('DEFAULT_LANG'));
+        $availableLanguages = $this->languageService->getAvailableLanguages(false);
+        $defaultLanguage = $this->languageService->getDefaultLanguage($this->c('DEFAULT_LANG'));
 
-        if (empty($lang) || $lang == $defaultLang || !array_key_exists($lang, $langList)) {
-            $redirLang = $this->languageService->getSecondaryLanguage();
+        if (empty($lang) || $lang == $defaultLanguage || !array_key_exists($lang, $availableLanguages)) {
+            $redirectLanguage = $this->languageService->getSecondaryLanguage();
 
-            if ($redirLang) {
-                $this->redirect('Translation:editor', ['lang' => $redirLang]);
+            if ($redirectLanguage) {
+                $this->redirect('Translation:editor', ['lang' => $redirectLanguage]);
             }
         }
 
-        $this->template->title .= ' (' . $langList[$defaultLang]['name'] . ' » ' . $langList[$lang]['name'] . ')';
+        $this->template->title .= ' (' . $availableLanguages[$defaultLanguage]->name . ' » ' . $availableLanguages[$lang]->name . ')';
     }
 
     public function renderCreate(string $lang = ''): void
@@ -115,7 +120,9 @@ class TranslationPresenter extends SecuredPresenter
             $form->setParam($this->getHttpRequest()->getPost('param'));
         }
 
-        $form->setLanguageList($this->languageService->getAvailableLanguages(false));
+        $form->setLanguageList(
+            $this->languageService->getAvailableLanguages(false)
+        );
 
         $form->onSuccess = function (string $message): void {
             $this->flashMessage($message, 'info');
