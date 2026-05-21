@@ -78,14 +78,18 @@ class StorageFilesRepository
     {
         return $this->db->table(self::TABLE_NAME)
             ->where('id', $id)
-            ->update([$this->db::literal('deleted_at = NOW()')]); // TODO: Check if this works
+            ->update([
+                'deleted_at' => $this->db::literal('NOW()'),
+            ]);
     }
 
     public function setUndelete(int $id): int
     {
         return $this->db->table(self::TABLE_NAME)
             ->where('id', $id)
-            ->update([$this->db::literal('deleted_at = NULL')]); // TODO: Check if this works
+            ->update([
+                'deleted_at' => null,
+            ]);
     }
 
     public function moveToFolder(int $id, int $treeId): int
