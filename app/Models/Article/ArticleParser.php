@@ -6,6 +6,7 @@ namespace App\Models\Article;
 
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Presenter;
+use Nette\Application\UI\Template;
 use Webmozart\Assert\Assert;
 
 class ArticleParser
@@ -98,14 +99,14 @@ class ArticleParser
             if (is_file($templatePath)) {
 //                Assert::methodExists($template, 'setFile', 'Unable to set a template file for a component');
 
-                if (method_exists($template, 'setFile')) {
+                if ($template instanceof Template) {
                     $template->setFile($templatePath);
                 }
             } else {
                 return "<!-- Template file not found for '{$name}' -->";
             }
 
-            if (method_exists($template, 'renderToString')) {
+            if ($template instanceof Template && method_exists($template, 'renderToString')) {
                 return $template->renderToString();
             } else {
                 return "<!-- Component '{$name}' render failed -->";
