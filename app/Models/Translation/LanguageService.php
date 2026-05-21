@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models\Translation;
 
+use App\Dto\Localization\LanguageDto;
 use App\Exception\TranslatorException;
 use App\Models\Config\ConfigManager;
 use Nette\Database\Explorer;
@@ -14,7 +15,7 @@ class LanguageService
 {
     public const string TABLE_NAME = 'lang';
 
-    /** @var array<string,array<string,mixed>> */
+    /** @var array<string, LanguageDto> */
     private array $languages = [];
 
     /** @var string Currently selected language */
@@ -32,9 +33,9 @@ class LanguageService
     {
         if (empty($this->languages)) {
             foreach ($this->db->table(self::TABLE_NAME)->fetchAll() as $row) {
-                $item = $row->toArray();
-                $key = $item['lang'];
-                $this->languages[$key] = $item;
+                $languageDto = LanguageDto::fromEntity($row);
+                $languageCode = $languageDto->lang;
+                $this->languages[$languageCode] = $languageDto;
             }
         }
     }
@@ -53,30 +54,29 @@ class LanguageService
     /**
      * @throws TranslatorException If language is not found.
      */
-    public function assertLanguageExists(string $lang): void
+    public function assertLanguageExists(string $languageCode): void
     {
         try {
-            Assert::keyExists($this->languages, $lang, "Language '$lang' not found.");
+            Assert::keyExists($this->languages, $languageCode, "Language '$languageCode' not found.");
         } catch (InvalidArgumentException $e) {
             throw new TranslatorException($e->getMessage(), $e->getCode(), $e);
         }
     }
 
     /**
-     * @return array<string,mixed>
      * @throws TranslatorException If language is not found.
      */
-    public function getLanguage(string $lang): array
+    public function getLanguage(string $languageCode): LanguageDto
     {
-        $this->assertLanguageExists($lang);
-        return $this->languages[$lang];
+        $this->assertLanguageExists($languageCode);
+        return $this->languages[$languageCode];
     }
 
-    /** @return array<string,array<string,mixed>> */
+    /** @return array<string, LanguageDto> */
     public function getAvailableLanguages(bool $enabledOnly = true): array
     {
         return $enabledOnly
-            ? array_filter($this->languages, fn($lang) => $lang['enabled'] ?? false)
+            ? array_filter($this->languages, fn($languageDto) => $languageDto->enabled)
             : $this->languages;
     }
 
@@ -90,8 +90,8 @@ class LanguageService
         $names = [];
         $languages = $this->getAvailableLanguages($enabledOnly);
 
-        foreach ($languages as $key => $data) {
-            $names[$key] = $data['name'];
+        foreach ($languages as $languageCode => $languageDto) {
+            $names[$languageCode] = $languageDto->name;
         }
 
         return $names;
@@ -104,9 +104,9 @@ class LanguageService
      */
     public function getDefaultLanguage(?string $fallback = null): string
     {
-        foreach ($this->languages as $lang => $data) {
-            if ($data['default'] == 1) {
-                return $lang;
+        foreach ($this->languages as $languageCode => $languageDto) {
+            if ($languageDto->default) {
+                return $languageCode;
             }
         }
 
@@ -127,9 +127,9 @@ class LanguageService
      */
     public function getSecondaryLanguage(string $fallback = 'en'): string
     {
-        foreach ($this->languages as $lang => $data) {
-            if ($data['default'] == 0 && $data['enabled'] == 1) {
-                return $lang;
+        foreach ($this->languages as $languageCode => $languageDto) {
+            if (!$languageDto->default && $languageDto->enabled) {
+                return $languageCode;
             }
         }
 
