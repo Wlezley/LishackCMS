@@ -4,6 +4,7 @@ search:
         classes:
             - *Factory
             - *Facade
+            - App\Commands\*
 
 extensions:
     console: Contributte\Console\DI\ConsoleExtension(%consoleMode%)
@@ -12,13 +13,6 @@ services:
     router: App\Router\RouterFactory::createRouter
     security.passwords: Nette\Security\Passwords(::PASSWORD_BCRYPT, [cost: 12])
     authenticator: App\Models\User\Authenticator
-
-    # Commands
-    - App\Commands\CategoryUpdateCommand
-    - App\Commands\DatasetAddCommand
-    - App\Commands\UserAddCommand
-    - App\Commands\UserPasswordCommand
-    - App\Commands\UserRoleCommand
 
     # Models
     - App\Models\Article\ArticleManager
@@ -33,6 +27,7 @@ services:
     - App\Models\Translation\Translator
     - App\Models\Translation\TranslatorEditor
     - App\Models\Translation\TranslatorLog
+    - App\Models\Translation\TranslatorMaintenanceManager
     - App\Models\Translation\TranslatorRepository
     - App\Models\Translation\TranslatorRepositoryCache
     - App\Models\UrlGenerator\UrlGenerator
