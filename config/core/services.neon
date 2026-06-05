@@ -8,6 +8,8 @@ search:
 
 extensions:
     console: Contributte\Console\DI\ConsoleExtension(%consoleMode%)
+    nettrine.dbal: Nettrine\DBAL\DI\DbalExtension
+    nettrine.orm: Nettrine\ORM\DI\OrmExtension
 
 services:
     router: App\Router\RouterFactory::createRouter

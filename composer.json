@@ -12,14 +12,11 @@
         "GPL-3.0"
     ],
     "require": {
-        "php": ">= 8.4",
+        "php": ">= 8.4.1",
         "ext-fileinfo": "*",
         "ext-gd": "*",
         "ext-pdo": "*",
         "ext-simplexml": "*",
-        "codeception/codeception": "^5.1",
-        "codeception/module-asserts": "*",
-        "codeception/module-phpbrowser": "*",
         "contributte/console": "^0.10.1",
         "latte/latte": "^3.0",
         "nesbot/carbon": "^3.8",
@@ -41,10 +38,14 @@
         "webmozart/assert": "^2.0",
         "nettrine/dbal": "^0.10.3",
         "nettrine/orm": "^0.10.1",
-        "nettrine/migrations": "^0.10.1"
+        "nettrine/migrations": "^0.10.1",
+        "symfony/var-exporter": "^8.1"
     },
     "require-dev": {
         "nette/tester": "^2.5",
+        "codeception/codeception": "^5.1",
+        "codeception/module-asserts": "*",
+        "codeception/module-phpbrowser": "*",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^2.0",
         "phpstan/phpstan-nette": "^2.0",
@@ -63,7 +64,7 @@
             "phpstan/extension-installer": true
         },
         "platform": {
-            "php": "8.4"
+            "php": "8.4.1"
         }
     },
     "scripts": {

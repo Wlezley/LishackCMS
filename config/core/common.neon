@@ -21,6 +21,28 @@ database:
     options:
         lazy: true
 
+nettrine.dbal:
+    connections:
+        default:
+            driver: pdo_mysql
+            host: %database.host%
+            dbname: %database.name%
+            user: %database.user%
+            password: %database.password%
+            charset: utf8mb4
+
+nettrine.orm:
+    managers:
+        default:
+            connection: default
+            lazyNativeObjects: true
+
+            mapping:
+                App:
+                    directories:
+                        - %appDir%/Entity
+                    namespace: App\Entity
+
 session:
     expiration: 14 days
 
