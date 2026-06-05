@@ -29,7 +29,7 @@ class FilePresenter extends SecuredPresenter
         $fileMeta = $this->fileManager->getFileById($id);
         $path = ''; // TODO !!!
         $name = $fileMeta?->name;
-        $type = $fileMeta?->type;
+        $type = $fileMeta?->type ?: 'application/octet-stream';
 
         $response = new FileResponse($path, $name, $type, false);
         $this->sendResponse($response);
