@@ -6,7 +6,6 @@ namespace App\Models\Article;
 
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Presenter;
-use Nette\Application\UI\Template;
 use Webmozart\Assert\Assert;
 
 class ArticleParser
