@@ -11,6 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'cms_config')]
 class CmsConfig
 {
+    #[ORM\Id]
     #[ORM\Column(type: Types::TEXT, length: 255, unique: true)]
     private string $key;
 
