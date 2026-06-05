@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Commands;
+namespace App\Commands\Translation;
 
 use App\Models\Translation\TranslatorMaintenanceManager;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Webmozart\Assert\Assert;
 
 #[AsCommand(
-    name: 'translations:cleanup-log',
+    name: 'translation:cleanup-log',
     description: 'Removes resolved records from translations_log.',
 )]
 final class CleanupTranslationsLogCommand extends Command
@@ -32,7 +32,7 @@ final class CleanupTranslationsLogCommand extends Command
         OutputInterface $output,
     ): int {
         try {
-            $output->writeln('Cleaning up resolved translations log records ...');
+            $output->writeln('<info>Cleaning up resolved translations log records ...</info>');
             $deletedRows = $this->translatorCommandManager->cleanupTranslationsLog();
             Assert::integer($deletedRows, 'Nothing to delete.');
 
@@ -43,8 +43,7 @@ final class CleanupTranslationsLogCommand extends Command
 
             return self::SUCCESS;
         } catch (\InvalidArgumentException $e) {
-            $output->writeln("<warning>{$e->getMessage()}</warning>");
-            $output->writeln('<info>Nothing to delete.</info>');
+            $output->writeln("<info>{$e->getMessage()}</info>");
             return self::SUCCESS;
         } catch (\Throwable $e) {
             $output->writeln(sprintf(

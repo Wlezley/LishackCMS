@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Commands;
+namespace App\Commands\User;
 
 use App\Models\User\UserManager;
 use Symfony\Component\Console\Attribute\AsCommand;

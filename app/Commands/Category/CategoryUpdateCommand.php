@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Commands;
+namespace App\Commands\Category;
 
 use App\Models\Category\CategoryManager;
 use Symfony\Component\Console\Attribute\AsCommand;
