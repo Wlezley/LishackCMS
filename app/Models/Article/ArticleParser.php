@@ -97,20 +97,12 @@ class ArticleParser
             bdump($templatePath, "Component '{$name}' Template Path");
 
             if (is_file($templatePath)) {
-//                Assert::methodExists($template, 'setFile', 'Unable to set a template file for a component');
-
-                if ($template instanceof Template) {
-                    $template->setFile($templatePath);
-                }
+                $template->setFile($templatePath);
             } else {
                 return "<!-- Template file not found for '{$name}' -->";
             }
 
-            if ($template instanceof Template && method_exists($template, 'renderToString')) {
-                return $template->renderToString();
-            } else {
-                return "<!-- Component '{$name}' render failed -->";
-            }
+            return $template->renderToString();
         } catch (\Throwable $e) {
             return "<!-- Cannot access template: {$e->getMessage()} -->";
         }
