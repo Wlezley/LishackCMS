@@ -6,7 +6,7 @@ Lishack CMS 🦊
 Requirements
 ------------
 
-- PHP 8.2
+- PHP >= 8.4
 - MySQL 8.4 LTS or MariaDB >= 11.4 LTS
 - Composer >= 2.5.1
 - Node.js >= 22.12 LTS
