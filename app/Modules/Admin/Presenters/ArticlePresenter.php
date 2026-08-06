@@ -119,6 +119,7 @@ class ArticlePresenter extends SecuredPresenter
         $form->setUrlGenerator($this->urlGenerator);
         $form->setUserManager($this->userManager);
 
+        // TODO: TRANSLATE FLASH MESSAGES !!!
         if ($id) {
             try {
                 $articleData = $this->articleManager->getById($id);
