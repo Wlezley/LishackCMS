@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace App\Modules\Admin\Presenters;
 
 use App\Components\Admin\TranslationEditor\ITranslationEditorFactory;
+use App\Components\Admin\TranslationEditor\TranslationEditor;
 use App\Components\Admin\TranslationForm\ITranslationFormFactory;
+use App\Components\Admin\TranslationForm\TranslationForm;
 use App\Components\Admin\TranslationList\ITranslationListFactory;
+use App\Components\Admin\TranslationList\TranslationList;
 use App\Exception\TranslatorException;
 use Nette\Application\UI\Template;
 use Nette\Bridges\ApplicationLatte\DefaultTemplate;
@@ -89,7 +92,7 @@ class TranslationPresenter extends SecuredPresenter
     // ###             COMPONENTS             ###
     // ##########################################
 
-    protected function createComponentTranslationList(): \App\Components\Admin\TranslationList\TranslationList
+    protected function createComponentTranslationList(): TranslationList
     {
         $control = $this->translationList->create();
         $control->setParam([
@@ -100,7 +103,7 @@ class TranslationPresenter extends SecuredPresenter
         return $control;
     }
 
-    protected function createComponentTranslationForm(): \App\Components\Admin\TranslationForm\TranslationForm
+    protected function createComponentTranslationForm(): TranslationForm
     {
         $form = $this->translationForm->create();
         $key = $this->getParameter('key');
@@ -136,7 +139,7 @@ class TranslationPresenter extends SecuredPresenter
         return $form;
     }
 
-    protected function createComponentTranslationEditor(): \App\Components\Admin\TranslationEditor\TranslationEditor
+    protected function createComponentTranslationEditor(): TranslationEditor
     {
         $control = $this->translationEditor->create();
         $lang = $this->getParameter('lang');

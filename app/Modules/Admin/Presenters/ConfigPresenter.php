@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
+use App\Components\Admin\ConfigEditor\ConfigEditor;
 use App\Components\Admin\ConfigEditor\IConfigEditorFactory;
+use App\Components\Admin\ConfigSeoForm\ConfigSeoForm;
 use App\Components\Admin\ConfigSeoForm\IConfigSeoFormFactory;
+use App\Components\Admin\ConfigWebsiteForm\ConfigWebsiteForm;
 use App\Components\Admin\ConfigWebsiteForm\IConfigWebsiteFormFactory;
 
 class ConfigPresenter extends SecuredPresenter
@@ -40,7 +43,7 @@ class ConfigPresenter extends SecuredPresenter
     // ###             COMPONENTS             ###
     // ##########################################
 
-    protected function createComponentConfigEditor(): \App\Components\Admin\ConfigEditor\ConfigEditor
+    protected function createComponentConfigEditor(): ConfigEditor
     {
         $control = $this->configEditor->create();
 
@@ -56,7 +59,7 @@ class ConfigPresenter extends SecuredPresenter
         return $control;
     }
 
-    protected function createComponentConfigWebsiteForm(): \App\Components\Admin\ConfigWebsiteForm\ConfigWebsiteForm
+    protected function createComponentConfigWebsiteForm(): ConfigWebsiteForm
     {
         $form = $this->configWebsiteForm->create();
 
@@ -74,7 +77,7 @@ class ConfigPresenter extends SecuredPresenter
         return $form;
     }
 
-    protected function createComponentConfigSeoForm(): \App\Components\Admin\ConfigSeoForm\ConfigSeoForm
+    protected function createComponentConfigSeoForm(): ConfigSeoForm
     {
         $form = $this->configSeoForm->create();
 

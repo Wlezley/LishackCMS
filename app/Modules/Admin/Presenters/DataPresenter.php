@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
+use App\Components\Admin\DataEditor\DataEditor;
 use App\Components\Admin\DataEditor\IDataEditorFactory;
+use App\Components\Admin\DataList\DataList;
 use App\Components\Admin\DataList\IDataListFactory;
 use App\Models\Dataset\DatasetManager;
 
@@ -79,7 +81,7 @@ class DataPresenter extends SecuredPresenter
     // ###             COMPONENTS             ###
     // ##########################################
 
-    protected function createComponentDataList(): \App\Components\Admin\DataList\DataList
+    protected function createComponentDataList(): DataList
     {
         $control = $this->dataList->create();
         $control->setParam([
@@ -90,7 +92,7 @@ class DataPresenter extends SecuredPresenter
         return $control;
     }
 
-    protected function createComponentDataEditor(): \App\Components\Admin\DataEditor\DataEditor
+    protected function createComponentDataEditor(): DataEditor
     {
         $control = $this->dataEditor->create();
 

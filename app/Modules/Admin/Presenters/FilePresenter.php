@@ -6,12 +6,16 @@ namespace App\Modules\Admin\Presenters;
 
 use App\Models\StorageSystem\FileManager;
 use Nette\Application\Responses\FileResponse;
+use Webmozart\Assert\Assert;
 
 class FilePresenter extends SecuredPresenter
 {
     public function __construct(
-        private FileManager $fileManager
+        private FileManager $fileManager, // TODO: Inject this ???
     ) {
+        parent::__construct();
+
+        // TODO: DEBUG ONLY !!! Remove this line in the future
         // \Tracy\Debugger::$showBar = false;
     }
 
@@ -27,11 +31,13 @@ class FilePresenter extends SecuredPresenter
         // $contentType = mime_content_type($absoluteFilePath);
 
         $fileMeta = $this->fileManager->getFileById($id);
-        $path = ''; // TODO !!!
-        $name = $fileMeta?->name;
-        $type = $fileMeta?->type ?: 'application/octet-stream';
+        Assert::notNull($fileMeta, 'File not found.');
 
-        $response = new FileResponse($path, $name, $type, false);
+        $path = ''; // TODO !!!
+        $name = $fileMeta->name;
+        $contentType = $fileMeta->contentType;
+
+        $response = new FileResponse($path, $name, $contentType, false);
         $this->sendResponse($response);
     }
 

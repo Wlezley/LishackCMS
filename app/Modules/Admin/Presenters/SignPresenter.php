@@ -40,6 +40,7 @@ class SignPresenter extends UnsecuredPresenter
             $this->redirect('Admin:default');
         };
 
+        // TODO: TRANSLATE FLASH MESSAGES !!!
         $form->onError[] = function (): void {
             $this->flashMessage('Nesprávné přihlašovací údaje', 'danger');
         };

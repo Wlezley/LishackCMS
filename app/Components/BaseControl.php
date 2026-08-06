@@ -62,7 +62,7 @@ class BaseControl extends Control
 
         // phpcs:disable
         $template->_ = fn($key) => $this->translator->translate($key); // @phpstan-ignore property.notFound
-        $template->_F = fn($key, $values) => $this->translator->translateFormat($key, null, $values); // @phpstan-ignore property.notFound
+        $template->_F = fn($key, $values) => $this->translator->translateFormat($key, $values); // @phpstan-ignore property.notFound
         // phpcs:enable
 
         return $template;

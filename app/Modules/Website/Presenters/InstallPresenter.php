@@ -23,7 +23,7 @@ final class InstallPresenter extends Presenter
             $this->redirect('Article:default');
         }
 
-        $this->layout = 'systemLayout';
+        $this->setLayout('installLayout');
     }
 
     public function renderRun(): void

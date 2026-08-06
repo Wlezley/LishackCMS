@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Modules\Website\Presenters;
 
+use App\Components\AdminButton\AdminButton;
 use App\Components\AdminButton\IAdminButtonFactory;
 use App\Components\Menu\IMenuFactory;
+use App\Components\Menu\Menu;
 use App\Components\Pagination\IPaginationFactory;
+use App\Components\Pagination\Pagination;
 use App\Exception\TranslatorException;
 use App\Models\Category\CategoryManager;
 use App\Models\Config\ConfigManager;
@@ -18,6 +21,7 @@ use App\Models\Translation\LanguageService;
 use App\Models\Translation\Translator;
 use App\Models\Translation\TranslatorTrait;
 use Nette;
+use Nette\ComponentModel\IComponent;
 use Nette\Database\Explorer;
 use Webmozart\Assert\Assert;
 
@@ -123,7 +127,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
         // TRANSLATOR
         $this->template->_ = fn($key) => $this->translator->translate($key, $this->lang);
-        $this->template->_F = fn($key, $values) => $this->translator->translateFormat($key, $this->lang, $values);
+        $this->template->_F = fn($key, $values) => $this->translator->translateFormat($key, $values, $this->lang);
 
         // Default parameters
         $this->template->setParameters($this->defaultParams);
@@ -172,7 +176,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $this->totalItems = $totalItems;
     }
 
-    protected function createComponentPagination(): \App\Components\Pagination\Pagination
+    protected function createComponentPagination(): Pagination
     {
         if ($this->itemsPerPage === null || $this->totalItems === null) {
             throw new \LogicException('Call setPagination() in the render method first.');
@@ -191,7 +195,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     // ###             COMPONENTS             ###
     // ##########################################
 
-    protected function createComponent(string $name): ?\Nette\ComponentModel\IComponent
+    protected function createComponent(string $name): ?IComponent
     {
         $component = parent::createComponent($name);
 
@@ -203,14 +207,14 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         return $component;
     }
 
-    protected function createComponentAdminButton(): \App\Components\AdminButton\AdminButton
+    protected function createComponentAdminButton(): AdminButton
     {
         $control = $this->adminBarFactory->create();
         $control->setAdminUrl($this->template->adminUrl);
         return $control;
     }
 
-    protected function createComponentMenu(): \App\Components\Menu\Menu
+    protected function createComponentMenu(): Menu
     {
         $control = $this->menuFactory->create();
         return $control;

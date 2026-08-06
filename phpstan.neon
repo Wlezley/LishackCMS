@@ -2,6 +2,7 @@ parameters:
     level: 8
     inferPrivatePropertyTypeFromConstructor: true
     reportUnmatchedIgnoredErrors: false
+    treatPhpDocTypesAsCertain: false
     phpVersion: 80400 # PHP 8.4
 
     paths:

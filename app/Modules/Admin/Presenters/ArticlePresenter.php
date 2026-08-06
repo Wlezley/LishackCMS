@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
+use App\Components\Admin\ArticleEditor\ArticleEditor;
 use App\Components\Admin\ArticleEditor\IArticleEditorFactory;
+use App\Components\Admin\ArticleList\ArticleList;
 use App\Components\Admin\ArticleList\IArticleListFactory;
 use App\Exception\ArticleException;
 use App\Models\Article\ArticleManager;
@@ -96,7 +98,7 @@ class ArticlePresenter extends SecuredPresenter
     // ###             COMPONENTS             ###
     // ##########################################
 
-    protected function createComponentArticleList(): \App\Components\Admin\ArticleList\ArticleList
+    protected function createComponentArticleList(): ArticleList
     {
         $control = $this->articleList->create();
         $control->setParam([
@@ -107,7 +109,7 @@ class ArticlePresenter extends SecuredPresenter
         return $control;
     }
 
-    protected function createComponentArticleEditor(): \App\Components\Admin\ArticleEditor\ArticleEditor
+    protected function createComponentArticleEditor(): ArticleEditor
     {
         $form = $this->articleEditor->create();
         $id = (int) $this->getParameter('id');
@@ -117,6 +119,7 @@ class ArticlePresenter extends SecuredPresenter
         $form->setUrlGenerator($this->urlGenerator);
         $form->setUserManager($this->userManager);
 
+        // TODO: TRANSLATE FLASH MESSAGES !!!
         if ($id) {
             try {
                 $articleData = $this->articleManager->getById($id);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
+use App\Components\Admin\CategoryForm\CategoryForm;
 use App\Components\Admin\CategoryForm\ICategoryFormFactory;
 use App\Exception\CategoryException;
 use App\Models\Category\CategoryManager;
@@ -18,7 +19,7 @@ class MenuPresenter extends SecuredPresenter
 
     public function renderDefault(): void
     {
-        $this->template->sortable = $this->userHavePermissionsTo('move'); // or 'sort' ???
+        $this->template->sortable = $this->userHavePermissionsTo('move'); // TODO: or 'sort' ???
     }
 
     public function renderCreate(): void
@@ -58,6 +59,7 @@ class MenuPresenter extends SecuredPresenter
 
         $data = $this->getHttpRequest()->getPost();
 
+        // TODO: TRANSLATE FLASH MESSAGES !!!
         try {
             if ($this->userHavePermissionsTo('delete')) {
                 $this->categoryManager->delete((int) $data['id']);
@@ -101,6 +103,7 @@ class MenuPresenter extends SecuredPresenter
             $this->redirect('this');
         }
 
+        // TODO: TRANSLATE FLASH MESSAGES !!!
         try {
             if ($this->userHavePermissionsTo('move')) {
                 $this->categoryManager->updatePosition((array) $this->getHttpRequest()->getPost());
@@ -147,7 +150,7 @@ class MenuPresenter extends SecuredPresenter
     // ###             COMPONENTS             ###
     // ##########################################
 
-    protected function createComponentCategoryForm(): \App\Components\Admin\CategoryForm\CategoryForm
+    protected function createComponentCategoryForm(): CategoryForm
     {
         $form = $this->categoryForm->create();
         $id = $this->getParameter('id');
