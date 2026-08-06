@@ -14,14 +14,14 @@ class Translator
 
     /**
      * @param ConfigManager $configManager Manages configuration settings, including the default language.
-     * @param TranslatorLog $log Handles logging of missing or problematic translations.
+     * @param TranslatorLog $translatorLog Handles logging of missing or problematic translations.
      */
     public function __construct(
         private readonly LanguageService $languageService,
         private readonly ConfigManager $configManager,
-        private readonly TranslatorLog $log, // TODO: Refactor
-        private readonly TranslatorRepository $repository,
-        private readonly TranslatorEditor $translationEditor,
+        private readonly TranslatorLog $translatorLog,
+        private readonly TranslatorRepository $translatorRepository,
+        private readonly TranslatorEditor $translatorEditor,
     ) {
     }
 
@@ -36,15 +36,15 @@ class Translator
     {
         $lang = $lang ?? $this->languageService->getCurrentLanguage();
 
-        if ($this->repository->exists($lang, $key) === false) {
+        if ($this->translatorRepository->exists($lang, $key) === false) {
             if ($this->configManager->get('LOG_TRANSLATION_FALLBACK') == 1) {
-                $this->log->logMissingKey($key, $lang);
+                $this->translatorLog->logMissingKey($key, $lang);
             }
 
             return $key;
         }
 
-        return $this->repository->get($lang, $key);
+        return $this->translatorRepository->get($lang, $key);
     }
 
     /**
@@ -57,11 +57,11 @@ class Translator
      *   a `ValueError` is caught, and the key itself is returned instead.
      *
      * @param string $key The translation key.
-     * @param string|null $lang The language code (defaults to the current language).
      * @param array<mixed> $values Values to be formatted into the translation string.
+     * @param string|null $lang The language code (defaults to the current language).
      * @return string The formatted translated text. If translation is missing or formatting fails, returns the key as a fallback.
      */
-    public function translateFormat(string $key, ?string $lang, array $values): string // TODO: Switch order of $values and $lang params
+    public function translateFormat(string $key, array $values, ?string $lang = null): string
     {
         $lang = $lang ?? $this->languageService->getCurrentLanguage();
 
@@ -71,36 +71,45 @@ class Translator
             return vsprintf($format, $values);
         } catch (ValueError $e) {
             if ($this->configManager->get('LOG_TRANSLATION_FALLBACK') == 1) {
-                $this->log->logMissingArguments($key, $lang, $values, $e->getMessage());
+                $this->translatorLog->logMissingArguments($key, $lang, $values, $e->getMessage());
             }
         }
 
         return $key;
     }
 
+    /**
+     * @throws TranslatorException
+     */
     public function add(string $key, string $lang, string $text): void
     {
-        $this->repository->add($key, $lang, $text);
+        $this->translatorRepository->add($key, $lang, $text);
     }
 
+    /**
+     * @throws TranslatorException
+     */
     public function update(string $key, string $lang, string $text): void
     {
-        $this->repository->update($key, $lang, $text);
+        $this->translatorRepository->update($key, $lang, $text);
     }
 
     public function delete(string $key, ?string $lang = null): void
     {
-        $this->repository->delete($key, $lang);
+        $this->translatorRepository->delete($key, $lang);
     }
 
+    /**
+     * @throws TranslatorException
+     */
     public function changeKey(string $oldKey, string $newKey, string $lang): void
     {
-        $this->repository->changeKey($oldKey, $newKey, $lang);
+        $this->translatorRepository->changeKey($oldKey, $newKey, $lang);
     }
 
     public function existsInDB(string $key, ?string $lang = null): bool
     {
-        return $this->repository->existsInDB($key, $lang);
+        return $this->translatorRepository->existsInDB($key, $lang);
     }
 
     /**
@@ -114,7 +123,7 @@ class Translator
      */
     public function getList(string $lang, ?int $limit = 50, ?int $offset = 0, ?string $search = null): array
     {
-        return $this->repository->getList($lang, $limit, $offset, $search);
+        return $this->translatorRepository->getList($lang, $limit, $offset, $search);
     }
 
     /**
@@ -126,7 +135,7 @@ class Translator
      */
     public function getCount(string $lang, ?string $search = null): int
     {
-        return $this->repository->getCount($lang, $search);
+        return $this->translatorRepository->getCount($lang, $search);
     }
 
     /**
@@ -138,7 +147,7 @@ class Translator
      */
     public function getTextListByKey(string $key): array
     {
-        return $this->repository->getTextListByKey($key);
+        return $this->translatorRepository->getTextListByKey($key);
     }
 
     /**
@@ -155,7 +164,7 @@ class Translator
      */
     public function saveTranslations(array $translations): void
     {
-        $this->translationEditor->saveTranslations($translations);
+        $this->translatorEditor->saveTranslations($translations);
     }
 
     /**
@@ -170,6 +179,6 @@ class Translator
      */
     public function getTranslations(string $targetLang): array
     {
-        return $this->translationEditor->getTranslations($targetLang);
+        return $this->translatorEditor->getTranslations($targetLang);
     }
 }

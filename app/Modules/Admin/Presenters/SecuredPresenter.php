@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
+use App\Components\Admin\DatasetSidebar\DatasetSidebar;
 use App\Components\Admin\DatasetSidebar\IDatasetSidebarFactory;
 use App\Components\Pagination\IPaginationFactory;
+use App\Components\Pagination\Pagination;
 use App\Models\User\UserManager;
 use App\Models\User\UserRole;
 use Webmozart\Assert\Assert;
@@ -28,6 +30,7 @@ class SecuredPresenter extends BasePresenter
     {
         parent::startup();
 
+        // TODO: TRANSLATE FLASH MESSAGES !!!
         if (!$this->user->isLoggedIn() && $this->presenter->getName() !== 'Admin:Sign') {
             if ($this->isAjax()) {
                 $this->flashMessage('Přístup odepřen: Uživatel se odhlásil', 'danger');
@@ -76,7 +79,7 @@ class SecuredPresenter extends BasePresenter
     // ###             COMPONENTS             ###
     // ##########################################
 
-    protected function createComponentDatasetSidebar(): \App\Components\Admin\DatasetSidebar\DatasetSidebar
+    protected function createComponentDatasetSidebar(): DatasetSidebar
     {
         $control = $this->datasetSidebarFactory->create();
 
@@ -93,7 +96,7 @@ class SecuredPresenter extends BasePresenter
         $this->totalItems = $totalItems;
     }
 
-    protected function createComponentPagination(): \App\Components\Pagination\Pagination
+    protected function createComponentPagination(): Pagination
     {
         if ($this->itemsPerPage === null || $this->totalItems === null) {
             throw new \LogicException('Call setPagination() in the render method first.');

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Admin\Presenters;
 
 use App\Components\Admin\UserForm\IUserFormFactory;
+use App\Components\Admin\UserForm\UserForm;
 use App\Components\Admin\UserList\UserListGrid;
 use App\Exception\UserException;
 use App\Models\User\UserManager;
@@ -19,10 +20,11 @@ class UserPresenter extends SecuredPresenter
     public IUserFormFactory $userForm;
 
     public function __construct(
-        private UserManager $userManager,
-        private UserListGrid $userListGrid
+        private readonly UserManager $userManager,
+        private readonly UserListGrid $userListGrid,
     ) {
         parent::__construct();
+
         $this->userListGrid->setPresenter($this);
     }
 
@@ -59,6 +61,7 @@ class UserPresenter extends SecuredPresenter
     {
         // TODO: Conditions from setDeleted_Callback()
         // TODO: Unify roles, create an ACL system...
+        // TODO: TRANSLATE FLASH MESSAGES !!!
         if ($this->user->isInRole('admin')) {
             $this->userManager->setDeleted($id, true);
             $this->flashMessage("Uživatel ID: $id byl odstraněn.", 'info');
@@ -103,11 +106,12 @@ class UserPresenter extends SecuredPresenter
         return $this->userListGrid->createGrid();
     }
 
-    protected function createComponentUserForm(): \App\Components\Admin\UserForm\UserForm
+    protected function createComponentUserForm(): UserForm
     {
         $form = $this->userForm->create();
         $id = $this->getParameter('id');
 
+        // TODO: TRANSLATE FLASH MESSAGES !!!
         if ($id) {
             try {
                 $userData = $this->userManager->get((int) $id);

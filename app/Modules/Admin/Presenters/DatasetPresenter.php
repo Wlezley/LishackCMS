@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
+use App\Components\Admin\DatasetEditor\DatasetEditor;
 use App\Components\Admin\DatasetEditor\IDatasetEditorFactory;
+use App\Components\Admin\DatasetList\DatasetList;
 use App\Components\Admin\DatasetList\IDatasetListFactory;
 use App\Models\Dataset\DatasetCreator;
 use App\Models\Dataset\DatasetManager;
@@ -64,7 +66,7 @@ class DatasetPresenter extends SecuredPresenter
     // ###             COMPONENTS             ###
     // ##########################################
 
-    protected function createComponentDatasetList(): \App\Components\Admin\DatasetList\DatasetList
+    protected function createComponentDatasetList(): DatasetList
     {
         $control = $this->datasetList->create();
         $control->setParam([
@@ -75,7 +77,7 @@ class DatasetPresenter extends SecuredPresenter
         return $control;
     }
 
-    protected function createComponentDatasetEditor(): \App\Components\Admin\DatasetEditor\DatasetEditor
+    protected function createComponentDatasetEditor(): DatasetEditor
     {
         $control = $this->datasetEditor->create();
         $id = $this->getParameter('id');

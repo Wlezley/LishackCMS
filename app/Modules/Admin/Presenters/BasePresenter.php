@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Admin\Presenters;
 
+use App\Components\BaseControl;
 use App\Exception\TranslatorException;
 use App\Models\Config\ConfigManager;
 use App\Models\Config\ConfigTrait;
@@ -12,10 +13,12 @@ use App\Models\Translation\LanguageService;
 use App\Models\Translation\Translator;
 use App\Models\Translation\TranslatorTrait;
 use Nette\Application\Helpers;
+use Nette\Application\UI\Presenter;
+use Nette\ComponentModel\IComponent;
 use Nette\Database\Explorer;
 use Webmozart\Assert\Assert;
 
-abstract class BasePresenter extends \Nette\Application\UI\Presenter
+abstract class BasePresenter extends Presenter
 {
     use ConfigTrait;
     use TranslatorTrait;
@@ -75,7 +78,7 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
 
         // TRANSLATOR
         $this->template->_ = fn($key) => $this->translator->translate($key, $this->lang);
-        $this->template->_F = fn($key, $values) => $this->translator->translateFormat($key, $this->lang, $values);
+        $this->template->_F = fn($key, $values) => $this->translator->translateFormat($key, $values, $this->lang);
 
         // Translated Title
         $this->template->title = $this->getPresenterTitle();
@@ -86,7 +89,7 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
         parent::afterRender();
 
         // CMS config
-        $this->template->VERSION = VERSION; // $this->c('VERSION');
+        $this->template->VERSION = VERSION; // $this->c('VERSION'); // TODO: Get version from config
         $this->template->HTML_LANG = $this->htmlLang;
 
         // TODO: Get language from URL or session
@@ -106,7 +109,9 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
         // Sidebar
         $this->template->activeMenu = $this->getPresenterCategory();
 
-        // bdump($this->template->getParameters(), 'TEMPLATE PARAMS');
+        if (DEBUG === true) { // TODO: Think about it...
+            bdump($this->template->getParameters(), 'TEMPLATE PARAMS');
+        }
 
         // Ajax
         if ($this->isAjax() && !$this->isControlInvalid()) {
@@ -140,7 +145,6 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
      *
      * @param string|null $lang Optional language code (defaults to current language).
      * @return string The translated title.
-     * @throws TranslatorException
      */
     protected function getPresenterTitle(?string $lang = null): string
     {
@@ -159,11 +163,11 @@ abstract class BasePresenter extends \Nette\Application\UI\Presenter
     // ###             COMPONENTS             ###
     // ##########################################
 
-    protected function createComponent(string $name): ?\Nette\ComponentModel\IComponent
+    protected function createComponent(string $name): ?IComponent
     {
         $component = parent::createComponent($name);
 
-        if ($component instanceof \App\Components\BaseControl) {
+        if ($component instanceof BaseControl) {
             $component->setTranslator($this->translator);
             $component->setConfigManager($this->configManager);
         }

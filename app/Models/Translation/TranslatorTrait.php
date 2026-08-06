@@ -67,6 +67,6 @@ trait TranslatorTrait
             throw new RuntimeException('Translator is not available in ' . static::class);
         }
 
-        return $this->translator->translateFormat($key, null, $values);
+        return $this->translator->translateFormat($key, $values);
     }
 }
