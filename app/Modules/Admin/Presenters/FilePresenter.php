@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Modules\Admin\Presenters;
 
 use App\Models\StorageSystem\FileManager;
+use JetBrains\PhpStorm\NoReturn;
 use Nette\Application\Responses\FileResponse;
+use Webmozart\Assert\Assert;
 
 class FilePresenter extends SecuredPresenter
 {
@@ -13,13 +15,16 @@ class FilePresenter extends SecuredPresenter
         private FileManager $fileManager
     ) {
         // \Tracy\Debugger::$showBar = false;
+        parent::__construct();
     }
 
+    #[NoReturn]
     public function actionDefault(): void
     {
         $this->terminate();
     }
 
+    #[NoReturn]
     public function actionShow(int $id): void
     {
         // $fileName = $imageMetadata['filename'];
@@ -27,19 +32,23 @@ class FilePresenter extends SecuredPresenter
         // $contentType = mime_content_type($absoluteFilePath);
 
         $fileMeta = $this->fileManager->getFileById($id);
-        $path = ''; // TODO !!!
-        $name = $fileMeta?->name;
-        $type = $fileMeta?->type;
+        Assert::notNull($fileMeta, 'File not found.');
 
-        $response = new FileResponse($path, $name, $type, false);
+        $path = ''; // TODO !!!
+        $name = $fileMeta->name;
+        $contentType = $fileMeta->contentType;
+
+        $response = new FileResponse($path, $name, $contentType, false);
         $this->sendResponse($response);
     }
 
+    #[NoReturn]
     public function actionDownload(int $id): void
     {
         $this->terminate();
     }
 
+    #[NoReturn]
     public function actionUpload(): void
     {
         bdump($_FILES);

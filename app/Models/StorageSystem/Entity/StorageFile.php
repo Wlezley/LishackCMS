@@ -17,7 +17,7 @@ final class StorageFile
     public ?int $position = null;
     public string $name = '';
     public string $nameUrl = '';
-    public string $type = '';
+    public string $contentType = '';
     public string $icon = 'unknown';
     public int $size = 0;
     public string $checksum = '';
@@ -45,7 +45,7 @@ final class StorageFile
         $file->position = IntegerHelper::toIntOrNull($row['position']);
         $file->name = (string) $row['name'];
         $file->nameUrl = (string) $row['name_url'];
-        $file->type = (string) $row['type'];
+        $file->contentType = (string) $row['type'];
         $file->icon = (string) $row['icon'];
         $file->size = (int) $row['size'];
         $file->checksum = (string) $row['checksum'];
@@ -74,7 +74,7 @@ final class StorageFile
             'position' => $this->position,
             'name' => $this->name,
             'name_url' => $this->nameUrl,
-            'type' => $this->type,
+            'type' => $this->contentType,
             'icon' => $this->icon,
             'size' => $this->size,
             'checksum' => $this->checksum,
@@ -96,7 +96,7 @@ final class StorageFile
         try {
             StringHelper::assertEmpty($this->name, 'name');
             StringHelper::assertEmpty($this->nameUrl, 'name_url');
-            StringHelper::assertEmpty($this->type, 'type');
+            StringHelper::assertEmpty($this->contentType, 'type');
             StringHelper::assertEmpty($this->checksum, 'checksum');
             StringHelper::assertEmpty($this->storageId, 'storage_id');
             StringHelper::assertEmpty($this->downloadId, 'download_id');
