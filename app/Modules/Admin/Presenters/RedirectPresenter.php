@@ -8,12 +8,16 @@ use App\Components\Admin\RedirectForm\IRedirectFormFactory;
 use App\Components\Admin\RedirectForm\RedirectForm;
 use App\Components\Admin\RedirectList\IRedirectListFactory;
 use App\Components\Admin\RedirectList\RedirectList;
-use App\Models\Redirect\RedirectManager;
+use App\Entity\Redirect\RedirectRepositoryInterface;
+use App\Service\Redirect\RedirectService;
 
 class RedirectPresenter extends SecuredPresenter
 {
-    /** @var RedirectManager @inject */
-    public RedirectManager $redirectManager;
+    /** @var RedirectRepositoryInterface @inject */
+    public RedirectRepositoryInterface $redirectRepository;
+
+    /** @var RedirectService @inject */
+    public RedirectService $redirectService;
 
     /** @var IRedirectListFactory @inject */
     public IRedirectListFactory $redirectList;
@@ -36,8 +40,12 @@ class RedirectPresenter extends SecuredPresenter
             $this->redirect(':default');
         }
 
-        if (!$this->redirectManager->getRow($id)) {
-            $this->flashMessage($this->tf('redirect.id.not-found', (int) $id), 'danger');
+        if ($this->redirectRepository->findById((int) $id) === null) {
+            $this->flashMessage(
+                message: $this->tf('redirect.id.not-found', (int) $id),
+                type: 'danger',
+            );
+
             $this->redirect(':default');
         }
     }
@@ -60,7 +68,13 @@ class RedirectPresenter extends SecuredPresenter
 
         // TODO: Permission check
 
-        $this->redirectManager->delete($data['id']);
+        $redirect = $this->redirectRepository->findById((int) $data['id']);
+        if ($redirect === null) {
+            // TODO: Flash message about error
+            return;
+        }
+
+        $this->redirectService->delete($redirect);
     }
 
     // ##########################################
@@ -85,8 +99,27 @@ class RedirectPresenter extends SecuredPresenter
 
         if ($id) {
             $form->setOrigin($form::OriginEdit);
-            $param = $this->redirectManager->getRow($id);
-            $param['page'] = $this->getHttpRequest()->getQuery('page');
+
+            $redirect = $this->redirectRepository->findById((int) $id);
+            if ($redirect === null) {
+                $this->flashMessage(
+                    message: $this->tf('redirect.id.not-found', (int) $id),
+                    type: 'danger',
+                );
+
+                return $form;
+            }
+
+            /** @var array<string, int|string> $param */
+            $param = [
+                'id' => $redirect->getId(),
+                'source' => $redirect->getSource(),
+                'target' => $redirect->getTarget(),
+                'code' => $redirect->getCode()->value,
+                'enabled' => $redirect->isEnabled(),
+                'page' => $this->getHttpRequest()->getQuery('page'),
+            ];
+
             $form->setParam($param);
         } else {
             $form->setOrigin($form::OriginCreate);

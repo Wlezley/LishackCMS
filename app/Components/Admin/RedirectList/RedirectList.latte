@@ -10,26 +10,26 @@
         </tr>
     </thead>
     <tbody>
-    {foreach $redirectList as $id => $redirectItem}
+    {foreach $redirectList as $redirectItem}
         <tr>
-            <td class="align-middle text-end id-col">{$id}</td>
+            <td class="align-middle text-end id-col">{$redirectItem->getId()}</td>
             <td class="align-middle url-col">
-                <a href="{$redirectItem['source']}" target="_blank" rel="noopener">{$redirectItem['source']}
+                <a href="{$redirectItem->getSource()}" target="_blank" rel="noopener">{$redirectItem->getSource()}
                     <sup class="fa-solid fa-up-right-from-square text-secondary"></sup>
                 </a>
             </td>
             <td class="align-middle url-col">
-                <a href="{$redirectItem['target']}" target="_blank" rel="noopener">{$redirectItem['target']}
+                <a href="{$redirectItem->getTarget()}" target="_blank" rel="noopener">{$redirectItem->getTarget()}
                     <sup class="fa-solid fa-up-right-from-square text-secondary"></sup>
                 </a>
             </td>
-            <td class="align-middle text-center http-code-col">{$redirectItem['code']}</td>
-            <td class="align-middle text-center http-code-col">{$redirectItem['enabled'] ? $_('yes') : $_('no')}</td>
+            <td class="align-middle text-center http-code-col">{$redirectItem->getCode()->value}</td>
+            <td class="align-middle text-center http-code-col">{$redirectItem->isEnabled() ? $_('yes') : $_('no')}</td>
             <td class="align-middle text-end ps-0 py-1 action-col">
-                <a n:href=":edit, id: $id" class="btn btn-sm btn-primary me-1">
+                <a n:href=":edit, id: $redirectItem->getId()" class="btn btn-sm btn-primary me-1">
                     <i class="fa-solid fa-pencil"></i>
                 </a>
-                <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteRedirectConfirmModal" data-json="{$getJson($id, $redirectItem['source'])}">
+                <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteRedirectConfirmModal" data-json="{$getJson($redirectItem->getId(), $redirectItem->getSource())}">
                     <i class="fa-solid fa-eraser"></i>
                 </button>
             </td>

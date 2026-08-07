@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Components\Admin\RedirectList;
 
 use App\Components\BaseControl;
-use App\Models\Redirect\RedirectManager;
+use App\Entity\Redirect\RedirectRepositoryInterface;
 use App\Modules\Admin\Presenters\RedirectPresenter;
 use Nette\Utils\Json;
 use Webmozart\Assert\Assert;
@@ -16,7 +16,7 @@ class RedirectList extends BaseControl
     private ?int $totalItems = null;
 
     public function __construct(
-        private RedirectManager $redirectManager
+        private RedirectRepositoryInterface $redirectRepository,
     ) {
     }
 
@@ -35,8 +35,12 @@ class RedirectList extends BaseControl
         $offset = ($page - 1) * $this->limit;
         Assert::range($offset, 0, PHP_INT_MAX, 'Offset must be a non-negative integer.');
 
-        $this->totalItems = $this->redirectManager->getCount($search);
-        $this->template->redirectList = $this->redirectManager->getList($this->limit, $offset, $search);
+        $this->totalItems = $this->redirectRepository->countBySearch($search);
+        $this->template->redirectList = $this->redirectRepository->findPaginated(
+            limit: $this->limit,
+            offset: $offset,
+            search: $search
+        );
 
         $this->template->getJson = function ($id, $source) {
             // TODO: Fix empty modal on second call of deletion method

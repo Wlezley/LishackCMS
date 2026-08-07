@@ -4,6 +4,9 @@ search:
         classes:
             - *Factory
             - *Facade
+            - *Service
+            - *Validator
+            - *Repository
             - App\Commands\**
 
 extensions:
@@ -22,7 +25,6 @@ services:
     - App\Models\Config\ConfigManager
     - App\Models\Helpers\AssetsVersion
     - App\Models\Installer\Installer
-    - App\Models\Redirect\RedirectManager
     - App\Models\Seo\SitemapGenerator
     - App\Models\SmsGate\SmsGate(%smsgate.url%, %smsgate.login%, %smsgate.password%, %smsgate.sender_id%, %smsgate.secured_login%)
     - App\Models\Translation\LanguageService

@@ -16,10 +16,10 @@ use App\Models\Config\ConfigManager;
 use App\Models\Config\ConfigTrait;
 use App\Models\Helpers\AssetsVersion;
 use App\Models\Helpers\IPValidator;
-use App\Models\Redirect\RedirectManager;
 use App\Models\Translation\LanguageService;
 use App\Models\Translation\Translator;
 use App\Models\Translation\TranslatorTrait;
+use App\Service\Redirect\RedirectService;
 use Nette;
 use Nette\ComponentModel\IComponent;
 use Nette\Database\Explorer;
@@ -42,8 +42,8 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     /** @var Translator @inject */
     public Translator $translator;
 
-    /** @var RedirectManager @inject */
-    public RedirectManager $redirectManager;
+    /** @var RedirectService @inject */
+    public RedirectService $redirectService;
 
     /** @var IAdminButtonFactory @inject */
     public IAdminButtonFactory $adminBarFactory;
@@ -84,10 +84,12 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $this->adminUrl = ADMIN_HOME_URL;
 
         // Redirect
-        $redirectCode = 0;
-        $redirectUrl = $this->redirectManager->get($this->currentUrl, $redirectCode);
-        if ($redirectUrl) {
-            $this->redirectUrl($redirectUrl, $redirectCode ?? Nette\Http\IResponse::S302_Found);
+        $redirect = $this->redirectService->resolve($this->currentUrl);
+        if ($redirect !== null) {
+            $this->redirectUrl(
+                url: $redirect->getTarget(),
+                httpCode: $redirect->getCode()->value,
+            );
         }
 
         // Language

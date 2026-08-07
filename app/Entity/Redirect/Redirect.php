@@ -4,50 +4,37 @@ declare(strict_types=1);
 
 namespace App\Entity\Redirect;
 
+use App\Entity\BaseEntity;
+use App\Enum\HttpRedirectCode;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'redirect')]
-class Redirect
+class Redirect extends BaseEntity
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: Types::INTEGER)]
-    private int $id;
-
     #[ORM\Column(type: Types::TEXT, length: 300)]
     private string $source;
 
     #[ORM\Column(type: Types::TEXT, length: 300)]
     private string $target;
 
-    #[ORM\Column(type: Types::INTEGER, options: ['default' => 302])]
-    private int $code = 302;
+    #[ORM\Column(enumType: HttpRedirectCode::class, options: ['default' => HttpRedirectCode::FOUND])]
+    private HttpRedirectCode $code;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]
-    private bool $enabled = true;
+    private bool $enabled;
 
     public function __construct(
         string $source,
         string $target,
-        int $code = 302,
+        HttpRedirectCode $code = HttpRedirectCode::FOUND,
         bool $enabled = true,
     ) {
         $this->source = $source;
         $this->target = $target;
         $this->code = $code;
         $this->enabled = $enabled;
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function setId(int $id): void
-    {
-        $this->id = $id;
     }
 
     public function getSource(): string
@@ -70,12 +57,12 @@ class Redirect
         $this->target = $target;
     }
 
-    public function getCode(): int
+    public function getCode(): HttpRedirectCode
     {
         return $this->code;
     }
 
-    public function setCode(int $code): void
+    public function setCode(HttpRedirectCode $code): void
     {
         $this->code = $code;
     }

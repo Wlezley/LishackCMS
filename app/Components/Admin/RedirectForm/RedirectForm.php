@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Components\Admin\RedirectForm;
 
 use App\Components\BaseControl;
+use App\Entity\Redirect\Redirect;
+use App\Enum\HttpRedirectCode;
 use App\Exception\RedirectException;
-use App\Models\Redirect\RedirectManager;
+use App\Service\Redirect\RedirectService;
 use Nette\Application\UI\Form;
 use Webmozart\Assert\Assert;
 
@@ -24,7 +26,7 @@ class RedirectForm extends BaseControl
     public $onError;
 
     public function __construct(
-        private RedirectManager $redirectManager
+        private readonly RedirectService $redirectService,
     ) {
     }
 
@@ -52,7 +54,7 @@ class RedirectForm extends BaseControl
             ->setValue($param['target'] ?? '')
             ->setRequired();
 
-        $form->addSelect('code', $this->t('http-code'), RedirectManager::REDIRECT_HTTP_CODES)
+        $form->addSelect('code', $this->t('http-code'), HttpRedirectCode::labels())
             ->setValue($param['code'] ?? 302)
             ->setRequired();
 
@@ -87,28 +89,46 @@ class RedirectForm extends BaseControl
             }
         }
 
-        if (!$this->redirectManager->checkHttpCode($values['code'])) {
-            call_user_func($this->onError, $this->tf('error.form.redirect.invalid-http-code', $values['code']));
+        $code = HttpRedirectCode::tryFrom((int) $values['code']);
+        if ($code === null) {
+            call_user_func(
+                $this->onError,
+                $this->tf(
+                    'error.form.redirect.invalid-http-code',
+                    $values['code'],
+                ),
+            );
+
             return;
         }
 
         try {
             if ($this->origin == self::OriginCreate) {
-                $this->redirectManager->add(
-                    source: $values['source'],
-                    target: $values['target'],
-                    code: $values['code'],
-                    enabled: $values['enabled'] == 1
+                $redirect = new Redirect(
+                    source: $values->source,
+                    target: $values->target,
+                    code: $code,
+                    enabled: (bool) $values->enabled,
                 );
+
+                $this->redirectService->save($redirect);
+
                 call_user_func($this->onSuccess, $this->t('success.form.redirect-created'), 1);
             } elseif ($this->origin == self::OriginEdit) {
-                $this->redirectManager->update(
-                    id: $values['id'],
-                    source: $values['source'],
-                    target: $values['target'],
-                    code: $values['code'],
-                    enabled: $values['enabled'] == 1
-                );
+                try {
+                    $redirect = $this->redirectService->getById((int) $values->id);
+                } catch (RedirectException $e) {
+                    call_user_func($this->onError, $this->t($e->getMessage()));
+                    return;
+                }
+
+                $redirect->setSource($values->source);
+                $redirect->setTarget($values->target);
+                $redirect->setCode($code);
+                $redirect->setEnabled((bool) $values->enabled);
+
+                $this->redirectService->save($redirect);
+
                 call_user_func($this->onSuccess, $this->t('success.form.redirect-saved'), $values['page'] ?? 1);
             } else {
                 call_user_func($this->onError, $this->t('error.form.unknown-origin'));
