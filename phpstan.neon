@@ -22,6 +22,8 @@ parameters:
 
     ignoreErrors:
         -
+            identifier: trait.unused
+        -
             messages:
                 - '#^Cannot call method getParameters\(\) on Nette\\Application\\UI\\Template\|stdClass\.$#'
                 - '#^Cannot call method setParameters\(\) on Nette\\Application\\UI\\Template\|stdClass\.$#'
