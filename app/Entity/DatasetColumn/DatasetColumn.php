@@ -4,18 +4,14 @@ declare(strict_types=1);
 
 namespace App\Entity\DatasetColumn;
 
+use App\Entity\BaseEntity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'dataset_column')]
-class DatasetColumn
+class DatasetColumn extends BaseEntity
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: Types::INTEGER)]
-    private int $id;
-
     #[ORM\Column(type: Types::INTEGER, unique: true)] // TODO: Link to column in dataset
     private int $datasetId;
 
@@ -68,16 +64,6 @@ class DatasetColumn
         $this->hidden = $hidden;
         $this->deleted = $deleted;
         $this->default = $default;
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function setId(int $id): void
-    {
-        $this->id = $id;
     }
 
     public function getDatasetId(): int

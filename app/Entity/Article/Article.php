@@ -6,18 +6,14 @@ namespace App\Entity\Article;
 
 //use App\Entity\Language\Language;
 
+use App\Entity\BaseEntity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'article')]
-class Article
+class Article extends BaseEntity
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: Types::INTEGER)]
-    private int $id;
-
     #[ORM\Column(type: Types::TEXT, length: 255, nullable: true)]
     private string $nameUrl;
 
@@ -113,16 +109,6 @@ class Article
         $this->metaTitle = $metaTitle;
         $this->metaDescription = $metaDescription;
 //        $this->metaKeywords = $metaKeywords;
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
-
-    public function setId(int $id): void
-    {
-        $this->id = $id;
     }
 
     public function getNameUrl(): string

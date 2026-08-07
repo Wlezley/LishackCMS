@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace App\Entity\User;
 
+use App\Entity\BaseEntity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'users')]
-class User
+//#[ORM\HasLifecycleCallbacks]
+class User extends BaseEntity
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: Types::INTEGER)]
-    private int $id;
+//    use CreatedAtTrait;
+//    use UpdatedAtTrait;
 
     #[ORM\Column(type: Types::TEXT, length: 50, unique: true)]
     private string $name; // TODO: Change to $username
@@ -43,6 +43,8 @@ class User
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private \DateTimeImmutable $created; // TODO: Change to $createdAt !!!
 
+    // TODO: Add $updatedAt !!! (trait ???)
+
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $lastLogin = null; // TODO: Change to $lastLoginAt !!!
 
@@ -56,8 +58,8 @@ class User
         bool $deleted = false,
         bool $enabled = true,
         ?\DateTimeImmutable $created = null,
-        ?\DateTimeImmutable $lastLogin = null,
         // ?\DateTimeImmutable $updatedAt = null, // TODO...
+        ?\DateTimeImmutable $lastLogin = null,
     ) {
         $this->name = $name;
         $this->password = $password;
@@ -69,16 +71,6 @@ class User
         $this->enabled = $enabled;
         $this->created = $created ?? new \DateTimeImmutable();
         $this->lastLogin = $lastLogin;
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function setId(int $id): void
-    {
-        $this->id = $id;
     }
 
     public function getName(): string

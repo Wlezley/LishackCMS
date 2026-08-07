@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity\SmsLog;
 
+use App\Entity\BaseEntity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Webmozart\Assert\Assert;
@@ -11,13 +12,8 @@ use Webmozart\Assert\InvalidArgumentException;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'log_sms')] // TODO: change table name to sms_log
-class SmsLog
+class SmsLog extends BaseEntity
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: Types::INTEGER)]
-    private int $id;
-
     #[ORM\Column(type: Types::INTEGER, nullable: true)]
     private ?int $userId = null;
 
@@ -45,16 +41,6 @@ class SmsLog
         $this->phoneNumber = $phoneNumber;
         $this->message = $message;
         $this->errorCode = $errorCode;
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function setId(int $id): void
-    {
-        $this->id = $id;
     }
 
     public function getUserId(): ?int

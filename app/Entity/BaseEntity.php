@@ -15,6 +15,13 @@ abstract class BaseEntity
     #[ORM\Column(type: Types::INTEGER)]
     protected int $id;
 
+    public function __clone()
+    {
+        if (isset($this->id)) {
+            unset($this->id);
+        }
+    }
+
     /**
      * Returns the entity identifier.
      */

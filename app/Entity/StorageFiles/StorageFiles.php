@@ -4,19 +4,15 @@ declare(strict_types=1);
 
 namespace App\Entity\StorageFiles;
 
+use App\Entity\BaseEntity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Webmozart\Assert\Assert;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'storage_files')]
-class StorageFiles
+class StorageFiles extends BaseEntity
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: Types::INTEGER)]
-    private int $id;
-
     #[ORM\Column(type: Types::INTEGER, options: ['default' => 0])]
     private int $treeId = 0;
 
@@ -89,16 +85,6 @@ class StorageFiles
         $this->uploadedAt = $uploadedAt;
         $this->modifiedAt = $modifiedAt;
         $this->deletedAt = $deletedAt;
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function setId(int $id): void
-    {
-        $this->id = $id;
     }
 
     public function getTreeId(): int

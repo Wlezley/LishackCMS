@@ -4,18 +4,14 @@ declare(strict_types=1);
 
 namespace App\Entity\Dataset;
 
+use App\Entity\BaseEntity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'dataset')]
-class Dataset
+class Dataset extends BaseEntity
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: Types::INTEGER)]
-    private int $id;
-
     #[ORM\Column(type: Types::TEXT, length: 50)]
     private string $name;
 
@@ -48,16 +44,6 @@ class Dataset
         $this->presenter = $presenter;
         $this->active = $active;
         $this->deleted = $deleted;
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function setId(int $id): void
-    {
-        $this->id = $id;
     }
 
     public function getName(): string

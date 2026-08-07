@@ -4,18 +4,14 @@ declare(strict_types=1);
 
 namespace App\Entity\StorageTree;
 
+use App\Entity\BaseEntity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'storage_tree')]
-class StorageTree
+class StorageTree extends BaseEntity
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: Types::INTEGER)]
-    private int $id;
-
     #[ORM\Column(type: Types::INTEGER, options: ['default' => 0])]
     private int $parentId = 0;
 
@@ -58,16 +54,6 @@ class StorageTree
         $this->createdAt = $createdAt;
         $this->modifiedAt = $modifiedAt;
         $this->deletedAt = $deletedAt;
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function setId(int $id): void
-    {
-        $this->id = $id;
     }
 
     public function getParentId(): int

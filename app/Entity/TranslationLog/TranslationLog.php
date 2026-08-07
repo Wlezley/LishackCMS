@@ -4,21 +4,17 @@ declare(strict_types=1);
 
 namespace App\Entity\TranslationLog;
 
+use App\Entity\BaseEntity;
 use App\Enum\TranslationLogType;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'translations_log')]
-class TranslationLog
+class TranslationLog extends BaseEntity
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: Types::INTEGER)]
-    private int $id;
-
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['default' => 'CURRENT_TIMESTAMP'])]
-    private \DateTimeImmutable $date;
+    private \DateTimeImmutable $date; // TODO: Change to $createdAt !!! (trait ???)
 
     /**
      * @todo KEY + LANG must be unique
@@ -29,8 +25,8 @@ class TranslationLog
     #[ORM\Column(type: Types::TEXT, length: 2)]
     private string $lang; // TODO: Change to $languageCode;
 
-    #[ORM\Column(type: Types::ENUM, enumType: TranslationLogType::class, options: ['default' => TranslationLogType::Unk])]
-    private TranslationLogType $type = TranslationLogType::Unk;
+    #[ORM\Column(enumType: TranslationLogType::class, options: ['default' => TranslationLogType::Unk])]
+    private TranslationLogType $type;
 
     #[ORM\Column(type: Types::TEXT)]
     private ?string $message;
@@ -45,16 +41,6 @@ class TranslationLog
         $this->lang = $lang;
         $this->type = $type;
         $this->message = $message;
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function setId(int $id): void
-    {
-        $this->id = $id;
     }
 
     public function getDate(): \DateTimeImmutable

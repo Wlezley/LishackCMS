@@ -4,18 +4,14 @@ declare(strict_types=1);
 
 namespace App\Entity\Category;
 
+use App\Entity\BaseEntity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'category')]
-class Category
+class Category extends BaseEntity
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: Types::INTEGER)]
-    private int $id;
-
     #[ORM\Column(type: Types::INTEGER, nullable: true)]
     private ?int $parentId;
 
@@ -63,16 +59,6 @@ class Category
         $this->description = $description;
         $this->body = $body;
         $this->hidden = $hidden;
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function setId(int $id): void
-    {
-        $this->id = $id;
     }
 
     public function getParentId(): ?int

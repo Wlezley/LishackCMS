@@ -4,18 +4,14 @@ declare(strict_types=1);
 
 namespace App\Entity\Translation;
 
+use App\Entity\BaseEntity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'translations')]
-class Translation
+class Translation extends BaseEntity
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: Types::INTEGER)]
-    private int $id;
-
     /**
      * @todo KEY + LANG must be unique
      */
@@ -36,16 +32,6 @@ class Translation
         $this->key = $key;
         $this->lang = $lang;
         $this->text = $text;
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function setId(int $id): void
-    {
-        $this->id = $id;
     }
 
     public function getKey(): string
