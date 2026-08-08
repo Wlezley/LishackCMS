@@ -20,6 +20,9 @@ services:
     security.passwords: Nette\Security\Passwords(::PASSWORD_BCRYPT, [cost: 12])
     authenticator: App\Models\User\Authenticator
 
+    # Doctrine
+    - App\Doctrine\SchemaAssetsFilter
+
     # Models
     - App\Models\Article\ArticleManager
     - App\Models\Category\CategoryManager

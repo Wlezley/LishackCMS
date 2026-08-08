@@ -30,6 +30,7 @@ nettrine.dbal:
             user: %database.user%
             password: %database.password%
             charset: utf8mb4
+            schemaAssetsFilter: @App\Doctrine\SchemaAssetsFilter
 
 nettrine.orm:
     managers:
