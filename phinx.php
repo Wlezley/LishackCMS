@@ -8,8 +8,8 @@ $dbConfig = $container->getParameter('database');
 return
 [
     'paths' => [
-        'migrations' => '%%PHINX_CONFIG_DIR%%/db/migrations',
-        'seeds' => '%%PHINX_CONFIG_DIR%%/db/seeds'
+        'migrations' => '%%PHINX_CONFIG_DIR%%/db/legacy/migrations',
+        'seeds' => '%%PHINX_CONFIG_DIR%%/db/legacy/seeds',
     ],
     'environments' => [
         'default_migration_table' => '_phinxlog',
@@ -22,10 +22,10 @@ return
             'pass' => $dbConfig['password'],
             'port' => $dbConfig['port'],
             'charset' => 'utf8',
-        ]
+        ],
     ],
     'version_order' => 'creation',
     'templates' => [
-        'style' => 'up_down'
-    ]
+        'style' => 'up_down',
+    ],
 ];

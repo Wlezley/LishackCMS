@@ -13,7 +13,7 @@ use Phinx\Wrapper\TextWrapper;
 class Installer
 {
     private const string TABLE_TO_CHECK = 'cms_config';
-    private const string SQL_DUMP_FILE = PROJECT_DIR . 'db/cms_database_setup.sql';
+    private const string SQL_DUMP_FILE = PROJECT_DIR . 'db/legacy/cms_database_setup.sql';
 
     private string $log;
 
