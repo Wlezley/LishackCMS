@@ -9,14 +9,14 @@ use App\Enum\HttpRedirectCode;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: RedirectRepository::class)]
 #[ORM\Table(name: 'redirect')]
 class Redirect extends BaseEntity
 {
-    #[ORM\Column(type: Types::TEXT, length: 300)]
+    #[ORM\Column(type: Types::STRING, length: 300)]
     private string $source;
 
-    #[ORM\Column(type: Types::TEXT, length: 300)]
+    #[ORM\Column(type: Types::STRING, length: 300)]
     private string $target;
 
     #[ORM\Column(enumType: HttpRedirectCode::class, options: ['default' => HttpRedirectCode::FOUND])]
