@@ -33,12 +33,6 @@
     </rule>
     <rule ref="SlevomatCodingStandard.Namespaces.AlphabeticallySortedUses" />
     <rule ref="SlevomatCodingStandard.Namespaces.DisallowGroupUse" />
-
-    <!-- TODO: Remove this rule after cancel Phinx DB migrations -->
-    <rule ref="SlevomatCodingStandard.Namespaces.RequireOneNamespaceInNamespace">
-        <exclude-pattern>db/legacy/**</exclude-pattern>
-    </rule>
-
     <rule ref="SlevomatCodingStandard.Namespaces.UnusedUses">
         <properties>
             <property name="searchAnnotations" value="true" />
