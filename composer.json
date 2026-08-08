@@ -18,6 +18,7 @@
         "ext-pdo": "*",
         "ext-simplexml": "*",
         "contributte/console": "^0.10.1",
+        "doctrine/migrations": "^3.9",
         "latte/latte": "^3.0",
         "nesbot/carbon": "^3.8",
         "nette/application": "^3.2",
@@ -31,15 +32,15 @@
         "nette/robot-loader": "^4.1",
         "nette/security": "^3.2",
         "nette/utils": "^4.0",
+        "nettrine/dbal": "^0.10.3",
+        "nettrine/migrations": "^0.10.1",
+        "nettrine/orm": "^0.10.1",
         "robmorgan/phinx": "^0.16.5",
         "samdark/sitemap": "^2.4",
+        "symfony/var-exporter": "^8.1",
         "tracy/tracy": "^2.10",
         "ublaboo/datagrid": "^7.1.x-dev",
-        "webmozart/assert": "^2.0",
-        "nettrine/dbal": "^0.10.3",
-        "nettrine/orm": "^0.10.1",
-        "nettrine/migrations": "^0.10.1",
-        "symfony/var-exporter": "^8.1"
+        "webmozart/assert": "^2.0"
     },
     "require-dev": {
         "brainmaestro/composer-git-hooks": "^3.0",
