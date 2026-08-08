@@ -13,6 +13,7 @@ extensions:
     console: Contributte\Console\DI\ConsoleExtension(%consoleMode%)
     nettrine.dbal: Nettrine\DBAL\DI\DbalExtension
     nettrine.orm: Nettrine\ORM\DI\OrmExtension
+    nettrine.migrations: Nettrine\Migrations\DI\MigrationsExtension
 
 services:
     router: App\Router\RouterFactory::createRouter
