@@ -43,6 +43,10 @@ nettrine.orm:
                         - %appDir%/Entity
                     namespace: App\Entity
 
+nettrine.migrations:
+    directories:
+        App\Migrations: %appDir%/../db/migrations
+
 session:
     expiration: 14 days
 
