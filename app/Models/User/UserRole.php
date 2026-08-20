@@ -11,7 +11,7 @@ use Webmozart\Assert\InvalidArgumentException;
 class UserRole
 {
     /** @var array<int,string> List of user roles */
-    public const array USER_ROLES = [
+    public const array USER_ROLES = [ // TODO: Use UserRoleEnum
         0 => 'guest',
         1 => 'user',
         2 => 'redactor',

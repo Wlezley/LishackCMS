@@ -5,82 +5,52 @@ declare(strict_types=1);
 namespace App\Entity\User;
 
 use App\Entity\BaseEntity;
+use App\Entity\Trait\CreatedAtTrait;
+use App\Entity\Trait\UpdatedAtTrait;
+use App\Enum\UserRoleEnum;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'users')]
-//#[ORM\HasLifecycleCallbacks]
+#[ORM\HasLifecycleCallbacks]
 class User extends BaseEntity
 {
-//    use CreatedAtTrait;
-//    use UpdatedAtTrait;
-
-    #[ORM\Column(type: Types::STRING, length: 50, unique: true)]
-    private string $name; // TODO: Change to $username
-
-    #[ORM\Column(type: Types::STRING, length: 255)]
-    private string $password;
-
-    #[ORM\Column(type: Types::STRING, length: 255)]
-    private string $email;
-
-    #[ORM\Column(type: Types::STRING, length: 50)]
-    private string $role; // TODO: Change to enum
-
-    #[ORM\Column(type: Types::STRING, length: 255)]
-    private string $fullName; // TODO: Split to $firstName $lastName
-
-    #[ORM\Column(type: Types::STRING, length: 150)] // TODO: Allow more than 150 chars ???
-    private string $sessionId;
-
-    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
-    private bool $deleted = false;
-
-    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]
-    private bool $enabled = true;
-
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['default' => 'CURRENT_TIMESTAMP'])]
-    private \DateTimeImmutable $created; // TODO: Change to $createdAt !!!
-
-    // TODO: Add $updatedAt !!! (trait ???)
-
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
-    private ?\DateTimeImmutable $lastLogin = null; // TODO: Change to $lastLoginAt !!!
+    use CreatedAtTrait;
+    use UpdatedAtTrait;
 
     public function __construct(
-        string $name,
-        string $password,
-        string $email,
-        string $role,
-        string $fullName,
-        string $sessionId,
-        bool $deleted = false,
-        bool $enabled = true,
-        ?\DateTimeImmutable $created = null,
-        // ?\DateTimeImmutable $updatedAt = null, // TODO...
-        ?\DateTimeImmutable $lastLogin = null,
+        #[ORM\Column(type: Types::STRING, length: 50, unique: true)]
+        private string $userName,
+        #[ORM\Column(type: Types::STRING, length: 255)]
+        private string $password,
+        #[ORM\Column(type: Types::STRING, length: 255)]
+        private string $email,
+        #[ORM\Column(type: Types::STRING, length: UserRoleEnum::MAX_LENGTH, enumType: UserRoleEnum::class)]
+        private UserRoleEnum $role,
+        #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+        private ?string $firstName,
+        #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+        private ?string $lastName,
+        #[ORM\Column(type: Types::STRING, length: 255)]
+        private string $sessionId,
+        #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
+        private bool $deleted = false,
+        #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]
+        private bool $enabled = true,
+        #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+        private ?\DateTimeImmutable $lastLoginAt = null,
     ) {
-        $this->name = $name;
-        $this->password = $password;
-        $this->email = $email;
-        $this->role = $role;
-        $this->fullName = $fullName;
-        $this->sessionId = $sessionId;
-        $this->deleted = $deleted;
-        $this->enabled = $enabled;
-        $this->created = $created ?? new \DateTimeImmutable();
-        $this->lastLogin = $lastLogin;
     }
 
-    public function getName(): string
+    public function getUserName(): string
     {
-        return $this->name;
+        return $this->userName;
     }
 
-    public function setName(string $name): void
+    public function setUserName(string $userName): void
     {
-        $this->name = $name;
+        $this->userName = $userName;
     }
 
     public function getPassword(): string
@@ -103,24 +73,53 @@ class User extends BaseEntity
         $this->email = $email;
     }
 
-    public function getRole(): string
+    public function getRole(): UserRoleEnum
     {
         return $this->role;
     }
 
-    public function setRole(string $role): void
+    public function setRole(UserRoleEnum $role): void
     {
         $this->role = $role;
     }
 
-    public function getFullName(): string
+    public function getFirstName(): ?string
     {
-        return $this->fullName;
+        return $this->firstName;
     }
 
-    public function setFullName(string $fullName): void
+    public function setFirstName(?string $firstName): void
     {
-        $this->fullName = $fullName;
+        $this->firstName = $firstName;
+    }
+
+    public function getLastName(): ?string
+    {
+        return $this->lastName;
+    }
+
+    public function setLastName(?string $lastName): void
+    {
+        $this->lastName = $lastName;
+    }
+
+    public function getFullName(): ?string
+    {
+        if (empty($this->firstName) && empty($this->lastName)) {
+            return null;
+        } elseif (empty($this->firstName)) {
+            return $this->lastName;
+        } elseif (empty($this->lastName)) {
+            return $this->firstName;
+        }
+
+        return $this->firstName . ' ' . $this->lastName;
+    }
+
+    public function setFullName(string $firstName, string $lastName): void
+    {
+        $this->firstName = $firstName;
+        $this->lastName = $lastName;
     }
 
     public function getSessionId(): string
@@ -153,23 +152,13 @@ class User extends BaseEntity
         $this->enabled = $enabled;
     }
 
-    public function getCreated(): \DateTimeImmutable
+    public function getLastLoginAt(): ?\DateTimeImmutable
     {
-        return $this->created;
+        return $this->lastLoginAt;
     }
 
-    public function setCreated(\DateTimeImmutable $created): void
+    public function setLastLoginAt(?\DateTimeImmutable $lastLoginAt): void
     {
-        $this->created = $created;
-    }
-
-    public function getLastLogin(): ?\DateTimeImmutable
-    {
-        return $this->lastLogin;
-    }
-
-    public function setLastLogin(?\DateTimeImmutable $lastLogin): void
-    {
-        $this->lastLogin = $lastLogin;
+        $this->lastLoginAt = $lastLoginAt;
     }
 }
