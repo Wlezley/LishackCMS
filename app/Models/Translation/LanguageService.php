@@ -5,16 +5,14 @@ declare(strict_types=1);
 namespace App\Models\Translation;
 
 use App\Dto\Localization\LanguageDto;
+use App\Entity\Language\LanguageRepositoryInterface;
 use App\Exception\TranslatorException;
 use App\Models\Config\ConfigManager;
-use Nette\Database\Explorer;
 use Webmozart\Assert\Assert;
 use Webmozart\Assert\InvalidArgumentException;
 
 class LanguageService
 {
-    public const string TABLE_NAME = 'lang';
-
     /** @var array<string, LanguageDto> */
     private array $languages = [];
 
@@ -22,8 +20,8 @@ class LanguageService
     private string $currentLanguage;
 
     public function __construct(
-        private readonly Explorer $db,
         private readonly ConfigManager $configManager,
+        private readonly LanguageRepositoryInterface $languageRepository,
     ) {
         $this->load();
         $this->currentLanguage = $this->getDefaultLanguage(); // Bootup default language
@@ -32,10 +30,9 @@ class LanguageService
     private function load(): void
     {
         if (empty($this->languages)) {
-            foreach ($this->db->table(self::TABLE_NAME)->fetchAll() as $row) {
-                $languageDto = LanguageDto::fromEntity($row);
-                $languageCode = $languageDto->lang;
-                $this->languages[$languageCode] = $languageDto;
+            foreach ($this->languageRepository->findAll() as $language) {
+                $languageDto = LanguageDto::fromEntity($language);
+                $this->languages[$language->getLanguageCode()] = $languageDto;
             }
         }
     }
