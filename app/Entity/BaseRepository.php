@@ -23,17 +23,12 @@ abstract readonly class BaseRepository implements BaseRepositoryInterface
         protected EntityManagerInterface $entityManager,
     ) {
         /** @var EntityRepository<TEntity> $repository */
-        $repository = $entityManager->getRepository(static::getEntityClass());
+        $repository = $entityManager->getRepository(
+            RepositoryEntityMap::resolveEntityClass(static::class),
+        );
 
         $this->repository = $repository;
     }
-
-    /**
-     * Returns the entity class name.
-     *
-     * @return class-string<TEntity>
-     */
-    abstract protected static function getEntityClass(): string;
 
     /** @inheritDoc */
     public function findById(int $id): ?object

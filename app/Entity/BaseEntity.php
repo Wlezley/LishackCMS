@@ -13,20 +13,24 @@ abstract class BaseEntity
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER)]
-    protected int $id;
+    protected ?int $id = null;
 
-    public function __clone()
+    public function __clone(): void
     {
-        if (isset($this->id)) {
-            unset($this->id);
-        }
+        $this->id = null;
     }
 
     /**
      * Returns the entity identifier.
+     *
+     * @throws \LogicException If the entity has not been persisted yet.
      */
     public function getId(): int
     {
+        if ($this->id === null) {
+            throw new \LogicException('Entity has not been persisted yet.');
+        }
+
         return $this->id;
     }
 
@@ -35,6 +39,6 @@ abstract class BaseEntity
      */
     public function isPersisted(): bool
     {
-        return isset($this->id);
+        return $this->id !== null;
     }
 }

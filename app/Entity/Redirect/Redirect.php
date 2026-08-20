@@ -9,7 +9,7 @@ use App\Enum\HttpRedirectCode;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: RedirectRepository::class)]
+#[ORM\Entity]
 #[ORM\Table(name: 'redirect')]
 class Redirect extends BaseEntity
 {

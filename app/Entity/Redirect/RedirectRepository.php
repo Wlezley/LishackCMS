@@ -11,14 +11,6 @@ use App\Entity\BaseRepository;
  */
 final readonly class RedirectRepository extends BaseRepository implements RedirectRepositoryInterface
 {
-    /**
-     * @return class-string<Redirect>
-     */
-    protected static function getEntityClass(): string
-    {
-        return Redirect::class;
-    }
-
     /** @inheritDoc */
     public function findBySource(string $source): ?Redirect
     {
