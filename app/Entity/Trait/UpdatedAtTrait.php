@@ -15,13 +15,13 @@ use Doctrine\ORM\Mapping as ORM;
  */
 trait UpdatedAtTrait
 {
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-    private DateTimeImmutable $updatedAt;
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?DateTimeImmutable $updatedAt = null;
 
     /**
      * Returns the date and time when the entity was last updated.
      */
-    public function getUpdatedAt(): DateTimeImmutable
+    public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updatedAt;
     }
@@ -29,12 +29,11 @@ trait UpdatedAtTrait
     /**
      * Sets the date and time when the entity was last updated.
      */
-    public function setUpdatedAt(DateTimeImmutable $updatedAt): void
+    public function setUpdatedAt(?DateTimeImmutable $updatedAt): void
     {
         $this->updatedAt = $updatedAt;
     }
 
-    #[ORM\PrePersist]
     #[ORM\PreUpdate]
     protected function touchUpdatedAt(): void
     {
