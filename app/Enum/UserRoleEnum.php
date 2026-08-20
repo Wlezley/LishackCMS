@@ -14,24 +14,43 @@ enum UserRoleEnum: string
     case Manager = 'manager';   // 3
     case Admin = 'admin';       // 4
 
-    // TODO: Handle this in the UserRoleLevelEnum ???
-    public static function getRoleLevel(string $role): ?int
+    public function getLevel(): int
     {
-        return match ($role) {
-            self::Guest->value => 0,
-            self::User->value => 1,
-            self::Redactor->value => 2,
-            self::Manager->value => 3,
-            self::Admin->value => 4,
-            default => null,
+        return match ($this) {
+            self::Guest => 0,
+            self::User => 1,
+            self::Redactor => 2,
+            self::Manager => 3,
+            self::Admin => 4,
         };
     }
 
+    public static function fromLevel(int $level): self
+    {
+        return self::tryFromLevel($level)
+            ?? throw new \ValueError(
+                sprintf('Invalid user role level "%d".', $level),
+            );
+    }
+
+    public static function tryFromLevel(int $level): ?self
+    {
+        return array_find(
+            self::cases(),
+            fn(self $role) => $role->getLevel() === $level,
+        );
+    }
+
     /**
-     * @return array<int, string>
+     * @return array<int, string> Array of roles, indexed by their level
      */
     public static function toArray(): array
     {
-        return array_column(self::cases(), 'value');
+        $roles = [];
+        foreach (self::cases() as $role) {
+            $roles[$role->getLevel()] = $role->value;
+        }
+
+        return $roles;
     }
 }
