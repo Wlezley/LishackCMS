@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity\CmsConfig;
 
+use App\Enum\CmsConfigCategoryEnum;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -11,24 +12,15 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'cms_config')]
 class CmsConfig
 {
-    #[ORM\Id]
-    #[ORM\Column(type: Types::STRING, length: 255, unique: true)]
-    private string $key;
-
-    #[ORM\Column(type: Types::STRING, length: 255)]
-    private string $category;
-
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $value;
-
     public function __construct(
-        string $key,
-        string $category,
-        ?string $value = null,
+        #[ORM\Id]
+        #[ORM\Column(type: Types::STRING, length: 255, unique: true)]
+        private string $key,
+        #[ORM\Column(type: Types::STRING, length: CmsConfigCategoryEnum::MAX_LENGTH, enumType: CmsConfigCategoryEnum::class)]
+        private CmsConfigCategoryEnum $category,
+        #[ORM\Column(type: Types::TEXT, nullable: true)]
+        private ?string $value = null,
     ) {
-        $this->key = $key;
-        $this->category = $category;
-        $this->value = $value;
     }
 
     public function getKey(): string
@@ -41,12 +33,12 @@ class CmsConfig
         $this->key = $key;
     }
 
-    public function getCategory(): string
+    public function getCategory(): CmsConfigCategoryEnum
     {
         return $this->category;
     }
 
-    public function setCategory(string $category): void
+    public function setCategory(CmsConfigCategoryEnum $category): void
     {
         $this->category = $category;
     }
