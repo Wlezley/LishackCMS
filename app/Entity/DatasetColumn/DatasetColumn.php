@@ -18,13 +18,13 @@ class DatasetColumn extends BaseEntity
     #[ORM\Column(type: Types::INTEGER, unique: true)] // TODO: Link to column in dataset
     private int $columnId;
 
-    #[ORM\Column(type: Types::TEXT, length: 50)]
+    #[ORM\Column(type: Types::STRING, length: 50)]
     private string $name;
 
-    #[ORM\Column(type: Types::TEXT, length: 50, unique: true)] // TODO: Must be unique in dataset
+    #[ORM\Column(type: Types::STRING, length: 50, unique: true)] // TODO: Must be unique in dataset
     private string $slug;
 
-    #[ORM\Column(type: Types::TEXT, length: 50)]
+    #[ORM\Column(type: Types::STRING, length: 50)]
     private string $type;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]

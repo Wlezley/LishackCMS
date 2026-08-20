@@ -12,10 +12,10 @@ use Doctrine\ORM\Mapping as ORM;
 class CmsConfig
 {
     #[ORM\Id]
-    #[ORM\Column(type: Types::TEXT, length: 255, unique: true)]
+    #[ORM\Column(type: Types::STRING, length: 255, unique: true)]
     private string $key;
 
-    #[ORM\Column(type: Types::TEXT, length: 255)]
+    #[ORM\Column(type: Types::STRING, length: 255)]
     private string $category;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]

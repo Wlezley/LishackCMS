@@ -21,10 +21,10 @@ class StorageTree extends BaseEntity
     #[ORM\Column(type: Types::INTEGER, nullable: true)]
     private ?int $position = null;
 
-    #[ORM\Column(type: Types::TEXT, length: 255)]
+    #[ORM\Column(type: Types::STRING, length: 255)]
     private string $name;
 
-    #[ORM\Column(type: Types::TEXT, length: 255)]
+    #[ORM\Column(type: Types::STRING, length: 255)]
     private string $nameUrl;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['default' => 'CURRENT_TIMESTAMP'])]

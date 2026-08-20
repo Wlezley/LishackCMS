@@ -12,16 +12,16 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'dataset')]
 class Dataset extends BaseEntity
 {
-    #[ORM\Column(type: Types::TEXT, length: 50)]
+    #[ORM\Column(type: Types::STRING, length: 50)]
     private string $name;
 
-    #[ORM\Column(type: Types::TEXT, length: 50)]
+    #[ORM\Column(type: Types::STRING, length: 50)]
     private string $slug;
 
-    #[ORM\Column(type: Types::TEXT, length: 50)]
+    #[ORM\Column(type: Types::STRING, length: 50)]
     private string $component;
 
-    #[ORM\Column(type: Types::TEXT, length: 50)]
+    #[ORM\Column(type: Types::STRING, length: 50)]
     private string $presenter;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]

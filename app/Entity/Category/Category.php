@@ -21,13 +21,13 @@ class Category extends BaseEntity
     #[ORM\Column(type: Types::INTEGER, nullable: true)]
     private ?int $level;
 
-    #[ORM\Column(type: Types::TEXT, length: 255, nullable: true)]
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private ?string $name;
 
-    #[ORM\Column(type: Types::TEXT, length: 255, nullable: true)]
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private ?string $nameUrl;
 
-    #[ORM\Column(type: Types::TEXT, length: 255, nullable: true)]
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private ?string $title;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]

@@ -16,22 +16,22 @@ class User extends BaseEntity
 //    use CreatedAtTrait;
 //    use UpdatedAtTrait;
 
-    #[ORM\Column(type: Types::TEXT, length: 50, unique: true)]
+    #[ORM\Column(type: Types::STRING, length: 50, unique: true)]
     private string $name; // TODO: Change to $username
 
-    #[ORM\Column(type: Types::TEXT, length: 255)]
+    #[ORM\Column(type: Types::STRING, length: 255)]
     private string $password;
 
-    #[ORM\Column(type: Types::TEXT, length: 255)]
+    #[ORM\Column(type: Types::STRING, length: 255)]
     private string $email;
 
-    #[ORM\Column(type: Types::TEXT, length: 50)]
+    #[ORM\Column(type: Types::STRING, length: 50)]
     private string $role; // TODO: Change to enum
 
-    #[ORM\Column(type: Types::TEXT, length: 255)]
+    #[ORM\Column(type: Types::STRING, length: 255)]
     private string $fullName; // TODO: Split to $firstName $lastName
 
-    #[ORM\Column(type: Types::TEXT, length: 150)] // TODO: Allow more than 150 chars ???
+    #[ORM\Column(type: Types::STRING, length: 150)] // TODO: Allow more than 150 chars ???
     private string $sessionId;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]

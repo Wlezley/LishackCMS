@@ -19,11 +19,11 @@ class TranslationLog extends BaseEntity
     /**
      * @todo KEY + LANG must be unique
      */
-    #[ORM\Column(type: Types::TEXT, length: 255)]
+    #[ORM\Column(type: Types::STRING, length: 255)]
     private string $key;
 
-    #[ORM\Column(type: Types::TEXT, length: 2)]
-    private string $lang; // TODO: Change to $languageCode;
+    #[ORM\Column(type: Types::STRING, length: 2)]
+    private string $lang; // TODO: Change to $languageCode; OR use entity Language???
 
     #[ORM\Column(enumType: TranslationLogType::class, options: ['default' => TranslationLogType::Unk])]
     private TranslationLogType $type;

@@ -14,13 +14,13 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'article')]
 class Article extends BaseEntity
 {
-    #[ORM\Column(type: Types::TEXT, length: 255, nullable: true)]
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private string $nameUrl;
 
     #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['default' => 1])]
     private int $categoryId;
 
-    #[ORM\Column(type: Types::TEXT, length: 255, nullable: true)]
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private string $title;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -38,37 +38,37 @@ class Article extends BaseEntity
     #[ORM\Column(type: Types::INTEGER, nullable: true)]
     private int $userId;
 
-    #[ORM\Column(type: Types::TEXT, length: 255, nullable: true)]
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private string $robots;
 
-    #[ORM\Column(type: Types::TEXT, length: 255, nullable: true)]
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private string $canonicalUrl;
 
-    #[ORM\Column(type: Types::TEXT, length: 255, nullable: true)]
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private string $ogTitle;
 
-    #[ORM\Column(type: Types::TEXT, length: 255, nullable: true)]
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private string $ogDescription;
 
-    #[ORM\Column(type: Types::TEXT, length: 255, nullable: true)]
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private string $ogImage;
 
-    #[ORM\Column(type: Types::TEXT, length: 255, nullable: true)]
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private string $ogUrl;
 
-    #[ORM\Column(type: Types::TEXT, length: 255, nullable: true)]
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private string $ogType;
 
-    #[ORM\Column(type: Types::TEXT, length: 255, nullable: true)]
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private string $metaTitle;
 
-    #[ORM\Column(type: Types::TEXT, length: 255, nullable: true)]
+    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private string $metaDescription;
 
-//    #[ORM\Column(type: Types::TEXT, length: 255, nullable: true)]
+//    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
 //    private string $metaKeywords;
 
-//    #[ORM\Column(type: Types::TEXT, length: 255, nullable: true)]
+//    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
 //    private Language $language;
 
     public function __construct(

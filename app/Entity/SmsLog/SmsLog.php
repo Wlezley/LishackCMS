@@ -20,10 +20,10 @@ class SmsLog extends BaseEntity
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private \DateTimeImmutable $date;
 
-    #[ORM\Column(type: Types::TEXT, length: 16)]
+    #[ORM\Column(type: Types::STRING, length: 16)]
     private string $phoneNumber; // TODO: change to phone ???
 
-    #[ORM\Column(type: Types::TEXT, length: 460)]
+    #[ORM\Column(type: Types::STRING, length: 460)]
     private string $message;
 
     #[ORM\Column(type: Types::SMALLINT, length: 3, nullable: true)]

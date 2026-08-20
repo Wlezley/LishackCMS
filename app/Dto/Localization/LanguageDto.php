@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Dto\Localization;
 
-use Nette\Database\Table\ActiveRow;
+use App\Entity\Language\Language;
 
 class LanguageDto
 {
     public function __construct(
         public ?int $id,
-        public string $lang,
+        public string $languageCode,
         public string $name,
         public string $htmlLang,
         public string $locale,
@@ -19,16 +19,16 @@ class LanguageDto
     ) {
     }
 
-    public static function fromEntity(ActiveRow $row): self
+    public static function fromEntity(Language $language): self
     {
         return new self(
-            id: $row->id,
-            lang: $row->lang,
-            name: $row->name,
-            htmlLang: $row->html_lang, // @phpcs:ignore Squiz.NamingConventions.ValidVariableName
-            locale: $row->locale,
-            enabled: $row->enabled == 1,
-            default: $row->default == 1,
+            id: $language->getId(),
+            languageCode: $language->getLanguageCode(),
+            name: $language->getName(),
+            htmlLang: $language->getHtmlLang(),
+            locale: $language->getLocale(),
+            enabled: $language->isEnabled(),
+            default: $language->isDefault(),
         );
     }
 
@@ -39,9 +39,9 @@ class LanguageDto
     {
         return [
             'id' => $this->id,
-            'lang' => $this->lang,
+            'languageCode' => $this->languageCode,
             'name' => $this->name,
-            'html_lang' => $this->htmlLang,
+            'htmlLang' => $this->htmlLang,
             'locale' => $this->locale,
             'enabled' => $this->enabled,
             'default' => $this->default,

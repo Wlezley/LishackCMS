@@ -22,28 +22,28 @@ class StorageFiles extends BaseEntity
     #[ORM\Column(type: Types::INTEGER, nullable: true)]
     private ?int $position = null;
 
-    #[ORM\Column(type: Types::TEXT, length: 255)]
+    #[ORM\Column(type: Types::STRING, length: 255)]
     private string $name;
 
-    #[ORM\Column(type: Types::TEXT, length: 255)]
+    #[ORM\Column(type: Types::STRING, length: 255)]
     private string $nameUrl;
 
-    #[ORM\Column(type: Types::TEXT, length: 255)]
+    #[ORM\Column(type: Types::STRING, length: 255)]
     private string $type;
 
-    #[ORM\Column(type: Types::TEXT, length: 5)]
+    #[ORM\Column(type: Types::STRING, length: 5)]
     private string $icon;
 
     #[ORM\Column(type: Types::BIGINT, options: ['default' => 0])]
     private int $size = 0;
 
-    #[ORM\Column(type: Types::TEXT, length: 32)] // TODO: Its MD5 ???
+    #[ORM\Column(type: Types::STRING, length: 32)] // TODO: Its MD5 ???
     private string $checksum;
 
-    #[ORM\Column(type: Types::TEXT, length: 16)]
+    #[ORM\Column(type: Types::STRING, length: 16)]
     private string $storageId;
 
-    #[ORM\Column(type: Types::TEXT, length: 16)]
+    #[ORM\Column(type: Types::STRING, length: 16)]
     private string $downloadId;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['default' => 'CURRENT_TIMESTAMP'])]

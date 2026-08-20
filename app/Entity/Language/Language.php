@@ -12,33 +12,33 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'language')]
 class Language extends BaseEntity
 {
-    #[ORM\Column(type: Types::TEXT, length: 2)]
-    private string $lang; // TODO: Change to $languageCode;
+    #[ORM\Column(type: Types::STRING, length: 2, unique: true)]
+    private string $languageCode;
 
-    #[ORM\Column(type: Types::TEXT, length: 50)]
+    #[ORM\Column(type: Types::STRING, length: 50)]
     private string $name;
 
-    #[ORM\Column(type: Types::TEXT, length: 2)]
+    #[ORM\Column(type: Types::STRING, length: 2)]
     private string $htmlLang;
 
-    #[ORM\Column(type: Types::TEXT, length: 5)]
+    #[ORM\Column(type: Types::STRING, length: 5)]
     private string $locale;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]
-    private bool $enabled = true;
+    private bool $enabled;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
-    private bool $default = false;
+    private bool $default;
 
     public function __construct(
-        string $lang,
+        string $languageCode,
         string $name,
         string $htmlLang,
         string $locale,
         bool $enabled = true,
         bool $default = false,
     ) {
-        $this->lang = $lang;
+        $this->languageCode = $languageCode;
         $this->name = $name;
         $this->htmlLang = $htmlLang;
         $this->locale = $locale;
@@ -46,14 +46,14 @@ class Language extends BaseEntity
         $this->default = $default;
     }
 
-    public function getLang(): string
+    public function getLanguageCode(): string
     {
-        return $this->lang;
+        return $this->languageCode;
     }
 
-    public function setLang(string $lang): void
+    public function setLanguageCode(string $languageCode): void
     {
-        $this->lang = $lang;
+        $this->languageCode = $languageCode;
     }
 
     public function getName(): string
