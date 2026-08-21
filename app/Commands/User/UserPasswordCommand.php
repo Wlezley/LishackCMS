@@ -4,11 +4,7 @@ declare(strict_types=1);
 
 namespace App\Commands\User;
 
-use App\Exception\UserException;
-use App\Models\User\UserManager;
-use App\Models\User\UserValidator;
-use Nette\Database\Explorer;
-use Nette\Security\Passwords;
+use App\Entity\User\UserRepositoryInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -16,6 +12,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
+use Webmozart\Assert\Assert;
 
 #[AsCommand(
     name: 'user:pass',
@@ -24,8 +21,7 @@ use Symfony\Component\Console\Question\Question;
 final class UserPasswordCommand extends Command
 {
     public function __construct(
-        private readonly Explorer $db,
-        private readonly UserManager $userManager
+        private readonly UserRepositoryInterface $userRepository,
     ) {
         parent::__construct();
     }
@@ -42,7 +38,8 @@ final class UserPasswordCommand extends Command
         $newPassword = $input->getArgument('password');
 
         try {
-            $userId = $this->userManager->getIdByName($username);
+            $user = $this->userRepository->getByUserName($username);
+            Assert::notNull($user, "User '$username' not found.");
         } catch (\Exception $e) {
             $output->writeln(\sprintf('<error>🔴 Error occurred: %s</error>', $e->getMessage()));
             return 1;
@@ -58,19 +55,8 @@ final class UserPasswordCommand extends Command
         $output->writeln("Changing password for user '$username' ...");
 
         try {
-            // Do NOT use UserManager::setPassword() here,
-            // because it will reject handle admin accounts.
-
-            $user = $this->db->table(UserManager::TABLE_NAME)
-                ->get($userId);
-
-            if (!$user) {
-                throw new UserException("User ID '$userId' not found.");
-            }
-
-            $data = ['password' => (new Passwords(PASSWORD_BCRYPT, ['cost' => 12]))->hash($newPassword)];
-            UserValidator::validateData($data);
-            $user->update($data);
+            $user->setPasswordFromPlaintext($newPassword);
+            $this->userRepository->save($user);
 
             $output->writeln(\sprintf("🟢 Password for user '%s' has been successfully changed.", $username));
             return 0;

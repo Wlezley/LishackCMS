@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace App\Commands\User;
 
-use App\Exception\UserException;
-use App\Models\User\UserManager;
+use App\Entity\User\UserRepositoryInterface;
+use App\Enum\UserRoleEnum;
 use App\Models\User\UserRole;
-use App\Models\User\UserValidator;
-use Nette\Database\Explorer;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -16,6 +14,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
+use Webmozart\Assert\Assert;
 
 #[AsCommand(
     name: 'user:role',
@@ -24,8 +23,7 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 final class UserRoleCommand extends Command
 {
     public function __construct(
-        private readonly Explorer $db,
-        private readonly UserManager $userManager
+        private readonly UserRepositoryInterface $userRepository,
     ) {
         parent::__construct();
     }
@@ -42,7 +40,8 @@ final class UserRoleCommand extends Command
         $role = $input->getArgument('role');
 
         try {
-            $userId = $this->userManager->getIdByName($username);
+            $user = $this->userRepository->getByUserName($username);
+            Assert::notNull($user, "User '$username' not found.");
         } catch (\Exception $e) {
             $output->writeln(\sprintf('<error>🔴 Error occurred: %s</error>', $e->getMessage()));
             return 1;
@@ -62,21 +61,11 @@ final class UserRoleCommand extends Command
         $output->writeln("Changing role of user '$username' to '$role': ...");
 
         try {
-            // Do NOT use UserManager::setPassword() here,
-            // because it will reject handle admin accounts.
+            $role = UserRoleEnum::from($role);
+            $user->setRole($role);
+            $this->userRepository->save($user);
 
-            $user = $this->db->table(UserManager::TABLE_NAME)
-                ->get($userId);
-
-            if (!$user) {
-                throw new UserException("User ID '$userId' not found.");
-            }
-
-            $data = ['role' => $role];
-            UserValidator::validateData($data);
-            $user->update($data);
-
-            $output->writeln(\sprintf("🟢 User '%s' has successfully gain role '%s'", $username, $role));
+            $output->writeln(\sprintf("🟢 User '%s' has successfully gain role '%s'", $username, $role->value));
             return 0;
         } catch (\Exception $e) {
             $output->writeln(\sprintf('<error>🔴 Error occurred: %s</error>', $e->getMessage()));
