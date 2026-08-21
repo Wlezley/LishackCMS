@@ -31,8 +31,8 @@ class Article extends BaseEntity
         private ?string $title = null,
         #[ORM\Column(type: Types::TEXT, nullable: true)]
         private ?string $content = null,
-        #[ORM\Column(type: Types::BOOLEAN, nullable: true)]
-        private ?bool $published = null,
+        #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]
+        private bool $published = true,
         #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['default' => 'CURRENT_TIMESTAMP'])]
         private ?\DateTimeImmutable $publishedAt = null,
         #[ORM\Column(type: Types::INTEGER, nullable: true)]
@@ -58,42 +58,42 @@ class Article extends BaseEntity
     ) {
     }
 
-    public function getNameUrl(): string
+    public function getNameUrl(): ?string
     {
         return $this->nameUrl;
     }
 
-    public function setNameUrl(string $nameUrl): void
+    public function setNameUrl(?string $nameUrl): void
     {
         $this->nameUrl = $nameUrl;
     }
 
-    public function getCategoryId(): int
+    public function getCategoryId(): ?int
     {
         return $this->categoryId;
     }
 
-    public function setCategoryId(int $categoryId): void
+    public function setCategoryId(?int $categoryId): void
     {
         $this->categoryId = $categoryId;
     }
 
-    public function getTitle(): string
+    public function getTitle(): ?string
     {
         return $this->title;
     }
 
-    public function setTitle(string $title): void
+    public function setTitle(?string $title): void
     {
         $this->title = $title;
     }
 
-    public function getContent(): string
+    public function getContent(): ?string
     {
         return $this->content;
     }
 
-    public function setContent(string $content): void
+    public function setContent(?string $content): void
     {
         $this->content = $content;
     }
@@ -108,122 +108,112 @@ class Article extends BaseEntity
         $this->published = $published;
     }
 
-    public function getPublishedAt(): \DateTimeImmutable
+    public function getPublishedAt(): ?\DateTimeImmutable
     {
         return $this->publishedAt;
     }
 
-    public function setPublishedAt(\DateTimeImmutable $publishedAt): void
+    public function setPublishedAt(?\DateTimeImmutable $publishedAt): void
     {
         $this->publishedAt = $publishedAt;
     }
 
-    public function getUpdatedAt(): \DateTimeImmutable
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(\DateTimeImmutable $updatedAt): void
-    {
-        $this->updatedAt = $updatedAt;
-    }
-
-    public function getUserId(): int
+    public function getUserId(): ?int
     {
         return $this->userId;
     }
 
-    public function setUserId(int $userId): void
+    public function setUserId(?int $userId): void
     {
         $this->userId = $userId;
     }
 
-    public function getRobots(): string
+    public function getRobots(): ?string
     {
         return $this->robots;
     }
 
-    public function setRobots(string $robots): void
+    public function setRobots(?string $robots): void
     {
         $this->robots = $robots;
     }
 
-    public function getCanonicalUrl(): string
+    public function getCanonicalUrl(): ?string
     {
         return $this->canonicalUrl;
     }
 
-    public function setCanonicalUrl(string $canonicalUrl): void
+    public function setCanonicalUrl(?string $canonicalUrl): void
     {
         $this->canonicalUrl = $canonicalUrl;
     }
 
-    public function getOgTitle(): string
+    public function getOgTitle(): ?string
     {
         return $this->ogTitle;
     }
 
-    public function setOgTitle(string $ogTitle): void
+    public function setOgTitle(?string $ogTitle): void
     {
         $this->ogTitle = $ogTitle;
     }
 
-    public function getOgDescription(): string
+    public function getOgDescription(): ?string
     {
         return $this->ogDescription;
     }
 
-    public function setOgDescription(string $ogDescription): void
+    public function setOgDescription(?string $ogDescription): void
     {
         $this->ogDescription = $ogDescription;
     }
 
-    public function getOgImage(): string
+    public function getOgImage(): ?string
     {
         return $this->ogImage;
     }
 
-    public function setOgImage(string $ogImage): void
+    public function setOgImage(?string $ogImage): void
     {
         $this->ogImage = $ogImage;
     }
 
-    public function getOgUrl(): string
+    public function getOgUrl(): ?string
     {
         return $this->ogUrl;
     }
 
-    public function setOgUrl(string $ogUrl): void
+    public function setOgUrl(?string $ogUrl): void
     {
         $this->ogUrl = $ogUrl;
     }
 
-    public function getOgType(): string
+    public function getOgType(): ?string
     {
         return $this->ogType;
     }
 
-    public function setOgType(string $ogType): void
+    public function setOgType(?string $ogType): void
     {
         $this->ogType = $ogType;
     }
 
-    public function getMetaTitle(): string
+    public function getMetaTitle(): ?string
     {
         return $this->metaTitle;
     }
 
-    public function setMetaTitle(string $metaTitle): void
+    public function setMetaTitle(?string $metaTitle): void
     {
         $this->metaTitle = $metaTitle;
     }
 
-    public function getMetaDescription(): string
+    public function getMetaDescription(): ?string
     {
         return $this->metaDescription;
     }
 
-    public function setMetaDescription(string $metaDescription): void
+    public function setMetaDescription(?string $metaDescription): void
     {
         $this->metaDescription = $metaDescription;
     }
