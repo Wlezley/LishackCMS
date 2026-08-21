@@ -15,7 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 trait UpdatedAtTrait
 {
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['default' => null])]
     private ?DateTimeImmutable $updatedAt = null;
 
     /**
