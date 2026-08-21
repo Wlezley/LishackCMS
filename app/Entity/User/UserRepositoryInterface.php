@@ -21,6 +21,19 @@ interface UserRepositoryInterface extends BaseRepositoryInterface
      */
     public function rename(int $userId, string $newName): void;
 
+    public function create(
+        string $userName,
+        #[\SensitiveParameter]
+        string $password,
+        string $email,
+        UserRoleEnum $role,
+        ?string $firstName,
+        ?string $lastName,
+        string $sessionId,
+        bool $deleted = false,
+        bool $enabled = true,
+    ): User;
+
     /**
      * @throws \Exception
      */
