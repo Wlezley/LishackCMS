@@ -26,7 +26,7 @@ interface UserRepositoryInterface extends BaseRepositoryInterface
     public function create(
         string $userName,
         #[\SensitiveParameter]
-        string $password,
+        string $encryptedPassword,
         string $email,
         UserRoleEnum $role,
         ?string $firstName,

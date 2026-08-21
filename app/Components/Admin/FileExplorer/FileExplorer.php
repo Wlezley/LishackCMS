@@ -6,13 +6,11 @@ namespace App\Components\Admin\FileExplorer;
 
 use App\Components\BaseControl;
 use App\Models\StorageSystem\TreeManager;
-use App\Models\User\UserManager;
 use Nette\Utils\Json;
 
 class FileExplorer extends BaseControl
 {
     public function __construct(
-        private UserManager $userManager,
         private TreeManager $treeManager
     ) {
     }
@@ -24,9 +22,6 @@ class FileExplorer extends BaseControl
 
         $this->template->fileList = $this->treeManager->getAllFiles($id);
         bdump($this->template->fileList);
-
-        $this->template->ownerList = $this->userManager->getList(true);
-        bdump($this->template->ownerList);
 
         $this->template->getJsonTree = function ($id, $treeName) {
             // TODO: Fix empty modal on second call of deletion method

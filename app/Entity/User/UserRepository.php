@@ -44,8 +44,7 @@ final readonly class UserRepository extends BaseRepository implements UserReposi
 
     public function create(
         string $userName,
-        #[\SensitiveParameter]
-        string $password,
+        string $encryptedPassword,
         string $email,
         UserRoleEnum $role,
         ?string $firstName,
@@ -56,7 +55,7 @@ final readonly class UserRepository extends BaseRepository implements UserReposi
     ): User {
         $user = new User(
             userName: $userName,
-            password: new Passwords(PASSWORD_BCRYPT, ['cost' => 12])->hash($password), // TODO: Password helper
+            password: $encryptedPassword,
             email: $email,
             role: $role,
             firstName: $firstName,
@@ -65,6 +64,7 @@ final readonly class UserRepository extends BaseRepository implements UserReposi
             deleted: $deleted,
             enabled: $enabled,
         );
+
         $this->save($user);
 
         return $user;

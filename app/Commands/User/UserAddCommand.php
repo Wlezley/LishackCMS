@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Commands\User;
 
-use App\Entity\User\UserRepositoryInterface;
 use App\Enum\UserRoleEnum;
+use App\Service\User\UserService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -21,7 +21,7 @@ use Symfony\Component\Console\Question\Question;
 final class UserAddCommand extends Command
 {
     public function __construct(
-        private readonly UserRepositoryInterface $userRepository,
+        private readonly UserService $userService,
     ) {
         parent::__construct();
     }
@@ -47,7 +47,7 @@ final class UserAddCommand extends Command
         $output->writeln("Adding user '$username': ...");
 
         try {
-            $user = $this->userRepository->create(
+            $user = $this->userService->create(
                 userName: $username,
                 password: $password,
                 email: '',

@@ -7,20 +7,23 @@ namespace App\Modules\Admin\Presenters;
 use App\Components\Admin\UserForm\IUserFormFactory;
 use App\Components\Admin\UserForm\UserForm;
 use App\Components\Admin\UserList\UserListGrid;
+use App\Entity\User\UserRepositoryInterface;
 use App\Exception\UserException;
-use App\Models\User\UserManager;
 use Contributte\Datagrid\Datagrid;
 use Contributte\Datagrid\Exception\DatagridColumnStatusException;
 use Contributte\Datagrid\Exception\DatagridException;
 use Nette\Utils\Json;
+use Webmozart\Assert\Assert;
 
 class UserPresenter extends SecuredPresenter
 {
     /** @var IUserFormFactory @inject */
     public IUserFormFactory $userForm;
 
+    /** @var UserRepositoryInterface @inject */
+    public UserRepositoryInterface $userRepository;
+
     public function __construct(
-        private readonly UserManager $userManager,
         private readonly UserListGrid $userListGrid,
     ) {
         parent::__construct();
@@ -39,17 +42,18 @@ class UserPresenter extends SecuredPresenter
     public function renderEdit(int $id): void
     {
         try {
-            $item = $this->userManager->get($id);
+            $user = $this->userRepository->getById($id);
+            Assert::notNull($user);
 
             $this->template->title .= " ID: $id";
-            $this->template->item = $item;
+            $this->template->item = $user;
 
             $this->template->jsonData = Json::encode([
-                'id' => $item['id'],
-                'name' => $item['name'],
+                'id' => $user->getId(),
+                'name' => $user->getUserName(),
                 'modal' => [
                     'title' => $this->t('modal.title.confirm-delete'),
-                    'body' => $this->tf('modal.body.delete-user', $item['name']),
+                    'body' => $this->tf('modal.body.delete-user', $user->getUserName()),
                 ],
             ]);
         } catch (\Exception $e) {
@@ -57,14 +61,17 @@ class UserPresenter extends SecuredPresenter
         }
     }
 
-    public function actionDelete(int $id): void
+    public function actionDelete(int $userId): void
     {
         // TODO: Conditions from setDeleted_Callback()
         // TODO: Unify roles, create an ACL system...
         // TODO: TRANSLATE FLASH MESSAGES !!!
         if ($this->user->isInRole('admin')) {
-            $this->userManager->setDeleted($id, true);
-            $this->flashMessage("Uživatel ID: $id byl odstraněn.", 'info');
+            $user = $this->userRepository->getById($userId);
+            $user->setDeleted(true);
+            $this->userRepository->save($user);
+
+            $this->flashMessage("Uživatel ID: $userId byl odstraněn.", 'info');
         } else {
             $this->flashMessage('K odstranění uživatele nemáte oprávnění.', 'danger');
         }
@@ -109,14 +116,15 @@ class UserPresenter extends SecuredPresenter
     protected function createComponentUserForm(): UserForm
     {
         $form = $this->userForm->create();
-        $id = $this->getParameter('id');
+        $userId = $this->getParameter('id');
 
         // TODO: TRANSLATE FLASH MESSAGES !!!
-        if ($id) {
+        if ($userId) {
             try {
-                $userData = $this->userManager->get((int) $id);
-                $form->setParam($userData);
-                $form->setOrigin($form::OriginEdit);
+                $user = $this->userRepository->getById($userId);
+
+                $form->setParam($user); // TODO: This value formerly was array, now it's object. We need to solve this...
+                $form->setOrigin($form::OriginEdit); // TODO: Create FormOrigin enum
             } catch (\Exception $e) {
                 $this->flashMessage('Chyba při čtení dat uživatele: ' . $e->getMessage(), 'danger');
             }
