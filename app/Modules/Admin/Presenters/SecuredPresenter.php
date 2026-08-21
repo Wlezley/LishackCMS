@@ -8,7 +8,7 @@ use App\Components\Admin\DatasetSidebar\DatasetSidebar;
 use App\Components\Admin\DatasetSidebar\IDatasetSidebarFactory;
 use App\Components\Pagination\IPaginationFactory;
 use App\Components\Pagination\Pagination;
-use App\Models\User\UserManager;
+use App\Entity\User\UserRepositoryInterface;
 use App\Models\User\UserRole;
 use Webmozart\Assert\Assert;
 
@@ -21,6 +21,9 @@ class SecuredPresenter extends BasePresenter
 
     /** @var IPaginationFactory @inject */
     public IPaginationFactory $paginationFactory;
+
+    /** @var UserRepositoryInterface @inject */
+    public UserRepositoryInterface $userRepository;
 
     // Pagination
     private ?int $itemsPerPage = null;
@@ -40,17 +43,15 @@ class SecuredPresenter extends BasePresenter
         }
 
         if ($this->user->isLoggedIn()) {
-            $userData = $this->db->table(UserManager::TABLE_NAME)->select('deleted, enabled, role')->where([
-                'id' => $this->user->getId(),
-            ])->fetch();
+            $userData = $this->userRepository->getById($this->user->getId());
 
-            if (!$userData || $userData['deleted'] == 1 || $userData['enabled'] != 1) {
+            if ($userData === null || $userData->isDeleted() || !$userData->isEnabled()) {
                 $this->user->logout(true);
                 $this->flashMessage('Uživatel byl odhlášen', 'danger');
                 $this->redirect('Sign:in');
             }
 
-            if ($this->user->getIdentity()?->getData()['role'] !== $userData['role']) {
+            if ($this->user->getIdentity()?->getData()['role'] !== $userData->getRole()->value) {
                 $this->user->logout(true);
                 $this->flashMessage('Uživatel byl odhlášen: Změna role', 'danger');
                 $this->redirect('Sign:in');

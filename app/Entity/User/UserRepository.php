@@ -96,4 +96,9 @@ final readonly class UserRepository extends BaseRepository implements UserReposi
         $user->setRole($role);
         $user->save();
     }
+
+    public function findActiveUserByUserName(string $username): ?User
+    {
+        return $this->findOneBy(['userName' => $username, 'deleted' => 0, 'enabled' => 1]);
+    }
 }

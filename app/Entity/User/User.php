@@ -23,7 +23,6 @@ class User extends BaseEntity
     public function __construct(
         #[ORM\Column(type: Types::STRING, length: 50, unique: true)]
         private string $userName,
-        #[\SensitiveParameter]
         #[ORM\Column(type: Types::STRING, length: 255)]
         private string $password,
         #[ORM\Column(type: Types::STRING, length: 255)]
@@ -58,6 +57,11 @@ class User extends BaseEntity
     public function getPasswordEncrypted(): string
     {
         return $this->password;
+    }
+
+    public function setPasswordEncrypted(string $encryptedPassword): void
+    {
+        $this->password = $encryptedPassword;
     }
 
     public function setPasswordFromPlaintext(#[\SensitiveParameter] string $passwordToEncrypt): void

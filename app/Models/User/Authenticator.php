@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace App\Models\User;
 
+use App\Entity\User\UserRepositoryInterface;
 use Carbon\Carbon;
-use Nette\Database\Explorer;
 use Nette\Http\Session;
 use Nette\Security\AuthenticationException;
 use Nette\Security\Passwords;
 use Nette\Security\SimpleIdentity;
 
-class Authenticator implements \Nette\Security\Authenticator
+readonly class Authenticator implements \Nette\Security\Authenticator
 {
     public function __construct(
-        protected Explorer $db,
+        private UserRepositoryInterface $userRepository,
         private Session $session,
         private Passwords $passwords
     ) {
@@ -22,38 +22,46 @@ class Authenticator implements \Nette\Security\Authenticator
 
     public function authenticate(string $username, #[\SensitiveParameter] string $password): SimpleIdentity
     {
-        $user = $this->db->table(UserManager::TABLE_NAME)
-            ->where(['name' => $username, 'deleted' => 0, 'enabled' => 1])
-            ->limit(1)
-            ->fetch();
-
-        if (!($user && $this->passwords->verify($password, $user['password']))) {
+        $user = $this->userRepository->findActiveUserByUserName($username);
+        if ($user === null) {
             throw new AuthenticationException('Invalid credentials.', self::InvalidCredential);
-        } elseif ($this->passwords->needsRehash($user['password'])) {
-            $user->update(['password' => $this->passwords->hash($password)]);
+        }
+
+        $encryptedPassword = $user->getPasswordEncrypted();
+
+        if (!$this->passwords->verify($password, $encryptedPassword)) {
+            throw new AuthenticationException('Invalid credentials.', self::InvalidCredential);
+        } elseif ($this->passwords->needsRehash($encryptedPassword)) {
+            $user->setPasswordEncrypted($this->passwords->hash($password));
+
+            // TODO: Tahle podmínka je divná...
         }
 
         $this->session->regenerateId();
         $sessionId = $this->session->getId();
         $lastLogin = Carbon::now();
 
-        $user->update([
-            'session_id' => $sessionId,
-            'last_login' => $lastLogin,
-        ]);
+        $user->setSessionId($sessionId);
+        $user->setLastLoginAt($lastLogin->toDateTimeImmutable());
+        $this->userRepository->save($user);
 
+        // TODO: Add toArray() method to User entity ???
         $data = [
-            'id' => $user['id'],
-            'name' => $user['name'],
-            'email' => $user['email'],
-            'role' => $user['role'],
-            'full_name' => $user['full_name'],
+            'id' => $user->getId(),
+            'user_name' => $user->getUserName(), // TODO: name ???
+            'email' => $user->getEmail(),
+            'role' => $user->getRole()->value,
+            'full_name' => $user->getFullName(),
             'session_id' => $sessionId,
-            'deleted' => $user['deleted'],
-            'enabled' => $user['enabled'],
+            'deleted' => $user->isDeleted(),
+            'enabled' => $user->isEnabled(),
             'last_login' => $lastLogin,
         ];
 
-        return new SimpleIdentity($user['id'], $user['role'], $data);
+        return new SimpleIdentity(
+            id: $user->getId(),
+            roles: $user->getRole()->value,
+            data: $data
+        );
     }
 }
