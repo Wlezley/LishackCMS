@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Commands\User;
 
-use App\Models\User\UserManager;
+use App\Entity\User\UserRepositoryInterface;
+use App\Enum\UserRoleEnum;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -20,7 +21,7 @@ use Symfony\Component\Console\Question\Question;
 final class UserAddCommand extends Command
 {
     public function __construct(
-        private readonly UserManager $userManager
+        private readonly UserRepositoryInterface $userRepository,
     ) {
         parent::__construct();
     }
@@ -46,11 +47,17 @@ final class UserAddCommand extends Command
         $output->writeln("Adding user '$username': ...");
 
         try {
-            $userId = $this->userManager->create([
-                'name' => $username,
-                'password' => $password,
-            ]);
-            $output->writeln(\sprintf('🟢 User has been successfully added; user ID: %d', $userId));
+            $user = $this->userRepository->create(
+                userName: $username,
+                password: $password,
+                email: '',
+                role: UserRoleEnum::User,
+                firstName: '',
+                lastName: '',
+                sessionId: '',
+            );
+
+            $output->writeln(\sprintf('🟢 User has been successfully added; user ID: %d', $user->getId()));
             return 0;
         } catch (\Exception $e) {
             $output->writeln(\sprintf('<error>🔴 Error occurred: %s</error>', $e->getMessage()));

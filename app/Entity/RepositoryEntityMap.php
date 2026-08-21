@@ -8,6 +8,8 @@ use App\Entity\Language\Language;
 use App\Entity\Language\LanguageRepository;
 use App\Entity\Redirect\Redirect;
 use App\Entity\Redirect\RedirectRepository;
+use App\Entity\User\User;
+use App\Entity\User\UserRepository;
 
 final class RepositoryEntityMap
 {
@@ -17,6 +19,7 @@ final class RepositoryEntityMap
     private const array MAP = [
         LanguageRepository::class => Language::class,
         RedirectRepository::class => Redirect::class,
+        UserRepository::class => User::class,
     ];
 
     /**

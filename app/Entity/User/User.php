@@ -10,10 +10,11 @@ use App\Entity\Trait\UpdatedAtTrait;
 use App\Enum\UserRoleEnum;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Nette\Security\Passwords;
 
 #[ORM\Entity]
-#[ORM\Table(name: 'users')]
 #[ORM\HasLifecycleCallbacks]
+#[ORM\Table(name: 'users')]
 class User extends BaseEntity
 {
     use CreatedAtTrait;
@@ -22,6 +23,7 @@ class User extends BaseEntity
     public function __construct(
         #[ORM\Column(type: Types::STRING, length: 50, unique: true)]
         private string $userName,
+        #[\SensitiveParameter]
         #[ORM\Column(type: Types::STRING, length: 255)]
         private string $password,
         #[ORM\Column(type: Types::STRING, length: 255)]
@@ -53,14 +55,19 @@ class User extends BaseEntity
         $this->userName = $userName;
     }
 
-    public function getPassword(): string
+    public function getPasswordEncrypted(): string
     {
         return $this->password;
     }
 
-    public function setPassword(string $password): void
+    public function setPasswordFromPlaintext(#[\SensitiveParameter] string $passwordToEncrypt): void
     {
-        $this->password = $password;
+        $this->password = new Passwords(
+            algo: PASSWORD_BCRYPT,
+            options: ['cost' => 12]
+        )->hash(
+            password: $passwordToEncrypt
+        );
     }
 
     public function getEmail(): string
