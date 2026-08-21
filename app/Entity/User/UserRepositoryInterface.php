@@ -14,6 +14,8 @@ interface UserRepositoryInterface extends BaseRepositoryInterface
 {
     public function getById(int $userId): ?User;
 
+    public function getByUserName(string $userName): ?User;
+
     public function getIdByUserName(string $userName): int;
 
     /**
@@ -43,4 +45,6 @@ interface UserRepositoryInterface extends BaseRepositoryInterface
      * @throws \Exception
      */
     public function setRole(int $userId, UserRoleEnum $role): void;
+
+    public function findActiveUserByUserName(string $username): ?User;
 }

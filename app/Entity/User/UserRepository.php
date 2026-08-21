@@ -18,11 +18,14 @@ final readonly class UserRepository extends BaseRepository implements UserReposi
         return $this->findById($userId);
     }
 
+    public function getByUserName(string $userName): ?User
+    {
+        return $this->findOneBy(['userName' => $userName]);
+    }
+
     public function getIdByUserName(string $userName): int
     {
-        $user = $this->findOneBy(['userName' => $userName]);
-
-        return $user->getId();
+        return $this->getByUserName($userName)->getId();
     }
 
     /**
