@@ -5,42 +5,28 @@ declare(strict_types=1);
 namespace App\Entity\SmsLog;
 
 use App\Entity\BaseEntity;
+use App\Entity\Trait\CreatedAtTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Webmozart\Assert\Assert;
 use Webmozart\Assert\InvalidArgumentException;
 
 #[ORM\Entity]
-#[ORM\Table(name: 'log_sms')] // TODO: change table name to sms_log
+#[ORM\Table(name: 'log_sms')] // TODO: change table name to sms_log ???
 class SmsLog extends BaseEntity
 {
-    #[ORM\Column(type: Types::INTEGER, nullable: true)]
-    private ?int $userId = null;
-
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['default' => 'CURRENT_TIMESTAMP'])]
-    private \DateTimeImmutable $date;
-
-    #[ORM\Column(type: Types::STRING, length: 16)]
-    private string $phoneNumber; // TODO: change to phone ???
-
-    #[ORM\Column(type: Types::STRING, length: 460)]
-    private string $message;
-
-    #[ORM\Column(type: Types::SMALLINT, length: 3, nullable: true)]
-    private ?int $errorCode = null;
+    use CreatedAtTrait;
 
     public function __construct(
-        int $userId,
-        \DateTimeImmutable $date,
-        string $phoneNumber,
-        string $message,
-        int $errorCode,
+        #[ORM\Column(type: Types::STRING, length: 16)]
+        private string $phoneNumber, // TODO: change to phone ???
+        #[ORM\Column(type: Types::STRING, length: 460)]
+        private string $message,
+        #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['default' => null])]
+        private ?int $userId = null,
+        #[ORM\Column(type: Types::SMALLINT, length: 3, nullable: true, options: ['default' => null])]
+        private ?int $errorCode = null,
     ) {
-        $this->userId = $userId;
-        $this->date = $date;
-        $this->phoneNumber = $phoneNumber;
-        $this->message = $message;
-        $this->errorCode = $errorCode;
     }
 
     public function getUserId(): ?int
@@ -51,16 +37,6 @@ class SmsLog extends BaseEntity
     public function setUserId(?int $userId): void
     {
         $this->userId = $userId;
-    }
-
-    public function getDate(): \DateTimeImmutable
-    {
-        return $this->date;
-    }
-
-    public function setDate(\DateTimeImmutable $date): void
-    {
-        $this->date = $date;
     }
 
     public function getPhoneNumber(): string

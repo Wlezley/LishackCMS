@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity\StorageTree;
 
 use App\Entity\BaseEntity;
+use App\Entity\Trait\CreatedAtTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -12,48 +13,33 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'storage_tree')]
 class StorageTree extends BaseEntity
 {
+    use CreatedAtTrait;
+
     #[ORM\Column(type: Types::INTEGER, options: ['default' => 0])]
     private int $parentId = 0;
 
     #[ORM\Column(type: Types::INTEGER, options: ['default' => 0])]
     private int $ownerId = 0;
 
-    #[ORM\Column(type: Types::INTEGER, nullable: true)]
+    #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['default' => null])]
     private ?int $position = null;
-
-    #[ORM\Column(type: Types::STRING, length: 255)]
-    private string $name;
-
-    #[ORM\Column(type: Types::STRING, length: 255)]
-    private string $nameUrl;
-
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['default' => 'CURRENT_TIMESTAMP'])]
-    private \DateTimeImmutable $createdAt;
-
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
-    private ?\DateTimeImmutable $modifiedAt = null;
-
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
-    private ?\DateTimeImmutable $deletedAt = null;
 
     public function __construct(
         int $parentId,
         int $ownerId,
         ?int $position,
-        string $name,
-        string $nameUrl,
-        \DateTimeImmutable $createdAt,
-        ?\DateTimeImmutable $modifiedAt = null,
-        ?\DateTimeImmutable $deletedAt = null,
+        #[ORM\Column(type: Types::STRING, length: 255)]
+        private string $name,
+        #[ORM\Column(type: Types::STRING, length: 255)]
+        private string $nameUrl,
+        #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['default' => null])]
+        private ?\DateTimeImmutable $modifiedAt = null,
+        #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['default' => null])]
+        private ?\DateTimeImmutable $deletedAt = null,
     ) {
         $this->parentId = $parentId;
         $this->ownerId = $ownerId;
         $this->position = $position;
-        $this->name = $name;
-        $this->nameUrl = $nameUrl;
-        $this->createdAt = $createdAt;
-        $this->modifiedAt = $modifiedAt;
-        $this->deletedAt = $deletedAt;
     }
 
     public function getParentId(): int

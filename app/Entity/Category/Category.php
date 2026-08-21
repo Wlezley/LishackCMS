@@ -12,53 +12,26 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'category')]
 class Category extends BaseEntity
 {
-    #[ORM\Column(type: Types::INTEGER, nullable: true)]
-    private ?int $parentId;
-
-    #[ORM\Column(type: Types::INTEGER, nullable: true)]
-    private ?int $position;
-
-    #[ORM\Column(type: Types::INTEGER, nullable: true)]
-    private ?int $level;
-
-    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-    private ?string $name;
-
-    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-    private ?string $nameUrl;
-
-    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-    private ?string $title;
-
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $description;
-
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $body;
-
-    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
-    private bool $hidden;
-
     public function __construct(
-        ?int $parentId = null,
-        ?int $position = null,
-        ?int $level = null,
-        ?string $name = null,
-        ?string $nameUrl = null,
-        ?string $title = null,
-        ?string $description = null,
-        ?string $body = null,
-        bool $hidden = false,
+        #[ORM\Column(type: Types::INTEGER, nullable: true)]
+        private ?int $parentId = null,
+        #[ORM\Column(type: Types::INTEGER, nullable: true)]
+        private ?int $position = null,
+        #[ORM\Column(type: Types::INTEGER, nullable: true)]
+        private ?int $level = null,
+        #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+        private ?string $name = null,
+        #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+        private ?string $nameUrl = null,
+        #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+        private ?string $title = null,
+        #[ORM\Column(type: Types::TEXT, nullable: true)]
+        private ?string $description = null,
+        #[ORM\Column(type: Types::TEXT, nullable: true)]
+        private ?string $body = null,
+        #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
+        private bool $hidden = false,
     ) {
-        $this->parentId = $parentId;
-        $this->position = $position;
-        $this->level = $level;
-        $this->name = $name;
-        $this->nameUrl = $nameUrl;
-        $this->title = $title;
-        $this->description = $description;
-        $this->body = $body;
-        $this->hidden = $hidden;
     }
 
     public function getParentId(): ?int

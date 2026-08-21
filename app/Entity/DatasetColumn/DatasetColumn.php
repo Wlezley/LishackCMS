@@ -12,58 +12,28 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'dataset_column')]
 class DatasetColumn extends BaseEntity
 {
-    #[ORM\Column(type: Types::INTEGER, unique: true)] // TODO: Link to column in dataset
-    private int $datasetId;
-
-    #[ORM\Column(type: Types::INTEGER, unique: true)] // TODO: Link to column in dataset
-    private int $columnId;
-
-    #[ORM\Column(type: Types::STRING, length: 50)]
-    private string $name;
-
-    #[ORM\Column(type: Types::STRING, length: 50, unique: true)] // TODO: Must be unique in dataset
-    private string $slug;
-
-    #[ORM\Column(type: Types::STRING, length: 50)]
-    private string $type;
-
-    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
-    private bool $required = false;
-
-    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
-    private bool $listed = false;
-
-    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
-    private bool $hidden = false;
-
-    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
-    private bool $deleted = false;
-
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $default;
-
     public function __construct(
-        int $datasetId,
-        int $columnId,
-        string $name,
-        string $slug,
-        string $type,
-        bool $required = false,
-        bool $listed = false,
-        bool $hidden = false,
-        bool $deleted = false,
-        ?string $default = null,
+        #[ORM\Column(type: Types::INTEGER, unique: true)] // TODO: Link to column in dataset
+        private int $datasetId,
+        #[ORM\Column(type: Types::INTEGER, unique: true)] // TODO: Link to column in dataset
+        private int $columnId,
+        #[ORM\Column(type: Types::STRING, length: 50)]
+        private string $name,
+        #[ORM\Column(type: Types::STRING, length: 50, unique: true)] // TODO: Must be unique in dataset
+        private string $slug,
+        #[ORM\Column(type: Types::STRING, length: 50)]
+        private string $type,
+        #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
+        private bool $required = false,
+        #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
+        private bool $listed = false,
+        #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
+        private bool $hidden = false,
+        #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
+        private bool $deleted = false,
+        #[ORM\Column(type: Types::TEXT, nullable: true)]
+        private ?string $default = null,
     ) {
-        $this->datasetId = $datasetId;
-        $this->columnId = $columnId;
-        $this->name = $name;
-        $this->slug = $slug;
-        $this->type = $type;
-        $this->required = $required;
-        $this->listed = $listed;
-        $this->hidden = $hidden;
-        $this->deleted = $deleted;
-        $this->default = $default;
     }
 
     public function getDatasetId(): int

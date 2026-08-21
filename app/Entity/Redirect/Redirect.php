@@ -13,28 +13,16 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'redirect')]
 class Redirect extends BaseEntity
 {
-    #[ORM\Column(type: Types::STRING, length: 300)]
-    private string $source;
-
-    #[ORM\Column(type: Types::STRING, length: 300)]
-    private string $target;
-
-    #[ORM\Column(enumType: HttpRedirectCode::class, options: ['default' => HttpRedirectCode::FOUND])]
-    private HttpRedirectCode $code;
-
-    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]
-    private bool $enabled;
-
     public function __construct(
-        string $source,
-        string $target,
-        HttpRedirectCode $code = HttpRedirectCode::FOUND,
-        bool $enabled = true,
+        #[ORM\Column(type: Types::STRING, length: 300)]
+        private string $source,
+        #[ORM\Column(type: Types::STRING, length: 300)]
+        private string $target,
+        #[ORM\Column(enumType: HttpRedirectCode::class, options: ['default' => HttpRedirectCode::FOUND])]
+        private HttpRedirectCode $code = HttpRedirectCode::FOUND,
+        #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]
+        private bool $enabled = true,
     ) {
-        $this->source = $source;
-        $this->target = $target;
-        $this->code = $code;
-        $this->enabled = $enabled;
     }
 
     public function getSource(): string

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity\TranslationLog;
 
 use App\Entity\BaseEntity;
+use App\Entity\Trait\CreatedAtTrait;
 use App\Enum\TranslationLogType;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -13,44 +14,21 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'translations_log')]
 class TranslationLog extends BaseEntity
 {
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['default' => 'CURRENT_TIMESTAMP'])]
-    private \DateTimeImmutable $date; // TODO: Change to $createdAt !!! (trait ???)
+    use CreatedAtTrait;
 
     /**
      * @todo KEY + LANG must be unique
      */
-    #[ORM\Column(type: Types::STRING, length: 255)]
-    private string $key;
-
-    #[ORM\Column(type: Types::STRING, length: 2)]
-    private string $lang; // TODO: Change to $languageCode; OR use entity Language???
-
-    #[ORM\Column(enumType: TranslationLogType::class, options: ['default' => TranslationLogType::Unk])]
-    private TranslationLogType $type;
-
-    #[ORM\Column(type: Types::TEXT)]
-    private ?string $message;
-
     public function __construct(
-        string $key,
-        string $lang,
-        TranslationLogType $type = TranslationLogType::Unk,
-        ?string $message = null,
+        #[ORM\Column(type: Types::STRING, length: 255)]
+        private string $key,
+        #[ORM\Column(type: Types::STRING, length: 2)]
+        private string $lang, // TODO: Change to $languageCode; OR use entity Language???
+        #[ORM\Column(enumType: TranslationLogType::class, options: ['default' => TranslationLogType::Unk])]
+        private TranslationLogType $type = TranslationLogType::Unk,
+        #[ORM\Column(type: Types::TEXT)]
+        private ?string $message = null,
     ) {
-        $this->key = $key;
-        $this->lang = $lang;
-        $this->type = $type;
-        $this->message = $message;
-    }
-
-    public function getDate(): \DateTimeImmutable
-    {
-        return $this->date;
-    }
-
-    public function setDate(\DateTimeImmutable $date): void
-    {
-        $this->date = $date;
     }
 
     public function getKey(): string

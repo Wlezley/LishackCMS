@@ -12,38 +12,20 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'dataset')]
 class Dataset extends BaseEntity
 {
-    #[ORM\Column(type: Types::STRING, length: 50)]
-    private string $name;
-
-    #[ORM\Column(type: Types::STRING, length: 50)]
-    private string $slug;
-
-    #[ORM\Column(type: Types::STRING, length: 50)]
-    private string $component;
-
-    #[ORM\Column(type: Types::STRING, length: 50)]
-    private string $presenter;
-
-    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]
-    private bool $active = true;
-
-    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
-    private bool $deleted = false;
-
     public function __construct(
-        string $name,
-        string $slug,
-        string $component,
-        string $presenter,
-        bool $active = true,
-        bool $deleted = false,
+        #[ORM\Column(type: Types::STRING, length: 50)]
+        private string $name,
+        #[ORM\Column(type: Types::STRING, length: 50)]
+        private string $slug,
+        #[ORM\Column(type: Types::STRING, length: 50)]
+        private string $component,
+        #[ORM\Column(type: Types::STRING, length: 50)]
+        private string $presenter,
+        #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]
+        private bool $active = true,
+        #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
+        private bool $deleted = false,
     ) {
-        $this->name = $name;
-        $this->slug = $slug;
-        $this->component = $component;
-        $this->presenter = $presenter;
-        $this->active = $active;
-        $this->deleted = $deleted;
     }
 
     public function getName(): string

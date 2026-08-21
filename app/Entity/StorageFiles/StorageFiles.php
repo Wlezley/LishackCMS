@@ -19,72 +19,39 @@ class StorageFiles extends BaseEntity
     #[ORM\Column(type: Types::INTEGER, options: ['default' => 0])]
     private int $ownerId = 0;
 
-    #[ORM\Column(type: Types::INTEGER, nullable: true)]
+    #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['default' => null])]
     private ?int $position = null;
-
-    #[ORM\Column(type: Types::STRING, length: 255)]
-    private string $name;
-
-    #[ORM\Column(type: Types::STRING, length: 255)]
-    private string $nameUrl;
-
-    #[ORM\Column(type: Types::STRING, length: 255)]
-    private string $type;
-
-    #[ORM\Column(type: Types::STRING, length: 5)]
-    private string $icon;
-
-    #[ORM\Column(type: Types::BIGINT, options: ['default' => 0])]
-    private int $size = 0;
-
-    #[ORM\Column(type: Types::STRING, length: 32)] // TODO: Its MD5 ???
-    private string $checksum;
-
-    #[ORM\Column(type: Types::STRING, length: 16)]
-    private string $storageId;
-
-    #[ORM\Column(type: Types::STRING, length: 16)]
-    private string $downloadId;
-
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['default' => 'CURRENT_TIMESTAMP'])]
-    private \DateTimeImmutable $uploadedAt;
-
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
-    private ?\DateTimeImmutable $modifiedAt = null;
-
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
-    private ?\DateTimeImmutable $deletedAt = null;
 
     public function __construct(
         int $treeId,
         int $ownerId,
         ?int $position,
-        string $name,
-        string $nameUrl,
-        string $type,
-        string $icon,
-        int $size,
-        string $checksum,
-        string $storageId,
-        string $downloadId,
-        \DateTimeImmutable $uploadedAt,
-        ?\DateTimeImmutable $modifiedAt = null,
-        ?\DateTimeImmutable $deletedAt = null,
+        #[ORM\Column(type: Types::STRING, length: 255)]
+        private string $name,
+        #[ORM\Column(type: Types::STRING, length: 255)]
+        private string $nameUrl,
+        #[ORM\Column(type: Types::STRING, length: 255)]
+        private string $type,
+        #[ORM\Column(type: Types::STRING, length: 5)]
+        private string $icon,
+        #[ORM\Column(type: Types::BIGINT, options: ['default' => 0])]
+        private int $size,
+        #[ORM\Column(type: Types::STRING, length: 32)] // TODO: Its MD5 ???
+        private string $checksum,
+        #[ORM\Column(type: Types::STRING, length: 16)]
+        private string $storageId,
+        #[ORM\Column(type: Types::STRING, length: 16)]
+        private string $downloadId,
+        #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['default' => 'CURRENT_TIMESTAMP'])]
+        private \DateTimeImmutable $uploadedAt,
+        #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['default' => null])]
+        private ?\DateTimeImmutable $modifiedAt = null,
+        #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['default' => null])]
+        private ?\DateTimeImmutable $deletedAt = null,
     ) {
         $this->treeId = $treeId;
         $this->ownerId = $ownerId;
         $this->position = $position;
-        $this->name = $name;
-        $this->nameUrl = $nameUrl;
-        $this->type = $type;
-        $this->icon = $icon;
-        $this->size = $size;
-        $this->checksum = $checksum;
-        $this->storageId = $storageId;
-        $this->downloadId = $downloadId;
-        $this->uploadedAt = $uploadedAt;
-        $this->modifiedAt = $modifiedAt;
-        $this->deletedAt = $deletedAt;
     }
 
     public function getTreeId(): int

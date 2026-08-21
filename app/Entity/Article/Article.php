@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Entity\Article;
 
-//use App\Entity\Language\Language;
-
 use App\Entity\BaseEntity;
+use App\Entity\Trait\CreatedAtTrait;
+use App\Entity\Trait\UpdatedAtTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -14,101 +14,48 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'article')]
 class Article extends BaseEntity
 {
-    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-    private string $nameUrl;
-
-    #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['default' => 1])]
-    private int $categoryId;
-
-    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-    private string $title;
-
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private string $content;
-
-    #[ORM\Column(type: Types::BOOLEAN, nullable: true)]
-    private bool $published;
-
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['default' => 'CURRENT_TIMESTAMP'])]
-    private \DateTimeImmutable $publishedAt;
-
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['default' => 'CURRENT_TIMESTAMP'])]
-    private \DateTimeImmutable $updatedAt;
-
-    #[ORM\Column(type: Types::INTEGER, nullable: true)]
-    private int $userId;
-
-    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-    private string $robots;
-
-    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-    private string $canonicalUrl;
-
-    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-    private string $ogTitle;
-
-    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-    private string $ogDescription;
-
-    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-    private string $ogImage;
-
-    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-    private string $ogUrl;
-
-    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-    private string $ogType;
-
-    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-    private string $metaTitle;
-
-    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-    private string $metaDescription;
+    use CreatedAtTrait;
+    use UpdatedAtTrait;
 
 //    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-//    private string $metaKeywords;
-
+//    private ?string $metaKeywords = null;
 //    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-//    private Language $language;
+//    private ?Language $language = null;
 
     public function __construct(
-        string $nameUrl,
-        int $categoryId,
-        string $title,
-        string $content,
-        bool $published,
-        \DateTimeImmutable $publishedAt,
-        \DateTimeImmutable $updatedAt,
-        int $userId,
-        string $robots,
-        string $canonicalUrl,
-        string $ogTitle,
-        string $ogDescription,
-        string $ogImage,
-        string $ogUrl,
-        string $ogType,
-        string $metaTitle,
-        string $metaDescription,
-        // string $metaKeywords,
+        #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+        private ?string $nameUrl = null,
+        #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['default' => 1])]
+        private ?int $categoryId = null,
+        #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+        private ?string $title = null,
+        #[ORM\Column(type: Types::TEXT, nullable: true)]
+        private ?string $content = null,
+        #[ORM\Column(type: Types::BOOLEAN, nullable: true)]
+        private ?bool $published = null,
+        #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['default' => 'CURRENT_TIMESTAMP'])]
+        private ?\DateTimeImmutable $publishedAt = null,
+        #[ORM\Column(type: Types::INTEGER, nullable: true)]
+        private ?int $userId = null,
+        #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+        private ?string $robots = null,
+        #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+        private ?string $canonicalUrl = null,
+        #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+        private ?string $ogTitle = null,
+        #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+        private ?string $ogDescription = null,
+        #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+        private ?string $ogImage = null,
+        #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+        private ?string $ogUrl = null,
+        #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+        private ?string $ogType = null,
+        #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+        private ?string $metaTitle = null,
+        #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+        private ?string $metaDescription = null,
     ) {
-        $this->nameUrl = $nameUrl;
-        $this->categoryId = $categoryId;
-        $this->title = $title;
-        $this->content = $content;
-        $this->published = $published;
-        $this->publishedAt = $publishedAt;
-        $this->updatedAt = $updatedAt;
-        $this->userId = $userId;
-        $this->robots = $robots;
-        $this->canonicalUrl = $canonicalUrl;
-        $this->ogTitle = $ogTitle;
-        $this->ogDescription = $ogDescription;
-        $this->ogImage = $ogImage;
-        $this->ogUrl = $ogUrl;
-        $this->ogType = $ogType;
-        $this->metaTitle = $metaTitle;
-        $this->metaDescription = $metaDescription;
-//        $this->metaKeywords = $metaKeywords;
     }
 
     public function getNameUrl(): string

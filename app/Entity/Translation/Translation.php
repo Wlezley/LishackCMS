@@ -15,23 +15,14 @@ class Translation extends BaseEntity
     /**
      * @todo KEY + LANG must be unique
      */
-    #[ORM\Column(type: Types::STRING, length: 255)]
-    private string $key;
-
-    #[ORM\Column(type: Types::STRING, length: 2)]
-    private string $lang; // TODO: Change to $languageCode; OR use entity Language???
-
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $text = null;
-
     public function __construct(
-        string $key,
-        string $lang,
-        ?string $text = null,
+        #[ORM\Column(type: Types::STRING, length: 255)]
+        private string $key,
+        #[ORM\Column(type: Types::STRING, length: 2)]
+        private string $lang, // TODO: Change to $languageCode; OR use entity Language ???
+        #[ORM\Column(type: Types::TEXT, nullable: true, options: ['default' => null])]
+        private ?string $text = null,
     ) {
-        $this->key = $key;
-        $this->lang = $lang;
-        $this->text = $text;
     }
 
     public function getKey(): string
