@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity\Trait;
 
+use App\Attributes\Sortable;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -16,6 +17,7 @@ use Doctrine\ORM\Mapping as ORM;
 trait CreatedAtTrait
 {
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: false, options: ['default' => 'CURRENT_TIMESTAMP'])]
+    #[Sortable]
     private DateTimeImmutable $createdAt;
 
     /**
