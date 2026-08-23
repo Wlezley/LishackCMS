@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Components\Admin\UserForm;
 
 use App\Components\BaseControl;
+use App\Enum\UserRoleEnum;
 use App\Exception\UserException;
-use App\Models\User\UserManager;
 use App\Models\User\UserRole;
-use App\Models\User\UserValidator;
+use App\Service\User\UserService;
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
 use Webmozart\Assert\Assert;
@@ -29,11 +29,12 @@ class UserForm extends BaseControl
     public $onError;
 
     public function __construct(
-        protected \Nette\Security\User $user,
-        protected UserManager $userManager
+        private readonly UserService $userService,
     ) {
         $this->param = [];
-        $this->editorRole = new UserRole($user);
+
+        Assert::notNull($this->user, 'User must be set');
+        $this->editorRole = new UserRole($this->user->getRole()->value);
     }
 
     public function createComponentForm(): Form
@@ -71,14 +72,14 @@ class UserForm extends BaseControl
             $form->addHidden('id', $param['id']);
         }
 
-        $form->addText('name', $this->t('login-name'))
+        $form->addText('name', $this->t('login-name')) // TODO: Rename to username
             ->setHtmlAttribute('placeholder', $this->t('login-name'))
             ->setHtmlAttribute('autocomplete', 'off')
             ->setHtmlAttribute('readonly', $readOnly)
             ->setValue($param['name'])
             ->setRequired();
 
-        $form->addText('full_name', $this->t('full-name'))
+        $form->addText('full_name', $this->t('full-name')) // TODO: Split to first name and last name
             ->setHtmlAttribute('placeholder', $this->t('full-name'))
             ->setHtmlAttribute('autocomplete', 'off')
             ->setHtmlAttribute('readonly', $readOnly)
@@ -91,7 +92,7 @@ class UserForm extends BaseControl
             ->setHtmlAttribute('readonly', $readOnly)
             ->setValue($param['email']);
 
-        Assert::keyExists($param, 'role', 'User role must be set');
+        Assert::keyExists($param, 'role', 'User role must be set'); // TODO: Use role enum
         Assert::stringNotEmpty($param['role'], 'User role must be a string');
         $form->addSelect('role', $this->t('permissions'), $this->getRoleSelectList($param['role']))
             ->setValue($param['role'])
@@ -142,14 +143,24 @@ class UserForm extends BaseControl
             return;
         }
 
-        if ($this->editorRole->isLessOrEqualsThan($values['role'])) {
+        if ($this->editorRole->isLessOrEqualsThan($values['role'])) { // TODO: ACL...
             call_user_func($this->onError, $this->t('error.form.user-role-elevation'));
             return;
         }
 
         try {
-            $userID = $this->userManager->create((array)$values);
-            call_user_func($this->onSuccess, $this->tf('success.form.user-created', $userID));
+//            $userID = $this->userManager->create((array)$values);
+            $user = $this->userService->create(
+                userName: $values['name'],
+                email: $values['email'],
+                password: $values['password'],
+                role: UserRoleEnum::from($values['role']),
+                firstName: $values['full_name'], // TODO: Rozdělit
+                lastName: $values['full_name'], // TODO: Rozdělit
+                deleted: (bool) $values['deleted'],
+                enabled: (bool) $values['enabled'],
+            );
+            call_user_func($this->onSuccess, $this->tf('success.form.user-created', $user->getId()));
         } catch (UserException $e) {
             call_user_func($this->onError, $e->getMessage());
         }
@@ -179,8 +190,8 @@ class UserForm extends BaseControl
         // }
 
         try {
-            $userData = UserValidator::prepareData((array)$values);
-            $this->userManager->update((int)$values['id'], $userData);
+//            $userData = UserValidator::prepareData((array)$values);
+//            $this->userManager->update((int)$values['id'], $userData);
             call_user_func($this->onSuccess, $this->t('success.form.user-saved'));
         } catch (UserException $e) {
             call_user_func($this->onError, $e->getMessage());
@@ -197,8 +208,8 @@ class UserForm extends BaseControl
                     throw new \Exception('User ID is missing.');
                 }
 
-                $this->param = $this->userManager->get((int) $id);
-                $this->template->readOnly = $this->isReadOnly($id, $this->param['role']);
+//                $this->param = $this->userManager->get((int) $id);
+//                $this->template->readOnly = $this->isReadOnly($id, $this->param['role']);
             }
         } catch (\Exception $e) {
             call_user_func($this->onError, $e->getMessage());
@@ -215,7 +226,7 @@ class UserForm extends BaseControl
 
     private function isReadOnly(int|string $targetId, string $targetRole): bool
     {
-        if ($this->user->getId() == $targetId) {
+        if ($this->user?->getId() == $targetId) {
             return false;
         }
 

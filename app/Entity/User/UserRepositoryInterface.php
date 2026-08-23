@@ -16,7 +16,15 @@ interface UserRepositoryInterface extends BaseRepositoryInterface
 
     public function getByUserName(string $userName): ?User;
 
-    public function getIdByUserName(string $userName): int;
+    public function getIdByUserName(string $userName): ?int;
+
+    /**
+     * @param array<string, mixed> $criteria
+     * @return User[]
+     */
+    public function getAllUsers(array $criteria = []): array;
+
+    public function findActiveUserByUserName(string $username): ?User;
 
     /**
      * @throws \Exception
@@ -25,9 +33,9 @@ interface UserRepositoryInterface extends BaseRepositoryInterface
 
     public function create(
         string $userName,
+        string $email,
         #[\SensitiveParameter]
         string $encryptedPassword,
-        string $email,
         UserRoleEnum $role,
         ?string $firstName,
         ?string $lastName,
@@ -46,5 +54,13 @@ interface UserRepositoryInterface extends BaseRepositoryInterface
      */
     public function setRole(int $userId, UserRoleEnum $role): void;
 
-    public function findActiveUserByUserName(string $username): ?User;
+    /**
+     * @throws \Exception
+     */
+    public function setEnabled(int $userId, bool $isEnabled): void;
+
+    /**
+     * @throws \Exception
+     */
+    public function setDeleted(int $userId, bool $isDeleted): void;
 }

@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\Components\Admin\ArticleEditor;
 
 use App\Components\BaseControl;
+use App\Entity\User\UserRepositoryInterface;
 use App\Exception\ArticleException;
 use App\Exception\UserException;
 use App\Models\Article\ArticleManager;
 use App\Models\Category\CategoryManager;
 use App\Models\Helpers\StringHelper;
 use App\Models\UrlGenerator\UrlGenerator;
-use App\Models\User\UserManager;
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
 use Nette\Utils\DateTime;
@@ -22,11 +22,12 @@ class ArticleEditor extends BaseControl
     public const string OriginCreate = 'Create';
     public const string OriginEdit = 'Edit';
 
+    /** @var UserRepositoryInterface @inject */
+    public UserRepositoryInterface $userRepository;
+
     private ArticleManager $articleManager;
 
     private CategoryManager $categoryManager;
-
-    private UserManager $userManager;
 
     private string $origin;
 
@@ -46,7 +47,9 @@ class ArticleEditor extends BaseControl
 
             try {
                 $this->param['category'] = $this->articleManager->getCategoryIdById((int) $this->param['id']);
-                $this->param['user_name'] = $this->userManager->get((int) $this->param['user_id'])['full_name'];
+                $user = $this->userRepository->getByUserName((string) $this->param['user_name']);
+                Assert::notNull($user, 'User not found');
+                $this->param['user_name'] = $user->getFullName() ?? '';
             } catch (ArticleException $e) {
                 $this->param['category'] = CategoryManager::MAIN_CATEGORY_ID;
             } catch (UserException $e) {
@@ -236,10 +239,5 @@ class ArticleEditor extends BaseControl
     public function setUrlGenerator(UrlGenerator $urlGenerator): void
     {
         $this->urlGenerator = $urlGenerator;
-    }
-
-    public function setUserManager(UserManager $userManager): void
-    {
-        $this->userManager = $userManager;
     }
 }

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Attributes\Sortable;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use ReflectionException;
 
 /**
  * @template TEntity of object
@@ -19,15 +21,24 @@ abstract readonly class BaseRepository implements BaseRepositoryInterface
      */
     private EntityRepository $repository;
 
+    /**
+     * @var list<string>
+     */
+    private array $sortableFields;
+
+    /**
+     * @throws ReflectionException
+     */
     public function __construct(
         protected EntityManagerInterface $entityManager,
     ) {
-        /** @var EntityRepository<TEntity> $repository */
-        $repository = $entityManager->getRepository(
-            RepositoryEntityMap::resolveEntityClass(static::class),
-        );
+        $entityClass = RepositoryEntityMap::resolveEntityClass(static::class);
 
+        /** @var EntityRepository<TEntity> $repository */
+        $repository = $entityManager->getRepository($entityClass);
         $this->repository = $repository;
+
+        $this->sortableFields = $this->resolveSortableFields($entityClass);
     }
 
     /** @inheritDoc */
@@ -126,5 +137,35 @@ abstract readonly class BaseRepository implements BaseRepositoryInterface
     public function flush(): void
     {
         $this->entityManager->flush();
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function getSortableFields(): array
+    {
+        return $this->sortableFields;
+    }
+
+    /**
+     * @param class-string $entityClass
+     *
+     * @return list<string>
+     * @throws ReflectionException
+     */
+    private function resolveSortableFields(string $entityClass): array
+    {
+        $reflectionClass = new \ReflectionClass($entityClass);
+        $sortableFields = [];
+
+        foreach ($reflectionClass->getProperties() as $property) {
+            if ($property->getAttributes(Sortable::class) === []) {
+                continue;
+            }
+
+            $sortableFields[] = $property->getName();
+        }
+
+        return $sortableFields;
     }
 }

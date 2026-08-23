@@ -12,7 +12,6 @@ use App\Exception\ArticleException;
 use App\Models\Article\ArticleManager;
 use App\Models\Category\CategoryManager;
 use App\Models\UrlGenerator\UrlGenerator;
-use App\Models\User\UserManager;
 
 class ArticlePresenter extends SecuredPresenter
 {
@@ -24,9 +23,6 @@ class ArticlePresenter extends SecuredPresenter
 
     /** @var UrlGenerator @inject */
     public UrlGenerator $urlGenerator;
-
-    /** @var UserManager @inject */
-    public UserManager $userManager;
 
     /** @var IArticleListFactory @inject */
     public IArticleListFactory $articleList;

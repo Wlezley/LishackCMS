@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Entity\User;
 
+use App\Attributes\Sortable;
 use App\Entity\BaseEntity;
 use App\Entity\Trait\CreatedAtTrait;
 use App\Entity\Trait\UpdatedAtTrait;
 use App\Enum\UserRoleEnum;
+use App\Helper\UserPasswordHelper;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Nette\Security\Passwords;
 
 #[ORM\Entity]
 #[ORM\HasLifecycleCallbacks]
@@ -22,24 +23,37 @@ class User extends BaseEntity
 
     public function __construct(
         #[ORM\Column(type: Types::STRING, length: 50, unique: true)]
+        #[Sortable]
         private string $userName,
         #[ORM\Column(type: Types::STRING, length: 255)]
-        private string $password,
-        #[ORM\Column(type: Types::STRING, length: 255)]
+        #[Sortable]
         private string $email,
-        #[ORM\Column(type: Types::STRING, length: UserRoleEnum::MAX_LENGTH, enumType: UserRoleEnum::class)]
-        private UserRoleEnum $role,
-        #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-        private ?string $firstName,
-        #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-        private ?string $lastName,
-        #[ORM\Column(type: Types::STRING, length: 255)]
-        private string $sessionId,
+        #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['default' => null])]
+        private ?string $password = null,
+        #[ORM\Column(
+            type: Types::STRING,
+            length: UserRoleEnum::MAX_LENGTH,
+            enumType: UserRoleEnum::class,
+            options: ['default' => UserRoleEnum::Guest]
+        )]
+        #[Sortable]
+        private UserRoleEnum $role = UserRoleEnum::Guest,
+        #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['default' => null])]
+        #[Sortable]
+        private ?string $firstName = null,
+        #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['default' => null])]
+        #[Sortable]
+        private ?string $lastName = null,
+        #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['default' => null])]
+        private ?string $sessionId = null,
         #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
+        #[Sortable]
         private bool $deleted = false,
         #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]
+        #[Sortable]
         private bool $enabled = true,
         #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+        #[Sortable]
         private ?\DateTimeImmutable $lastLoginAt = null,
     ) {
     }
@@ -54,7 +68,7 @@ class User extends BaseEntity
         $this->userName = $userName;
     }
 
-    public function getPasswordEncrypted(): string
+    public function getPasswordEncrypted(): ?string
     {
         return $this->password;
     }
@@ -66,12 +80,7 @@ class User extends BaseEntity
 
     public function setPasswordFromPlaintext(#[\SensitiveParameter] string $passwordToEncrypt): void
     {
-        $this->password = new Passwords(
-            algo: PASSWORD_BCRYPT,
-            options: ['cost' => 12]
-        )->hash(
-            password: $passwordToEncrypt
-        );
+        $this->password = UserPasswordHelper::encrypt($passwordToEncrypt);
     }
 
     public function getEmail(): string
@@ -133,12 +142,12 @@ class User extends BaseEntity
         $this->lastName = $lastName;
     }
 
-    public function getSessionId(): string
+    public function getSessionId(): ?string
     {
         return $this->sessionId;
     }
 
-    public function setSessionId(string $sessionId): void
+    public function setSessionId(?string $sessionId): void
     {
         $this->sessionId = $sessionId;
     }

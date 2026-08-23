@@ -39,7 +39,6 @@ services:
     - App\Models\Translation\TranslatorRepository
     - App\Models\Translation\TranslatorRepositoryCache
     - App\Models\UrlGenerator\UrlGenerator
-    - App\Models\User\UserManager
 
     # Dataset
     - App\Models\Dataset\DatasetCreator

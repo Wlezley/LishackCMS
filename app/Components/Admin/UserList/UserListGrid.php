@@ -6,21 +6,21 @@ namespace App\Components\Admin\UserList;
 
 use AllowDynamicProperties;
 use App\Components\BaseControl;
+use App\Entity\User\UserRepositoryInterface;
+use App\Enum\UserRoleEnum;
 use App\Exception\TranslatorException;
 use App\Exception\UserException;
 use App\Models\Translation\TranslatorTrait;
-use App\Models\User\UserManager;
 use App\Models\User\UserRole;
 use Contributte\Datagrid\Datagrid;
 use Contributte\Datagrid\Exception\DatagridColumnStatusException;
 use Contributte\Datagrid\Exception\DatagridException;
 use Nette\Application\InvalidPresenterException;
 use Nette\Application\UI\Presenter;
-use Nette\Database\Explorer;
 use Nette\Database\Table\ActiveRow;
-use Nette\Security\User;
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
+use Webmozart\Assert\Assert;
 
 /**
  * @property string $id
@@ -40,11 +40,10 @@ class UserListGrid extends BaseControl
     protected Presenter $presenter;
 
     public function __construct(
-        public Explorer $db,
-        private UserManager $userManager,
-        protected User $user,
+        protected UserRepositoryInterface $userRepository,
     ) {
-        $this->userRole = new UserRole($user);
+        Assert::notNull($this->user, 'User must be set');
+        $this->userRole = new UserRole($this->user->getRole()->value);
     }
 
     public function setPresenter(Presenter $presenter): void
@@ -66,17 +65,23 @@ class UserListGrid extends BaseControl
         $columnDeletedAllowed = $this->userRole->isInArray(['manager', 'admin']);
         $columnEnabledAllowed = $this->userRole->isInArray(['manager', 'admin']);
 
+        // TODO: Fix this for data grid functionality !!!
         if ($userIsAdmin) {
-            $grid->setDataSource($this->db->table(UserManager::TABLE_NAME)->select('*')->where('id != 0'));
+            $grid->setDataSource($this->userRepository->getAllUsers());
         } else {
             $deletedFilter = $columnDeletedAllowed ? ['0', '1'] : '0';
             $enabledFilter = $columnEnabledAllowed ? ['1', '0'] : '1';
-            $grid->setDataSource($this->db->table(UserManager::TABLE_NAME)->select('*')->where([
-                'id != 0',
+            $grid->setDataSource($this->userRepository->getAllUsers([
                 'role' => $editableRoles,
                 'deleted' => $deletedFilter,
                 'enabled' => $enabledFilter,
             ]));
+//            $grid->setDataSource($this->db->table(UserManager::TABLE_NAME)->select('*')->where([
+//                'id != 0',
+//                'role' => $editableRoles,
+//                'deleted' => $deletedFilter,
+//                'enabled' => $enabledFilter,
+//            ]));
         }
 
         $paginationItemLimit = (int) $this->c('PAGINATION_PAGE_ITEMS');
@@ -211,11 +216,11 @@ class UserListGrid extends BaseControl
             return false;
         }
         // SUPERADMIN can edit all
-        if ($this->user->getId() === 1) {
+        if ($this->user?->getId() === 1) {
             return true;
         }
         // User can edit himself
-        if ($this->user->getId() == $item->id) {
+        if ($this->user?->getId() == $item->id) {
             return true;
         }
         // User cannot edit other users in the same or higher role
@@ -234,11 +239,11 @@ class UserListGrid extends BaseControl
             return false;
         }
         // SUPERADMIN can delete (almost) all
-        if ($this->user->getId() === 1) {
+        if ($this->user?->getId() === 1) {
             return true;
         }
         // User cannot delete himself
-        if ($this->user->getId() == $item->id) {
+        if ($this->user?->getId() == $item->id) {
             return false;
         }
         // User cannot delete other users in the same or higher role
@@ -286,19 +291,25 @@ class UserListGrid extends BaseControl
         }
 
         if ($this->presenter->isAjax()) {
-            $userData = $this->userManager->get((int)$id);
+            $user = $this->userRepository->getById((int) $id);
+            Assert::notNull($user, 'User not found.');
 
-            if ($userData['role'] == $role) {
+            if ($user->getRole()->value == $role) {
                 return;
-            } elseif ($this->user->getId() == (int)$id) {
+            } elseif ($this->user?->getId() == (int) $id) {
                 $this->presenter->flashMessage($this->t('user.role-callback.himself'), 'danger');
             } elseif ($id == 1) {
                 $this->presenter->flashMessage($this->t('user.role-callback.admin'), 'danger');
-            } elseif ($this->userRole->isLessOrEqualsThan($userData['role']) && $this->userRole->isNot('admin')) {
+            } elseif ($this->userRole->isLessOrEqualsThan($user->getRole()->value) && $this->userRole->isNot('admin')) {
                 $this->presenter->flashMessage($this->t('user.role-callback.same-role'), 'danger');
             } elseif ($this->userRole->isLessOrEqualsThan($role) && $this->userRole->isNot('admin')) {
                 $this->presenter->flashMessage($this->t('user.role-callback.role-elevation'), 'danger');
-            } elseif (!$this->userManager->setRole((int)$id, $role)) {
+            }
+
+            try {
+                $user->setRole(UserRoleEnum::from($role));
+                $this->userRepository->save($user);
+            } catch (\Exception $e) {
                 $this->presenter->flashMessage($this->t('user.role-callback.update-failed'), 'danger');
             }
 
@@ -318,18 +329,25 @@ class UserListGrid extends BaseControl
         }
 
         if ($this->presenter->isAjax()) {
-            $userData = $this->userManager->get((int)$id);
+            $user = $this->userRepository->getById((int) $id);
+            Assert::notNull($user, 'User not found.');
+
             $actionName = $enabled === '1' ? $this->t('enable') : $this->t('disable');
 
-            if ($userData['enabled'] == $enabled) {
+            if ($user->isEnabled() == $enabled) {
                 return;
-            } elseif ($this->user->getId() == (int)$id) {
+            } elseif ($this->user?->getId() == (int) $id) {
                 $this->presenter->flashMessage($this->tf('user.enabled-callback.himself', $actionName), 'danger');
             } elseif ($id == 1) {
                 $this->presenter->flashMessage($this->tf('user.enabled-callback.admin', $actionName), 'danger');
-            } elseif ($this->userRole->isLessOrEqualsThan($userData['role']) && $this->userRole->isNot('admin')) {
+            } elseif ($this->userRole->isLessOrEqualsThan($user->getRole()->value) && $this->userRole->isNot('admin')) {
                 $this->presenter->flashMessage($this->tf('user.enabled-callback.same-role', $actionName), 'danger');
-            } elseif (!$this->userManager->setEnabled((int)$id, $enabled === '1')) {
+            }
+
+            try {
+                $user->setEnabled($enabled === '1');
+                $this->userRepository->save($user);
+            } catch (\Exception $e) {
                 $this->presenter->flashMessage($this->tf('user.enabled-callback.update-failed', $actionName), 'danger');
             }
 
@@ -349,18 +367,25 @@ class UserListGrid extends BaseControl
         }
 
         if ($this->presenter->isAjax()) {
-            $userData = $this->userManager->get((int)$id);
+            $user = $this->userRepository->getById((int) $id);
+            Assert::notNull($user, 'User not found.');
+
             $actionName = $deleted === '1' ? $this->t('delete') : $this->t('restore');
 
-            if ($userData['deleted'] == $deleted) {
+            if ($user->isDeleted() == $deleted) {
                 return;
-            } elseif ($this->user->getId() == (int)$id) {
+            } elseif ($this->user?->getId() == (int) $id) {
                 $this->presenter->flashMessage($this->tf('user.deleted-callback.himself', $actionName), 'danger');
             } elseif ($id == 1) {
                 $this->presenter->flashMessage($this->tf('user.deleted-callback.admin', $actionName), 'danger');
-            } elseif ($this->userRole->isLessOrEqualsThan($userData['role']) && $this->userRole->isNot('admin')) {
+            } elseif ($this->userRole->isLessOrEqualsThan($user->getRole()->value) && $this->userRole->isNot('admin')) {
                 $this->presenter->flashMessage($this->tf('user.deleted-callback.same-role', $actionName), 'danger');
-            } elseif (!$this->userManager->setDeleted((int)$id, $deleted === '1')) {
+            }
+
+            try {
+                $user->setDeleted($deleted === '1');
+                $this->userRepository->save($user);
+            } catch (\Exception $e) {
                 $this->presenter->flashMessage($this->tf('user.deleted-callback.update-failed', $actionName), 'danger');
             }
 

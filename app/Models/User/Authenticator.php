@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace App\Models\User;
 
 use App\Entity\User\UserRepositoryInterface;
+use App\Helper\UserPasswordHelper;
 use Carbon\Carbon;
 use Nette\Http\Session;
 use Nette\Security\AuthenticationException;
-use Nette\Security\Passwords;
 use Nette\Security\SimpleIdentity;
+use Webmozart\Assert\Assert;
 
 readonly class Authenticator implements \Nette\Security\Authenticator
 {
     public function __construct(
         private UserRepositoryInterface $userRepository,
         private Session $session,
-        private Passwords $passwords
     ) {
     }
 
@@ -28,13 +28,12 @@ readonly class Authenticator implements \Nette\Security\Authenticator
         }
 
         $encryptedPassword = $user->getPasswordEncrypted();
+        Assert::notNull($encryptedPassword, 'Password not set.');
 
-        if (!$this->passwords->verify($password, $encryptedPassword)) {
+        if (!UserPasswordHelper::verify($password, $encryptedPassword)) {
             throw new AuthenticationException('Invalid credentials.', self::InvalidCredential);
-        } elseif ($this->passwords->needsRehash($encryptedPassword)) {
-            $user->setPasswordEncrypted($this->passwords->hash($password));
-
-            // TODO: Tahle podmínka je divná...
+        } elseif (UserPasswordHelper::needsRehash($encryptedPassword)) {
+            $user->setPasswordEncrypted(UserPasswordHelper::encrypt($password));
         }
 
         $this->session->regenerateId();

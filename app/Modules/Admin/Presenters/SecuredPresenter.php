@@ -43,7 +43,7 @@ class SecuredPresenter extends BasePresenter
         }
 
         if ($this->user->isLoggedIn()) {
-            $userData = $this->userRepository->getById($this->user->getId());
+            $userData = $this->userRepository->getById((int) $this->user->getId()); // TODO: remove re-typecast... It's INSECURE as f*ck HERE !!!
 
             if ($userData === null || $userData->isDeleted() || !$userData->isEnabled()) {
                 $this->user->logout(true);

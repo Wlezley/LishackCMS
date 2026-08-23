@@ -68,6 +68,10 @@ class UserPresenter extends SecuredPresenter
         // TODO: TRANSLATE FLASH MESSAGES !!!
         if ($this->user->isInRole('admin')) {
             $user = $this->userRepository->getById($userId);
+            if ($user === null) {
+                throw new \Exception('User not found');
+            }
+
             $user->setDeleted(true);
             $this->userRepository->save($user);
 
@@ -121,9 +125,7 @@ class UserPresenter extends SecuredPresenter
         // TODO: TRANSLATE FLASH MESSAGES !!!
         if ($userId) {
             try {
-                $user = $this->userRepository->getById($userId);
-
-                $form->setParam($user); // TODO: This value formerly was array, now it's object. We need to solve this...
+                $form->setUser($this->userRepository->getById($userId));
                 $form->setOrigin($form::OriginEdit); // TODO: Create FormOrigin enum
             } catch (\Exception $e) {
                 $this->flashMessage('Chyba při čtení dat uživatele: ' . $e->getMessage(), 'danger');

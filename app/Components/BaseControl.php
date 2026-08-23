@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Components;
 
+use App\Entity\User\User;
 use App\Models\Config\ConfigManager;
 use App\Models\Config\ConfigTrait;
 use App\Models\Translation\LanguageService;
@@ -31,6 +32,9 @@ class BaseControl extends Control
 
     /** @var UrlGenerator @inject */
     public UrlGenerator $urlGenerator;
+
+    /** @var ?User @inject */
+    protected ?User $user = null;
 
     /** @var array<string,string> $cmsConfig */
     protected array $cmsConfig = [];
@@ -114,6 +118,11 @@ class BaseControl extends Control
     public function setParam(?array $param): void
     {
         $this->param = $param === null ? [] : $param;
+    }
+
+    public function setUser(?User $user): void
+    {
+        $this->user = $user;
     }
 
     public function getMixedParam(string $key): mixed

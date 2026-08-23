@@ -6,7 +6,6 @@ namespace App\Entity\User;
 
 use App\Entity\BaseRepository;
 use App\Enum\UserRoleEnum;
-use Nette\Security\Passwords;
 
 /**
  * @extends BaseRepository<User>
@@ -23,13 +22,27 @@ final readonly class UserRepository extends BaseRepository implements UserReposi
         return $this->findOneBy(['userName' => $userName]);
     }
 
-    public function getIdByUserName(string $userName): int
+    // TODO: Move to UserService ???
+    public function getIdByUserName(string $userName): ?int
     {
-        return $this->getByUserName($userName)->getId();
+        return $this->getByUserName($userName)?->getId();
     }
 
     /**
-     * @throws \Exception
+     * @inheritDoc
+     */
+    public function getAllUsers(array $criteria = []): array
+    {
+        return $this->findBy(criteria: $criteria);
+    }
+
+    public function findActiveUserByUserName(string $username): ?User
+    {
+        return $this->findOneBy(['userName' => $username, 'deleted' => 0, 'enabled' => 1]);
+    }
+
+    /**
+     * @inheritDoc
      */
     public function rename(int $userId, string $newName): void
     {
@@ -39,24 +52,24 @@ final readonly class UserRepository extends BaseRepository implements UserReposi
         }
 
         $user->setUserName($newName);
-        $user->save();
+        $this->save($user);
     }
 
     public function create(
         string $userName,
-        string $encryptedPassword,
         string $email,
-        UserRoleEnum $role,
-        ?string $firstName,
-        ?string $lastName,
-        string $sessionId,
+        ?string $encryptedPassword = null,
+        UserRoleEnum $role = UserRoleEnum::Guest,
+        ?string $firstName = null,
+        ?string $lastName = null,
+        ?string $sessionId = null,
         bool $deleted = false,
         bool $enabled = true,
     ): User {
         $user = new User(
             userName: $userName,
-            password: $encryptedPassword,
             email: $email,
+            password: $encryptedPassword,
             role: $role,
             firstName: $firstName,
             lastName: $lastName,
@@ -71,7 +84,7 @@ final readonly class UserRepository extends BaseRepository implements UserReposi
     }
 
     /**
-     * @throws \Exception
+     * @inheritDoc
      */
     public function setPassword(int $userId, #[\SensitiveParameter] string $password): void
     {
@@ -80,14 +93,12 @@ final readonly class UserRepository extends BaseRepository implements UserReposi
             throw new \Exception('User not found');
         }
 
-        $cryptedPassword = new Passwords(PASSWORD_BCRYPT, ['cost' => 12])->hash($password);
-
-        $user->setPassword($cryptedPassword);
-        $user->save();
+        $user->setPasswordFromPlaintext($password);
+        $this->save($user);
     }
 
     /**
-     * @throws \Exception
+     * @inheritDoc
      */
     public function setRole(int $userId, UserRoleEnum $role): void
     {
@@ -97,11 +108,34 @@ final readonly class UserRepository extends BaseRepository implements UserReposi
         }
 
         $user->setRole($role);
-        $user->save();
+        $this->save($user);
     }
 
-    public function findActiveUserByUserName(string $username): ?User
+    /**
+     * @inheritDoc
+     */
+    public function setEnabled(int $userId, bool $isEnabled): void
     {
-        return $this->findOneBy(['userName' => $username, 'deleted' => 0, 'enabled' => 1]);
+        $user = $this->findById($userId);
+        if ($user === null) {
+            throw new \Exception('User not found');
+        }
+
+        $user->setEnabled($isEnabled);
+        $this->save($user);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setDeleted(int $userId, bool $isDeleted): void
+    {
+        $user = $this->findById($userId);
+        if ($user === null) {
+            throw new \Exception('User not found');
+        }
+
+        $user->setDeleted($isDeleted);
+        $this->save($user);
     }
 }
