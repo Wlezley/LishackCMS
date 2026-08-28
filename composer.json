@@ -1,8 +1,8 @@
 {
-    "name": "nette/web-project",
-    "description": "Lishack CMS Project",
+    "name": "wlezley/lishack-cms",
+    "description": "Lishack CMS",
     "keywords": [
-        "nette"
+        "lishack"
     ],
     "type": "project",
     "license": [
