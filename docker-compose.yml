@@ -1,6 +1,7 @@
 services:
     web:
-        image: jakubboucek/lamp-devstack-php:8.4
+        build:
+            context: .docker/web
         environment:
             # APACHE_DOCUMENT_ROOT: "/var/www/html/www"
             APP_DEBUG: 1

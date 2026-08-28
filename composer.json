@@ -1,8 +1,8 @@
 {
-    "name": "nette/web-project",
-    "description": "Lishack CMS Project",
+    "name": "wlezley/lishack-cms",
+    "description": "Lishack CMS",
     "keywords": [
-        "nette"
+        "lishack"
     ],
     "type": "project",
     "license": [
@@ -44,10 +44,10 @@
     },
     "require-dev": {
         "brainmaestro/composer-git-hooks": "^3.0",
-        "nette/tester": "^2.5",
         "codeception/codeception": "^5.1",
         "codeception/module-asserts": "*",
         "codeception/module-phpbrowser": "*",
+        "nette/tester": "^2.5",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^2.0",
         "phpstan/phpstan-nette": "^2.0",
@@ -75,7 +75,14 @@
         "lint": "phpcs",
         "lint-fix": "phpcbf",
         "phpstan": "phpstan analyse --memory-limit 512M",
-        "flush-cache": "rm -rf temp/cache/*"
+        "flush-cache": "rm -rf temp/cache/*",
+        "cghooks": "cghooks",
+        "post-install-cmd": [
+            "[ $COMPOSER_DEV_MODE -eq 0 ] || cghooks add --ignore-lock"
+        ],
+        "post-update-cmd": [
+            "[ $COMPOSER_DEV_MODE -eq 0 ] || cghooks update"
+        ]
     },
     "extra": {
         "hooks": {
