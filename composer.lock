@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "487cc19d2945544db0487af0e04c307b",
+    "content-hash": "1c0e90ced75abc237aa887ae431b2f45",
     "packages": [
         {
             "name": "cakephp/chronos",
