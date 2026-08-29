@@ -26,7 +26,7 @@ class TranslationLog extends BaseEntity
         private string $lang, // TODO: Change to $languageCode; OR use entity Language???
         #[ORM\Column(enumType: TranslationLogType::class, options: ['default' => TranslationLogType::Unk])]
         private TranslationLogType $type = TranslationLogType::Unk,
-        #[ORM\Column(type: Types::TEXT)]
+        #[ORM\Column(type: Types::TEXT, nullable: true, options: ['default' => null])]
         private ?string $message = null,
     ) {
     }
