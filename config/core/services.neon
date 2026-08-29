@@ -23,6 +23,21 @@ services:
     # Doctrine
     - App\Doctrine\SchemaAssetsFilter
 
+    # Repositories
+    - App\Entity\Article\ArticleRepository
+    - App\Entity\Category\CategoryRepository
+    - App\Entity\CmsConfig\CmsConfigRepository
+    - App\Entity\Dataset\DatasetRepository
+    - App\Entity\DatasetColumn\DatasetColumnRepository
+    - App\Entity\Language\LanguageRepository
+    - App\Entity\Redirect\RedirectRepository
+    - App\Entity\SmsLog\SmsLogRepository
+    - App\Entity\StorageFiles\StorageFilesRepository
+    - App\Entity\StorageTree\StorageTreeRepository
+    - App\Entity\Translation\TranslationRepository
+    - App\Entity\TranslationLog\TranslationLogRepository
+    - App\Entity\User\UserRepository
+
     # Models
     - App\Models\Article\ArticleManager
     - App\Models\Category\CategoryManager

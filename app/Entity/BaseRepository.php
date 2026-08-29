@@ -62,7 +62,7 @@ abstract readonly class BaseRepository implements BaseRepositoryInterface
      * @param array<string, mixed> $criteria
      * @return TEntity|null
      */
-    protected function findOneBy(array $criteria): ?object
+    public function findOneBy(array $criteria): ?object
     {
         return $this->repository->findOneBy($criteria);
     }
@@ -74,7 +74,7 @@ abstract readonly class BaseRepository implements BaseRepositoryInterface
      * @param array<string, 'ASC'|'DESC'>|null $orderBy
      * @return list<TEntity>
      */
-    protected function findBy(
+    public function findBy(
         array $criteria,
         ?array $orderBy = null,
         ?int $limit = null,
@@ -92,7 +92,7 @@ abstract readonly class BaseRepository implements BaseRepositoryInterface
      * @param array<string, mixed> $criteria
      * @return int<0, max>
      */
-    protected function count(array $criteria = []): int
+    public function count(array $criteria = []): int
     {
         return $this->repository->count($criteria);
     }
