@@ -1,9 +1,10 @@
 parameters:
     level: 8
+    phpVersion: 80400 # PHP 8.4
     inferPrivatePropertyTypeFromConstructor: true
     reportUnmatchedIgnoredErrors: false
     treatPhpDocTypesAsCertain: false
-    phpVersion: 80400 # PHP 8.4
+    tmpDir: %currentWorkingDirectory%/temp/phpstan
 
     paths:
         - app
