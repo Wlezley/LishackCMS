@@ -50,6 +50,7 @@
         "nette/tester": "^2.5",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^2.0",
+        "phpstan/phpstan-doctrine": "^2.0",
         "phpstan/phpstan-nette": "^2.0",
         "phpstan/phpstan-webmozart-assert": "^2.0",
         "slevomat/coding-standard": "^8.26"

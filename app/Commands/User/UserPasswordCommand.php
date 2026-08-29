@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Commands\User;
 
-use App\Entity\User\UserRepositoryInterface;
+use App\Service\User\UserService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -16,12 +16,15 @@ use Webmozart\Assert\Assert;
 
 #[AsCommand(
     name: 'user:pass',
-    description: 'Changes the password for the given user. You will be asked to enter a password.'
+    description: 'Changes the password for the given user. You will be asked to enter a password.',
+    usages: [
+        'user:pass <username> [<password>]',
+    ],
 )]
 final class UserPasswordCommand extends Command
 {
     public function __construct(
-        private readonly UserRepositoryInterface $userRepository,
+        private readonly UserService $userService,
     ) {
         parent::__construct();
     }
@@ -34,35 +37,33 @@ final class UserPasswordCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $username = $input->getArgument('username');
+        $userName = $input->getArgument('username');
         $newPassword = $input->getArgument('password');
 
         try {
-            $user = $this->userRepository->getByUserName($username);
-            Assert::notNull($user, "User '$username' not found.");
+            $user = $this->userService->findByUserName($userName);
+            Assert::notNull($user, sprintf("User '%s' not found.", $userName));
         } catch (\Exception $e) {
-            $output->writeln(\sprintf('<error>🔴 Error occurred: %s</error>', $e->getMessage()));
-            return 1;
+            $output->writeln(sprintf('<error>🔴 Error occurred: %s</error>', $e->getMessage()));
+            return Command::FAILURE;
         }
 
         if (!$newPassword) {
             /** @var QuestionHelper $helper */
             $helper = $this->getHelper('question');
-            $question = new Question("Choose a password for user '$username': ");
+            $question = new Question(sprintf("Choose a password for user '%s': ", $userName));
             $newPassword = $helper->ask($input, $output, $question);
         }
 
-        $output->writeln("Changing password for user '$username' ...");
+        $output->writeln(sprintf("Changing password for user '%s' ...", $userName));
 
         try {
-            $user->setPasswordFromPlaintext($newPassword);
-            $this->userRepository->save($user);
-
-            $output->writeln(\sprintf("🟢 Password for user '%s' has been successfully changed.", $username));
-            return 0;
+            $this->userService->setPassword($user, $newPassword);
+            $output->writeln(\sprintf("🟢 Password for user '%s' has been successfully changed.", $userName));
+            return Command::SUCCESS;
         } catch (\Exception $e) {
             $output->writeln(\sprintf('<error>🔴 Error occurred: %s</error>', $e->getMessage()));
-            return 1;
+            return Command::FAILURE;
         }
     }
 }

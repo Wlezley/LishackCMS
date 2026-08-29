@@ -47,7 +47,7 @@ class ArticleEditor extends BaseControl
 
             try {
                 $this->param['category'] = $this->articleManager->getCategoryIdById((int) $this->param['id']);
-                $user = $this->userRepository->getByUserName((string) $this->param['user_name']);
+                $user = $this->userRepository->findByUserName((string) $this->param['user_name']);
                 Assert::notNull($user, 'User not found');
                 $this->param['user_name'] = $user->getFullName() ?? '';
             } catch (ArticleException $e) {

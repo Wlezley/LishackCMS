@@ -12,25 +12,6 @@ use App\Enum\UserRoleEnum;
  */
 interface UserRepositoryInterface extends BaseRepositoryInterface
 {
-    public function getById(int $userId): ?User;
-
-    public function getByUserName(string $userName): ?User;
-
-    public function getIdByUserName(string $userName): ?int;
-
-    /**
-     * @param array<string, mixed> $criteria
-     * @return User[]
-     */
-    public function getAllUsers(array $criteria = []): array;
-
-    public function findActiveUserByUserName(string $username): ?User;
-
-    /**
-     * @throws \Exception
-     */
-    public function rename(int $userId, string $newName): void;
-
     public function create(
         string $userName,
         string $email,
@@ -44,23 +25,19 @@ interface UserRepositoryInterface extends BaseRepositoryInterface
         bool $enabled = true,
     ): User;
 
-    /**
-     * @throws \Exception
-     */
-    public function setPassword(int $userId, #[\SensitiveParameter] string $password): void;
+    public function getById(int $userId): ?User;
+
+    public function findByUserName(
+        string $userName,
+        bool $filterDisabled = false,
+        bool $filterDeleted = false,
+    ): ?User;
 
     /**
-     * @throws \Exception
+     * @param array<string, mixed> $criteria
+     * @return User[]
      */
-    public function setRole(int $userId, UserRoleEnum $role): void;
+    public function getAllUsers(array $criteria = []): array;
 
-    /**
-     * @throws \Exception
-     */
-    public function setEnabled(int $userId, bool $isEnabled): void;
-
-    /**
-     * @throws \Exception
-     */
-    public function setDeleted(int $userId, bool $isDeleted): void;
+    public function findActiveUserByUserName(string $username): ?User;
 }

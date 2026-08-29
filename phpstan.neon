@@ -14,6 +14,8 @@ parameters:
 
     excludePaths:
         - config
+        - log
+        - temp
         - tests
         - vendor
         - node_modules

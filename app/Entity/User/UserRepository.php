@@ -12,49 +12,6 @@ use App\Enum\UserRoleEnum;
  */
 final readonly class UserRepository extends BaseRepository implements UserRepositoryInterface
 {
-    public function getById(int $userId): ?User
-    {
-        return $this->findById($userId);
-    }
-
-    public function getByUserName(string $userName): ?User
-    {
-        return $this->findOneBy(['userName' => $userName]);
-    }
-
-    // TODO: Move to UserService ???
-    public function getIdByUserName(string $userName): ?int
-    {
-        return $this->getByUserName($userName)?->getId();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getAllUsers(array $criteria = []): array
-    {
-        return $this->findBy(criteria: $criteria);
-    }
-
-    public function findActiveUserByUserName(string $username): ?User
-    {
-        return $this->findOneBy(['userName' => $username, 'deleted' => 0, 'enabled' => 1]);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function rename(int $userId, string $newName): void
-    {
-        $user = $this->findById($userId);
-        if ($user === null) {
-            throw new \Exception('User not found');
-        }
-
-        $user->setUserName($newName);
-        $this->save($user);
-    }
-
     public function create(
         string $userName,
         string $email,
@@ -83,59 +40,46 @@ final readonly class UserRepository extends BaseRepository implements UserReposi
         return $user;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function setPassword(int $userId, #[\SensitiveParameter] string $password): void
+    public function getById(int $userId): ?User
     {
-        $user = $this->findById($userId);
-        if ($user === null) {
-            throw new \Exception('User not found');
+        return $this->findById($userId);
+    }
+
+    public function findByUserName(
+        string $userName,
+        ?bool $filterDisabled = null,
+        ?bool $filterDeleted = null,
+    ): ?User {
+        $qb = $this->entityManager->createQueryBuilder();
+
+        $qb->select('u')
+            ->from(User::class, 'u')
+            ->where('u.userName = :userName')
+            ->setParameter('userName', $userName);
+
+        if ($filterDisabled !== null) {
+            $qb->andWhere('u.enabled != :enabled')
+                ->setParameter('enabled', $filterDisabled);
         }
 
-        $user->setPasswordFromPlaintext($password);
-        $this->save($user);
+        if ($filterDeleted !== null) {
+            $qb->andWhere('u.deleted != :deleted')
+                ->setParameter('deleted', $filterDeleted);
+        }
+
+        return $qb->getQuery()->getOneOrNullResult();
     }
 
     /**
      * @inheritDoc
      */
-    public function setRole(int $userId, UserRoleEnum $role): void
+    public function getAllUsers(array $criteria = []): array
     {
-        $user = $this->findById($userId);
-        if ($user === null) {
-            throw new \Exception('User not found');
-        }
-
-        $user->setRole($role);
-        $this->save($user);
+        return $this->findBy(criteria: $criteria);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function setEnabled(int $userId, bool $isEnabled): void
+    public function findActiveUserByUserName(string $username): ?User
     {
-        $user = $this->findById($userId);
-        if ($user === null) {
-            throw new \Exception('User not found');
-        }
-
-        $user->setEnabled($isEnabled);
-        $this->save($user);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function setDeleted(int $userId, bool $isDeleted): void
-    {
-        $user = $this->findById($userId);
-        if ($user === null) {
-            throw new \Exception('User not found');
-        }
-
-        $user->setDeleted($isDeleted);
-        $this->save($user);
+        return $this->findOneBy(['userName' => $username, 'deleted' => 0, 'enabled' => 1]);
     }
 }

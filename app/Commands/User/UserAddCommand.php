@@ -16,7 +16,10 @@ use Symfony\Component\Console\Question\Question;
 
 #[AsCommand(
     name: 'user:add',
-    description: 'Adds user with given username to database. You will be asked to enter a password.'
+    description: 'Adds user with given username to database. You will be asked to enter a password.',
+    usages: [
+        'user:add <username> [<password>]',
+    ],
 )]
 final class UserAddCommand extends Command
 {
@@ -34,34 +37,34 @@ final class UserAddCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $username = $input->getArgument('username');
+        $userName = $input->getArgument('username');
         $password = $input->getArgument('password');
 
         if (!$password) {
             /** @var QuestionHelper $helper */
             $helper = $this->getHelper('question');
-            $question = new Question("Choose a password for user '$username': ");
+            $question = new Question(sprintf("Choose a password for user '%s': ", $userName));
             $password = $helper->ask($input, $output, $question);
         }
 
-        $output->writeln("Adding user '$username': ...");
+        $output->writeln(sprintf("Adding user '%s': ...", $userName));
 
         try {
             $user = $this->userService->create(
-                userName: $username,
-                password: $password,
+                userName: $userName,
                 email: '',
+                password: $password,
                 role: UserRoleEnum::User,
                 firstName: '',
                 lastName: '',
                 sessionId: '',
             );
 
-            $output->writeln(\sprintf('🟢 User has been successfully added; user ID: %d', $user->getId()));
-            return 0;
+            $output->writeln(sprintf('🟢 User has been successfully added; user ID: %d', $user->getId()));
+            return Command::SUCCESS;
         } catch (\Exception $e) {
-            $output->writeln(\sprintf('<error>🔴 Error occurred: %s</error>', $e->getMessage()));
-            return 1;
+            $output->writeln(sprintf('<error>🔴 Error occurred: %s</error>', $e->getMessage()));
+            return Command::FAILURE;
         }
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models\User;
 
+use App\Enum\UserRoleEnum;
 use Nette\Security\User as NetteUser;
 use Webmozart\Assert\Assert;
 use Webmozart\Assert\InvalidArgumentException;
@@ -19,7 +20,7 @@ class UserRole
         4 => 'admin',
     ];
 
-    public const string DEFAULT_ROLE = 'user';
+    public const string DEFAULT_ROLE = UserRoleEnum::User->value;
 
     public int $level;
 
