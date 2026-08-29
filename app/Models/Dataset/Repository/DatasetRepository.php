@@ -4,51 +4,59 @@ declare(strict_types=1);
 
 namespace App\Models\Dataset\Repository;
 
+use App\Entity\Dataset\Dataset as DatasetEntity;
+use App\Entity\Dataset\DatasetRepository as DoctrineRepository;
 use App\Exception\DatasetException;
 use App\Models\Dataset\Entity\Dataset;
 use App\Models\Helpers\ArrayHelper;
 use Nette\Database\Explorer;
-use Nette\Database\Table\ActiveRow;
 
 final class DatasetRepository
 {
     public const TABLE_NAME = 'dataset';
 
     public function __construct(
-        private Explorer $db
+        private Explorer $db,
+        private DoctrineRepository $doctrineRepository,
     ) {
     }
 
     public function findById(int $id): ?Dataset
     {
-        $row = $this->db->table(self::TABLE_NAME)->get($id);
-        return $row ? Dataset::fromDatabaseRow($row->toArray()) : null;
+        $entity = $this->doctrineRepository->findById($id);
+        return $entity ? $this->entityToModel($entity) : null;
     }
 
     public function findBySlug(string $slug): ?Dataset
     {
-        $row = $this->db->table(self::TABLE_NAME)
-            ->where('slug', $slug)
-            ->fetch();
-
-        return $row ? Dataset::fromDatabaseRow($row->toArray()) : null;
+        $entity = $this->doctrineRepository->findOneBy(['slug' => $slug]);
+        return $entity ? $this->entityToModel($entity) : null;
     }
 
     /** @return Dataset[] */
     public function findAll(): array
     {
+        $entities = $this->doctrineRepository->findBy([], ['id' => 'ASC']);
         $result = [];
-        foreach ($this->db->table(self::TABLE_NAME)->order('id') as $row) {
-            $result[] = Dataset::fromDatabaseRow($row->toArray());
+        foreach ($entities as $entity) {
+            $result[] = $this->entityToModel($entity);
         }
         return $result;
     }
 
     public function insert(Dataset $dataset): Dataset
     {
-        /** @var ActiveRow $row */
-        $row = $this->db->table(self::TABLE_NAME)->insert($dataset->toDatabaseRow());
-        $dataset->id = (int) $row->getPrimary();
+        $entity = new DatasetEntity(
+            (string)$dataset->name,
+            (string)$dataset->slug,
+            (string)$dataset->component,
+            (string)$dataset->presenter,
+            true, // active
+            (bool)$dataset->deleted
+        );
+
+        $this->doctrineRepository->save($entity);
+        $dataset->id = $entity->getId();
         return $dataset;
     }
 
@@ -58,35 +66,61 @@ final class DatasetRepository
             throw new DatasetException('Cannot update dataset without ID.');
         }
 
-        $this->db->table(self::TABLE_NAME)
-            ->where('id', $dataset->id)
-            ->update($dataset->toDatabaseRow());
+        $entity = $this->doctrineRepository->findById($dataset->id);
+        if (!$entity) {
+            throw new DatasetException("Dataset ID '$dataset->id' not found.");
+        }
+
+        $entity->setName((string)$dataset->name);
+        $entity->setSlug((string)$dataset->slug);
+        $entity->setComponent((string)$dataset->component);
+        $entity->setPresenter((string)$dataset->presenter);
+        $entity->setDeleted((bool)$dataset->deleted);
+
+        $this->doctrineRepository->save($entity);
     }
 
     public function delete(int $id): int
     {
-        return $this->db->table(self::TABLE_NAME)
-            ->where('id', $id)
-            ->delete();
+        $entity = $this->doctrineRepository->findById($id);
+        if ($entity) {
+            $this->doctrineRepository->delete($entity);
+            return 1;
+        }
+        return 0;
     }
 
     public function setDeleted(int $id, bool $deleted = true): int
     {
-        return $this->db->table(self::TABLE_NAME)
-            ->where('id', $id)
-            ->update(['deleted' => (int) $deleted]);
+        $entity = $this->doctrineRepository->findById($id);
+        if ($entity) {
+            $entity->setDeleted($deleted);
+            $this->doctrineRepository->save($entity);
+            return 1;
+        }
+        return 0;
+    }
+
+    private function entityToModel(DatasetEntity $entity): Dataset
+    {
+        $model = new Dataset();
+        $model->id = $entity->getId();
+        $model->name = $entity->getName();
+        $model->slug = $entity->getSlug();
+        $model->component = $entity->getComponent();
+        $model->presenter = $entity->getPresenter();
+        $model->deleted = $entity->isDeleted();
+        return $model;
     }
 
     public function exists(int $id, bool $includeDeleted = false): bool
     {
-        $query = $this->db->table(self::TABLE_NAME)
-            ->where('id', $id);
-
+        $criteria = ['id' => $id];
         if (!$includeDeleted) {
-            $query->where('deleted', 0);
+            $criteria['deleted'] = false;
         }
 
-        return $query->fetch() !== null;
+        return $this->doctrineRepository->exists($criteria);
     }
 
     /**

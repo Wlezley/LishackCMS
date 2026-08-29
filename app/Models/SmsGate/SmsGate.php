@@ -25,7 +25,7 @@ class SmsGate
         private string $password,
         private int $senderID,
         private bool $securedLogin,
-        private Explorer $db
+        private Explorer $db,
     ) {
     }
 

@@ -4,36 +4,36 @@ declare(strict_types=1);
 
 namespace App\Models\Dataset\Repository;
 
+use App\Entity\DatasetColumn\DatasetColumn as DatasetColumnEntity;
+use App\Entity\DatasetColumn\DatasetColumnRepository as DoctrineRepository;
 use App\Exception\DatasetException;
 use App\Models\Dataset\Entity\DatasetColumn;
 use App\Models\Helpers\SqlHelper;
 use Nette\Database\Explorer;
-use Nette\Database\Table\ActiveRow;
 
 final class ColumnRepository
 {
     public const TABLE_NAME = 'dataset_column';
 
     public function __construct(
-        private Explorer $db
+        private Explorer $db,
+        private DoctrineRepository $doctrineRepository,
     ) {
     }
 
     /** @return DatasetColumn[] */
     public function findByDatasetId(int $datasetId, bool $includeDeleted = false): array
     {
-        $query = $this->db->table(self::TABLE_NAME)
-            ->where('dataset_id', $datasetId);
-
+        $criteria = ['datasetId' => $datasetId];
         if (!$includeDeleted) {
-            $query->where('deleted', 0);
+            $criteria['deleted'] = false;
         }
 
-        $rows = $query->order('column_id')->fetchAll();
+        $entities = $this->doctrineRepository->findBy($criteria, ['columnId' => 'ASC']);
 
         $result = [];
-        foreach ($rows as $row) {
-            $column = DatasetColumn::fromDatabaseRow($row->toArray());
+        foreach ($entities as $entity) {
+            $column = $this->entityToModel($entity);
             $result[$column->columnId] = $column;
         }
 
@@ -42,32 +42,26 @@ final class ColumnRepository
 
     public function findColumn(int $datasetId, int $columnId, bool $includeDeleted = false): ?DatasetColumn
     {
-        $where = [
-            'dataset_id' => $datasetId,
-            'column_id' => $columnId,
+        $criteria = [
+            'datasetId' => $datasetId,
+            'columnId' => $columnId,
         ];
 
         if (!$includeDeleted) {
-            $where['deleted'] = 0;
+            $criteria['deleted'] = false;
         }
 
-        $row = $this->db->table(self::TABLE_NAME)
-            ->where($where)
-            ->fetch();
+        $entity = $this->doctrineRepository->findOneBy($criteria);
 
-        return $row ? DatasetColumn::fromDatabaseRow($row->toArray()) : null;
+        return $entity ? $this->entityToModel($entity) : null;
     }
 
     public function lastColumnId(int $datasetId): int
     {
+        // For MAX(column_id) we can still use DB explorer or custom DQL
         $max = $this->db->table(self::TABLE_NAME)
             ->where('dataset_id', $datasetId)
             ->max('column_id');
-
-        if ($max !== null && !is_int($max)) {
-            $type = gettype($max);
-            throw new DatasetException("Whoa... I asked for an integer, not a {$type}. Are we still in the Matrix?");
-        }
 
         return $max ? (int) $max : 0;
     }
@@ -78,12 +72,23 @@ final class ColumnRepository
             throw new DatasetException('Cannot insert column without dataset ID.');
         }
 
-        $column->columnId = $this->lastColumnId($column->datasetId);
-        $column->columnId++;
+        $column->columnId = $this->lastColumnId($column->datasetId) + 1;
 
-        /** @var ActiveRow $row */
-        $row = $this->db->table(self::TABLE_NAME)->insert($column->toDatabaseRow());
-        return DatasetColumn::fromDatabaseRow($row->toArray());
+        $entity = new DatasetColumnEntity(
+            $column->datasetId,
+            $column->columnId,
+            (string)$column->name,
+            (string)$column->slug,
+            (string)$column->type,
+            (bool)$column->required,
+            (bool)$column->listed,
+            (bool)$column->hidden,
+            (bool)$column->deleted,
+            $column->default
+        );
+
+        $this->doctrineRepository->save($entity);
+        return $this->entityToModel($entity);
     }
 
     public function update(DatasetColumn $column): int
@@ -95,11 +100,42 @@ final class ColumnRepository
             throw new DatasetException('Cannot update column without column ID.');
         }
 
-        return $this->db->table(self::TABLE_NAME)
-            ->where([
-                'dataset_id' => $column->datasetId,
-                'column_id' => $column->columnId,
-            ])->update($column->toDatabaseRow());
+        $entity = $this->doctrineRepository->findOneBy([
+            'datasetId' => $column->datasetId,
+            'columnId' => $column->columnId,
+        ]);
+
+        if (!$entity) {
+            return 0;
+        }
+
+        $entity->setName((string)$column->name);
+        $entity->setSlug((string)$column->slug);
+        $entity->setType((string)$column->type);
+        $entity->setRequired((bool)$column->required);
+        $entity->setListed((bool)$column->listed);
+        $entity->setHidden((bool)$column->hidden);
+        $entity->setDeleted((bool)$column->deleted);
+        $entity->setDefault($column->default);
+
+        $this->doctrineRepository->save($entity);
+        return 1;
+    }
+
+    private function entityToModel(DatasetColumnEntity $entity): DatasetColumn
+    {
+        $model = new DatasetColumn();
+        $model->datasetId = $entity->getDatasetId();
+        $model->columnId = $entity->getColumnId();
+        $model->name = $entity->getName();
+        $model->slug = $entity->getSlug();
+        $model->type = $entity->getType();
+        $model->required = $entity->isRequired();
+        $model->listed = $entity->isListed();
+        $model->hidden = $entity->isHidden();
+        $model->deleted = $entity->isDeleted();
+        $model->default = $entity->getDefault();
+        return $model;
     }
 
     /**
@@ -117,13 +153,17 @@ final class ColumnRepository
             throw new DatasetException("Column '{$columnName}' does not exist.");
         }
 
-        return $this->db->table(self::TABLE_NAME)
-            ->where([
-                'dataset_id' => $datasetId,
-                'column_id' => $columnId,
-            ])->update([
-                'deleted' => 1,
-            ]);
+        $entity = $this->doctrineRepository->findOneBy([
+            'datasetId' => $datasetId,
+            'columnId' => $columnId,
+        ]);
+
+        if ($entity) {
+            $entity->setDeleted(true);
+            $this->doctrineRepository->save($entity);
+            return 1;
+        }
+        return 0;
     }
 
     /**
@@ -132,9 +172,13 @@ final class ColumnRepository
      */
     public function deleteAllColumns(int $datasetId): int
     {
-        return $this->db->table(self::TABLE_NAME)
-            ->where('dataset_id', $datasetId)
-            ->update(['deleted' => 1]);
+        $entities = $this->doctrineRepository->findBy(['datasetId' => $datasetId]);
+        foreach ($entities as $entity) {
+            $entity->setDeleted(true);
+            $this->doctrineRepository->add($entity);
+        }
+        $this->doctrineRepository->flush();
+        return count($entities);
     }
 
     /**

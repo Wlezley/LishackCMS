@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace App\Models\Category;
 
+use App\Entity\Category\Category;
+use App\Entity\Category\CategoryRepository;
 use App\Exception\CategoryException;
 use App\Models\Article\ArticleManager;
 use App\Models\BaseModel;
+use App\Models\Config\ConfigManager;
 use App\Models\Helpers\ArrayHelper;
+use Nette\Database\Explorer;
 
 class CategoryManager extends BaseModel
 {
@@ -19,6 +23,14 @@ class CategoryManager extends BaseModel
     /** @var array<int|string,array<string,string|int|null>> $categories */
     protected array $categories = [];
 
+    public function __construct(
+        protected Explorer $db,
+        protected ConfigManager $configManager,
+        private CategoryRepository $categoryRepository,
+    ) {
+        parent::__construct($db, $configManager);
+    }
+
     /**
      * Loads all categories from the database into an internal cache.
      * Categories are indexed by their ID and ordered by `position`.
@@ -26,11 +38,11 @@ class CategoryManager extends BaseModel
     public function load(): void
     {
         if (empty($this->categories)) {
-            $result = $this->db->table(self::TABLE_NAME)
-                ->order('position')
-                ->fetchAll();
+            $categories = $this->categoryRepository->findBy([], ['position' => 'ASC']);
 
-            $this->categories = ArrayHelper::resultToArray($result);
+            foreach ($categories as $category) {
+                $this->categories[$category->getId()] = $this->categoryToArray($category);
+            }
         }
     }
 
@@ -79,8 +91,9 @@ class CategoryManager extends BaseModel
         $data = CategoryValidator::prepareData($data);
         CategoryValidator::validateData($data);
 
-        $this->db->table(self::TABLE_NAME)
-            ->insert($data);
+        $category = new Category();
+        $this->fillCategory($category, $data);
+        $this->categoryRepository->save($category);
 
         $this->invalidate();
         $this->updateChildLevels();
@@ -95,17 +108,16 @@ class CategoryManager extends BaseModel
      */
     public function update(int $id, array $data): void
     {
-        $this->load();
+        $category = $this->categoryRepository->findById($id);
 
-        if (!isset($this->categories[$id])) {
+        if (!$category) {
             throw new CategoryException("Category ID '$id' not found, entry cannot be updated", 1);
         }
 
         CategoryValidator::validateData($data);
 
-        $this->db->table(self::TABLE_NAME)
-            ->where(['id' => $id])
-            ->update($data);
+        $this->fillCategory($category, $data);
+        $this->categoryRepository->save($category);
 
         $this->invalidate();
         $this->updateChildLevels();
@@ -125,24 +137,26 @@ class CategoryManager extends BaseModel
             throw new CategoryException('MAIN_CATEGORY cannot be removed.');
         }
 
-        $node = $this->db->table(self::TABLE_NAME)
-            ->get($id);
+        $category = $this->categoryRepository->findById($id);
 
-        if (!$node) {
+        if (!$category) {
             throw new CategoryException("Category ID '$id' not found.");
         }
 
-        $parentID = $node['parent_id'];
-        $node->delete();
+        $parentId = $category->getParentId();
 
-        $this->db->table(self::TABLE_NAME)
-            ->where(['parent_id' => $id])
-            ->update(['parent_id' => $parentID]);
+        // Move child categories
+        $children = $this->categoryRepository->findBy(['parentId' => $id]);
+        foreach ($children as $child) {
+            $child->setParentId($parentId);
+            $this->categoryRepository->add($child);
+        }
 
-        // $this->articleManager->updateCategoryId($id, (int) $parentID);
         $this->db->table(ArticleManager::TABLE_NAME)
             ->where('category_id', $id)
-            ->update(['category_id' => $parentID]);
+            ->update(['category_id' => $parentId]);
+
+        $this->categoryRepository->delete($category);
 
         $this->invalidate();
         $this->updateChildLevels();
@@ -151,7 +165,7 @@ class CategoryManager extends BaseModel
     /**
      * Returns all cached categories indexed by ID.
      *
-     * @return array<int|string,array<string,string|int|null>> Category data.
+     * @return array<int|string,array<string,mixed>> Category data.
      */
     public function getData(): array
     {
@@ -162,7 +176,7 @@ class CategoryManager extends BaseModel
     /**
      * Builds and returns a hierarchical tree of categories.
      *
-     * @return list<array<mixed>> Nested category tree.
+     * @return list<array<string,mixed>> Nested category tree.
      */
     public function getTree(): array
     {
@@ -249,7 +263,7 @@ class CategoryManager extends BaseModel
     /**
      * Returns a nested tree of categories formatted for drag-and-drop sorting.
      *
-     * @return list<array<mixed>> Nested sortable category data.
+     * @return list<array<string,mixed>> Nested sortable category data.
      */
     public function getSortableTree(): array
     {
@@ -261,9 +275,9 @@ class CategoryManager extends BaseModel
      * Recursively formats a category tree for sorting purposes.
      * Builds a nested structure with metadata (id, name, url, etc.) for each node.
      *
-     * @param list<array<mixed>> $items List of category items (from getTree()).
+     * @param list<array<string,mixed>> $items List of category items (from getTree()).
      * @param string $url URL prefix built recursively (default: '').
-     * @return list<array<mixed>> Formatted tree suitable for sortable UI components.
+     * @return list<array<string,mixed>> Formatted tree suitable for sortable UI components.
      */
     private function sortableTreeFormat(array $items, string $url = ''): array
     {
@@ -289,7 +303,7 @@ class CategoryManager extends BaseModel
     /**
      * Updates category positions and parent relationships based on drag-and-drop data.
      *
-     * @param array<mixed> $data Reordering data must contain keys:
+     * @param array<string, mixed> $data Reordering data must contain keys:
      *   - node_id
      *   - source_id
      *   - target_id
@@ -336,25 +350,17 @@ class CategoryManager extends BaseModel
      */
     public function updateChildLevels(int $parentId = self::MAIN_CATEGORY_ID, int $parentLevel = 0): void
     {
-        $this->load();
+        $children = $this->categoryRepository->findBy(['parentId' => $parentId]);
 
-        $childs = [];
-        foreach ($this->categories as $id => $category) {
-            if ($category['parent_id'] == $parentId) {
-                $childs[$id] = $category;
-            }
-        }
-
-        foreach ($childs as $childId => $childCategory) {
+        foreach ($children as $child) {
             $newLevel = $parentLevel + 1;
-
-            if ($childCategory['level'] != $newLevel) {
-                $this->db->table(self::TABLE_NAME)
-                    ->where('id', $childId)
-                    ->update(['level' => $newLevel]);
+            if ($child->getLevel() !== $newLevel) {
+                $child->setLevel($newLevel);
+                $this->categoryRepository->add($child);
             }
-            $this->updateChildLevels((int) $childId, $newLevel);
+            $this->updateChildLevels((int)$child->getId(), $newLevel);
         }
+        $this->categoryRepository->flush();
     }
 
     /**
@@ -371,7 +377,7 @@ class CategoryManager extends BaseModel
     /**
      * Helper for building a flat, indented category list from a nested tree.
      *
-     * @param list<array<mixed>> $items Category tree.
+     * @param list<array<string,mixed>> $items Category tree.
      * @param int $level Current nesting level (default: 0).
      * @return array<int,string> Format: [id => '— Category Name']
      */
@@ -380,7 +386,7 @@ class CategoryManager extends BaseModel
         $options = [];
 
         foreach ($items as $item) {
-            $options[$item['id']] = str_repeat('— ', $level) . $item['name'];
+            $options[(int)$item['id']] = str_repeat('— ', $level) . $item['name'];
 
             if (!empty($item['items'])) {
                 $options += $this->buildCategorySelectData($item['items'], $level + 1);
@@ -388,5 +394,58 @@ class CategoryManager extends BaseModel
         }
 
         return $options;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function categoryToArray(Category $category): array
+    {
+        return [
+            'id' => $category->getId(),
+            'parent_id' => $category->getParentId(),
+            'position' => $category->getPosition(),
+            'level' => $category->getLevel(),
+            'name' => $category->getName(),
+            'name_url' => $category->getNameUrl(),
+            'title' => $category->getTitle(),
+            'description' => $category->getDescription(),
+            'body' => $category->getBody(),
+            'hidden' => $category->isHidden(),
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function fillCategory(Category $category, array $data): void
+    {
+        if (isset($data['parent_id'])) {
+            $category->setParentId((int)$data['parent_id']);
+        }
+        if (isset($data['position'])) {
+            $category->setPosition((int)$data['position']);
+        }
+        if (isset($data['level'])) {
+            $category->setLevel((int)$data['level']);
+        }
+        if (isset($data['name'])) {
+            $category->setName((string)$data['name']);
+        }
+        if (isset($data['name_url'])) {
+            $category->setNameUrl((string)$data['name_url']);
+        }
+        if (isset($data['title'])) {
+            $category->setTitle((string)$data['title']);
+        }
+        if (isset($data['description'])) {
+            $category->setDescription((string)$data['description']);
+        }
+        if (isset($data['body'])) {
+            $category->setBody((string)$data['body']);
+        }
+        if (isset($data['hidden'])) {
+            $category->setHidden((bool)$data['hidden']);
+        }
     }
 }

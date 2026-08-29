@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Models\Config;
 
+use App\Entity\CmsConfig\CmsConfig;
+use App\Entity\CmsConfig\CmsConfigRepository;
+use App\Enum\CmsConfigCategoryEnum;
 use App\Exception\ConfigException;
 use Nette\Database\Explorer;
-use Nette\Database\Table\ActiveRow;
 use Webmozart\Assert\Assert;
-use Webmozart\Assert\InvalidArgumentException;
 
 /**
  * @todo Rename to Configurator
@@ -17,11 +18,12 @@ class ConfigManager
 {
     public const TABLE_NAME = 'cms_config';
 
-    /** @var array<string,array<string,string>> Configuration data indexed by a setting key. */
+    /** @var array<string,array{key: string, category: string, value: string|null}> Configuration data indexed by a setting key. */
     private array $configuration = [];
 
     public function __construct(
-        private Explorer $db
+        private Explorer $db,
+        private CmsConfigRepository $cmsConfigRepository,
     ) {
     }
 
@@ -31,12 +33,14 @@ class ConfigManager
     private function load(): void
     {
         if (empty($this->configuration)) {
-            $result = $this->db->table(self::TABLE_NAME)->fetchAll();
+            $configs = $this->cmsConfigRepository->findAll();
 
-            foreach ($result as $row) {
-                /** @var array<string,string> $item */
-                $item = $row->toArray();
-                $this->configuration[$item['key']] = $item;
+            foreach ($configs as $config) {
+                $this->configuration[$config->getKey()] = [
+                    'key' => $config->getKey(),
+                    'category' => $config->getCategory()->value,
+                    'value' => $config->getValue(),
+                ];
             }
         }
     }
@@ -63,7 +67,7 @@ class ConfigManager
      *
      * @param string $key Configuration key.
      * @return string|null The configuration value, or null if not found.
-     * @throws InvalidArgumentException If the configuration key is empty
+     * @throws \InvalidArgumentException If the configuration key is empty
      */
     public function get(string $key): ?string
     {
@@ -75,7 +79,7 @@ class ConfigManager
     /**
      * Returns an associative array of all configuration values.
      *
-     * @return array<string,string> Associative array of configuration keys and their values.
+     * @return array<string,string|null> Associative array of configuration keys and their values.
      */
     public function getConfigValues(): array
     {
@@ -93,7 +97,7 @@ class ConfigManager
      * Retrieves configuration values belonging to a specific category.
      *
      * @param string $category The category name.
-     * @return array<string,string> Associative array of category values (empty if none found).
+     * @return array<string,string|null> Associative array of category values (empty if none found).
      */
     public function getCategoryValues(string $category): array
     {
@@ -143,23 +147,16 @@ class ConfigManager
      */
     public function set(string $key, string $category, string $value): void
     {
-        $this->load();
+        $config = $this->cmsConfigRepository->findOneBy(['key' => $key]);
 
-        if (isset($this->configuration[$key])) {
-            $this->db->table(self::TABLE_NAME)->where([
-                'key' => $key,
-            ])->update([
-                'category' => $category,
-                'value' => $value,
-            ]);
+        if ($config) {
+            $config->setCategory(CmsConfigCategoryEnum::from(strtoupper($category)));
+            $config->setValue($value);
         } else {
-            $this->db->table(self::TABLE_NAME)->insert([
-                'key' => $key,
-                'category' => $category,
-                'value' => $value,
-            ]);
+            $config = new CmsConfig($key, CmsConfigCategoryEnum::from(strtoupper($category)), $value);
         }
 
+        $this->cmsConfigRepository->save($config);
         $this->invalidate();
     }
 
@@ -282,16 +279,12 @@ class ConfigManager
      */
     public function delete(string $key): void
     {
-        // $this->load();
-        // if (!isset($this->configuration[$key])) {
-        //     throw new ConfigException("Key '$key' not found, configuration entry cannot be deleted", 1);
-        // }
+        $config = $this->cmsConfigRepository->findOneBy(['key' => $key]);
 
-        $this->db->table(self::TABLE_NAME)
-            ->where('key', $key)
-            ->delete();
-
-        $this->invalidate();
+        if ($config) {
+            $this->cmsConfigRepository->delete($config);
+            $this->invalidate();
+        }
     }
 
     // LISTING METHODS
@@ -303,7 +296,7 @@ class ConfigManager
      * @param int<0,max>|null $offset Offset for pagination.
      * @param string|null $category Filter by category (optional).
      * @param string|null $search Search term for key or value (optional).
-     * @return array<ActiveRow> List of configuration entries.
+     * @return array<\Nette\Database\Table\ActiveRow> List of configuration entries.
      */
     public function getList(?int $limit = 50, ?int $offset = 0, ?string $category = null, ?string $search = null): array
     {
@@ -387,7 +380,7 @@ class ConfigManager
     /**
      * Returns configuration data.
      *
-     * @return array<string,array<string,string>> Associative array of configuration data indexed by setting key.
+     * @return array<string,array{key: string, category: string, value: string|null}> Associative array of configuration data indexed by setting key.
      */
     public function getConfigData(): array
     {

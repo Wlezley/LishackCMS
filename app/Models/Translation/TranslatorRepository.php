@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models\Translation;
 
+use App\Entity\Translation\TranslationRepository;
 use App\Exception\TranslatorException;
 use Nette\Database\Explorer;
-use Nette\Database\Table\ActiveRow;
 
 final class TranslatorRepository
 {
@@ -15,6 +15,7 @@ final class TranslatorRepository
     public function __construct(
         private readonly Explorer $db,
         private readonly TranslatorRepositoryCache $cache,
+        private readonly TranslationRepository $translationRepository,
     ) {
     }
 
@@ -24,9 +25,12 @@ final class TranslatorRepository
             return;
         }
 
-        $data = $this->db->table(self::TABLE_NAME)
-            ->where('lang', $lang)
-            ->fetchPairs('key', 'text');
+        $translations = $this->translationRepository->findBy(['lang' => $lang]);
+
+        $data = [];
+        foreach ($translations as $translation) {
+            $data[$translation->getKey()] = (string) $translation->getText();
+        }
 
         $this->cache->pushLanguage($lang, $data);
     }
@@ -248,7 +252,7 @@ final class TranslatorRepository
      *
      * @param string $targetLanguage The target language code.
      * @param string $defaultLanguage The default language code.
-     * @return ActiveRow[] An array of translation pairs with keys, languages, and texts.
+     * @return \Nette\Database\Table\ActiveRow[] An array of translation pairs with keys, languages, and texts.
      */
     public function getTranslationPairs(string $targetLanguage, string $defaultLanguage): array
     {

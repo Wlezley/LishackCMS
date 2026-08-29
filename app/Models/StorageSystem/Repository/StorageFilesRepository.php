@@ -4,40 +4,38 @@ declare(strict_types=1);
 
 namespace App\Models\StorageSystem\Repository;
 
+use App\Entity\StorageFiles\StorageFiles as StorageFileEntity;
+use App\Entity\StorageFiles\StorageFilesRepository as DoctrineRepository;
 use App\Exception\StorageSystemException;
 use App\Models\StorageSystem\Entity\StorageFile;
-use Nette\Database\Explorer;
-use Nette\Database\Table\ActiveRow;
 
 class StorageFilesRepository
 {
     public const TABLE_NAME = 'storage_files';
 
     public function __construct(
-        private Explorer $db
+        private DoctrineRepository $doctrineRepository,
     ) {
     }
 
     public function findById(int $id): ?StorageFile
     {
-        $row = $this->db->table(self::TABLE_NAME)
-            ->where('id', $id)
-            ->fetch();
+        $entity = $this->doctrineRepository->findById($id);
+        if (!$entity) {
+            return null;
+        }
 
-        return $row ? StorageFile::fromDatabaseRow($row->toArray()) : null;
+        return $this->entityToModel($entity);
     }
 
     /** @return StorageFile[] */
     public function getFilesInFolder(int $treeId = 0): array
     {
-        $query = $this->db->table(self::TABLE_NAME)
-            ->where('tree_id', $treeId)
-            ->order('position')
-            ->fetchAll();
+        $entities = $this->doctrineRepository->findBy(['treeId' => $treeId], ['position' => 'ASC']);
 
         $result = [];
-        foreach ($query as $row) {
-            $result[] = StorageFile::fromDatabaseRow($row->toArray());
+        foreach ($entities as $entity) {
+            $result[] = $this->entityToModel($entity);
         }
 
         return $result;
@@ -48,9 +46,31 @@ class StorageFilesRepository
         $file->setId(null);
         $file->validate();
 
-        /** @var ActiveRow $row */
-        $row = $this->db->table(self::TABLE_NAME)->insert($file->toDatabaseRow());
-        $file->id = (int) $row->getPrimary();
+        $entity = new StorageFileEntity(
+            (int)$file->treeId,
+            (int)$file->ownerId,
+            $file->position,
+            (string)$file->name,
+            (string)$file->nameUrl,
+            (string)$file->contentType,
+            (string)$file->icon,
+            (int)$file->size,
+            (string)$file->checksum,
+            (string)$file->storageId,
+            (string)$file->downloadId,
+            $file->uploadedAt instanceof \DateTimeInterface
+                ? \DateTimeImmutable::createFromInterface($file->uploadedAt)
+                : new \DateTimeImmutable(),
+            $file->modifiedAt instanceof \DateTimeInterface
+                ? \DateTimeImmutable::createFromInterface($file->modifiedAt)
+                : null,
+            $file->deletedAt instanceof \DateTimeInterface
+                ? \DateTimeImmutable::createFromInterface($file->deletedAt)
+                : null
+        );
+
+        $this->doctrineRepository->save($entity);
+        $file->id = $entity->getId();
         return $file;
     }
 
@@ -62,33 +82,81 @@ class StorageFilesRepository
             throw new StorageSystemException('Cannot update file without ID.');
         }
 
-        $this->db->table(self::TABLE_NAME)
-            ->where('id', $file->id)
-            ->update($file->toDatabaseRow());
+        $entity = $this->doctrineRepository->findById($file->id);
+        if (!$entity) {
+            throw new StorageSystemException("File ID '$file->id' not found.");
+        }
+
+        $entity->setTreeId((int)$file->treeId);
+        $entity->setOwnerId((int)$file->ownerId);
+        $entity->setPosition($file->position);
+        $entity->setName((string)$file->name);
+        $entity->setNameUrl((string)$file->nameUrl);
+        $entity->setType((string)$file->contentType);
+        $entity->setIcon((string)$file->icon);
+        $entity->setSize((int)$file->size);
+        $entity->setChecksum((string)$file->checksum);
+        $entity->setStorageId((string)$file->storageId);
+        $entity->setDownloadId((string)$file->downloadId);
+        if ($file->uploadedAt) {
+            $entity->setUploadedAt(\DateTimeImmutable::createFromInterface($file->uploadedAt));
+        }
+        $entity->setModifiedAt($file->modifiedAt ? \DateTimeImmutable::createFromInterface($file->modifiedAt) : null);
+        $entity->setDeletedAt($file->deletedAt ? \DateTimeImmutable::createFromInterface($file->deletedAt) : null);
+
+        $this->doctrineRepository->save($entity);
     }
 
     public function delete(int $id): int
     {
-        return $this->db->table(self::TABLE_NAME)
-            ->where('id', $id)
-            ->delete();
+        $entity = $this->doctrineRepository->findById($id);
+        if ($entity) {
+            $this->doctrineRepository->delete($entity);
+            return 1;
+        }
+        return 0;
+    }
+
+    private function entityToModel(StorageFileEntity $entity): StorageFile
+    {
+        $file = new StorageFile();
+        $file->id = $entity->getId();
+        $file->treeId = $entity->getTreeId();
+        $file->ownerId = $entity->getOwnerId();
+        $file->position = $entity->getPosition();
+        $file->name = $entity->getName();
+        $file->nameUrl = $entity->getNameUrl();
+        $file->contentType = $entity->getType();
+        $file->icon = $entity->getIcon();
+        $file->size = $entity->getSize();
+        $file->checksum = $entity->getChecksum();
+        $file->storageId = $entity->getStorageId();
+        $file->downloadId = $entity->getDownloadId();
+        $file->uploadedAt = \Nette\Utils\DateTime::createFromInterface($entity->getUploadedAt());
+        $file->modifiedAt = $entity->getModifiedAt() ? \Nette\Utils\DateTime::createFromInterface($entity->getModifiedAt()) : null;
+        $file->deletedAt = $entity->getDeletedAt() ? \Nette\Utils\DateTime::createFromInterface($entity->getDeletedAt()) : null;
+        return $file;
     }
 
     public function setDeleted(int $id, bool $isDeleted): int
     {
-        return $this->db->table(self::TABLE_NAME)
-            ->where('id', $id)
-            ->update([
-                'deleted_at' => $isDeleted
-                    ? $this->db::literal('NOW()')
-                    : null,
-            ]);
+        $entity = $this->doctrineRepository->findById($id);
+        if ($entity) {
+            $entity->setDeletedAt($isDeleted ? new \DateTimeImmutable() : null);
+            $this->doctrineRepository->save($entity);
+            return 1;
+        }
+        return 0;
     }
 
     public function moveToFolder(int $id, int $treeId): int
     {
-        return $this->db->table(self::TABLE_NAME)
-            ->where(['id' => $id])
-            ->update(['tree_id' => $treeId]);
+        $entity = $this->doctrineRepository->findById($id);
+        if ($entity) {
+            $entity->setTreeId($treeId);
+            $this->doctrineRepository->save($entity);
+            return 1;
+        }
+        return 0;
     }
 }
