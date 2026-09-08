@@ -6,6 +6,7 @@ namespace App\Entity\StorageTree;
 
 use App\Entity\BaseEntity;
 use App\Entity\Trait\CreatedAtTrait;
+use App\Entity\Trait\HasIdTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -13,6 +14,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'storage_tree')]
 class StorageTree extends BaseEntity
 {
+    use HasIdTrait;
+
     use CreatedAtTrait;
 
     #[ORM\Column(type: Types::INTEGER, options: ['default' => 0])]

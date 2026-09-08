@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity\Dataset;
 
 use App\Entity\BaseEntity;
+use App\Entity\Trait\HasIdTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -12,6 +13,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'dataset')]
 class Dataset extends BaseEntity
 {
+    use HasIdTrait;
+
     public function __construct(
         #[ORM\Column(type: Types::STRING, length: 50)]
         private string $name,

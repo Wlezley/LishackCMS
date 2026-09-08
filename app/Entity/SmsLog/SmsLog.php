@@ -6,6 +6,7 @@ namespace App\Entity\SmsLog;
 
 use App\Entity\BaseEntity;
 use App\Entity\Trait\CreatedAtTrait;
+use App\Entity\Trait\HasIdTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Webmozart\Assert\Assert;
@@ -15,6 +16,7 @@ use Webmozart\Assert\InvalidArgumentException;
 #[ORM\Table(name: 'log_sms')] // TODO: change table name to sms_log ???
 class SmsLog extends BaseEntity
 {
+    use HasIdTrait;
     use CreatedAtTrait;
 
     public function __construct(

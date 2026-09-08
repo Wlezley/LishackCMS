@@ -7,6 +7,7 @@ namespace App\Entity\User;
 use App\Attributes\Sortable;
 use App\Entity\BaseEntity;
 use App\Entity\Trait\CreatedAtTrait;
+use App\Entity\Trait\HasIdTrait;
 use App\Entity\Trait\UpdatedAtTrait;
 use App\Enum\UserRoleEnum;
 use App\Helper\UserPasswordHelper;
@@ -18,6 +19,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'users')]
 class User extends BaseEntity
 {
+    use HasIdTrait;
     use CreatedAtTrait;
     use UpdatedAtTrait;
 

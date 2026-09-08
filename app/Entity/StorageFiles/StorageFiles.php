@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity\StorageFiles;
 
 use App\Entity\BaseEntity;
+use App\Entity\Trait\HasIdTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Webmozart\Assert\Assert;
@@ -13,6 +14,8 @@ use Webmozart\Assert\Assert;
 #[ORM\Table(name: 'storage_files')]
 class StorageFiles extends BaseEntity
 {
+    use HasIdTrait;
+
     #[ORM\Column(type: Types::INTEGER, options: ['default' => 0])]
     private int $treeId = 0;
 

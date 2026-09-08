@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity\Translation;
 
 use App\Entity\BaseEntity;
+use App\Entity\Trait\HasIdTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -12,9 +13,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'translations')]
 class Translation extends BaseEntity
 {
-    /**
-     * @todo KEY + LANG must be unique
-     */
+    use HasIdTrait;
+
     public function __construct(
         #[ORM\Column(type: Types::STRING, length: 255)]
         private string $key,

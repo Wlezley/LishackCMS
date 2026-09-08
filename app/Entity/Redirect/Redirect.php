@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity\Redirect;
 
 use App\Entity\BaseEntity;
+use App\Entity\Trait\HasIdTrait;
 use App\Enum\HttpRedirectCode;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -13,6 +14,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'redirect')]
 class Redirect extends BaseEntity
 {
+    use HasIdTrait;
+
     public function __construct(
         #[ORM\Column(type: Types::STRING, length: 300)]
         private string $source,

@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Entity\CmsConfig;
 
+use App\Entity\BaseEntity;
 use App\Enum\CmsConfigCategoryEnum;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'cms_config')]
-class CmsConfig
+class CmsConfig extends BaseEntity
 {
     public function __construct(
         #[ORM\Id]

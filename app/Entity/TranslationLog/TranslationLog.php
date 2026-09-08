@@ -6,6 +6,7 @@ namespace App\Entity\TranslationLog;
 
 use App\Entity\BaseEntity;
 use App\Entity\Trait\CreatedAtTrait;
+use App\Entity\Trait\HasIdTrait;
 use App\Enum\TranslationLogType;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -14,6 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'translations_log')]
 class TranslationLog extends BaseEntity
 {
+    use HasIdTrait;
     use CreatedAtTrait;
 
     /**
