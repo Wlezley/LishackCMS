@@ -37,9 +37,9 @@ interface TranslationRepositoryInterface extends BaseRepositoryInterface
     /**
      * @return list<Translation>
      */
-    public function findByKey(string $key): array;
+    public function findByKey(string $translationKey): array;
 
-    public function findOneByKeyAndLanguage(string $key, Language $language): ?Translation;
+    public function findOneByKeyAndLanguage(string $translationKey, Language $language): ?Translation;
 
-    public function existsByKeyAndLanguage(string $key, Language $language): bool;
+    public function existsByKeyAndLanguage(string $translationKey, Language $language): bool;
 }

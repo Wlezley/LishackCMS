@@ -73,11 +73,11 @@ final readonly class TranslationRepository extends BaseRepository implements Tra
             ->join('t.language', 'l')
             ->where('l.code = :languageCode')
             ->setParameter('languageCode', $languageCode)
-            ->orderBy('t.key', 'ASC');
+            ->orderBy('t.translationKey', 'ASC');
 
         if ($search !== null) {
             $qb->andWhere(
-                't.key LIKE :search OR t.text LIKE :search'
+                't.translationKey LIKE :search OR t.text LIKE :search'
             )->setParameter(
                 'search',
                 '%' . $search . '%'
@@ -102,7 +102,7 @@ final readonly class TranslationRepository extends BaseRepository implements Tra
 
         if ($search !== null) {
             $qb->andWhere(
-                't.key LIKE :search OR t.text LIKE :search'
+                't.translationKey LIKE :search OR t.text LIKE :search'
             )->setParameter(
                 'search',
                 '%' . $search . '%'
@@ -115,23 +115,23 @@ final readonly class TranslationRepository extends BaseRepository implements Tra
     /**
      * @inheritDoc
      */
-    public function findByKey(string $key): array
+    public function findByKey(string $translationKey): array
     {
         return $this->findBy([
-            'key' => $key,
+            'translationKey' => $translationKey,
         ]);
     }
 
-    public function findOneByKeyAndLanguage(string $key, Language $language): ?Translation
+    public function findOneByKeyAndLanguage(string $translationKey, Language $language): ?Translation
     {
         return $this->findOneBy([
-            'key' => $key,
+            'translationKey' => $translationKey,
             'language' => $language,
         ]);
     }
 
-    public function existsByKeyAndLanguage(string $key, Language $language): bool
+    public function existsByKeyAndLanguage(string $translationKey, Language $language): bool
     {
-        return $this->findOneByKeyAndLanguage($key, $language) !== null;
+        return $this->findOneByKeyAndLanguage($translationKey, $language) !== null;
     }
 }
