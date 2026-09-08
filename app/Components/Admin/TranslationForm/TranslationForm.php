@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Components\Admin\TranslationForm;
 
 use App\Components\BaseControl;
-use App\Dto\Localization\LanguageDto;
+use App\Entity\Language\Language;
 use App\Exception\TranslatorException;
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
@@ -17,7 +17,7 @@ class TranslationForm extends BaseControl
 
     private string $origin;
 
-    /** @var array<string, LanguageDto> */
+    /** @var array<string, Language> */
     private array $languageList;
 
     /** @var array<string,string> $queryParams */
@@ -42,11 +42,11 @@ class TranslationForm extends BaseControl
             ->setValue($param['key'] ?? '')
             ->setRequired();
 
-        foreach ($this->languageList as $languageCode => $languageDto) {
-            $form->addTextArea("text_$languageCode", $this->t('text') . " ($languageDto->name)", null, 1)
+        foreach ($this->languageList as $language) {
+            $form->addTextArea("text_{$language->getCode()}", $this->t('text') . " ({$language->getName()})", null, 1)
                 ->setHtmlAttribute('autocomplete', 'off')
-                ->setValue($param["text_$languageCode"] ?? '')
-                ->setRequired($languageDto->default);
+                ->setValue($param["text_{$language->getCode()}"] ?? '')
+                ->setRequired($language->isDefault());
         }
 
         $form->addSubmit('save');
@@ -62,7 +62,7 @@ class TranslationForm extends BaseControl
      */
     public function processCreate(Form $form, ArrayHash $values): void
     {
-        if (!empty($this->translator->getTextListByKey($values['key']))) {
+        if (!empty($this->translationService->getTextListByKey($values['key']))) {
             $editLink = $this->buildEditUrl($values['key']);
             $editAnchor =
                 '<a href="' . $editLink . '" target="_blank">'
@@ -76,11 +76,11 @@ class TranslationForm extends BaseControl
                         continue;
                     }
 
-                    $this->translator->add($values['key'], $languageCode, $values["text_$languageCode"]);
+                    $this->translationService->add($values['key'], $languageCode, $values["text_$languageCode"]);
                 }
             }
 
-            if (!empty($this->translator->getTextListByKey($values['key']))) {
+            if (!empty($this->translationService->getTextListByKey($values['key']))) {
                 call_user_func($this->onSuccess, $this->tf('success.form.translation-created.named', $values['key']));
             } else {
                 call_user_func($this->onError, $this->t('error.form.translation-create'));
@@ -95,17 +95,17 @@ class TranslationForm extends BaseControl
     public function processEdit(Form $form, ArrayHash $values): void
     {
         $key = $values['key'];
-        $textList = $this->translator->getTextListByKey($key);
+        $textList = $this->translationService->getTextListByKey($key);
 
         foreach ($this->languageList as $languageCode => $languageDto) {
             if (isset($textList[$languageCode])) {
                 if (empty($values["text_$languageCode"])) {
-                    $this->translator->delete($key, $languageCode);
+                    $this->translationService->delete($key, $languageCode);
                 } else {
-                    $this->translator->update($key, $languageCode, $values["text_$languageCode"]);
+                    $this->translationService->update($key, $languageCode, $values["text_$languageCode"]);
                 }
             } elseif (!empty($values["text_$languageCode"])) {
-                $this->translator->add($key, $languageCode, $values["text_$languageCode"]);
+                $this->translationService->add($key, $languageCode, $values["text_$languageCode"]);
             }
         }
 
@@ -125,7 +125,7 @@ class TranslationForm extends BaseControl
     }
 
     /**
-     * @param array<string, LanguageDto> $languageList
+     * @param array<string, Language> $languageList
      */
     public function setLanguageList(array $languageList): void
     {

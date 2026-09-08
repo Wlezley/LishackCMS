@@ -32,6 +32,8 @@ class TranslatorLog
      * @param string $key The missing translation key.
      * @param string $lang The language code.
      * @param string|null $url The URL where the missing key was encountered (default: current URL).
+     *
+     * @todo Use Language Entity, not string $lang !!!
      */
     public function logMissingKey(string $key, string $lang, ?string $url = null): void
     {
@@ -51,6 +53,8 @@ class TranslatorLog
      * @param array<mixed> $values The values provided to vsprintf.
      * @param string|null $error Optional error message (e.g., vsprintf() error description).
      * @param string|null $url The URL where the issue occurred (default: current URL).
+     *
+     * @todo Use Language Entity, not string $lang !!!
      */
     public function logMissingArguments(string $key, string $lang, array $values, ?string $error = null, ?string $url = null): void
     {
@@ -74,6 +78,7 @@ class TranslatorLog
      * @param string $message Additional information about the issue.
      *
      * @todo Optimize for large number of entries
+     * @todo Use Language Entity, not string $lang !!!
      */
     private function log(string $key, string $lang, string $type, string $message): void
     {

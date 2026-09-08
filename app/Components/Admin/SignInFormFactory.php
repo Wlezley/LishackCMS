@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Components\Admin;
 
-use App\Models\Translation\Translator;
+use App\Models\Translation\TranslationService;
 use Nette\Application\UI\Form;
 use Nette\Security\User;
 
@@ -12,7 +12,7 @@ class SignInFormFactory
 {
     public function __construct(
         protected User $user,
-        protected Translator $translator,
+        protected TranslationService $translator,
     ) {
     }
 

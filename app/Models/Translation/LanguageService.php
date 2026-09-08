@@ -4,35 +4,31 @@ declare(strict_types=1);
 
 namespace App\Models\Translation;
 
-use App\Dto\Localization\LanguageDto;
+use App\Entity\Language\Language;
 use App\Entity\Language\LanguageRepositoryInterface;
 use App\Exception\TranslatorException;
-use App\Models\Config\ConfigManager;
 use Webmozart\Assert\Assert;
 use Webmozart\Assert\InvalidArgumentException;
 
 class LanguageService
 {
-    /** @var array<string, LanguageDto> */
+    /** @var array<string, Language> */
     private array $languages = [];
 
-    /** @var string Currently selected language */
-    private string $currentLanguage;
+    private Language $currentLanguage;
 
     public function __construct(
-        private readonly ConfigManager $configManager,
         private readonly LanguageRepositoryInterface $languageRepository,
     ) {
         $this->load();
-        $this->currentLanguage = $this->getDefaultLanguage(); // Bootup default language
+        $this->currentLanguage = $this->getDefaultLanguage();
     }
 
     private function load(): void
     {
         if (empty($this->languages)) {
             foreach ($this->languageRepository->findAll() as $language) {
-                $languageDto = LanguageDto::fromEntity($language);
-                $this->languages[$language->getLanguageCode()] = $languageDto;
+                $this->languages[$language->getCode()] = $language;
             }
         }
     }
@@ -63,17 +59,17 @@ class LanguageService
     /**
      * @throws TranslatorException If language is not found.
      */
-    public function getLanguage(string $languageCode): LanguageDto
+    public function getLanguage(string $languageCode): Language
     {
         $this->assertLanguageExists($languageCode);
         return $this->languages[$languageCode];
     }
 
-    /** @return array<string, LanguageDto> */
+    /** @return array<string, Language> */
     public function getAvailableLanguages(bool $enabledOnly = true): array
     {
         return $enabledOnly
-            ? array_filter($this->languages, fn($languageDto) => $languageDto->enabled)
+            ? array_filter($this->languages, fn($languageDto) => $languageDto->isEnabled())
             : $this->languages;
     }
 
@@ -88,30 +84,15 @@ class LanguageService
         $languages = $this->getAvailableLanguages($enabledOnly);
 
         foreach ($languages as $languageCode => $languageDto) {
-            $names[$languageCode] = $languageDto->name;
+            $names[$languageCode] = $languageDto->getName();
         }
 
         return $names;
     }
 
-    /**
-     * Returns the default language code.
-     *
-     * @param string|null $fallback Fallback language code if default is not found, defaults to config value
-     */
-    public function getDefaultLanguage(?string $fallback = null): string
+    public function getDefaultLanguage(): Language
     {
-        foreach ($this->languages as $languageCode => $languageDto) {
-            if ($languageDto->default) {
-                return $languageCode;
-            }
-        }
-
-        if ($fallback === null) {
-            return $this->configManager->get('DEFAULT_LANG') ?? 'en';
-        }
-
-        return $fallback;
+        return $this->languageRepository->findDefault();
     }
 
     /**
@@ -121,11 +102,13 @@ class LanguageService
      * @throws InvalidArgumentException If no secondary language is found
      *
      * @todo Secondary language must be configurable
+     * @todo Move to LanguageRepository
+     * @todo Remove fallback parameter
      */
     public function getSecondaryLanguage(string $fallback = 'en'): string
     {
         foreach ($this->languages as $languageCode => $languageDto) {
-            if (!$languageDto->default && $languageDto->enabled) {
+            if (!$languageDto->isDefault() && $languageDto->isEnabled()) {
                 return $languageCode;
             }
         }
@@ -133,13 +116,13 @@ class LanguageService
         return $fallback;
     }
 
-    public function getCurrentLanguage(): string
+    public function getCurrentLanguage(): Language
     {
         return $this->currentLanguage;
     }
 
-    public function setCurrentLanguage(string $currentLanguage): void
+    public function switchLanguage(Language $language): void
     {
-        $this->currentLanguage = $currentLanguage;
+        $this->currentLanguage = $language;
     }
 }

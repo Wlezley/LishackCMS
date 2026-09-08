@@ -79,7 +79,7 @@ class DatasetList extends BaseControl
         $presenter = $this->getPresenter();
 
         $control = $presenter->paginationFactory->create();
-        $control->setTranslator($presenter->translator);
+        $control->setTranslationService($presenter->translationService);
         $control->setConfigManager($presenter->configManager);
         $control->setQueryParams($presenter->getHttpRequest()->getQuery());
         $control->setTotalItems($this->totalItems);

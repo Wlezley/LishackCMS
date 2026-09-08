@@ -5,21 +5,35 @@ declare(strict_types=1);
 namespace App\Entity\Language;
 
 use App\Entity\BaseRepository;
+use App\Enum\ErrorCode\TranslatorErrorCode;
+use App\Exception\TranslatorException;
 
 /**
  * @extends BaseRepository<Language>
  */
 final readonly class LanguageRepository extends BaseRepository implements LanguageRepositoryInterface
 {
-    public function findByLanguageCode(string $languageCode): ?Language
+    /**
+     * @throws TranslatorException
+     */
+    public function findByLanguageCode(string $languageCode): Language
     {
-        return $this->findOneBy([
+        $language = $this->findOneBy([
             'languageCode' => $languageCode,
         ]);
+
+        if ($language === null) {
+            throw new TranslatorException(
+                "Language '$languageCode' not found.",
+                TranslatorErrorCode::LanguageNotFound,
+            );
+        }
+
+        return $language;
     }
 
     /**
-     * @return list<Language>
+     * @inheritDoc
      */
     public function findEnabled(): array
     {
@@ -29,10 +43,22 @@ final readonly class LanguageRepository extends BaseRepository implements Langua
         );
     }
 
-    public function findDefault(): ?Language
+    /**
+     * @throws TranslatorException
+     */
+    public function findDefault(): Language
     {
-        return $this->findOneBy([
+        $language = $this->findOneBy([
             'default' => true,
         ]);
+
+        if ($language === null) {
+            throw new TranslatorException(
+                'Default language not defined.',
+                TranslatorErrorCode::DefaultLanguageNotFound,
+            );
+        }
+
+        return $language;
     }
 }

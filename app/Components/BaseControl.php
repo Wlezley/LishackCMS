@@ -8,7 +8,7 @@ use App\Entity\User\User;
 use App\Models\Config\ConfigManager;
 use App\Models\Config\ConfigTrait;
 use App\Models\Translation\LanguageService;
-use App\Models\Translation\Translator;
+use App\Models\Translation\TranslationService;
 use App\Models\Translation\TranslatorTrait;
 use App\Models\UrlGenerator\UrlGenerator;
 use Nette\Application\UI\Control;
@@ -27,8 +27,8 @@ class BaseControl extends Control
     /** @var LanguageService @inject */
     public LanguageService $languageService;
 
-    /** @var Translator @inject */
-    public Translator $translator;
+    /** @var TranslationService @inject */
+    public TranslationService $translationService;
 
     /** @var UrlGenerator @inject */
     public UrlGenerator $urlGenerator;
@@ -60,13 +60,13 @@ class BaseControl extends Control
         $template->_C = fn($key) => $this->configManager->get($key); // @phpstan-ignore property.notFound
 
         // TRANSLATOR
-        if (!isset($this->translator)) {
+        if (!isset($this->translationService)) {
             throw new RuntimeException('Translator is not available in ' . static::class);
         }
 
         // phpcs:disable
-        $template->_ = fn($key) => $this->translator->translate($key); // @phpstan-ignore property.notFound
-        $template->_F = fn($key, $values) => $this->translator->translateFormat($key, $values); // @phpstan-ignore property.notFound
+        $template->_ = fn($key) => $this->translationService->translate($key); // @phpstan-ignore property.notFound
+        $template->_F = fn($key, $values) => $this->translationService->translateFormat($key, $values); // @phpstan-ignore property.notFound
         // phpcs:enable
 
         return $template;
@@ -92,14 +92,14 @@ class BaseControl extends Control
         $this->languageService = $languageService;
     }
 
-    public function getTranslator(): Translator
+    public function getTranslationService(): TranslationService
     {
-        return $this->translator;
+        return $this->translationService;
     }
 
-    public function setTranslator(Translator $translator): void
+    public function setTranslationService(TranslationService $translationService): void
     {
-        $this->translator = $translator;
+        $this->translationService = $translationService;
     }
 
     /** @return array<string,string> */

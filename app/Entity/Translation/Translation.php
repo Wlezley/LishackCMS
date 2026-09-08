@@ -5,12 +5,21 @@ declare(strict_types=1);
 namespace App\Entity\Translation;
 
 use App\Entity\BaseEntity;
+use App\Entity\Language\Language;
 use App\Entity\Trait\HasIdTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-#[ORM\Table(name: 'translations')]
+#[ORM\Table(
+    name: 'translations',
+    uniqueConstraints: [
+        new ORM\UniqueConstraint(
+            name: 'translation_key_language_unique',
+            columns: ['key', 'language'],
+        ),
+    ],
+)]
 class Translation extends BaseEntity
 {
     use HasIdTrait;
@@ -18,8 +27,14 @@ class Translation extends BaseEntity
     public function __construct(
         #[ORM\Column(type: Types::STRING, length: 255)]
         private string $key,
-        #[ORM\Column(type: Types::STRING, length: 2)]
-        private string $lang, // TODO: Change to $languageCode; OR use entity Language ???
+        #[ORM\ManyToOne(targetEntity: Language::class)]
+        #[ORM\JoinColumn(
+            name: 'language',
+            referencedColumnName: 'code',
+            nullable: false,
+            onDelete: 'RESTRICT',
+        )]
+        private Language $language,
         #[ORM\Column(type: Types::TEXT, nullable: true, options: ['default' => null])]
         private ?string $text = null,
     ) {
@@ -35,14 +50,14 @@ class Translation extends BaseEntity
         $this->key = $key;
     }
 
-    public function getLang(): string
+    public function getLanguage(): Language
     {
-        return $this->lang;
+        return $this->language;
     }
 
-    public function setLang(string $lang): void
+    public function setLanguage(Language $language): void
     {
-        $this->lang = $lang;
+        $this->language = $language;
     }
 
     public function getText(): ?string
@@ -53,5 +68,10 @@ class Translation extends BaseEntity
     public function setText(?string $text): void
     {
         $this->text = $text;
+    }
+
+    public function getLanguageCode(): string
+    {
+        return $this->language->getCode();
     }
 }

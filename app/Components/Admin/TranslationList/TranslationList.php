@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Components\Admin\TranslationList;
 
 use App\Components\BaseControl;
+use App\Dto\Localization\TranslationCollectionDto;
 use App\Modules\Admin\Presenters\TranslationPresenter;
 use Nette\Utils\Json;
 use Webmozart\Assert\Assert;
@@ -27,7 +28,7 @@ class TranslationList extends BaseControl
         $offset = ($page - 1) * $this->limit;
         Assert::range($offset, 0, PHP_INT_MAX, 'Offset must be a non-negative integer.');
 
-        $this->totalItems = $this->translator->getCount($lang, $search);
+        $this->totalItems = $this->translationService->getCount($lang, $search);
 
         $this->template->getJson = function ($key) {
             return Json::encode([
@@ -40,7 +41,9 @@ class TranslationList extends BaseControl
         };
 
         $this->template->lang = $lang;
-        $this->template->translations = $this->translator->getList($lang, $this->limit, $offset, $search);
+        $this->template->translations = TranslationCollectionDto::fromEntities(
+            $this->translationService->getList($lang, $search, $this->limit, $offset)
+        )->toArray();
 
         $this->getTemplate()->setFile(__DIR__ . '/TranslationList.latte');
         $this->getTemplate()->render();
@@ -61,7 +64,7 @@ class TranslationList extends BaseControl
         $presenter = $this->getPresenter();
 
         $control = $presenter->paginationFactory->create();
-        $control->setTranslator($presenter->translator);
+        $control->setTranslationService($presenter->translationService);
         $control->setConfigManager($presenter->configManager);
         $control->setQueryParams($presenter->getHttpRequest()->getQuery());
         $control->setTotalItems($this->totalItems);

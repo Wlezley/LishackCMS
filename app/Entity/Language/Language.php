@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Entity\Language;
 
 use App\Entity\BaseEntity;
-use App\Entity\Trait\HasIdTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -13,11 +12,10 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'language')]
 class Language extends BaseEntity
 {
-    use HasIdTrait;
-
     public function __construct(
-        #[ORM\Column(type: Types::STRING, length: 2, unique: true)]
-        private string $languageCode,
+        #[ORM\Id]
+        #[ORM\Column(type: Types::STRING, length: 2)]
+        private string $code,
         #[ORM\Column(type: Types::STRING, length: 50)]
         private string $name,
         #[ORM\Column(type: Types::STRING, length: 2)]
@@ -31,14 +29,9 @@ class Language extends BaseEntity
     ) {
     }
 
-    public function getLanguageCode(): string
+    public function getCode(): string
     {
-        return $this->languageCode;
-    }
-
-    public function setLanguageCode(string $languageCode): void
-    {
-        $this->languageCode = $languageCode;
+        return $this->code;
     }
 
     public function getName(): string

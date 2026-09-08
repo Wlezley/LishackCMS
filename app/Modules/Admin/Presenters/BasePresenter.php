@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace App\Modules\Admin\Presenters;
 
 use App\Components\BaseControl;
+use App\Entity\Language\Language;
 use App\Exception\TranslatorException;
 use App\Models\Config\ConfigManager;
 use App\Models\Config\ConfigTrait;
 use App\Models\Helpers\AssetsVersion;
 use App\Models\Translation\LanguageService;
-use App\Models\Translation\Translator;
+use App\Models\Translation\TranslationService;
 use App\Models\Translation\TranslatorTrait;
 use Nette\Application\Helpers;
 use Nette\Application\UI\Presenter;
@@ -49,10 +50,10 @@ abstract class BasePresenter extends Presenter
     /** @var LanguageService @inject */
     public LanguageService $languageService;
 
-    /** @var Translator @inject */
-    public Translator $translator;
+    /** @var TranslationService @inject */
+    public TranslationService $translationService;
 
-    protected string $lang;
+    protected Language $language;
     protected string $htmlLang;
 
     /**
@@ -62,11 +63,9 @@ abstract class BasePresenter extends Presenter
     {
         parent::startup();
 
-        $lang = $this->c('DEFAULT_LANG_ADMIN'); // TODO: Get language from URL or session
-        Assert::notNull($lang, 'Default admin language not found');
-        $this->lang = $lang;
-        $this->languageService->setCurrentLanguage($this->lang);
-        $this->htmlLang = $this->languageService->getLanguage($this->lang)->htmlLang ?? $this->lang;
+        $this->language = $this->languageService->getDefaultLanguage(); // TODO: Get language from URL or session
+        $this->languageService->switchLanguage($this->language);
+        $this->htmlLang = $this->language->getHtmlLang();
     }
 
     public function beforeRender(): void
@@ -77,8 +76,8 @@ abstract class BasePresenter extends Presenter
         $this->template->_C = fn($key) => $this->configManager->get($key);
 
         // TRANSLATOR
-        $this->template->_ = fn($key) => $this->translator->translate($key, $this->lang);
-        $this->template->_F = fn($key, $values) => $this->translator->translateFormat($key, $values, $this->lang);
+        $this->template->_ = fn($key) => $this->translationService->translate($key, $this->language->getCode()); // TODO: Use Language Entity
+        $this->template->_F = fn($key, $values) => $this->translationService->translateFormat($key, $values, $this->language->getCode()); // TODO: Use Language Entity
 
         // Translated Title
         $this->template->title = $this->getPresenterTitle();
@@ -156,7 +155,7 @@ abstract class BasePresenter extends Presenter
 
         $translationKey = 'title.' . str_replace(':', '.', $name) . '.' . $action;
         $translationKey = strtolower($translationKey);
-        return $this->translator->translate($translationKey, $lang);
+        return $this->translationService->translate($translationKey, $lang);
     }
 
     // ##########################################
@@ -168,7 +167,7 @@ abstract class BasePresenter extends Presenter
         $component = parent::createComponent($name);
 
         if ($component instanceof BaseControl) {
-            $component->setTranslator($this->translator);
+            $component->setTranslationService($this->translationService);
             $component->setConfigManager($this->configManager);
         }
 

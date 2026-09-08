@@ -11,12 +11,12 @@ use App\Entity\BaseRepositoryInterface;
  */
 interface LanguageRepositoryInterface extends BaseRepositoryInterface
 {
-    public function findByLanguageCode(string $languageCode): ?Language;
+    public function findByLanguageCode(string $languageCode): Language;
 
     /**
      * @return list<Language>
      */
     public function findEnabled(): array;
 
-    public function findDefault(): ?Language;
+    public function findDefault(): Language;
 }

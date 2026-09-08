@@ -46,11 +46,11 @@ trait TranslatorTrait
      */
     public function t(string $key, ?string $lang = null): string
     {
-        if (!isset($this->translator)) {
+        if (!isset($this->translationService)) {
             throw new RuntimeException('Translator is not available in ' . static::class);
         }
 
-        return $this->translator->translate($key, $lang);
+        return $this->translationService->translate($key, $lang);
     }
 
     /**
@@ -63,10 +63,10 @@ trait TranslatorTrait
      */
     public function tf(string $key, mixed ...$values): string
     {
-        if (!isset($this->translator)) {
+        if (!isset($this->translationService)) {
             throw new RuntimeException('Translator is not available in ' . static::class);
         }
 
-        return $this->translator->translateFormat($key, $values);
+        return $this->translationService->translateFormat($key, $values);
     }
 }

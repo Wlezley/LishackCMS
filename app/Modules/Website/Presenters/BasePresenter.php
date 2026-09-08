@@ -10,6 +10,7 @@ use App\Components\Menu\IMenuFactory;
 use App\Components\Menu\Menu;
 use App\Components\Pagination\IPaginationFactory;
 use App\Components\Pagination\Pagination;
+use App\Entity\Language\Language;
 use App\Exception\TranslatorException;
 use App\Models\Category\CategoryManager;
 use App\Models\Config\ConfigManager;
@@ -17,7 +18,7 @@ use App\Models\Config\ConfigTrait;
 use App\Models\Helpers\AssetsVersion;
 use App\Models\Helpers\IPValidator;
 use App\Models\Translation\LanguageService;
-use App\Models\Translation\Translator;
+use App\Models\Translation\TranslationService;
 use App\Models\Translation\TranslatorTrait;
 use App\Service\Redirect\RedirectService;
 use Nette;
@@ -39,8 +40,8 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     /** @var LanguageService @inject */
     public LanguageService $languageService;
 
-    /** @var Translator @inject */
-    public Translator $translator;
+    /** @var TranslationService @inject */
+    public TranslationService $translationService;
 
     /** @var RedirectService @inject */
     public RedirectService $redirectService;
@@ -65,7 +66,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     protected string $baseUrl;
     protected string $currentUrl;
     protected string $adminUrl;
-    protected string $lang;
+    protected Language $language;
 
     /** @var array<string,mixed> $defaultParams */
     protected array $defaultParams = [];
@@ -93,15 +94,13 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         }
 
         // Language
-        $lang = $this->c('DEFAULT_LANG'); // TODO: Get language from URL or session
-        Assert::notNull($lang, 'Default language not found');
-        $this->lang = $lang;
-        $this->languageService->setCurrentLanguage($this->lang);
+        $this->language = $this->languageService->getDefaultLanguage(); // TODO: Get language from URL or session
+        $this->languageService->switchLanguage($this->language);
 
         // Default parameters
         $this->defaultParams = [
-            'lang' => $this->lang, // TODO: Get language from URL or session
-            'HTML_LANG' => $this->languageService->getLanguage($this->lang)->htmlLang ?? $this->lang,
+            'lang' => $this->language->getCode(), // TODO: Get language from URL or session
+            'HTML_LANG' => $this->language->getHtmlLang(), // ?? $this->language->getCode(),
             'DEFAULT_LANG' => $this->c('DEFAULT_LANG'),
             'page' => $this->c('DEFAULT_PAGE'),
             'title' => $this->c('SITE_TITLE'), // TODO: Use SEO_TITLE instead?
@@ -116,7 +115,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
             'og_description' => $this->c('OG_DESCRIPTION'),
             'og_image' => $this->c('OG_IMAGE'),
             'og_show_locale' => ($this->c('OG_SHOW_LOCALE') == 1),
-            'og_locale' => $this->languageService->getLanguage($this->lang)->locale ?? $this->c('DEFAULT_LOCALE'),
+            'og_locale' => $this->language->getLocale(), // ?? $this->c('DEFAULT_LOCALE'),
         ];
     }
 
@@ -128,8 +127,8 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $this->template->_C = fn($key) => $this->configManager->get($key);
 
         // TRANSLATOR
-        $this->template->_ = fn($key) => $this->translator->translate($key, $this->lang);
-        $this->template->_F = fn($key, $values) => $this->translator->translateFormat($key, $values, $this->lang);
+        $this->template->_ = fn($key) => $this->translationService->translate($key, $this->language->getCode()); // TODO: Use Language Entity
+        $this->template->_F = fn($key, $values) => $this->translationService->translateFormat($key, $values, $this->language->getCode()); // TODO: Use Language Entity
 
         // Default parameters
         $this->template->setParameters($this->defaultParams);
@@ -202,7 +201,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $component = parent::createComponent($name);
 
         if ($component instanceof \App\Components\BaseControl) {
-            $component->setTranslator($this->translator);
+            $component->setTranslationService($this->translationService);
             $component->setConfigManager($this->configManager);
         }
 

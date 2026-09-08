@@ -47,12 +47,10 @@ services:
     - App\Models\Seo\SitemapGenerator
     - App\Models\SmsGate\SmsGate(%smsgate.url%, %smsgate.login%, %smsgate.password%, %smsgate.sender_id%, %smsgate.secured_login%)
     - App\Models\Translation\LanguageService
-    - App\Models\Translation\Translator
-    - App\Models\Translation\TranslatorEditor
+    - App\Models\Translation\TranslationCache
+    - App\Models\Translation\TranslationService
     - App\Models\Translation\TranslatorLog
     - App\Models\Translation\TranslatorMaintenanceManager
-    - App\Models\Translation\TranslatorRepository
-    - App\Models\Translation\TranslatorRepositoryCache
     - App\Models\UrlGenerator\UrlGenerator
 
     # Dataset

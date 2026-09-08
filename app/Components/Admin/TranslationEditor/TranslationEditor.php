@@ -24,9 +24,9 @@ class TranslationEditor extends BaseControl
     {
         $form = new Form();
 
-        $defaultLang = $this->languageService->getDefaultLanguage($this->c('DEFAULT_LANG'));
+        $defaultLang = $this->languageService->getDefaultLanguage();
         $languages = $this->languageService->getLanguageNames(false);
-        unset($languages[$defaultLang]);
+        unset($languages[$defaultLang->getCode()]);
 
         $form->addHidden('target_lang', $this->param['lang'] ?? $this->languageService->getSecondaryLanguage());
         $form->addHidden('translations', '');
@@ -54,16 +54,16 @@ class TranslationEditor extends BaseControl
         }
 
         $translations = Json::decode($values['translations'], true);
-        $this->translator->saveTranslations($translations);
+        $this->translationService->saveTranslations($translations);
         call_user_func($this->onSuccess, $this->t('success.form.translations-saved'), $values['target_lang']);
     }
 
     public function render(): void
     {
-        $defaultLang = $this->languageService->getDefaultLanguage($this->c('DEFAULT_LANG'));
+        $defaultLang = $this->languageService->getDefaultLanguage();
         $targetLang = $this->param['lang'] ?? $this->languageService->getSecondaryLanguage();
         Assert::nullOrStringNotEmpty($targetLang, 'Target language is not set');
-        $this->template->translations = $this->translator->getTranslations($targetLang);
+        $this->template->translations = $this->translationService->getTranslations($targetLang);
 
         $this->template->defaultLang = $defaultLang;
         $this->template->targetLang = $targetLang;

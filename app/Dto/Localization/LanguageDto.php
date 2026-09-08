@@ -9,8 +9,7 @@ use App\Entity\Language\Language;
 class LanguageDto
 {
     public function __construct(
-        public ?int $id,
-        public string $languageCode,
+        public string $code,
         public string $name,
         public string $htmlLang,
         public string $locale,
@@ -22,8 +21,7 @@ class LanguageDto
     public static function fromEntity(Language $language): self
     {
         return new self(
-            id: $language->getId(),
-            languageCode: $language->getLanguageCode(),
+            code: $language->getCode(),
             name: $language->getName(),
             htmlLang: $language->getHtmlLang(),
             locale: $language->getLocale(),
@@ -38,8 +36,7 @@ class LanguageDto
     public function toArray(): array
     {
         return [
-            'id' => $this->id,
-            'languageCode' => $this->languageCode,
+            'code' => $this->code,
             'name' => $this->name,
             'htmlLang' => $this->htmlLang,
             'locale' => $this->locale,
