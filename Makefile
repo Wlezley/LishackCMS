@@ -16,5 +16,14 @@ down: ## Puts Docker stack down
 restart: ## Restarts docker stack
 	docker compose restart
 
-php-open-sh: ## Opens PHP shell inside running container
+shell: ## Opens PHP shell inside running container
 	docker exec -it lishack-cms-web bash
+
+list: ## Doctrine migration list
+	docker exec -it lishack-cms-web bash -c "./bin/console.php mi:li"
+
+diff: ## Doctrine migration list
+	docker exec -it lishack-cms-web bash -c "./bin/console.php mi:di"
+
+migrate: ## Doctrine migration
+	docker exec -it lishack-cms-web bash -c "./bin/console.php mi:mi"
