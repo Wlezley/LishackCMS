@@ -65,7 +65,7 @@ class TranslationEditor extends BaseControl
         Assert::nullOrStringNotEmpty($targetLang, 'Target language is not set');
         $this->template->translations = $this->translationService->getTranslations($targetLang);
 
-        $this->template->defaultLang = $defaultLang;
+        $this->template->defaultLang = $defaultLang->getCode();
         $this->template->targetLang = $targetLang;
         $this->template->languages = $this->languageService->getLanguageNames(false);
 

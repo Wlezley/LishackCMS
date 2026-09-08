@@ -69,7 +69,7 @@ class LanguageService
     public function getAvailableLanguages(bool $enabledOnly = true): array
     {
         return $enabledOnly
-            ? array_filter($this->languages, fn($languageDto) => $languageDto->isEnabled())
+            ? array_filter($this->languages, fn($language) => $language->isEnabled())
             : $this->languages;
     }
 
@@ -80,11 +80,11 @@ class LanguageService
      */
     public function getLanguageNames(bool $enabledOnly = true): array
     {
-        $names = [];
         $languages = $this->getAvailableLanguages($enabledOnly);
 
-        foreach ($languages as $languageCode => $languageDto) {
-            $names[$languageCode] = $languageDto->getName();
+        $names = [];
+        foreach ($languages as $language) {
+            $names[$language->getCode()] = $language->getName();
         }
 
         return $names;
@@ -107,9 +107,9 @@ class LanguageService
      */
     public function getSecondaryLanguage(string $fallback = 'en'): string
     {
-        foreach ($this->languages as $languageCode => $languageDto) {
-            if (!$languageDto->isDefault() && $languageDto->isEnabled()) {
-                return $languageCode;
+        foreach ($this->languages as $language) {
+            if (!$language->isDefault() && $language->isEnabled()) {
+                return $language->getCode();
             }
         }
 

@@ -119,7 +119,7 @@ readonly class TranslationService
         $this->cache->assertTranslationNotExists($languageCode, $key, 'entry cannot be added');
 
         $translation = new Translation(
-            key: $key,
+            translationKey: $key,
             language: $language,
             text: $text
         );
@@ -201,7 +201,7 @@ readonly class TranslationService
 
         $translation = $this->translationRepository->findOneByKeyAndLanguage($oldKey, $language);
         if ($translation) {
-            $translation->setKey($newKey);
+            $translation->setTranslationKey($newKey);
             $this->translationRepository->save($translation);
         }
 
@@ -267,27 +267,26 @@ readonly class TranslationService
      *        second-level keys are language codes, and values are translated texts.
      *
      * @throws TranslatorException
-     * @todo Optimize. see: https://doc.nette.org/en/database/explorer#toc-selection-insert
      */
     public function saveTranslations(array $translations): void
     {
         $defaultLanguage = $this->languageService->getDefaultLanguage();
 
         foreach ($translations as $key => $texts) {
-            foreach ($texts as $lang => $text) {
-                if ($lang == 'default') { // TODO: WTF ???
-                    $lang = $defaultLanguage->getCode();
+            foreach ($texts as $languageCode => $text) {
+                if ($languageCode == 'default') { // TODO: WTF ???
+                    $languageCode = $defaultLanguage->getCode();
                 }
 
-                if ($this->exists($lang, $key)) {
+                if ($this->exists($languageCode, $key)) {
                     if (!empty($text)) {
-                        $this->update($key, $lang, $text);
+                        $this->update($key, $languageCode, $text);
                     } else {
-                        $this->delete($key, $lang);
+                        $this->delete($key, $languageCode);
                     }
                 } else {
                     if (!empty($text)) {
-                        $this->add($key, $lang, $text);
+                        $this->add($key, $languageCode, $text);
                     }
                 }
             }
@@ -308,7 +307,7 @@ readonly class TranslationService
         $translations = [];
         foreach ($this->getTranslationPairs($targetLanguage) as $translation) {
             $languageCode = $translation->getLanguage()->isDefault() ? 'default' : $translation->getLanguage()->getCode();
-            $translations[$translation->getKey()][$languageCode] = (string)$translation->getText();
+            $translations[$translation->getTranslationKey()][$languageCode] = (string)$translation->getText();
         }
 
         return $translations;
@@ -354,7 +353,7 @@ readonly class TranslationService
 
         $data = [];
         foreach ($translations as $translation) {
-            $data[$translation->getKey()] = (string) $translation->getText();
+            $data[$translation->getTranslationKey()] = (string) $translation->getText();
         }
 
         $this->cache->pushLanguage($languageCode, $data);

@@ -11,7 +11,7 @@ class TranslationDto
 {
     public function __construct(
         public int $id,
-        public string $key,
+        public string $translationKey,
         public Language $language,
         public ?string $text = null,
     ) {
@@ -21,7 +21,7 @@ class TranslationDto
     {
         return new self(
             id: $translation->getId(),
-            key: $translation->getKey(),
+            translationKey: $translation->getTranslationKey(),
             language: $translation->getLanguage(),
             text: $translation->getText(),
         );
@@ -34,7 +34,7 @@ class TranslationDto
     {
         return [
             'id' => $this->id,
-            'key' => $this->key,
+            'translationKey' => $this->translationKey,
             'language' => LanguageDto::fromEntity($this->language)->toArray(),
             'text' => $this->text,
         ];

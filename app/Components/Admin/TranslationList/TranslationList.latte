@@ -7,12 +7,12 @@
         </tr>
     </thead>
     <tbody>
-    {foreach $translations as $key => $text}
+    {foreach $translations as $key => $translation}
         <tr>
-            <td class="align-middle key-col">{$key}</td>
-            <td class="align-middle"><pre class="mb-0">{$text}</pre></td>
+            <td class="align-middle key-col">{$translation['translationKey']}</td>
+            <td class="align-middle"><pre class="mb-0">{$translation['text']}</pre></td>
             <td class="align-middle text-end ps-0 py-1 action-col">
-                <a n:href=":edit, key: $key, lang: $lang" class="btn btn-sm btn-primary me-1">
+                <a n:href=":edit, key: $translation['translationKey'], lang: $lang" class="btn btn-sm btn-primary me-1">
                     <i class="fa-solid fa-pencil"></i>
                 </a>
                 <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteTranslationConfirmModal" data-json="{$getJson($key)}">

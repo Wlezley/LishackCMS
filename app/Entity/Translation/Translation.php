@@ -16,7 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
     uniqueConstraints: [
         new ORM\UniqueConstraint(
             name: 'translation_key_language_unique',
-            columns: ['key', 'language'],
+            columns: ['translation_key', 'language'],
         ),
     ],
 )]
@@ -26,7 +26,7 @@ class Translation extends BaseEntity
 
     public function __construct(
         #[ORM\Column(type: Types::STRING, length: 255)]
-        private string $key,
+        private string $translationKey,
         #[ORM\ManyToOne(targetEntity: Language::class)]
         #[ORM\JoinColumn(
             name: 'language',
@@ -40,14 +40,14 @@ class Translation extends BaseEntity
     ) {
     }
 
-    public function getKey(): string
+    public function getTranslationKey(): string
     {
-        return $this->key;
+        return $this->translationKey;
     }
 
-    public function setKey(string $key): void
+    public function setTranslationKey(string $translationKey): void
     {
-        $this->key = $key;
+        $this->translationKey = $translationKey;
     }
 
     public function getLanguage(): Language
