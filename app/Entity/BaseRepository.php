@@ -41,13 +41,17 @@ abstract readonly class BaseRepository implements BaseRepositoryInterface
         $this->sortableFields = $this->resolveSortableFields($entityClass);
     }
 
-    /** @inheritDoc */
+    /**
+     * @inheritDoc
+     */
     public function findById(int $id): ?object
     {
         return $this->repository->find($id);
     }
 
-    /** @inheritDoc */
+    /**
+     * @inheritDoc
+     */
     public function findAll(): array
     {
         /** @var list<TEntity> $entities */
@@ -57,10 +61,7 @@ abstract readonly class BaseRepository implements BaseRepositoryInterface
     }
 
     /**
-     * Finds a single entity by criteria.
-     *
-     * @param array<string, mixed> $criteria
-     * @return TEntity|null
+     * @inheritDoc
      */
     public function findOneBy(array $criteria): ?object
     {
@@ -68,11 +69,7 @@ abstract readonly class BaseRepository implements BaseRepositoryInterface
     }
 
     /**
-     * Finds entities by criteria.
-     *
-     * @param array<string, mixed> $criteria
-     * @param array<string, 'ASC'|'DESC'>|null $orderBy
-     * @return list<TEntity>
+     * @inheritDoc
      */
     public function findBy(
         array $criteria,
@@ -87,10 +84,7 @@ abstract readonly class BaseRepository implements BaseRepositoryInterface
     }
 
     /**
-     * Counts entities matching the given criteria.
-     *
-     * @param array<string, mixed> $criteria
-     * @return int<0, max>
+     * @inheritDoc
      */
     public function count(array $criteria = []): int
     {
@@ -98,9 +92,7 @@ abstract readonly class BaseRepository implements BaseRepositoryInterface
     }
 
     /**
-     * Checks whether an entity matching the given criteria exists.
-     *
-     * @param array<string, mixed> $criteria
+     * @inheritDoc
      */
     public function exists(array $criteria): bool
     {
@@ -140,7 +132,7 @@ abstract readonly class BaseRepository implements BaseRepositoryInterface
     }
 
     /**
-     * @return list<string>
+     * @inheritDoc
      */
     public function getSortableFields(): array
     {
