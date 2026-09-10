@@ -67,7 +67,7 @@ class TranslationEditor extends BaseControl
 
         $this->template->defaultLang = $defaultLang->getCode();
         $this->template->targetLang = $targetLang;
-        $this->template->languages = $this->languageService->getLanguageNames(false);
+        $this->template->languageNames = $this->languageService->getLanguageNames(false);
 
         $this->getTemplate()->setFile(__DIR__ . '/TranslationEditor.latte');
         $this->getTemplate()->render();

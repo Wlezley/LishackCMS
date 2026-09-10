@@ -8,9 +8,9 @@
                     {label key, class => 'form-label required' /}
                     {input key, class => 'form-control'}
                 </div>
-                <div n:foreach="$languageList as $key => $langData" class="mb-3 col-12">
-                    {var $textKey = 'text_' . $key}
-                    {var $textKey_class = 'form-label' . ($langData->isDefault() ? ' required' : '')}
+                <div n:foreach="$availableLanguages as $availableLanguage" class="mb-3 col-12">
+                    {var $textKey = 'text_' . $availableLanguage->getCode()}
+                    {var $textKey_class = 'form-label' . ($availableLanguage->isDefault() ? ' required' : '')}
                     {label $textKey, class => $textKey_class /}
                     {input $textKey, class => 'form-control'}
                 </div>

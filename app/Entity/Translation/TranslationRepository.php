@@ -31,9 +31,9 @@ final readonly class TranslationRepository extends BaseRepository implements Tra
 
         $qb->select('t')
             ->from(Translation::class, 't')
-            ->join('t.language', 'l')
-            ->where('l.code = :languageCode')
-            ->setParameter('languageCode', $languageCode);
+            ->join('t.language', 'l') // TODO: Use Language entity
+            ->where('l.code = :language')
+            ->setParameter('language', $languageCode);
 
         return $qb->getQuery()->getResult();
     }
@@ -47,7 +47,7 @@ final readonly class TranslationRepository extends BaseRepository implements Tra
 
         $qb->select('t')
             ->from(Translation::class, 't')
-            ->join('t.language', 'l')
+            ->join('t.language', 'l') // TODO: Use Language entity
             ->where('l.code IN (:languages)')
             ->setParameter('languages', [
                 $targetLanguage,
@@ -61,7 +61,7 @@ final readonly class TranslationRepository extends BaseRepository implements Tra
      * @inheritDoc
      */
     public function findBySearch(
-        string $languageCode,
+        Language $language,
         ?string $search = null,
         ?int $limit = null,
         ?int $offset = null,
@@ -70,9 +70,8 @@ final readonly class TranslationRepository extends BaseRepository implements Tra
 
         $qb->select('t')
             ->from(Translation::class, 't')
-            ->join('t.language', 'l')
-            ->where('l.code = :languageCode')
-            ->setParameter('languageCode', $languageCode)
+            ->where('t.language = :language')
+            ->setParameter('language', $language)
             ->orderBy('t.translationKey', 'ASC');
 
         if ($search !== null) {
@@ -90,15 +89,14 @@ final readonly class TranslationRepository extends BaseRepository implements Tra
         return $qb->getQuery()->getResult();
     }
 
-    public function countBySearch(string $languageCode, ?string $search = null): int
+    public function countBySearch(Language $language, ?string $search = null): int
     {
         $qb = $this->entityManager->createQueryBuilder();
 
         $qb->select('COUNT(t.id)')
             ->from(Translation::class, 't')
-            ->join('t.language', 'l')
-            ->where('l.code = :languageCode')
-            ->setParameter('languageCode', $languageCode);
+            ->where('t.language = :language')
+            ->setParameter('language', $language);
 
         if ($search !== null) {
             $qb->andWhere(

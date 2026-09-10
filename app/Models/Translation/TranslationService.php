@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models\Translation;
 
+use App\Entity\Language\Language;
 use App\Entity\Translation\Translation;
 use App\Entity\Translation\TranslationRepositoryInterface;
 use App\Exception\TranslatorException;
@@ -216,27 +217,27 @@ readonly class TranslationService
     /**
      * Retrieves a paginated list of translations for a specific language.
      *
-     * @param string $languageCode The language code.
+     * @param Language $language The language entity.
      * @param string|null $search Optional search query to filter by key or text.
      * @param int<0,max>|null $limit The maximum number of records to return.
      * @param int<0,max>|null $offset The number of records to skip.
      * @return Translation[] An array of Translation entities.
      */
-    public function getList(string $languageCode, ?string $search = null, ?int $limit = 50, ?int $offset = 0): array
+    public function getList(Language $language, ?string $search = null, ?int $limit = 50, ?int $offset = 0): array
     {
-        return $this->translationRepository->findBySearch($languageCode, $search, $limit, $offset);
+        return $this->translationRepository->findBySearch($language, $search, $limit, $offset);
     }
 
     /**
      * Returns the number of translations for a given language.
      *
-     * @param string $languageCode The language code.
+     * @param Language $language The language entity.
      * @param string|null $search Optional search query to filter by key or text.
      * @return int The count of matching translations.
      */
-    public function getCount(string $languageCode, ?string $search = null): int
+    public function getCount(Language $language, ?string $search = null): int
     {
-        return $this->translationRepository->countBySearch($languageCode, $search);
+        return $this->translationRepository->countBySearch($language, $search);
     }
 
     /**

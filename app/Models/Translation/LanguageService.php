@@ -15,13 +15,16 @@ class LanguageService
     /** @var array<string, Language> */
     private array $languages = [];
 
+    private Language $defaultLanguage;
+
     private Language $currentLanguage;
 
     public function __construct(
         private readonly LanguageRepositoryInterface $languageRepository,
     ) {
         $this->load();
-        $this->currentLanguage = $this->getDefaultLanguage();
+        $this->defaultLanguage = $this->languageRepository->findDefault();
+        $this->currentLanguage = $this->defaultLanguage; // Current language default to the default language
     }
 
     private function load(): void
@@ -57,10 +60,15 @@ class LanguageService
     }
 
     /**
+     * @param string|null $languageCode Language code or null for the default language.
      * @throws TranslatorException If language is not found.
      */
-    public function getLanguage(string $languageCode): Language
+    public function getLanguage(?string $languageCode): Language
     {
+        if ($languageCode === null) {
+            return $this->getDefaultLanguage();
+        }
+
         $this->assertLanguageExists($languageCode);
         return $this->languages[$languageCode];
     }
@@ -92,7 +100,17 @@ class LanguageService
 
     public function getDefaultLanguage(): Language
     {
-        return $this->languageRepository->findDefault();
+        return $this->defaultLanguage;
+    }
+
+    public function getCurrentLanguage(): Language
+    {
+        return $this->currentLanguage;
+    }
+
+    public function switchLanguage(Language $language): void
+    {
+        $this->currentLanguage = $language;
     }
 
     /**
@@ -114,15 +132,5 @@ class LanguageService
         }
 
         return $fallback;
-    }
-
-    public function getCurrentLanguage(): Language
-    {
-        return $this->currentLanguage;
-    }
-
-    public function switchLanguage(Language $language): void
-    {
-        $this->currentLanguage = $language;
     }
 }

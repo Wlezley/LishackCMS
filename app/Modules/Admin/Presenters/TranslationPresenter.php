@@ -31,9 +31,7 @@ class TranslationPresenter extends SecuredPresenter
     public function renderDefault(int $page = 1, ?string $lang = null, ?string $search = null): void
     {
         try {
-            $language = $lang === null
-                ? $this->languageService->getDefaultLanguage()
-                : $this->languageService->getLanguage($lang);
+            $language = $this->languageService->getLanguage($lang);
         } catch (TranslatorException) {
             $this->redirect('Translation:');
         }
@@ -42,7 +40,7 @@ class TranslationPresenter extends SecuredPresenter
 
         $this->template->lang = $language->getCode();
         $this->template->language = $language;
-        $this->template->langList = $this->languageService->getAvailableLanguages(false);
+        $this->template->availableLanguages = $this->languageService->getAvailableLanguages(false);
         $this->template->search = $search;
     }
 
@@ -89,7 +87,7 @@ class TranslationPresenter extends SecuredPresenter
 
         // TODO: Permission check
 
-        $this->translationService->delete($data['key']);
+        $this->translationService->delete($data['translationKey']);
     }
 
     // ##########################################
@@ -127,7 +125,7 @@ class TranslationPresenter extends SecuredPresenter
             $form->setParam($this->getHttpRequest()->getPost('param'));
         }
 
-        $form->setLanguageList(
+        $form->setAvailableLanguages(
             $this->languageService->getAvailableLanguages(false)
         );
 

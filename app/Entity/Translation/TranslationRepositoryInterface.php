@@ -30,9 +30,9 @@ interface TranslationRepositoryInterface extends BaseRepositoryInterface
     /**
      * @return list<Translation>
      */
-    public function findBySearch(string $languageCode, ?string $search = null, ?int $limit = null, ?int $offset = null): array;
+    public function findBySearch(Language $language, ?string $search = null, ?int $limit = null, ?int $offset = null): array;
 
-    public function countBySearch(string $languageCode, ?string $search = null): int;
+    public function countBySearch(Language $language, ?string $search = null): int;
 
     /**
      * @return list<Translation>

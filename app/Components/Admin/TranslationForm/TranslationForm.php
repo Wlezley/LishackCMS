@@ -18,7 +18,7 @@ class TranslationForm extends BaseControl
     private string $origin;
 
     /** @var array<string, Language> */
-    private array $languageList;
+    private array $availableLanguages;
 
     /** @var array<string,string> $queryParams */
     private array $queryParams;
@@ -42,7 +42,7 @@ class TranslationForm extends BaseControl
             ->setValue($param['key'] ?? '')
             ->setRequired();
 
-        foreach ($this->languageList as $language) {
+        foreach ($this->availableLanguages as $language) {
             $form->addTextArea("text_{$language->getCode()}", $this->t('text') . " ({$language->getName()})", null, 1)
                 ->setHtmlAttribute('autocomplete', 'off')
                 ->setValue($param["text_{$language->getCode()}"] ?? '')
@@ -70,7 +70,7 @@ class TranslationForm extends BaseControl
                 ' <sup><i class="fa fa-external-link"></i></sup></a>';
             call_user_func($this->onError, $this->tf('error.form.translation-duplicate-key', $values['key'], $editAnchor));
         } else {
-            foreach ($this->languageList as $languageCode => $languageDto) {
+            foreach ($this->availableLanguages as $languageCode => $languageDto) {
                 if (isset($values["text_$languageCode"])) {
                     if (empty($values["text_$languageCode"])) {
                         continue;
@@ -97,7 +97,7 @@ class TranslationForm extends BaseControl
         $key = $values['key'];
         $textList = $this->translationService->getTextListByKey($key);
 
-        foreach ($this->languageList as $languageCode => $languageDto) {
+        foreach ($this->availableLanguages as $languageCode => $languageDto) {
             if (isset($textList[$languageCode])) {
                 if (empty($values["text_$languageCode"])) {
                     $this->translationService->delete($key, $languageCode);
@@ -114,7 +114,7 @@ class TranslationForm extends BaseControl
 
     public function render(int|string|null $key = null): void
     {
-        $this->template->languageList = $this->languageList;
+        $this->template->availableLanguages = $this->availableLanguages;
         $this->getTemplate()->setFile(__DIR__ . '/TranslationForm.latte');
         $this->getTemplate()->render();
     }
@@ -125,11 +125,11 @@ class TranslationForm extends BaseControl
     }
 
     /**
-     * @param array<string, Language> $languageList
+     * @param array<string, Language> $availableLanguages
      */
-    public function setLanguageList(array $languageList): void
+    public function setAvailableLanguages(array $availableLanguages): void
     {
-        $this->languageList = $languageList;
+        $this->availableLanguages = $availableLanguages;
     }
 
     /**

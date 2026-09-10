@@ -5,18 +5,18 @@
     <div class="col">
 
         <div>
-            {foreach $langList as $langKey => $langData}
-                {var $btnColor = $langKey == $lang ? 'btn-primary' : 'btn-light btn-outline-primary'}
-                <a n:href="Translation:, lang: $langKey" n:class="'btn float-start me-3', $btnColor">
-                    {$langData->getName()}
-                    {if $langData->isDefault()}
+            {foreach $availableLanguages as $availableLanguage}
+                {var $btnColor = $availableLanguage->getCode() == $language->getCode() ? 'btn-primary' : 'btn-light btn-outline-primary'}
+                <a n:href="Translation:, lang: $availableLanguage->getCode()" n:class="'btn float-start me-3', $btnColor">
+                    {$availableLanguage->getName()}
+                    {if $availableLanguage->isDefault()}
                         ({$_('default')})
                     {/if}
                 </a>
             {/foreach}
 
             <form class="row g-3 float-end" name="searchForm">
-                <input type="hidden" name="lang" value="{$lang}">
+                <input type="hidden" name="lang" value="{$language->getCode()}">
                 <div class="col-auto">
                     <label for="search" class="visually-hidden">{$_('search.key')}</label>
                     <input type="text" class="form-control" id="search" name="search" value="{$search}" placeholder="{$_('search.key')}">
@@ -27,22 +27,22 @@
             </form>
         </div>
 
-        {control translationList, $lang}
+        {control translationList, $language}
 
         <div class="datagrid-mt-fix">
             <hr class="my-3">
         </div>
 
         <div>
-            {foreach $langList as $langKey => $langData}
-                {continueIf $langData->isDefault()}
-                <a n:href="Translation:editor, lang: $langKey" class="btn btn-light btn-outline-primary float-start me-3">
+            {foreach $availableLanguages as $availableLanguage}
+                {continueIf $availableLanguage->isDefault()}
+                <a n:href="Translation:editor, lang: $availableLanguage->getCode()" class="btn btn-light btn-outline-primary float-start me-3">
                     <i class="fa-solid fa-language pe-1"></i>
-                    {$_('editor')} ({$langKey|upper})
+                    {$_('editor')} ({$availableLanguage->getCode()|upper})
                 </a>
             {/foreach}
 
-            <a n:href="Translation:create, lang: $lang" class="btn btn-primary float-end">
+            <a n:href="Translation:create, lang: $language->getCode()" class="btn btn-primary float-end">
                 <i class="fa-solid fa-plus pe-2"></i>
                 {$_('add')}
             </a>
