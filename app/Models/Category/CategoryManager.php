@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace App\Models\Category;
 
+use App\Entity\Article\ArticleRepository;
 use App\Entity\Category\Category;
 use App\Entity\Category\CategoryRepository;
 use App\Exception\CategoryException;
-use App\Models\Article\ArticleManager;
 use App\Models\BaseModel;
 use App\Models\Config\ConfigManager;
 use App\Models\Helpers\ArrayHelper;
-use Nette\Database\Explorer;
 
 class CategoryManager extends BaseModel
 {
@@ -24,11 +23,11 @@ class CategoryManager extends BaseModel
     protected array $categories = [];
 
     public function __construct(
-        protected Explorer $db,
         protected ConfigManager $configManager,
         private CategoryRepository $categoryRepository,
+        private ArticleRepository $articleRepository,
     ) {
-        parent::__construct($db, $configManager);
+        parent::__construct($configManager);
     }
 
     /**
@@ -152,9 +151,12 @@ class CategoryManager extends BaseModel
             $this->categoryRepository->add($child);
         }
 
-        $this->db->table(ArticleManager::TABLE_NAME)
-            ->where('category_id', $id)
-            ->update(['category_id' => $parentId]);
+        $articles = $this->articleRepository->findBy(['categoryId' => $id]);
+        foreach ($articles as $article) {
+            $article->setCategoryId($parentId);
+            $this->articleRepository->add($article);
+        }
+        $this->articleRepository->flush();
 
         $this->categoryRepository->delete($category);
 
@@ -321,20 +323,22 @@ class CategoryManager extends BaseModel
         ArrayHelper::assertMissingKeys(['node_id', 'source_id', 'target_id', 'order_list'], $data);
 
         // Update parent ID
-        $this->db->table(self::TABLE_NAME)
-            ->where(['id' => $data['node_id']])
-            ->update(['parent_id' => $data['target_id']]);
+        $node = $this->categoryRepository->findById((int)$data['node_id']);
+        if ($node) {
+            $node->setParentId((int)$data['target_id']);
+            $this->categoryRepository->add($node);
+        }
 
         // Update positions
-        // TODO: Refactor SQL query construction
-        $sql = 'UPDATE `' . self::TABLE_NAME . "` SET `position` = CASE `id`\n";
         foreach ($data['order_list'] as $position => $id) {
-            $sql .= "WHEN $id THEN $position\n";
+            $category = $this->categoryRepository->findById((int)$id);
+            if ($category) {
+                $category->setPosition((int)$position);
+                $this->categoryRepository->add($category);
+            }
         }
-        $sql .= "ELSE `position` END\n";
-        $sql .= 'WHERE `id` IN (' . implode(',', $data['order_list']) . ');';
 
-        $this->db->query($sql); // @phpstan-ignore-line
+        $this->categoryRepository->flush();
 
         // Update levels
         $this->updateChildLevels();

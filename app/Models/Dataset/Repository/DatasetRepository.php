@@ -8,15 +8,12 @@ use App\Entity\Dataset\Dataset as DatasetEntity;
 use App\Entity\Dataset\DatasetRepository as DoctrineRepository;
 use App\Exception\DatasetException;
 use App\Models\Dataset\Entity\Dataset;
-use App\Models\Helpers\ArrayHelper;
-use Nette\Database\Explorer;
 
 final class DatasetRepository
 {
     public const TABLE_NAME = 'dataset';
 
     public function __construct(
-        private Explorer $db,
         private DoctrineRepository $doctrineRepository,
     ) {
     }
@@ -134,17 +131,22 @@ final class DatasetRepository
      */
     public function getSidebarList(bool $includeDeleted = false): ?array
     {
-        $query = $this->db->table(DatasetRepository::TABLE_NAME)
-            ->select('id, name, slug')
-            ->order('id ASC');
+        $entities = $this->doctrineRepository->findBySearch(null, null, null, $includeDeleted);
 
-        if (!$includeDeleted) {
-            $query->where('deleted', 0);
+        if (!$entities) {
+            return null;
         }
 
-        $data = $query->fetchAll();
+        $result = [];
+        foreach ($entities as $entity) {
+            $result[$entity->getId()] = [
+                'id' => $entity->getId(),
+                'name' => $entity->getName(),
+                'slug' => $entity->getSlug(),
+            ];
+        }
 
-        return $data ? ArrayHelper::resultToArray($data) : null;
+        return $result;
     }
 
     /**
@@ -153,39 +155,33 @@ final class DatasetRepository
      * @param int<0, max>|null $limit Number of results to return (default: 50).
      * @param int<0, max>|null $offset Offset for pagination (default: 0).
      * @param string|null $search Optional search query for name, slug, component, or presenter fields.
-     * @return array<int|string,array<string,string|int|null>>|null Array of datasets indexed by ID, or null if none found.
+     * @return array<int,array<string,int|string|bool>>|null Array of datasets indexed by ID, or null if none found.
      */
     public function getList(?int $limit = 50, ?int $offset = 0, ?string $search = null): ?array
     {
-        $query = $this->db->table(DatasetRepository::TABLE_NAME)
-            ->where('deleted', 0)
-            ->limit($limit, $offset)
-            ->order('id ASC');
+        $entities = $this->doctrineRepository->findBySearch($search, $limit, $offset, false);
 
-        if ($search !== null) {
-            $query->where(
-                condition: 'name LIKE ? OR slug LIKE ? OR component LIKE ? OR presenter LIKE ?',
-                params: ["%$search%", "%$search%", "%$search%", "%$search%"]
-            );
+        if (!$entities) {
+            return null;
         }
 
-        $data = $query->fetchAll();
+        $result = [];
+        foreach ($entities as $entity) {
+            $result[$entity->getId()] = [
+                'id' => $entity->getId(),
+                'name' => $entity->getName(),
+                'slug' => $entity->getSlug(),
+                'component' => $entity->getComponent(),
+                'presenter' => $entity->getPresenter(),
+                'deleted' => $entity->isDeleted(),
+            ];
+        }
 
-        return $data ? ArrayHelper::resultToArray($data) : null;
+        return $result;
     }
 
     public function getCount(?string $search = null): int
     {
-        $query = $this->db->table(DatasetRepository::TABLE_NAME)
-            ->where('deleted', 0);
-
-        if ($search !== null) {
-            $query->where(
-                condition: 'name LIKE ? OR slug LIKE ? OR component LIKE ? OR presenter LIKE ?',
-                params: ["%$search%", "%$search%", "%$search%", "%$search%"]
-            );
-        }
-
-        return $query->count('*');
+        return $this->doctrineRepository->countBySearch($search, false);
     }
 }

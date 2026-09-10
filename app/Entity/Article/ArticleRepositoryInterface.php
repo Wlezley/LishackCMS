@@ -11,4 +11,10 @@ use App\Entity\BaseRepositoryInterface;
  */
 interface ArticleRepositoryInterface extends BaseRepositoryInterface
 {
+    /**
+     * @return list<Article>
+     */
+    public function findBySearch(?string $search = null, ?int $categoryId = null, ?int $limit = null, ?int $offset = null): array;
+
+    public function countBySearch(?string $search = null, ?int $categoryId = null): int;
 }

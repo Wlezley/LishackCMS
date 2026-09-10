@@ -7,9 +7,7 @@ namespace App\Models\Dataset\Repository;
 use App\Exception\DatasetException;
 use App\Models\Dataset\Entity\DatasetColumn;
 use App\Models\Dataset\Entity\DatasetRow;
-use App\Models\Helpers\ArrayHelper;
-use Nette\Database\Explorer;
-use Nette\Database\Table\ActiveRow;
+use Doctrine\ORM\EntityManagerInterface;
 
 final class DataRepository
 {
@@ -17,7 +15,7 @@ final class DataRepository
     public const DATA_COLUMN_PREFIX = 'data_';
 
     public function __construct(
-        private Explorer $db,
+        private EntityManagerInterface $entityManager,
         private ColumnRepository $columnRepository
     ) {
     }
@@ -31,10 +29,14 @@ final class DataRepository
     public function findAll(int $datasetId): array
     {
         $columns = $this->columnRepository->findByDatasetId($datasetId);
+        $connection = $this->entityManager->getConnection();
+        $tableName = $this->getTableName($datasetId);
+        $sql = "SELECT * FROM `$tableName`";
+        $data = $connection->fetchAllAssociative($sql);
 
         $result = [];
-        foreach ($this->db->table($this->getTableName($datasetId)) as $row) {
-            $result[] = DatasetRow::fromDatabaseRow($row->toArray(), $columns);
+        foreach ($data as $row) {
+            $result[] = DatasetRow::fromDatabaseRow($row, $columns);
         }
 
         return $result;
@@ -43,12 +45,12 @@ final class DataRepository
     public function findById(int $datasetId, int $id): ?DatasetRow
     {
         $columns = $this->columnRepository->findByDatasetId($datasetId);
+        $connection = $this->entityManager->getConnection();
+        $tableName = $this->getTableName($datasetId);
+        $sql = "SELECT * FROM `$tableName` WHERE id = ?";
+        $row = $connection->fetchAssociative($sql, [$id]);
 
-        $row = $this->db->table($this->getTableName($datasetId))
-            ->where('id', $id)
-            ->fetch();
-
-        return $row ? DatasetRow::fromDatabaseRow($row->toArray(), $columns) : null;
+        return $row ? DatasetRow::fromDatabaseRow($row, $columns) : null;
     }
 
     /** @param DatasetColumn[] $columns */
@@ -69,10 +71,10 @@ final class DataRepository
         $sql = sprintf(
             'CREATE TABLE IF NOT EXISTS `%s` (%s) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;',
             $this->getTableName($datasetId),
-            implode(', ', $parts)
+            implode(', ', $parts),
         );
 
-        $this->db->query($sql); // @phpstan-ignore-line
+        $this->entityManager->getConnection()->executeStatement($sql);
     }
 
     /**
@@ -136,17 +138,18 @@ final class DataRepository
                 implode(', ', $alterParts)
             );
 
-            $this->db->query($sql); // @phpstan-ignore-line
+            $this->entityManager->getConnection()->executeStatement($sql);
         }
     }
 
     public function insert(int $datasetId, DatasetRow $row): DatasetRow
     {
-        /** @var ActiveRow $dbRow */
-        $dbRow = $this->db->table($this->getTableName($datasetId))
-            ->insert($row->toDatabaseRow());
+        $connection = $this->entityManager->getConnection();
+        $tableName = $this->getTableName($datasetId);
+        $data = $row->toDatabaseRow();
 
-        $row->id = (int) $dbRow->getPrimary();
+        $connection->insert($tableName, $data);
+        $row->id = (int) $connection->lastInsertId();
 
         return $row;
     }
@@ -157,58 +160,81 @@ final class DataRepository
             throw new DatasetException('Dataset Row Entity must have an ID to be updated.');
         }
 
-        return $this->db->table($this->getTableName($datasetId))
-            ->where('id', $row->id)
-            ->update($row->toDatabaseRow());
+        $connection = $this->entityManager->getConnection();
+        $tableName = $this->getTableName($datasetId);
+        $data = $row->toDatabaseRow();
+
+        return (int) $connection->update($tableName, $data, ['id' => $row->id]);
     }
 
     public function delete(int $datasetId, int $rowId): int
     {
-        return $this->db->table($this->getTableName($datasetId))
-            ->where('id', $rowId)
-            ->delete();
+        $connection = $this->entityManager->getConnection();
+        $tableName = $this->getTableName($datasetId);
+
+        return (int) $connection->delete($tableName, ['id' => $rowId]);
     }
 
     /**
-     * Retrieves a list of datasets with optional search and pagination.
-     *
-     * @param int $datasetId Dataset ID.
-     * @param int<0, max>|null $limit Number of results to return (default: 50).
-     * @param int<0, max>|null $offset Offset for pagination (default: 0).
-     * @param string|null $search Optional search query for name, slug, component, or presenter fields.
-     * @return array<int|string,array<string,string|int|null>>|null Array of datasets indexed by ID, or null if none found.
+     * @return array<int, array<string, mixed>>|null
      */
     public function getList(int $datasetId, ?int $limit = 50, ?int $offset = 0, ?string $search = null): ?array
     {
-        $query = $this->db->table($this->getTableName($datasetId))
-            ->limit($limit, $offset)
-            ->order('id ASC');
+        $connection = $this->entityManager->getConnection();
+        $tableName = $this->getTableName($datasetId);
+        $qb = $connection->createQueryBuilder();
 
-        $searchColumns = $this->columnRepository->getSearchColumns($datasetId);
+        $qb->select('*')
+            ->from("`$tableName`", 'd')
+            ->orderBy('id', 'ASC');
 
-        $whereParts = [];
-        foreach ($searchColumns as $column) {
-            $whereParts["$column LIKE ?"] = "%$search%";
+        if ($limit !== null) {
+            $qb->setMaxResults($limit);
         }
-        $query->whereOr($whereParts);
 
-        $data = $query->fetchAll();
+        if ($offset !== null) {
+            $qb->setFirstResult($offset);
+        }
 
-        return $data ? ArrayHelper::resultToArray($data) : null;
+        if ($search !== null) {
+            $searchColumns = $this->columnRepository->getSearchColumns($datasetId);
+            foreach ($searchColumns as $column) {
+                $qb->orWhere("`$column` LIKE :search");
+            }
+            $qb->setParameter('search', '%' . $search . '%');
+        }
+
+        $data = $qb->executeQuery()->fetchAllAssociative();
+
+        if (!$data) {
+            return null;
+        }
+
+        $result = [];
+        foreach ($data as $row) {
+            $result[$row['id']] = $row;
+        }
+
+        return $result;
     }
 
     public function getCount(int $datasetId, ?string $search = null): int
     {
-        $query = $this->db->table($this->getTableName($datasetId));
+        $connection = $this->entityManager->getConnection();
+        $tableName = $this->getTableName($datasetId);
+        $qb = $connection->createQueryBuilder();
 
-        $searchColumns = $this->columnRepository->getSearchColumns($datasetId);
+        $qb->select('COUNT(*)')
+            ->from("`$tableName`", 'd');
 
-        $whereParts = [];
-        foreach ($searchColumns as $column) {
-            $whereParts["$column LIKE ?"] = "%$search%";
+        if ($search !== null) {
+            $searchColumns = $this->columnRepository->getSearchColumns($datasetId);
+            foreach ($searchColumns as $column) {
+                $qb->orWhere("`$column` LIKE :search");
+            }
+            $qb->setParameter('search', '%' . $search . '%');
         }
-        $query->whereOr($whereParts);
 
-        return $query->count('*');
+        return (int) $qb->executeQuery()->fetchOne();
     }
 }

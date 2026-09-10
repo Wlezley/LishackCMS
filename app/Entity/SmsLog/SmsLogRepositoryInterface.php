@@ -11,4 +11,10 @@ use App\Entity\BaseRepositoryInterface;
  */
 interface SmsLogRepositoryInterface extends BaseRepositoryInterface
 {
+    public function create(
+        string $phoneNumber,
+        string $message,
+        ?int $userId = null,
+        ?int $errorCode = null,
+    ): SmsLog;
 }

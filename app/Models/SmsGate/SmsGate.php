@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models\SmsGate;
 
+use App\Entity\SmsLog\SmsLogRepository;
 use App\Exception\SmsGateException;
 use Carbon\Carbon;
-use Nette\Database\Explorer;
 use Nette\Utils\Random;
 use SimpleXMLElement;
 use Webmozart\Assert\Assert;
@@ -25,7 +25,7 @@ class SmsGate
         private string $password,
         private int $senderID,
         private bool $securedLogin,
-        private Explorer $db,
+        private SmsLogRepository $smsLogRepository,
     ) {
     }
 
@@ -106,11 +106,11 @@ class SmsGate
 
     private function logSMS(string $phoneNumber, string $message, ?int $errorCode, int $userID = self::SYSTEM_USER_ID): void
     {
-        $this->db->table(self::TABLE_NAME)->insert([
-            'user_id' => $userID,
-            'phone_number' => $phoneNumber,
-            'message' => $message,
-            'error_code' => $errorCode,
-        ]);
+        $this->smsLogRepository->create(
+            phoneNumber: $phoneNumber,
+            message: $message,
+            userId: $userID,
+            errorCode: $errorCode,
+        );
     }
 }

@@ -11,4 +11,10 @@ use App\Entity\BaseRepositoryInterface;
  */
 interface DatasetRepositoryInterface extends BaseRepositoryInterface
 {
+    /**
+     * @return list<Dataset>
+     */
+    public function findBySearch(?string $search = null, ?int $limit = null, ?int $offset = null, bool $includeDeleted = false): array;
+
+    public function countBySearch(?string $search = null, bool $includeDeleted = false): int;
 }

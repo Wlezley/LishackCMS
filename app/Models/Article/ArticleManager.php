@@ -10,20 +10,17 @@ use App\Exception\ArticleException;
 use App\Models\BaseModel;
 use App\Models\Category\CategoryManager;
 use App\Models\Config\ConfigManager;
-use App\Models\Helpers\ArrayHelper;
-use Nette\Database\Explorer;
 
 class ArticleManager extends BaseModel
 {
     public const string TABLE_NAME = 'article';
 
     public function __construct(
-        protected Explorer $db,
         protected ConfigManager $configManager,
         public CategoryManager $categoryManager,
         private ArticleRepository $articleRepository,
     ) {
-        parent::__construct($db, $configManager);
+        parent::__construct($configManager);
     }
 
     /**
@@ -212,50 +209,18 @@ class ArticleManager extends BaseModel
      */
     public function getList(?int $limit = 50, ?int $offset = 0, ?string $search = null, ?int $categoryId = null): ?array
     {
-        // For complex search we might still want to use DB explorer or QueryBuilder,
-        // but let's try to stay within repository for now if possible.
-        // BaseRepository findBy doesn't support LIKE easily without custom implementation.
+        $articles = $this->articleRepository->findBySearch($search, $categoryId, $limit, $offset);
 
-        $criteria = [];
-        if ($categoryId !== null) {
-            $criteria['categoryId'] = $categoryId;
+        if (!$articles) {
+            return null;
         }
 
-        // If search is present, we might need a custom method in repository or use QueryBuilder.
-        // For simplicity during migration, I'll use the repository's findBy if no search,
-        // otherwise I'd need to extend ArticleRepository.
-
-        if ($search === null) {
-            $articles = $this->articleRepository->findBy($criteria, ['id' => 'ASC'], $limit, $offset);
-            if (!$articles) {
-                return null;
-            }
-
-            $result = [];
-            foreach ($articles as $article) {
-                $result[$article->getId()] = $this->articleToArray($article);
-            }
-            return $result;
+        $result = [];
+        foreach ($articles as $article) {
+            $result[$article->getId()] = $this->articleToArray($article);
         }
 
-        // With search, let's keep it using DB for now or implement in repo.
-        // Given the goal is "Doctrine everywhere", I should probably use QueryBuilder.
-        // But to keep it simple and working:
-        $query = $this->db->table(self::TABLE_NAME)
-            ->limit($limit, $offset)
-            ->order('id ASC');
-
-        if ($search) {
-            $query->where('title LIKE ? OR content LIKE ?', "%$search%", "%$search%");
-        }
-
-        if ($categoryId !== null) {
-            $query->where('category_id ?', $categoryId);
-        }
-
-        $data = $query->fetchAll();
-
-        return $data ? ArrayHelper::resultToArray($data) : null;
+        return $result;
     }
 
     /**
@@ -352,16 +317,6 @@ class ArticleManager extends BaseModel
      */
     public function getCount(?string $search = null): int
     {
-        if ($search === null) {
-            return $this->articleRepository->count([]);
-        }
-
-        $query = $this->db->table(self::TABLE_NAME);
-
-        if ($search) {
-            $query->where('title LIKE ? OR content LIKE ?', "%$search%", "%$search%");
-        }
-
-        return $query->count('*');
+        return $this->articleRepository->countBySearch($search);
     }
 }

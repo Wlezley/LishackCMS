@@ -8,7 +8,6 @@ use App\Entity\CmsConfig\CmsConfig;
 use App\Entity\CmsConfig\CmsConfigRepository;
 use App\Enum\CmsConfigCategoryEnum;
 use App\Exception\ConfigException;
-use Nette\Database\Explorer;
 use Webmozart\Assert\Assert;
 
 /**
@@ -22,7 +21,6 @@ class ConfigManager
     private array $configuration = [];
 
     public function __construct(
-        private Explorer $db,
         private CmsConfigRepository $cmsConfigRepository,
     ) {
     }
@@ -178,12 +176,10 @@ class ConfigManager
             throw new ConfigException("Duplicate key '$key' found, configuration entry cannot be inserted", 1);
         }
 
-        $item = ['key' => $key, 'category' => $category, 'value' => $value];
+        $config = new CmsConfig($key, CmsConfigCategoryEnum::from(strtoupper($category)), $value);
+        $this->cmsConfigRepository->save($config);
 
-        $this->db->table(self::TABLE_NAME)
-            ->insert($item);
-
-        $this->configuration[$key] = $item;
+        $this->configuration[$key] = ['key' => $key, 'category' => strtoupper($category), 'value' => $value];
     }
 
     /**
@@ -204,16 +200,14 @@ class ConfigManager
             throw new ConfigException("Key '$key' not found, configuration entry cannot be updated", 1);
         }
 
-        $item = ['key' => $key, 'category' => $category, 'value' => $value];
+        $config = $this->cmsConfigRepository->findOneBy(['key' => $key]);
+        if ($config) {
+            $config->setCategory(CmsConfigCategoryEnum::from(strtoupper($category)));
+            $config->setValue($value);
+            $this->cmsConfigRepository->save($config);
+        }
 
-        $this->db->table(self::TABLE_NAME)->where([
-            'key' => $key,
-        ])->update([
-            'category' => $category,
-            'value' => $value,
-        ]);
-
-        $this->configuration[$key] = $item;
+        $this->configuration[$key] = ['key' => $key, 'category' => strtoupper($category), 'value' => $value];
     }
 
     /**
@@ -233,11 +227,11 @@ class ConfigManager
             throw new ConfigException("Key '$key' not found, configuration entry cannot be updated", 1);
         }
 
-        $this->db->table(self::TABLE_NAME)->where([
-            'key' => $key,
-        ])->update([
-            'value' => $value,
-        ]);
+        $config = $this->cmsConfigRepository->findOneBy(['key' => $key]);
+        if ($config) {
+            $config->setValue($value);
+            $this->cmsConfigRepository->save($config);
+        }
 
         $this->configuration[$key]['value'] = $value;
     }
@@ -263,11 +257,11 @@ class ConfigManager
             throw new ConfigException("Duplicate key '$newKey' found, key cannot be changed", 1);
         }
 
-        $this->db->table(self::TABLE_NAME)->where([
-            'key' => $oldKey,
-        ])->update([
-            'key' => $newKey,
-        ]);
+        $config = $this->cmsConfigRepository->findOneBy(['key' => $oldKey]);
+        if ($config) {
+            $config->setKey($newKey);
+            $this->cmsConfigRepository->save($config);
+        }
 
         $this->invalidate();
     }
@@ -296,28 +290,11 @@ class ConfigManager
      * @param int<0,max>|null $offset Offset for pagination.
      * @param string|null $category Filter by category (optional).
      * @param string|null $search Search term for key or value (optional).
-     * @return array<\Nette\Database\Table\ActiveRow> List of configuration entries.
+     * @return array<CmsConfig> List of configuration entries.
      */
     public function getList(?int $limit = 50, ?int $offset = 0, ?string $category = null, ?string $search = null): array
     {
-        $query = $this->db->table(self::TABLE_NAME)
-            ->limit($limit, $offset);
-
-        if ($category !== null) {
-            $query->where('category', $category);
-        }
-
-        if ($search !== null) {
-            $query->whereOr([
-                'key LIKE ?' => "%$search%",
-                'value LIKE ?' => "%$search%",
-            ]);
-        }
-
-        // DEBUG: Array test @return array<T|mixed>
-        // return ArrayHelper::resultToArray($query->fetchAll(), null);
-
-        return $query->fetchAll();
+        return $this->cmsConfigRepository->findBySearch($category, $search, $limit, $offset);
     }
 
     /**
@@ -329,20 +306,7 @@ class ConfigManager
      */
     public function getCount(?string $category = null, ?string $search = null): int
     {
-        $query = $this->db->table(self::TABLE_NAME);
-
-        if ($category !== null) {
-            $query->where('category', $category);
-        }
-
-        if ($search !== null) {
-            $query->whereOr([
-                'key LIKE ?' => "%$search%",
-                'value LIKE ?' => "%$search%",
-            ]);
-        }
-
-        return $query->count('*');
+        return $this->cmsConfigRepository->countBySearch($category, $search);
     }
 
     // CONFIG EDITOR METHODS

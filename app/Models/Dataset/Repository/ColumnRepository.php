@@ -9,15 +9,15 @@ use App\Entity\DatasetColumn\DatasetColumnRepository as DoctrineRepository;
 use App\Exception\DatasetException;
 use App\Models\Dataset\Entity\DatasetColumn;
 use App\Models\Helpers\SqlHelper;
-use Nette\Database\Explorer;
+use Doctrine\ORM\EntityManagerInterface;
 
 final class ColumnRepository
 {
     public const TABLE_NAME = 'dataset_column';
 
     public function __construct(
-        private Explorer $db,
         private DoctrineRepository $doctrineRepository,
+        private EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -58,12 +58,7 @@ final class ColumnRepository
 
     public function lastColumnId(int $datasetId): int
     {
-        // For MAX(column_id) we can still use DB explorer or custom DQL
-        $max = $this->db->table(self::TABLE_NAME)
-            ->where('dataset_id', $datasetId)
-            ->max('column_id');
-
-        return $max ? (int) $max : 0;
+        return $this->doctrineRepository->getMaxColumnId($datasetId);
     }
 
     public function insert(DatasetColumn $column): DatasetColumn
@@ -187,14 +182,12 @@ final class ColumnRepository
      */
     public function columnCount(int $datasetId, bool $includeDeleted = false): int
     {
-        $query = $this->db->table(self::TABLE_NAME)
-            ->where('dataset_id', $datasetId);
-
+        $criteria = ['datasetId' => $datasetId];
         if (!$includeDeleted) {
-            $query->where('deleted', 0);
+            $criteria['deleted'] = false;
         }
 
-        return $query->count('*');
+        return $this->doctrineRepository->count($criteria);
     }
 
     private function columnExists(int $datasetId, string $columnName): bool
@@ -204,26 +197,25 @@ final class ColumnRepository
         SqlHelper::assertSafeIdentifier($tableName);
         SqlHelper::assertSafeIdentifier($columnName);
 
-        // TODO: Refactor SQL query construction
+        $connection = $this->entityManager->getConnection();
         $sql = "SHOW COLUMNS FROM `$tableName` WHERE FIELD = ?";
-        $result = $this->db->fetch($sql, $columnName); // @phpstan-ignore-line
+        $result = $connection->fetchAssociative($sql, [$columnName]);
 
-        return $result !== null;
+        return $result !== false;
     }
 
     /** @return array<string> */
     public function getSearchColumns(int $datasetId): array
     {
-        $query = $this->db->table(self::TABLE_NAME)
-            ->select('column_id')
-            ->where([
-                'dataset_id' => $datasetId,
-                'listed' => 1,
-            ])->fetchAll();
+        $entities = $this->doctrineRepository->findBy([
+            'datasetId' => $datasetId,
+            'listed' => true,
+            'deleted' => false,
+        ]);
 
         $columns = [];
-        foreach ($query as $row) {
-            $columns[] = "data_{$row['column_id']}";
+        foreach ($entities as $entity) {
+            $columns[] = "data_{$entity->getColumnId()}";
         }
 
         return $columns;

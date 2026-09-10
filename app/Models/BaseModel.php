@@ -7,7 +7,6 @@ namespace App\Models;
 use App\Models\Config\ConfigManager;
 use App\Models\Config\ConfigTrait;
 use App\Models\Translation\TranslatorTrait;
-use Nette\Database\Explorer;
 use Nette\SmartObject;
 
 abstract class BaseModel
@@ -20,7 +19,6 @@ abstract class BaseModel
     protected mixed $data = null;
 
     public function __construct(
-        protected Explorer $db,
         protected ConfigManager $configManager,
     ) {
     }
