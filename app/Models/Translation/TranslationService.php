@@ -161,13 +161,13 @@ readonly class TranslationService
     /**
      * Deletes a translation entry.
      *
-     * @param string $key The translation key.
+     * @param string $translationKey The translation key.
      * @param string|null $languageCode The language code (if null, deletes in all languages).
      * @throws TranslatorException
      */
-    public function delete(string $key, ?string $languageCode = null): void
+    public function delete(string $translationKey, ?string $languageCode = null): void
     {
-        $criteria = ['key' => $key];
+        $criteria = ['translationKey' => $translationKey];
         if ($languageCode !== null) {
             $criteria['language'] = $this->languageService->getLanguage($languageCode);
             $this->cache->invalidate($languageCode);
@@ -208,9 +208,9 @@ readonly class TranslationService
         $this->cache->invalidate($languageCode);
     }
 
-    public function keyExists(string $key): bool
+    public function keyExists(string $translationKey): bool
     {
-        return $this->translationRepository->exists(['key' => $key]);
+        return $this->translationRepository->exists(['translationKey' => $translationKey]);
     }
 
     /**
