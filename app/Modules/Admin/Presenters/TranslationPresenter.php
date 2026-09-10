@@ -28,12 +28,12 @@ class TranslationPresenter extends SecuredPresenter
     /** @var ITranslationEditorFactory @inject */
     public ITranslationEditorFactory $translationEditor;
 
-    public function renderDefault(int $page = 1, ?string $languageCode = null, ?string $search = null): void
+    public function renderDefault(int $page = 1, ?string $lang = null, ?string $search = null): void
     {
         try {
-            $language = $languageCode === null
+            $language = $lang === null
                 ? $this->languageService->getDefaultLanguage()
-                : $this->languageService->getLanguage($languageCode);
+                : $this->languageService->getLanguage($lang);
         } catch (TranslatorException) {
             $this->redirect('Translation:');
         }
@@ -41,6 +41,7 @@ class TranslationPresenter extends SecuredPresenter
         $this->template->title .= ' - ' . $language->getName() . ($language->isDefault() ? ' (' . $this->t('default') . ')' : '');
 
         $this->template->lang = $language->getCode();
+        $this->template->language = $language;
         $this->template->langList = $this->languageService->getAvailableLanguages(false);
         $this->template->search = $search;
     }
@@ -50,7 +51,7 @@ class TranslationPresenter extends SecuredPresenter
         $availableLanguages = $this->languageService->getAvailableLanguages(false);
         $defaultLanguage = $this->languageService->getDefaultLanguage();
 
-        if (empty($lang) || $lang == $defaultLanguage || !array_key_exists($lang, $availableLanguages)) {
+        if (empty($lang) || $lang === $defaultLanguage->getCode() || !array_key_exists($lang, $availableLanguages)) {
             $redirectLanguage = $this->languageService->getSecondaryLanguage();
 
             if ($redirectLanguage) {

@@ -74,6 +74,7 @@
     },
     "scripts": {
         "lint": "phpcs",
+        "lint-detail": "phpcs -s",
         "lint-fix": "phpcbf",
         "phpstan": "phpstan analyse --memory-limit 512M",
         "flush-cache": "rm -rf temp/cache/* temp/phpstan/*",

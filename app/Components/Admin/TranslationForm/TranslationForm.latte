@@ -1,3 +1,5 @@
+{templateType App\Modules\Admin\TemplateParameters\TranslationFormTemplateParameters}
+
 {form form}
     <div class="row">
         <div class="col-4 mx-auto">
@@ -8,7 +10,7 @@
                 </div>
                 <div n:foreach="$languageList as $key => $langData" class="mb-3 col-12">
                     {var $textKey = 'text_' . $key}
-                    {var $textKey_class = 'form-label' . ($langData->default ? ' required' : '')}
+                    {var $textKey_class = 'form-label' . ($langData->isDefault() ? ' required' : '')}
                     {label $textKey, class => $textKey_class /}
                     {input $textKey, class => 'form-control'}
                 </div>
