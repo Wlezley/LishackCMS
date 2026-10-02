@@ -8,12 +8,12 @@ use App\Components\Admin\DataEditor\DataEditor;
 use App\Components\Admin\DataEditor\IDataEditorFactory;
 use App\Components\Admin\DataList\DataList;
 use App\Components\Admin\DataList\IDataListFactory;
-use App\Models\Dataset\DatasetManager;
+use App\Service\Dataset\DatasetService;
 
 class DataPresenter extends SecuredPresenter
 {
-    /** @var DatasetManager @inject */
-    public DatasetManager $datasetManager;
+    /** @var DatasetService @inject */
+    public DatasetService $datasetService;
 
     /** @var IDataListFactory @inject */
     public IDataListFactory $dataList;
@@ -23,12 +23,12 @@ class DataPresenter extends SecuredPresenter
 
     public function renderDefault(int $datasetId = 0, int $page = 1, ?string $search = null): void
     {
-        if (!$this->datasetManager->loadDatasetById($datasetId, true)) {
+        if (!$this->datasetService->loadDatasetById($datasetId, true)) {
             $this->flashMessage($this->tf('dataset.id.not-found', (int) $datasetId), 'danger');
             return;
         }
 
-        $datasetName = $this->datasetManager->getDataset()->name;
+        $datasetName = $this->datasetService->getDataset()->getName();
 
         $this->template->title .= " ($datasetName)";
         $this->template->datasetId = $datasetId;
@@ -37,24 +37,24 @@ class DataPresenter extends SecuredPresenter
 
     public function renderCreate(int $datasetId): void
     {
-        if (!$this->datasetManager->loadDatasetById($datasetId, true)) {
+        if (!$this->datasetService->loadDatasetById($datasetId, true)) {
             $this->flashMessage($this->tf('dataset.id.not-found', (int) $datasetId), 'danger');
             $this->redirect(':default');
         }
 
-        $datasetName = $this->datasetManager->getDataset()->name;
+        $datasetName = $this->datasetService->getDataset()->getName();
 
         $this->template->title .= " ($datasetName)";
     }
 
     public function renderEdit(int $datasetId, int $itemId): void
     {
-        if (!$this->datasetManager->loadDatasetById($datasetId, true)) {
+        if (!$this->datasetService->loadDatasetById($datasetId, true)) {
             $this->flashMessage($this->tf('dataset.id.not-found', (int) $datasetId), 'danger');
             $this->redirect(':default');
         }
 
-        $datasetName = $this->datasetManager->getDataset()->name;
+        $datasetName = $this->datasetService->getDataset()->getName();
 
         $this->template->title .= " ($datasetName / $itemId)";
     }
@@ -69,7 +69,7 @@ class DataPresenter extends SecuredPresenter
 
         // TODO: Permission check
 
-        $this->datasetManager->deleteRow((int) $data['datasetId'], (int) $data['itemId']);
+        $this->datasetService->deleteRow((int) $data['datasetId'], (int) $data['itemId']);
 
         $this->flashMessage("Řádek s ID {$data['itemId']} byl odstraněn.", 'info');
         $this->redirect(':default', [
@@ -96,7 +96,7 @@ class DataPresenter extends SecuredPresenter
     {
         $control = $this->dataEditor->create();
 
-        $control->setDatasetManager($this->datasetManager);
+        $control->setDatasetService($this->datasetService);
 
         $control->setOrigin(
             $this->getParameter('itemId') ? $control::OriginEdit : $control::OriginCreate

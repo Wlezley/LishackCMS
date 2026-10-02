@@ -110,10 +110,6 @@ class ArticlePresenter extends SecuredPresenter
         $form = $this->articleEditor->create();
         $id = (int) $this->getParameter('id');
 
-        $form->setArticleManager($this->articleManager);
-        $form->setCategoryManager($this->categoryManager);
-        $form->setUrlGenerator($this->urlGenerator);
-
         // TODO: TRANSLATE FLASH MESSAGES !!!
         if ($id) {
             try {

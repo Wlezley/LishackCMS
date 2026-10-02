@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Components\Admin\DataList;
 
 use App\Components\BaseControl;
-use App\Models\Dataset\DatasetManager;
 use App\Modules\Admin\Presenters\DataPresenter;
 use Nette\Utils\Json;
 use Webmozart\Assert\Assert;
@@ -17,7 +16,7 @@ class DataList extends BaseControl
     private ?int $totalItems = null;
 
     public function __construct(
-        private DatasetManager $datasetManager
+        private \App\Service\Dataset\DatasetService $datasetService
     ) {
     }
 
@@ -36,10 +35,10 @@ class DataList extends BaseControl
         $offset = ($page - 1) * $this->limit;
         Assert::range($offset, 0, PHP_INT_MAX, 'Offset must be a non-negative integer.');
 
-        $this->datasetManager->loadDatasetById($datasetId);
-        $this->totalItems = $this->datasetManager->getDataRepository()->getCount($datasetId, $search);
-        $this->template->dataList = $this->datasetManager->getDataRepository()->getList($datasetId, $this->limit, $offset, $search);
-        $this->template->listColumns = $this->datasetManager->getListedColumns();
+        $this->datasetService->loadDatasetById($datasetId);
+        $this->totalItems = $this->datasetService->getDataRepository()->getCount($datasetId, $search);
+        $this->template->dataList = $this->datasetService->getDataRepository()->getList($datasetId, $this->limit, $offset, $search);
+        $this->template->listColumns = $this->datasetService->getListedColumns();
         $this->template->datasetId = $datasetId;
 
         $this->template->getJson = function ($datasetId, $itemId) {

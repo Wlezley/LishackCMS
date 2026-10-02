@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Components\Admin\DatasetList;
 
 use App\Components\BaseControl;
-use App\Models\Dataset\DatasetManager;
 use App\Modules\Admin\Presenters\DatasetPresenter;
+use App\Service\Dataset\DatasetService;
 use Nette\Utils\Json;
 use Webmozart\Assert\Assert;
 
@@ -17,7 +17,7 @@ class DatasetList extends BaseControl
     private ?int $totalItems = null;
 
     public function __construct(
-        private DatasetManager $datasetManager
+        private DatasetService $datasetService
     ) {
     }
 
@@ -36,8 +36,8 @@ class DatasetList extends BaseControl
         $offset = ($page - 1) * $this->limit;
         Assert::range($offset, 0, PHP_INT_MAX, 'Offset must be a non-negative integer.');
 
-        $this->totalItems = $this->datasetManager->getDatasetRepository()->getCount($search);
-        $this->template->datasetList = $this->datasetManager->getDatasetRepository()->getList($this->limit, $offset, $search);
+        $this->totalItems = $this->datasetService->getCount($search);
+        $this->template->datasetList = $this->datasetService->getList($this->limit, $offset, $search);
 
         $this->template->getJson = function ($id, $name) {
             // TODO: Fix empty modal on second call of deletion method

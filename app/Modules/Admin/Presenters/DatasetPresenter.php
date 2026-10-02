@@ -8,20 +8,17 @@ use App\Components\Admin\DatasetEditor\DatasetEditor;
 use App\Components\Admin\DatasetEditor\IDatasetEditorFactory;
 use App\Components\Admin\DatasetList\DatasetList;
 use App\Components\Admin\DatasetList\IDatasetListFactory;
-use App\Models\Dataset\DatasetCreator;
-use App\Models\Dataset\DatasetManager;
-use App\Models\Dataset\DatasetUpdater;
+use App\Service\Dataset\DatasetService;
 
 class DatasetPresenter extends SecuredPresenter
 {
-    /** @var DatasetCreator @inject */
-    public DatasetCreator $datasetCreator;
+    /** @var \App\Service\Dataset\DatasetServiceCreator @inject */
+    public \App\Service\Dataset\DatasetServiceCreator $datasetCreator;
+    /** @var \App\Service\Dataset\DatasetServiceUpdater @inject */
+    public \App\Service\Dataset\DatasetServiceUpdater $datasetUpdater;
 
-    /** @var DatasetManager @inject */
-    public DatasetManager $datasetManager;
-
-    /** @var DatasetUpdater @inject */
-    public DatasetUpdater $datasetUpdater;
+    /** @var DatasetService @inject */
+    public DatasetService $datasetService;
 
     /** @var IDatasetListFactory @inject */
     public IDatasetListFactory $datasetList;
@@ -42,7 +39,7 @@ class DatasetPresenter extends SecuredPresenter
     {
         $this->template->title .= " ID: $id";
 
-        if (!$this->datasetManager->loadDatasetById($id, true)) {
+        if (!$this->datasetService->loadDatasetById($id, true)) {
             $this->flashMessage($this->tf('dataset.id.not-found', (int) $id), 'danger');
             $this->redirect(':default');
         }
@@ -58,7 +55,7 @@ class DatasetPresenter extends SecuredPresenter
 
         // TODO: Permission check
 
-        $this->datasetManager->deleteDataset((int) $data['id']);
+        $this->datasetService->deleteDatasetById((int) $data['id']);
         $this->flashMessage("Dataset ID: {$data['id']} byl odstraněn.", 'info');
     }
 
@@ -83,7 +80,7 @@ class DatasetPresenter extends SecuredPresenter
         $id = $this->getParameter('id');
 
         $control->setDatasetCreator($this->datasetCreator); // TODO: Load it in Manager?
-        $control->setDatasetManager($this->datasetManager);
+        $control->setDatasetService($this->datasetService);
         $control->setDatasetUpdater($this->datasetUpdater); // TODO: Load it in Manager?
 
         $control->setOrigin(

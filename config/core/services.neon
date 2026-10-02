@@ -7,6 +7,7 @@ search:
             - *Service
             - *Validator
             - *Repository
+            - App\Service\**
             - App\Commands\**
 
 extensions:
@@ -22,21 +23,6 @@ services:
 
     # Doctrine
     - App\Doctrine\SchemaAssetsFilter
-
-    # Repositories
-    - App\Entity\Article\ArticleRepository
-    - App\Entity\Category\CategoryRepository
-    - App\Entity\CmsConfig\CmsConfigRepository
-    - App\Entity\Dataset\DatasetRepository
-    - App\Entity\DatasetColumn\DatasetColumnRepository
-    - App\Entity\Language\LanguageRepository
-    - App\Entity\Redirect\RedirectRepository
-    - App\Entity\SmsLog\SmsLogRepository
-    - App\Entity\StorageFiles\StorageFilesRepository
-    - App\Entity\StorageTree\StorageTreeRepository
-    - App\Entity\Translation\TranslationRepository
-    - App\Entity\TranslationLog\TranslationLogRepository
-    - App\Entity\User\UserRepository
 
     # Models
     - App\Models\Article\ArticleManager
@@ -54,12 +40,14 @@ services:
     - App\Models\UrlGenerator\UrlGenerator
 
     # Dataset
-    - App\Models\Dataset\DatasetCreator
-    - App\Models\Dataset\DatasetManager
-    - App\Models\Dataset\DatasetUpdater
-    - App\Models\Dataset\Repository\ColumnRepository
-    - App\Models\Dataset\Repository\DataRepository
-    - App\Models\Dataset\Repository\DatasetRepository
+    - App\Components\Admin\DatasetSidebar\IDatasetSidebarFactory
+    - App\Components\Admin\DataList\IDataListFactory
+    - App\Components\Admin\DataEditor\IDataEditorFactory
+    - App\Components\Admin\DatasetList\IDatasetListFactory
+    - App\Components\Admin\DatasetEditor\IDatasetEditorFactory
+    - App\Entity\Dataset\DatasetRepository
+    - App\Entity\DatasetColumn\DatasetColumnRepository
+    - App\Entity\DatasetData\DatasetDataRepository
 
     # StorageSystem
     - App\Models\StorageSystem\Storage
@@ -80,3 +68,7 @@ services:
 
     # Components
     - App\Components\Admin\UserList\UserListGrid
+    - App\Components\Admin\ArticleEditor\IArticleEditorFactory
+    - App\Components\Admin\ArticleList\IArticleListFactory
+    - App\Components\Pagination\IPaginationFactory
+    - App\Components\Admin\CategoryForm\ICategoryFormFactory

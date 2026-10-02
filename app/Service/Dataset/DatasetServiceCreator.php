@@ -2,17 +2,18 @@
 
 declare(strict_types=1);
 
-namespace App\Models\Dataset;
+namespace App\Service\Dataset;
 
+use App\Entity\Dataset\Dataset;
+use App\Entity\Dataset\DatasetRepositoryInterface;
+use App\Entity\DatasetColumn\DatasetColumn;
+use App\Entity\DatasetColumn\DatasetColumnRepositoryInterface;
+use App\Entity\DatasetData\DatasetDataRepositoryInterface;
+use App\Enum\Dataset\DatasetColumnType;
 use App\Exception\DatasetException;
-use App\Models\Dataset\Entity\Dataset;
-use App\Models\Dataset\Entity\DatasetColumn;
-use App\Models\Dataset\Repository\ColumnRepository;
-use App\Models\Dataset\Repository\DataRepository;
-use App\Models\Dataset\Repository\DatasetRepository;
 use Webmozart\Assert\Assert;
 
-class DatasetCreator
+class DatasetServiceCreator
 {
     private ?Dataset $dataset = null;
 
@@ -20,9 +21,9 @@ class DatasetCreator
     private array $columns = [];
 
     public function __construct(
-        private DatasetRepository $datasetRepository,
-        private ColumnRepository $columnRepository,
-        private DataRepository $dataRepository
+        private DatasetRepositoryInterface $datasetRepository,
+        private DatasetColumnRepositoryInterface $columnRepository,
+        private DatasetDataRepositoryInterface $dataRepository,
     ) {
     }
 
@@ -37,8 +38,7 @@ class DatasetCreator
      * @param string $presenter Optional presenter routing value.
      * @param bool $active Whether the dataset is active.
      * @param bool $deleted Whether the dataset is marked as deleted.
-     * @return DatasetCreator
-     * @throws DatasetException If the dataset is already configured.
+     * @return DatasetServiceCreator
      */
     public function configure(
         string $name,
@@ -48,17 +48,14 @@ class DatasetCreator
         bool $active = true,
         bool $deleted = false
     ): self {
-        $this->dataset = new Dataset()
-            ->setId(null)
-            ->setName($name)
-            ->setSlug($slug)
-            ->setComponent($component)
-            ->setPresenter($presenter)
-            ->setActive($active)
-            ->setDeleted($deleted);
-
-        $this->dataset->prepare();
-        $this->dataset->validate();
+        $this->dataset = new Dataset(
+            name: $name,
+            slug: $slug,
+            component: $component,
+            presenter: $presenter,
+            active: $active,
+            deleted: $deleted,
+        );
 
         return $this;
     }
@@ -68,36 +65,37 @@ class DatasetCreator
      *
      * @param string $name Column display name.
      * @param string $slug Optional slug identifier.
-     * @param string $type Column data type (e.g., 'string', 'int').
+     * @param DatasetColumnType $type Column data type (e.g., 'string', 'int').
      * @param bool $required The column is required.
      * @param bool $listed The column is listed in the DataList.
      * @param bool $hidden The column is editable only with a user in the admin role.
      * @param bool $deleted The column is marked as deleted.
      * @param string|null $default Default value of the column.
-     * @throws DatasetException
      */
     public function addColumn(
         string $name,
         string $slug = '',
-        string $type = 'string',
+        DatasetColumnType $type = DatasetColumnType::String,
         bool $required = false,
         bool $listed = false,
         bool $hidden = false,
         bool $deleted = false,
         ?string $default = null
     ): self {
-        $column = new DatasetColumn()
-            ->setName($name)
-            ->setSlug($slug)
-            ->setType($type)
-            ->setRequired($required)
-            ->setListed($listed)
-            ->setHidden($hidden)
-            ->setDeleted($deleted)
-            ->setDefault($default);
+        Assert::notNull($this->dataset, 'Dataset must be configured before adding columns.');
 
-        $column->prepare();
-        $column->validate();
+        $column = new DatasetColumn(
+            dataset: $this->dataset,
+            columnId: count($this->columns) > 0 ? $this->columns[count($this->columns) - 1]->getColumnId() + 1 : 1,
+            name: $name,
+            slug: $slug,
+            type: $type,
+            required: $required,
+            listed: $listed,
+            hidden: $hidden,
+            deleted: $deleted,
+            defaultValue: $default,
+        );
 
         $this->columns[] = $column;
 
@@ -115,7 +113,7 @@ class DatasetCreator
      */
     public function commit(): int
     {
-        if (!isset($this->dataset)) {
+        if ($this->dataset === null) {
             throw new DatasetException('Dataset is not configured yet.');
         }
 
@@ -123,19 +121,19 @@ class DatasetCreator
             throw new DatasetException('Dataset must have at least one column.');
         }
 
-        $this->dataset = $this->datasetRepository->insert($this->dataset);
-        Assert::notNull($this->dataset->id, 'Dataset ID must not be null.');
-        $columnId = 0;
+        $this->datasetRepository->save($this->dataset);
+        $datasetId = $this->dataset->getId();
 
+        $columnId = 0;
         foreach ($this->columns as $column) {
-            $column->setDatasetId($this->dataset->id);
+            $column->setDataset($this->dataset);
             $column->setColumnId(++$columnId);
-            $this->columnRepository->insert($column);
+            $this->columnRepository->save($column);
         }
 
-        $this->dataRepository->createTable($this->dataset->id, $this->columns);
+        $this->dataRepository->createTable($datasetId, $this->columns); // TODO: We need method to create table for DATA !!!
 
-        return $this->dataset->id;
+        return $datasetId;
     }
 
     /**

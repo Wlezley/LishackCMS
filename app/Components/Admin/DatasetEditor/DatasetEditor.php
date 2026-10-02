@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Components\Admin\DatasetEditor;
 
 use App\Components\BaseControl;
+use App\Enum\Dataset\DatasetColumnType;
 use App\Exception\DatasetException;
-use App\Models\Dataset\DatasetCreator;
-use App\Models\Dataset\DatasetManager;
-use App\Models\Dataset\DatasetUpdater;
-use App\Models\Dataset\Entity\DatasetColumn;
+use App\Service\Dataset\DatasetService;
+use App\Service\Dataset\DatasetServiceCreator;
+use App\Service\Dataset\DatasetServiceUpdater;
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
 use Nette\Utils\Json;
@@ -22,14 +22,14 @@ class DatasetEditor extends BaseControl
 
     private string $origin;
 
-    /** @var DatasetCreator @inject */
-    public DatasetCreator $datasetCreator;
+    /** @var DatasetServiceCreator @inject */
+    public DatasetServiceCreator $datasetCreator;
 
-    /** @var DatasetManager @inject */
-    public DatasetManager $datasetManager;
+    /** @var DatasetService @inject */
+    public DatasetService $datasetService;
 
-    /** @var DatasetUpdater @inject */
-    public DatasetUpdater $datasetUpdater;
+    /** @var DatasetServiceUpdater @inject */
+    public DatasetServiceUpdater $datasetUpdater;
 
     /** @var callable(string): void */
     public $onSuccess;
@@ -44,9 +44,9 @@ class DatasetEditor extends BaseControl
         $form->setHtmlAttribute('autocomplete', 'off');
 
         $param = [];
-        if ($this->origin == self::OriginEdit && $this->datasetManager->isReady()) {
-            $param = $this->datasetManager->getDataset()->toDatabaseRow();
-            $param['id'] = $this->datasetManager->getDataset()->id;
+        if ($this->origin == self::OriginEdit && $this->datasetService->isReady()) {
+            $param = $this->datasetService->getDataset()->toArray(); // TODO: Move to repository, or create convertible DTO ???
+            $param['id'] = $this->datasetService->getDataset()->getId();
         }
 
         $form->addHidden('id')
@@ -172,7 +172,7 @@ class DatasetEditor extends BaseControl
 
     public function render(): void
     {
-        $columns = $this->datasetManager->getColumnsList();
+        $columns = $this->datasetService->getColumnsList();
 
         if (empty($columns)) {
             $this->template->lastColumnId = 2;
@@ -191,7 +191,7 @@ class DatasetEditor extends BaseControl
                 ];
             }
         } else {
-            $this->template->lastColumnId = $this->datasetManager->getLastColumnId();
+            $this->template->lastColumnId = $this->datasetService->getLastColumnId();
         }
 
         $this->template->datasetColumns = $columns;
@@ -206,17 +206,17 @@ class DatasetEditor extends BaseControl
         $this->origin = $origin;
     }
 
-    public function setDatasetCreator(DatasetCreator $datasetCreator): void
+    public function setDatasetCreator(DatasetServiceCreator $datasetCreator): void
     {
         $this->datasetCreator = $datasetCreator;
     }
 
-    public function setDatasetManager(DatasetManager $datasetManager): void
+    public function setDatasetService(DatasetService $datasetService): void
     {
-        $this->datasetManager = $datasetManager;
+        $this->datasetService = $datasetService;
     }
 
-    public function setDatasetUpdater(DatasetUpdater $datasetUpdater): void
+    public function setDatasetUpdater(DatasetServiceUpdater $datasetUpdater): void
     {
         $this->datasetUpdater = $datasetUpdater;
     }
@@ -227,8 +227,8 @@ class DatasetEditor extends BaseControl
     public function getColumnTypeOptions(): array
     {
         $options = [];
-        foreach (DatasetColumn::ALLOWED_TYPES as $type) {
-            $options[$type] = $this->t("dataset.column.type.$type");
+        foreach (DatasetColumnType::cases() as $type) {
+            $options[$type->value] = $this->t("dataset.column.type.$type->value");
         }
 
         return $options;

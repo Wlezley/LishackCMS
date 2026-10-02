@@ -14,6 +14,7 @@ console:
     autoExit: true
     url: https://localhost
 
+# TODO: REMOVE AFTER IMPL. OF DOCTRINE ???
 database:
     user: %database.user%
     password: %database.password%

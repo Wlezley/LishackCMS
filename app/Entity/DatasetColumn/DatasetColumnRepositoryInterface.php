@@ -11,4 +11,6 @@ use App\Entity\BaseRepositoryInterface;
  */
 interface DatasetColumnRepositoryInterface extends BaseRepositoryInterface
 {
+    /** @return \App\Entity\DatasetColumn\DatasetColumn[] */
+    public function findByDatasetId(int $datasetId, bool $deletedOnly = false): array;
 }

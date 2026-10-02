@@ -9,16 +9,27 @@ use App\Entity\BaseRepository;
 /**
  * @extends BaseRepository<DatasetColumn>
  */
-final readonly class DatasetColumnRepository extends BaseRepository
+final readonly class DatasetColumnRepository extends BaseRepository implements DatasetColumnRepositoryInterface
 {
-    public function getMaxColumnId(int $datasetId): int
+    /**
+     * @inheritDoc
+     */
+    public function findByDatasetId(int $datasetId, bool $deletedOnly = false): array
     {
         $qb = $this->entityManager->createQueryBuilder();
-        $qb->select('MAX(dc.columnId)')
+
+        $qb->select('dc')
             ->from(DatasetColumn::class, 'dc')
-            ->where('dc.datasetId = :datasetId')
+            ->innerJoin('dc.dataset', 'd')
+            ->where('d.id = :datasetId')
             ->setParameter('datasetId', $datasetId);
 
-        return (int) $qb->getQuery()->getSingleScalarResult();
+        // TODO: This filter system needs to be reworked... WTF ????????
+        if (!$deletedOnly) {
+            $qb->andWhere('dc.deleted = :deleted')
+                ->setParameter('deleted', false);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 }

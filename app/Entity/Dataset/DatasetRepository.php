@@ -11,12 +11,55 @@ use App\Entity\BaseRepository;
  */
 final readonly class DatasetRepository extends BaseRepository implements DatasetRepositoryInterface
 {
-    /**
-     * @return list<Dataset>
-     */
-    public function findBySearch(?string $search = null, ?int $limit = null, ?int $offset = null, bool $includeDeleted = false): array
+    public function findBySlug(string $slug): ?Dataset
     {
+        return $this->findOneBy(['slug' => $slug]);
+    }
+
+    public function create(
+        string $name,
+        ?string $slug = null,
+        ?string $component = null,
+        ?string $presenter = null,
+        bool $active = true,
+        bool $deleted = false,
+    ): Dataset {
+        $dataset = new Dataset(
+            name: $name,
+            slug: $slug,
+            component: $component,
+            presenter: $presenter,
+            active: $active,
+            deleted: $deleted,
+        );
+        $this->save($dataset);
+
+        return $dataset; // TODO: Check if this object have correct ID of created object...
+    }
+
+    public function deleteById(int $id): bool
+    {
+        $dataset = $this->findById($id);
+
+        if ($dataset !== null) {
+            $this->delete($dataset);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function findBySearch(
+        ?int $limit = null,
+        ?int $offset = null,
+        bool $includeDeleted = false,
+        ?string $search = null,
+    ): array {
         $qb = $this->entityManager->createQueryBuilder();
+
         $qb->select('d')
             ->from(Dataset::class, 'd')
             ->orderBy('d.id', 'ASC');
@@ -45,6 +88,7 @@ final readonly class DatasetRepository extends BaseRepository implements Dataset
     public function countBySearch(?string $search = null, bool $includeDeleted = false): int
     {
         $qb = $this->entityManager->createQueryBuilder();
+
         $qb->select('COUNT(d.id)')
             ->from(Dataset::class, 'd');
 

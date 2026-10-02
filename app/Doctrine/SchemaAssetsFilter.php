@@ -9,8 +9,8 @@ final class SchemaAssetsFilter
     public function __invoke(string $assetName): bool
     {
         return !preg_match(
-            '~^(?:_phinxlog|dataset_data_[0-9]+)$~',
-            $assetName
+            pattern: '~^(?:_phinxlog|dataset_data_[0-9]+)$~',
+            subject: $assetName
         );
     }
 }

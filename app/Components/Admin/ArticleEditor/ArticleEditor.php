@@ -15,15 +15,13 @@ use App\Models\UrlGenerator\UrlGenerator;
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
 use Nette\Utils\DateTime;
-use Webmozart\Assert\Assert;
 
 class ArticleEditor extends BaseControl
 {
     public const string OriginCreate = 'Create';
     public const string OriginEdit = 'Edit';
 
-    /** @var UserRepositoryInterface @inject */
-    public UserRepositoryInterface $userRepository;
+    private UserRepositoryInterface $userRepository;
 
     private ArticleManager $articleManager;
 
@@ -37,6 +35,18 @@ class ArticleEditor extends BaseControl
     /** @var callable(string): void */
     public $onError;
 
+    public function __construct(
+        UserRepositoryInterface $userRepository,
+        ArticleManager $articleManager,
+        CategoryManager $categoryManager,
+        UrlGenerator $urlGenerator
+    ) {
+        $this->userRepository = $userRepository;
+        $this->articleManager = $articleManager;
+        $this->categoryManager = $categoryManager;
+        $this->urlGenerator = $urlGenerator;
+    }
+
     public function createComponentForm(): Form
     {
         $form = new Form();
@@ -47,9 +57,13 @@ class ArticleEditor extends BaseControl
 
             try {
                 $this->param['category'] = $this->articleManager->getCategoryIdById((int) $this->param['id']);
-                $user = $this->userRepository->findByUserName((string) $this->param['user_name']);
-                Assert::notNull($user, 'User not found');
-                $this->param['user_name'] = $user->getFullName() ?? '';
+                $userId = $this->param['user_id'] ?? null;
+                if ($userId) {
+                    $user = $this->userRepository->getById((int) $userId);
+                    $this->param['user_name'] = $user?->getFullName() ?? $user?->getUserName() ?? $this->t('author.unknown');
+                } else {
+                    $this->param['user_name'] = $this->t('author.unknown');
+                }
             } catch (ArticleException $e) {
                 $this->param['category'] = CategoryManager::MAIN_CATEGORY_ID;
             } catch (UserException $e) {
@@ -57,8 +71,8 @@ class ArticleEditor extends BaseControl
             }
         } else {
             try {
-                $this->param['user_name'] = $this->presenter->getUser()->getIdentity()?->getData()['full_name'];
-                Assert::notNull($this->param['user_name']);
+                $user = $this->presenter->getUser()->getIdentity();
+                $this->param['user_name'] = $user?->getData()['full_name'] ?? $user?->getData()['user_name'] ?? $this->t('author.system');
             } catch (\Exception $e) {
                 $this->param['user_name'] = $this->t('author.system');
             }
@@ -216,7 +230,6 @@ class ArticleEditor extends BaseControl
 
     public function render(): void
     {
-        $this->template->origin = $this->origin;
         $this->getTemplate()->setFile(__DIR__ . '/ArticleEditor.latte');
         $this->getTemplate()->render();
     }
@@ -224,20 +237,5 @@ class ArticleEditor extends BaseControl
     public function setOrigin(string $origin): void
     {
         $this->origin = $origin;
-    }
-
-    public function setArticleManager(ArticleManager $articleManager): void
-    {
-        $this->articleManager = $articleManager;
-    }
-
-    public function setCategoryManager(CategoryManager $categoryManager): void
-    {
-        $this->categoryManager = $categoryManager;
-    }
-
-    public function setUrlGenerator(UrlGenerator $urlGenerator): void
-    {
-        $this->urlGenerator = $urlGenerator;
     }
 }

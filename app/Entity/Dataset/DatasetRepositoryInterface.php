@@ -11,10 +11,28 @@ use App\Entity\BaseRepositoryInterface;
  */
 interface DatasetRepositoryInterface extends BaseRepositoryInterface
 {
+    public function findBySlug(string $slug): ?Dataset;
+
+    public function create(
+        string $name,
+        string $slug,
+        string $component,
+        string $presenter,
+        bool $active = true,
+        bool $deleted = false,
+    ): Dataset;
+
+    public function deleteById(int $id): bool;
+
     /**
-     * @return list<Dataset>
+     * @return \App\Entity\Dataset\Dataset[]
      */
-    public function findBySearch(?string $search = null, ?int $limit = null, ?int $offset = null, bool $includeDeleted = false): array;
+    public function findBySearch(
+        ?int $limit = null,
+        ?int $offset = null,
+        bool $includeDeleted = false,
+        ?string $search = null,
+    ): array;
 
     public function countBySearch(?string $search = null, bool $includeDeleted = false): int;
 }

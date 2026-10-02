@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Commands\Dataset;
 
-use App\Models\Dataset\DatasetCreator;
+use App\Enum\Dataset\DatasetColumnType;
+use App\Exception\DatasetException;
+use App\Service\Dataset\DatasetServiceCreator;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -18,7 +20,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 final class DatasetAddCommand extends Command
 {
     public function __construct(
-        private readonly DatasetCreator $datasetCreator
+        private readonly DatasetServiceCreator $datasetCreator
     ) {
         parent::__construct();
     }
@@ -29,6 +31,9 @@ final class DatasetAddCommand extends Command
         $this->addArgument('col_count', InputArgument::OPTIONAL, 'Number of dataset columns');
     }
 
+    /**
+     * @throws DatasetException
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('<info>Creating new dataset...</info>');
@@ -38,11 +43,11 @@ final class DatasetAddCommand extends Command
         $datasetId = $this->datasetCreator
             ->configure($datasetName)
             ->addColumn('Column 1')
-            ->addColumn('Column 2', '', 'int')
-            ->addColumn('Column 3', '', 'bool', true)
-            ->addColumn('Column 4', '', 'text')
-            ->addColumn('Column 5', '', 'string', true)
-            ->addColumn('Column 6', '', 'json', false)
+            ->addColumn('Column 2', '', DatasetColumnType::Int)
+            ->addColumn('Column 3', '', DatasetColumnType::Bool, true)
+            ->addColumn('Column 4', '', DatasetColumnType::Text)
+            ->addColumn('Column 5', '', DatasetColumnType::String, true)
+            ->addColumn('Column 6', '', DatasetColumnType::Json, false)
             ->commit();
 
         // $datasetId = $this->datasetCreator->getDataset()->id;

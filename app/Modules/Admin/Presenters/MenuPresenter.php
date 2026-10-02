@@ -155,8 +155,6 @@ class MenuPresenter extends SecuredPresenter
         $form = $this->categoryForm->create();
         $id = $this->getParameter('id');
 
-        $form->setCategoryManager($this->categoryManager);
-
         if ($id) {
             $form->setOrigin($form::OriginEdit);
             $param = $this->categoryManager->getById((int) $id);

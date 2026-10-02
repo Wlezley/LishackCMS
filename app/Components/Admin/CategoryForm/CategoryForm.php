@@ -19,8 +19,12 @@ class CategoryForm extends BaseControl
 
     private string $origin;
 
-    /** @var CategoryManager @inject */
     private CategoryManager $categoryManager;
+
+    public function __construct(CategoryManager $categoryManager)
+    {
+        $this->categoryManager = $categoryManager;
+    }
 
     /** @var callable(string, int): void */
     public $onSuccess;
@@ -131,10 +135,5 @@ class CategoryForm extends BaseControl
     public function setOrigin(string $origin): void
     {
         $this->origin = $origin;
-    }
-
-    public function setCategoryManager(CategoryManager $categoryManager): void
-    {
-        $this->categoryManager = $categoryManager;
     }
 }

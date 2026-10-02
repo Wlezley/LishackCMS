@@ -72,11 +72,15 @@ class StringHelper
      *
      * A valid slug contains only lowercase letters, numbers, and underscores (`_`).
      *
-     * @param string $value The string to check.
+     * @param string|null $value The string to check.
      * @return bool True if the string is a valid slug, false otherwise.
      */
-    public static function isSlug(string $value): bool
+    public static function isSlug(?string $value): bool
     {
+        if (empty($value)) {
+            return false;
+        }
+
         return (bool) preg_match('/^[a-z0-9_]+$/', $value);
     }
 
@@ -85,12 +89,12 @@ class StringHelper
      *
      * Throws an exception if the input string does not meet the slug format criteria.
      *
-     * @param string $value The string to validate.
+     * @param string|null $value The string to validate.
      * @param string $label A custom label for the variable in the error message. Defaults to 'variable'.
      *
      * @throws \InvalidArgumentException If the string is not a valid slug.
      */
-    public static function assertSlug(string $value, string $label = 'variable'): void
+    public static function assertSlug(?string $value, string $label = 'variable'): void
     {
         if (!self::isSlug($value)) {
             throw new \InvalidArgumentException("The $label must be in a valid slug format.");
