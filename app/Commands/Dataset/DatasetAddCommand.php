@@ -47,7 +47,7 @@ final class DatasetAddCommand extends Command
             ->addColumn('Column 3', '', DatasetColumnType::Bool, true)
             ->addColumn('Column 4', '', DatasetColumnType::Text)
             ->addColumn('Column 5', '', DatasetColumnType::String, true)
-            ->addColumn('Column 6', '', DatasetColumnType::Json, false)
+            ->addColumn('Column 6', '', DatasetColumnType::Json)
             ->commit();
 
         // $datasetId = $this->datasetCreator->getDataset()->id;
