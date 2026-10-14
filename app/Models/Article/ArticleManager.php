@@ -139,6 +139,7 @@ class ArticleManager extends BaseModel
             user: null,
             seo: null,
         ); // TODO: Use Article DTO
+        $article->setCreatedAt(new \DateTimeImmutable());
         $this->fillArticle($article, $data); // TODO: Remove this piece of SHIT !!!
 
         try {
