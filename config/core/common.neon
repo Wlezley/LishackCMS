@@ -48,6 +48,7 @@ nettrine.orm:
 nettrine.migrations:
     directories:
         App\Migrations: %appDir%/../db/migrations
+    allOrNothing: true
 
 session:
     expiration: 14 days
