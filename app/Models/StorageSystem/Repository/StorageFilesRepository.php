@@ -6,6 +6,7 @@ namespace App\Models\StorageSystem\Repository;
 
 use App\Entity\StorageFiles\StorageFiles as StorageFileEntity;
 use App\Entity\StorageFiles\StorageFilesRepository as DoctrineRepository;
+use App\Enum\SortOrderEnum;
 use App\Exception\StorageSystemException;
 use App\Models\StorageSystem\Entity\StorageFile;
 
@@ -31,7 +32,7 @@ class StorageFilesRepository
     /** @return StorageFile[] */
     public function getFilesInFolder(int $treeId = 0): array
     {
-        $entities = $this->doctrineRepository->findBy(['treeId' => $treeId], ['position' => 'ASC']);
+        $entities = $this->doctrineRepository->findBy(['treeId' => $treeId], ['position' => SortOrderEnum::Asc->value]);
 
         $result = [];
         foreach ($entities as $entity) {

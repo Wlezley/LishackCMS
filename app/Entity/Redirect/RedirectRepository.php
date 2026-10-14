@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity\Redirect;
 
 use App\Entity\BaseRepository;
+use App\Enum\SortOrderEnum;
 
 /**
  * @extends BaseRepository<Redirect>
@@ -35,7 +36,7 @@ final readonly class RedirectRepository extends BaseRepository implements Redire
     {
         return $this->findBy(
             criteria: ['enabled' => true],
-            orderBy: ['id' => 'ASC'],
+            orderBy: ['id' => SortOrderEnum::Asc->value],
         );
     }
 
@@ -68,16 +69,18 @@ final readonly class RedirectRepository extends BaseRepository implements Redire
         int $limit,
         int $offset,
         ?string $search = null,
+        SortOrderEnum $order = SortOrderEnum::Desc,
     ): array {
         $qb = $this->entityManager->createQueryBuilder();
 
         $qb->select('r')
             ->from(Redirect::class, 'r')
-            ->orderBy('r.id', 'DESC')
+            ->setMaxResults($limit)
             ->setFirstResult($offset)
-            ->setMaxResults($limit);
+            ->orderBy('r.id', $order->value);
 
-        if ($search !== null && $search !== '') {
+        if ($search !== null && $search !== '') { // TODO: use a better way to check if the string is empty, maybe use a helper function;
+                                                  //       beware of trimming spaces, etc...
             $qb->andWhere('r.source LIKE :search OR r.target LIKE :search')
                 ->setParameter('search', '%' . $search . '%');
         }

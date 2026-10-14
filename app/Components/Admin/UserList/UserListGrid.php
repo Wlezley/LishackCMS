@@ -7,6 +7,7 @@ namespace App\Components\Admin\UserList;
 use AllowDynamicProperties;
 use App\Components\BaseControl;
 use App\Entity\User\UserRepositoryInterface;
+use App\Enum\SortOrderEnum;
 use App\Enum\UserRoleEnum;
 use App\Exception\TranslatorException;
 use App\Exception\UserException;
@@ -92,7 +93,7 @@ class UserListGrid extends BaseControl
         ];
 
         // Datagrid settings
-        $grid->setDefaultSort(['id' => 'ASC']);
+        $grid->setDefaultSort(['id' => SortOrderEnum::Asc->value]);
         $grid->setDefaultPerPage($paginationItemLimit);
         $grid->setItemsPerPageList($paginationItemLimitList, true);
         $grid->allowRowsInlineEdit(function () {

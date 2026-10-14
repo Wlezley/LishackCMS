@@ -6,6 +6,7 @@ namespace App\Entity\Language;
 
 use App\Entity\BaseRepository;
 use App\Enum\ErrorCode\TranslatorErrorCode;
+use App\Enum\SortOrderEnum;
 use App\Exception\TranslatorException;
 
 /**
@@ -39,7 +40,7 @@ final readonly class LanguageRepository extends BaseRepository implements Langua
     {
         return $this->findBy(
             ['enabled' => true],
-            ['id' => 'ASC'],
+            ['id' => SortOrderEnum::Asc->value],
         );
     }
 

@@ -7,6 +7,7 @@ namespace App\Models\Category;
 use App\Entity\Article\ArticleRepository;
 use App\Entity\Category\Category;
 use App\Entity\Category\CategoryRepository;
+use App\Enum\SortOrderEnum;
 use App\Exception\CategoryException;
 use App\Models\BaseModel;
 use App\Models\Config\ConfigManager;
@@ -37,7 +38,7 @@ class CategoryManager extends BaseModel
     public function load(): void
     {
         if (empty($this->categories)) {
-            $categories = $this->categoryRepository->findBy([], ['position' => 'ASC']);
+            $categories = $this->categoryRepository->findBy([], ['position' => SortOrderEnum::Asc->value]);
 
             foreach ($categories as $category) {
                 $this->categories[$category->getId()] = $this->categoryToArray($category);

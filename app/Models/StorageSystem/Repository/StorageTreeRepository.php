@@ -6,6 +6,7 @@ namespace App\Models\StorageSystem\Repository;
 
 use App\Entity\StorageTree\StorageTree as StorageTreeEntity;
 use App\Entity\StorageTree\StorageTreeRepository as DoctrineRepository;
+use App\Enum\SortOrderEnum;
 use App\Exception\StorageSystemException;
 use App\Models\StorageSystem\Entity\StorageTree;
 
@@ -31,7 +32,7 @@ class StorageTreeRepository
     /** @return StorageTree[] */
     public function getFoldersInFolder(int $parentId = 0): array
     {
-        $entities = $this->doctrineRepository->findBy(['parentId' => $parentId], ['position' => 'ASC']);
+        $entities = $this->doctrineRepository->findBy(['parentId' => $parentId], ['position' => SortOrderEnum::Asc->value]);
 
         $result = [];
         foreach ($entities as $entity) {

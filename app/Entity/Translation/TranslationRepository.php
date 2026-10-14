@@ -6,6 +6,7 @@ namespace App\Entity\Translation;
 
 use App\Entity\BaseRepository;
 use App\Entity\Language\Language;
+use App\Enum\SortOrderEnum;
 
 /**
  * @extends BaseRepository<Translation>
@@ -72,7 +73,7 @@ final readonly class TranslationRepository extends BaseRepository implements Tra
             ->from(Translation::class, 't')
             ->where('t.language = :language')
             ->setParameter('language', $language)
-            ->orderBy('t.translationKey', 'ASC');
+            ->orderBy('t.translationKey', SortOrderEnum::Asc->value);
 
         if ($search !== null) {
             $qb->andWhere(

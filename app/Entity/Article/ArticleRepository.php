@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity\Article;
 
 use App\Entity\BaseRepository;
+use App\Enum\SortOrderEnum;
 
 /**
  * @extends BaseRepository<Article>
@@ -19,7 +20,7 @@ final readonly class ArticleRepository extends BaseRepository implements Article
         $qb = $this->entityManager->createQueryBuilder();
         $qb->select('a')
             ->from(Article::class, 'a')
-            ->orderBy('a.id', 'ASC');
+            ->orderBy('a.id', SortOrderEnum::Asc->value);
 
         if ($search !== null) {
             $qb->andWhere('a.title LIKE :search OR a.content LIKE :search')

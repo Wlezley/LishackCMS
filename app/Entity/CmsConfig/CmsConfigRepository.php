@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity\CmsConfig;
 
 use App\Entity\BaseRepository;
+use App\Enum\SortOrderEnum;
 
 /**
  * @extends BaseRepository<CmsConfig>
@@ -19,7 +20,7 @@ final readonly class CmsConfigRepository extends BaseRepository implements CmsCo
         $qb = $this->entityManager->createQueryBuilder();
         $qb->select('c')
             ->from(CmsConfig::class, 'c')
-            ->orderBy('c.key', 'ASC');
+            ->orderBy('c.key', SortOrderEnum::Asc->value);
 
         if ($category !== null) {
             $qb->andWhere('c.category = :category')
