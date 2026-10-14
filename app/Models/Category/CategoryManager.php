@@ -138,23 +138,21 @@ class CategoryManager extends BaseModel
         }
 
         $category = $this->categoryRepository->findById($id);
-
         if (!$category) {
             throw new CategoryException("Category ID '$id' not found.");
         }
 
-        $parentId = $category->getParentId();
-
         // Move child categories
         $children = $this->categoryRepository->findBy(['parentId' => $id]);
         foreach ($children as $child) {
-            $child->setParentId($parentId);
+            $child->setParent($category->getParent());
             $this->categoryRepository->add($child);
         }
 
         $articles = $this->articleRepository->findBy(['categoryId' => $id]);
         foreach ($articles as $article) {
-            $article->setCategoryId($parentId);
+            $article->setCategoryId($category->getParent()?->getId()); // TODO: REMOVE
+//            $article->setCategory($category->getParent()); // TODO: Revert this !!!
             $this->articleRepository->add($article);
         }
         $this->articleRepository->flush();
@@ -326,8 +324,11 @@ class CategoryManager extends BaseModel
         // Update parent ID
         $node = $this->categoryRepository->findById((int)$data['node_id']);
         if ($node) {
-            $node->setParentId((int)$data['target_id']);
-            $this->categoryRepository->add($node);
+            $targetCategory = $this->categoryRepository->findById((int)$data['target_id']);
+            if ($targetCategory) {
+                $node->setParent($targetCategory);
+                $this->categoryRepository->add($node);
+            }
         }
 
         // Update positions
@@ -408,7 +409,7 @@ class CategoryManager extends BaseModel
     {
         return [
             'id' => $category->getId(),
-            'parent_id' => $category->getParentId(),
+            'parent_id' => $category->getParent()?->getId(),
             'position' => $category->getPosition(),
             'level' => $category->getLevel(),
             'name' => $category->getName(),
@@ -426,7 +427,10 @@ class CategoryManager extends BaseModel
     private function fillCategory(Category $category, array $data): void
     {
         if (isset($data['parent_id'])) {
-            $category->setParentId((int)$data['parent_id']);
+            $parent = $this->categoryRepository->findById((int)$data['parent_id']);
+            if ($parent) {
+                $category->setParent($parent);
+            }
         }
         if (isset($data['position'])) {
             $category->setPosition((int)$data['position']);

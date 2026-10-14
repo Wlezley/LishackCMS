@@ -16,8 +16,14 @@ class Category extends BaseEntity
     use HasIdTrait;
 
     public function __construct(
-        #[ORM\Column(type: Types::INTEGER, nullable: true)]
-        private ?int $parentId = null,
+        #[ORM\ManyToOne(targetEntity: Category::class)]
+        #[ORM\JoinColumn(
+            name: 'parent_id',
+            referencedColumnName: 'id',
+            nullable: true,
+            onDelete: 'SET NULL',
+        )]
+        private ?Category $parent = null,
         #[ORM\Column(type: Types::INTEGER, nullable: true)]
         private ?int $position = null,
         #[ORM\Column(type: Types::INTEGER, nullable: true)]
@@ -37,14 +43,14 @@ class Category extends BaseEntity
     ) {
     }
 
-    public function getParentId(): ?int
+    public function getParent(): ?Category
     {
-        return $this->parentId;
+        return $this->parent;
     }
 
-    public function setParentId(?int $parentId): void
+    public function setParent(?Category $parent): void
     {
-        $this->parentId = $parentId;
+        $this->parent = $parent;
     }
 
     public function getPosition(): ?int
