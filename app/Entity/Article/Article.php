@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace App\Entity\Article;
 
 use App\Entity\BaseEntity;
+use App\Entity\Category\Category;
+use App\Entity\Seo\Seo;
 use App\Entity\Trait\CreatedAtTrait;
 use App\Entity\Trait\HasIdTrait;
 use App\Entity\Trait\UpdatedAtTrait;
+use App\Entity\User\User;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -25,69 +28,69 @@ class Article extends BaseEntity
 //    private ?Language $language = null;
 
     public function __construct(
-        #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-        private ?string $nameUrl = null,
-        #[ORM\Column(type: Types::INTEGER, nullable: true, options: ['default' => 1])]
-        private ?int $categoryId = null,
-        #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-        private ?string $title = null,
+        #[ORM\Column(type: Types::STRING, length: 255)]
+        private string $title,
+        #[ORM\Column(type: Types::STRING, length: 255)]
+        private string $nameUrl,
+        #[ORM\ManyToOne(targetEntity: Category::class)]
+        #[ORM\JoinColumn(
+            name: 'category_id',
+            referencedColumnName: 'id',
+            nullable: true,
+            onDelete: 'SET NULL',
+        )]
+        private ?Category $category = null,
         #[ORM\Column(type: Types::TEXT, nullable: true)]
         private ?string $content = null,
-        #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]
-        private bool $published = true,
         #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['default' => 'CURRENT_TIMESTAMP'])]
         private ?\DateTimeImmutable $publishedAt = null,
-        #[ORM\Column(type: Types::INTEGER, nullable: true)]
-        private ?int $userId = null,
-        #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-        private ?string $robots = null,
-        #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-        private ?string $canonicalUrl = null,
-        #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-        private ?string $ogTitle = null,
-        #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-        private ?string $ogDescription = null,
-        #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-        private ?string $ogImage = null,
-        #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-        private ?string $ogUrl = null,
-        #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-        private ?string $ogType = null,
-        #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-        private ?string $metaTitle = null,
-        #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-        private ?string $metaDescription = null,
+        #[ORM\ManyToOne(targetEntity: User::class)]
+        #[ORM\JoinColumn(
+            name: 'user_id',
+            referencedColumnName: 'id',
+            nullable: true,
+            onDelete: 'SET NULL',
+        )]
+        private ?User $user = null,
+        #[ORM\ManyToOne(targetEntity: Seo::class)]
+        #[ORM\JoinColumn(
+            name: 'seo_id',
+            referencedColumnName: 'id',
+            nullable: true,
+            onDelete: 'SET NULL',
+        )]
+        private ?Seo $seo = null,
     ) {
     }
 
-    public function getNameUrl(): ?string
-    {
-        return $this->nameUrl;
-    }
-
-    public function setNameUrl(?string $nameUrl): void
-    {
-        $this->nameUrl = $nameUrl;
-    }
-
-    public function getCategoryId(): ?int
-    {
-        return $this->categoryId;
-    }
-
-    public function setCategoryId(?int $categoryId): void
-    {
-        $this->categoryId = $categoryId;
-    }
-
-    public function getTitle(): ?string
+    public function getTitle(): string
     {
         return $this->title;
     }
 
-    public function setTitle(?string $title): void
+    public function setTitle(string $title): void
     {
         $this->title = $title;
+    }
+
+    public function getNameUrl(): string
+    {
+        return $this->nameUrl;
+    }
+
+    public function setNameUrl(string $nameUrl): void
+    {
+        $this->nameUrl = $nameUrl;
+    }
+
+    public function getCategory(): ?Category
+    {
+        return $this->category;
+    }
+
+    public function setCategory(?Category $category): void
+    {
+        $this->category = $category;
     }
 
     public function getContent(): ?string
@@ -100,16 +103,6 @@ class Article extends BaseEntity
         $this->content = $content;
     }
 
-    public function isPublished(): bool
-    {
-        return $this->published;
-    }
-
-    public function setPublished(bool $published): void
-    {
-        $this->published = $published;
-    }
-
     public function getPublishedAt(): ?\DateTimeImmutable
     {
         return $this->publishedAt;
@@ -120,103 +113,23 @@ class Article extends BaseEntity
         $this->publishedAt = $publishedAt;
     }
 
-    public function getUserId(): ?int
+    public function getUser(): ?User
     {
-        return $this->userId;
+        return $this->user;
     }
 
-    public function setUserId(?int $userId): void
+    public function setUser(?User $user): void
     {
-        $this->userId = $userId;
+        $this->user = $user;
     }
 
-    public function getRobots(): ?string
+    public function getSeo(): ?Seo
     {
-        return $this->robots;
+        return $this->seo;
     }
 
-    public function setRobots(?string $robots): void
+    public function setSeo(?Seo $seo): void
     {
-        $this->robots = $robots;
-    }
-
-    public function getCanonicalUrl(): ?string
-    {
-        return $this->canonicalUrl;
-    }
-
-    public function setCanonicalUrl(?string $canonicalUrl): void
-    {
-        $this->canonicalUrl = $canonicalUrl;
-    }
-
-    public function getOgTitle(): ?string
-    {
-        return $this->ogTitle;
-    }
-
-    public function setOgTitle(?string $ogTitle): void
-    {
-        $this->ogTitle = $ogTitle;
-    }
-
-    public function getOgDescription(): ?string
-    {
-        return $this->ogDescription;
-    }
-
-    public function setOgDescription(?string $ogDescription): void
-    {
-        $this->ogDescription = $ogDescription;
-    }
-
-    public function getOgImage(): ?string
-    {
-        return $this->ogImage;
-    }
-
-    public function setOgImage(?string $ogImage): void
-    {
-        $this->ogImage = $ogImage;
-    }
-
-    public function getOgUrl(): ?string
-    {
-        return $this->ogUrl;
-    }
-
-    public function setOgUrl(?string $ogUrl): void
-    {
-        $this->ogUrl = $ogUrl;
-    }
-
-    public function getOgType(): ?string
-    {
-        return $this->ogType;
-    }
-
-    public function setOgType(?string $ogType): void
-    {
-        $this->ogType = $ogType;
-    }
-
-    public function getMetaTitle(): ?string
-    {
-        return $this->metaTitle;
-    }
-
-    public function setMetaTitle(?string $metaTitle): void
-    {
-        $this->metaTitle = $metaTitle;
-    }
-
-    public function getMetaDescription(): ?string
-    {
-        return $this->metaDescription;
-    }
-
-    public function setMetaDescription(?string $metaDescription): void
-    {
-        $this->metaDescription = $metaDescription;
+        $this->seo = $seo;
     }
 }

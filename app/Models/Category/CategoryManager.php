@@ -151,8 +151,7 @@ class CategoryManager extends BaseModel
 
         $articles = $this->articleRepository->findBy(['categoryId' => $id]);
         foreach ($articles as $article) {
-            $article->setCategoryId($category->getParent()?->getId()); // TODO: REMOVE
-//            $article->setCategory($category->getParent()); // TODO: Revert this !!!
+            $article->setCategory($category->getParent());
             $this->articleRepository->add($article);
         }
         $this->articleRepository->flush();

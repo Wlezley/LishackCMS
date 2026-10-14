@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Models\Article;
 
 use App\Entity\Article\Article;
-use App\Entity\Article\ArticleRepository;
+use App\Entity\Article\ArticleRepositoryInterface;
+use App\Entity\Category\CategoryRepositoryInterface;
+use App\Entity\User\UserRepositoryInterface;
 use App\Exception\ArticleException;
 use App\Models\BaseModel;
 use App\Models\Category\CategoryManager;
@@ -18,7 +20,9 @@ class ArticleManager extends BaseModel
     public function __construct(
         protected ConfigManager $configManager,
         public CategoryManager $categoryManager,
-        private ArticleRepository $articleRepository,
+        private ArticleRepositoryInterface $articleRepository,
+        private CategoryRepositoryInterface $categoryRepository,
+        private UserRepositoryInterface $userRepository,
     ) {
         parent::__construct($configManager);
     }
@@ -101,14 +105,14 @@ class ArticleManager extends BaseModel
     {
         $article = $this->articleRepository->findById($id);
 
-        if (!$article || $article->getCategoryId() === null) {
+        if (!$article || $article->getCategory()?->getId() === null) {
             throw new ArticleException(
                 "Unable to find category ID by article ID: '$id'.",
                 \Nette\Http\IResponse::S404_NotFound
             );
         }
 
-        return $article->getCategoryId();
+        return $article->getCategory()?->getId() ?: 0;
     }
 
     // #####################################
@@ -126,8 +130,16 @@ class ArticleManager extends BaseModel
      */
     public function create(array $data): int
     {
-        $article = new Article();
-        $this->fillArticle($article, $data);
+        $article = new Article(
+            title: '',
+            nameUrl: '',
+            category: null,
+            content: '',
+            publishedAt: null,
+            user: null,
+            seo: null,
+        ); // TODO: Use Article DTO
+        $this->fillArticle($article, $data); // TODO: Remove this piece of SHIT !!!
 
         try {
             $this->articleRepository->save($article);
@@ -183,12 +195,17 @@ class ArticleManager extends BaseModel
      *
      * @param int $oldCategoryId The current category ID to replace.
      * @param int $newCategoryId The new category ID to assign.
+     * @throws ArticleException
      */
     public function updateCategoryId(int $oldCategoryId, int $newCategoryId): void
     {
         $articles = $this->articleRepository->findBy(['categoryId' => $oldCategoryId]);
         foreach ($articles as $article) {
-            $article->setCategoryId($newCategoryId);
+            $newCategory = $this->categoryRepository->findById($newCategoryId);
+            if (!$newCategory) {
+                throw new ArticleException('Category not found: ' . $newCategoryId, 500);
+            }
+            $article->setCategory($newCategory);
             $this->articleRepository->add($article);
         }
         $this->articleRepository->flush();
@@ -228,29 +245,32 @@ class ArticleManager extends BaseModel
      */
     private function articleToArray(Article $article): array
     {
-        return [
+        $seo = $article->getSeo();
+
+        return [ // TODO: Use Article DTO, REWORK NEEDED !!!
             'id' => $article->getId(),
             'name_url' => $article->getNameUrl(),
-            'category_id' => $article->getCategoryId(),
+            'category_id' => $article->getCategory()?->getId(),
             'title' => $article->getTitle(),
             'content' => $article->getContent(),
-            'published' => $article->isPublished(),
+            'published' => $article->getPublishedAt() !== null,
             'published_at' => $article->getPublishedAt(),
-            'user_id' => $article->getUserId(),
-            'robots' => $article->getRobots(),
-            'canonical_url' => $article->getCanonicalUrl(),
-            'og_title' => $article->getOgTitle(),
-            'og_description' => $article->getOgDescription(),
-            'og_image' => $article->getOgImage(),
-            'og_url' => $article->getOgUrl(),
-            'og_type' => $article->getOgType(),
-            'meta_title' => $article->getMetaTitle(),
-            'meta_description' => $article->getMetaDescription(),
+            'user_id' => $article->getUser()?->getId(),
+            'robots' => $seo?->getRobots(),
+            'canonical_url' => $seo?->getCanonicalUrl(),
+            'og_title' => $seo?->getOgTitle(),
+            'og_description' => $seo?->getOgDescription(),
+            'og_image' => $seo?->getOgImage(),
+            'og_url' => $seo?->getOgUrl(),
+            'og_type' => $seo?->getOgType(),
+            'meta_title' => $seo?->getMetaTitle(),
+            'meta_description' => $seo?->getMetaDescription(),
         ];
     }
 
     /**
      * @param array<string, mixed> $data
+     * @throws ArticleException
      */
     private function fillArticle(Article $article, array $data): void
     {
@@ -258,16 +278,17 @@ class ArticleManager extends BaseModel
             $article->setNameUrl($data['name_url']);
         }
         if (isset($data['category_id'])) {
-            $article->setCategoryId($data['category_id']);
+            $category = $this->categoryRepository->findById($data['category_id']);
+            if (!$category) {
+                throw new ArticleException('Category not found: ' . $data['category_id'], 500);
+            }
+            $article->setCategory($category);
         }
         if (isset($data['title'])) {
             $article->setTitle($data['title']);
         }
         if (isset($data['content'])) {
             $article->setContent($data['content']);
-        }
-        if (isset($data['published'])) {
-            $article->setPublished((bool)$data['published']);
         }
         if (isset($data['published_at'])) {
             $val = $data['published_at'];
@@ -278,35 +299,42 @@ class ArticleManager extends BaseModel
             }
         }
         if (isset($data['user_id'])) {
-            $article->setUserId($data['user_id']);
+            $user = $this->userRepository->findById($data['user_id']);
+            if ($user === null) {
+                throw new ArticleException('User not found: ' . $data['user_id'], 500);
+            }
+            $article->setUser($user);
         }
-        if (isset($data['robots'])) {
-            $article->setRobots($data['robots']);
-        }
-        if (isset($data['canonical_url'])) {
-            $article->setCanonicalUrl($data['canonical_url']);
-        }
-        if (isset($data['og_title'])) {
-            $article->setOgTitle($data['og_title']);
-        }
-        if (isset($data['og_description'])) {
-            $article->setOgDescription($data['og_description']);
-        }
-        if (isset($data['og_image'])) {
-            $article->setOgImage($data['og_image']);
-        }
-        if (isset($data['og_url'])) {
-            $article->setOgUrl($data['og_url']);
-        }
-        if (isset($data['og_type'])) {
-            $article->setOgType($data['og_type']);
-        }
-        if (isset($data['meta_title'])) {
-            $article->setMetaTitle($data['meta_title']);
-        }
-        if (isset($data['meta_description'])) {
-            $article->setMetaDescription($data['meta_description']);
-        }
+
+        // TODO: APPLY SEO REPOSITORY !!!!
+//        $seo = $this->seoRepository
+//        if (isset($data['robots'])) {
+//            $article->setRobots($data['robots']);
+//        }
+//        if (isset($data['canonical_url'])) {
+//            $article->setCanonicalUrl($data['canonical_url']);
+//        }
+//        if (isset($data['og_title'])) {
+//            $article->setOgTitle($data['og_title']);
+//        }
+//        if (isset($data['og_description'])) {
+//            $article->setOgDescription($data['og_description']);
+//        }
+//        if (isset($data['og_image'])) {
+//            $article->setOgImage($data['og_image']);
+//        }
+//        if (isset($data['og_url'])) {
+//            $article->setOgUrl($data['og_url']);
+//        }
+//        if (isset($data['og_type'])) {
+//            $article->setOgType($data['og_type']);
+//        }
+//        if (isset($data['meta_title'])) {
+//            $article->setMetaTitle($data['meta_title']);
+//        }
+//        if (isset($data['meta_description'])) {
+//            $article->setMetaDescription($data['meta_description']);
+//        }
     }
 
     /**
