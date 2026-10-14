@@ -7,6 +7,7 @@ namespace App\Entity\DatasetData;
 use App\Entity\DatasetColumn\DatasetColumn;
 use App\Entity\DatasetColumn\DatasetColumnRepositoryInterface;
 use App\Enum\SortOrderEnum;
+use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Exception\TypesException;
 use Doctrine\DBAL\Types\Types;
@@ -15,8 +16,8 @@ use Webmozart\Assert\Assert;
 
 final readonly class DatasetDataRepository implements DatasetDataRepositoryInterface
 {
-    public const TABLE_NAME_PREFIX = 'dataset_data_';
-    public const DATA_COLUMN_PREFIX = 'data_';
+    public const string TABLE_NAME_PREFIX = 'dataset_data_';
+    public const string DATA_COLUMN_PREFIX = 'data_';
 
     public function __construct(
         private EntityManagerInterface $entityManager,
@@ -170,8 +171,17 @@ final readonly class DatasetDataRepository implements DatasetDataRepositoryInter
         }
 
         $table = new Table($tableName);
-        $table->addColumn('id', Types::INTEGER, ['autoincrement' => true, 'unsigned' => true]);
-        $table->setPrimaryKey(['id']);
+
+        $table->addColumn('id', Types::INTEGER, [
+            'autoincrement' => true,
+            'unsigned' => true,
+        ]);
+
+        $table->addPrimaryKeyConstraint(
+            PrimaryKeyConstraint::editor()
+                ->setUnquotedColumnNames('id')
+                ->create(),
+        );
 
         foreach ($columns as $column) {
             $columnName = self::DATA_COLUMN_PREFIX . $column->getColumnId();
