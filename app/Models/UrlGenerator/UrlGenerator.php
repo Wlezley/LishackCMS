@@ -6,12 +6,12 @@ namespace App\Models\UrlGenerator;
 
 use App\Exception\ArticleException;
 use App\Exception\CategoryException;
-use App\Models\Category\CategoryManager;
 use App\Models\Config\ConfigManager;
 use App\Models\Config\ConfigTrait;
 use App\Models\Helpers\ArrayHelper;
 use App\Models\Helpers\StringHelper;
 use App\Service\Article\ArticleService;
+use App\Service\Category\CategoryService;
 use Nette\Database\Explorer;
 
 class UrlGenerator
@@ -60,7 +60,7 @@ class UrlGenerator
      */
     public function generateCategoryUrl(int $categoryId): string
     {
-        $result = $this->db->table(CategoryManager::TABLE_NAME)
+        $result = $this->db->table(CategoryService::TABLE_NAME)
             ->order('position')
             ->fetchAll();
 
@@ -111,7 +111,7 @@ class UrlGenerator
         $nameUrl = $article['name_url'];
         $categoryId = $article['category_id'];
 
-        if ($categoryId == CategoryManager::MAIN_CATEGORY_ID) {
+        if ($categoryId == CategoryService::MAIN_CATEGORY_ID) {
             if ($this->c('DEFAULT_PAGE') == $nameUrl) {
                 return '';
             } else {

@@ -8,10 +8,10 @@ use App\Components\BaseControl;
 use App\Entity\User\UserRepositoryInterface;
 use App\Exception\ArticleException;
 use App\Exception\UserException;
-use App\Models\Category\CategoryManager;
 use App\Models\Helpers\StringHelper;
 use App\Models\UrlGenerator\UrlGenerator;
 use App\Service\Article\ArticleService;
+use App\Service\Category\CategoryService;
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
 use Nette\Utils\DateTime;
@@ -25,7 +25,7 @@ class ArticleEditor extends BaseControl
 
     private ArticleService $articleManager;
 
-    private CategoryManager $categoryManager;
+    private CategoryService $categoryManager;
 
     private string $origin;
 
@@ -38,7 +38,7 @@ class ArticleEditor extends BaseControl
     public function __construct(
         UserRepositoryInterface $userRepository,
         ArticleService $articleManager,
-        CategoryManager $categoryManager,
+        CategoryService $categoryManager,
         UrlGenerator $urlGenerator
     ) {
         $this->userRepository = $userRepository;
@@ -65,7 +65,7 @@ class ArticleEditor extends BaseControl
                     $this->param['user_name'] = $this->t('author.unknown');
                 }
             } catch (ArticleException $e) {
-                $this->param['category'] = CategoryManager::MAIN_CATEGORY_ID;
+                $this->param['category'] = CategoryService::MAIN_CATEGORY_ID;
             } catch (UserException $e) {
                 $this->param['user_name'] = $this->t('author.unknown');
             }
@@ -87,7 +87,7 @@ class ArticleEditor extends BaseControl
         // CATEGORY
         $categorySelectOptions = $this->categoryManager->getCategorySelectData();
         $form->addSelect('category_id', $this->t('form.article.category'), $categorySelectOptions)
-            ->setValue($this->param['category_id'] ?? CategoryManager::MAIN_CATEGORY_ID)
+            ->setValue($this->param['category_id'] ?? CategoryService::MAIN_CATEGORY_ID)
             ->setRequired();
 
         // COMMON ATTRIBUTES

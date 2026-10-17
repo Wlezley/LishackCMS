@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Models\Category;
+namespace App\Service\Category;
 
 use App\Entity\Article\ArticleRepository;
 use App\Entity\Category\Category;
@@ -13,7 +13,7 @@ use App\Models\BaseModel;
 use App\Models\Config\ConfigManager;
 use App\Models\Helpers\ArrayHelper;
 
-class CategoryManager extends BaseModel
+class CategoryService extends BaseModel
 {
     public const string TABLE_NAME = 'category';
 

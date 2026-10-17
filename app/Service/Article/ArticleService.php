@@ -11,8 +11,8 @@ use App\Entity\Seo\SeoRepositoryInterface;
 use App\Entity\User\UserRepositoryInterface;
 use App\Exception\ArticleException;
 use App\Models\BaseModel;
-use App\Models\Category\CategoryManager;
 use App\Models\Config\ConfigManager;
+use App\Service\Category\CategoryService;
 
 class ArticleService extends BaseModel
 {
@@ -20,7 +20,7 @@ class ArticleService extends BaseModel
 
     public function __construct(
         protected ConfigManager $configManager,
-        public CategoryManager $categoryManager,
+        public CategoryService $categoryManager,
         private ArticleRepositoryInterface $articleRepository,
         private CategoryRepositoryInterface $categoryRepository,
         private UserRepositoryInterface $userRepository,

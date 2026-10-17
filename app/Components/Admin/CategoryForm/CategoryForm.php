@@ -6,8 +6,8 @@ namespace App\Components\Admin\CategoryForm;
 
 use App\Components\BaseControl;
 use App\Exception\CategoryException;
-use App\Models\Category\CategoryManager;
 use App\Models\Helpers\StringHelper;
+use App\Service\Category\CategoryService;
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
 use Webmozart\Assert\Assert;
@@ -19,9 +19,9 @@ class CategoryForm extends BaseControl
 
     private string $origin;
 
-    private CategoryManager $categoryManager;
+    private CategoryService $categoryManager;
 
-    public function __construct(CategoryManager $categoryManager)
+    public function __construct(CategoryService $categoryManager)
     {
         $this->categoryManager = $categoryManager;
     }
@@ -52,7 +52,7 @@ class CategoryForm extends BaseControl
 
         $categorySelectOptions = $this->categoryManager->getCategorySelectData();
         $form->addSelect('parent_id', $this->t('form.category.parent_id'), $categorySelectOptions)
-            ->setValue($this->param['parent_id'] ?? CategoryManager::MAIN_CATEGORY_ID)
+            ->setValue($this->param['parent_id'] ?? CategoryService::MAIN_CATEGORY_ID)
             ->setRequired();
 
         $form->addText('name_url', $this->t('form.category.name_url'))

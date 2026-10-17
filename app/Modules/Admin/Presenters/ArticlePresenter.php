@@ -9,17 +9,17 @@ use App\Components\Admin\ArticleEditor\IArticleEditorFactory;
 use App\Components\Admin\ArticleList\ArticleList;
 use App\Components\Admin\ArticleList\IArticleListFactory;
 use App\Exception\ArticleException;
-use App\Models\Category\CategoryManager;
 use App\Models\UrlGenerator\UrlGenerator;
 use App\Service\Article\ArticleService;
+use App\Service\Category\CategoryService;
 
 class ArticlePresenter extends SecuredPresenter
 {
     /** @var ArticleService @inject */
     public ArticleService $articleManager;
 
-    /** @var CategoryManager @inject */
-    public CategoryManager $categoryManager;
+    /** @var CategoryService @inject */
+    public CategoryService $categoryManager;
 
     /** @var UrlGenerator @inject */
     public UrlGenerator $urlGenerator;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Commands\Category;
 
-use App\Models\Category\CategoryManager;
+use App\Service\Category\CategoryService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 final class CategoryUpdateCommand extends Command
 {
     public function __construct(
-        private readonly CategoryManager $categoryManager
+        private readonly CategoryService $categoryManager
     ) {
         parent::__construct();
     }

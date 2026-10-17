@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace App\Components\Menu;
 
 use App\Components\BaseControl;
-use App\Models\Category\CategoryManager;
+use App\Service\Category\CategoryService;
 
 class Menu extends BaseControl
 {
     public function __construct(
-        protected CategoryManager $categoryManager
+        protected CategoryService $categoryManager
     ) {
     }
 
     public function render(?int $activeCategory = null, string $template = 'Menu'): void
     {
-        $activeCategory = $activeCategory ?? CategoryManager::MAIN_CATEGORY_ID;
+        $activeCategory = $activeCategory ?? CategoryService::MAIN_CATEGORY_ID;
 
         $this->template->activeCategory = $activeCategory;
         $this->template->activeList = $this->categoryManager->getActiveList($activeCategory);

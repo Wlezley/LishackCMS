@@ -12,7 +12,6 @@ use App\Components\Pagination\IPaginationFactory;
 use App\Components\Pagination\Pagination;
 use App\Entity\Language\Language;
 use App\Exception\TranslatorException;
-use App\Models\Category\CategoryManager;
 use App\Models\Config\ConfigManager;
 use App\Models\Config\ConfigTrait;
 use App\Models\Helpers\AssetsVersionHelper;
@@ -20,6 +19,7 @@ use App\Models\Helpers\IPHelper;
 use App\Models\Translation\LanguageService;
 use App\Models\Translation\TranslationService;
 use App\Models\Translation\TranslatorTrait;
+use App\Service\Category\CategoryService;
 use App\Service\Redirect\RedirectService;
 use Nette;
 use Nette\ComponentModel\IComponent;
@@ -132,7 +132,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
         // Default parameters
         $this->template->setParameters($this->defaultParams);
-        $this->template->activeCategory = CategoryManager::MAIN_CATEGORY_ID;
+        $this->template->activeCategory = CategoryService::MAIN_CATEGORY_ID;
     }
 
     public function afterRender(): void
