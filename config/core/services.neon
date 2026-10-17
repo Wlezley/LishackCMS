@@ -25,19 +25,24 @@ services:
     - App\Doctrine\SchemaAssetsFilter
 
     # Models
-    - App\Models\Article\ArticleManager
-    - App\Models\Category\CategoryManager
-    - App\Models\Config\ConfigManager
     - App\Models\Helpers\AssetsVersionHelper
     - App\Models\Installer\Installer
-    - App\Models\Seo\SitemapGenerator
-    - App\Models\SmsGate\SmsGate(%smsgate.url%, %smsgate.login%, %smsgate.password%, %smsgate.sender_id%, %smsgate.secured_login%)
     - App\Models\Translation\LanguageService
     - App\Models\Translation\TranslationCache
     - App\Models\Translation\TranslationService
     - App\Models\Translation\TranslatorLog
     - App\Models\Translation\TranslatorMaintenanceManager
     - App\Models\UrlGenerator\UrlGenerator
+
+    # Services
+#    - App\Service\Article\ArticleService
+#    - App\Service\Category\CategoryService
+#    - App\Service\Config\ConfigService
+#    - App\Service\Dataset\DatasetService
+    - App\Service\Dataset\DatasetServiceCreator
+    - App\Service\Dataset\DatasetServiceUpdater
+#    - App\Service\Seo\SitemapService
+    - App\Service\Sms\SmsService(%smsgate.url%, %smsgate.login%, %smsgate.password%, %smsgate.sender_id%, %smsgate.secured_login%)
 
     # Dataset
     - App\Components\Admin\DatasetSidebar\IDatasetSidebarFactory

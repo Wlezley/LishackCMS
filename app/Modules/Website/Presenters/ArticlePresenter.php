@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Modules\Website\Presenters;
 
 use App\Exception\CategoryException;
+use App\Helper\ArticleParser;
 use App\Models\UrlGenerator\UrlGenerator;
-use App\Service\Article\ArticleParser;
 use App\Service\Article\ArticleService;
 use App\Service\Category\CategoryService;
 use Nette;
