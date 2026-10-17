@@ -7,6 +7,7 @@ namespace App\Models\Article;
 use App\Entity\Article\Article;
 use App\Entity\Article\ArticleRepositoryInterface;
 use App\Entity\Category\CategoryRepositoryInterface;
+use App\Entity\Seo\SeoRepositoryInterface;
 use App\Entity\User\UserRepositoryInterface;
 use App\Exception\ArticleException;
 use App\Models\BaseModel;
@@ -23,6 +24,7 @@ class ArticleManager extends BaseModel
         private ArticleRepositoryInterface $articleRepository,
         private CategoryRepositoryInterface $categoryRepository,
         private UserRepositoryInterface $userRepository,
+        private SeoRepositoryInterface $seoRepository,
     ) {
         parent::__construct($configManager);
     }
@@ -307,35 +309,38 @@ class ArticleManager extends BaseModel
             $article->setUser($user);
         }
 
-        // TODO: APPLY SEO REPOSITORY !!!!
-//        $seo = $this->seoRepository
-//        if (isset($data['robots'])) {
-//            $article->setRobots($data['robots']);
-//        }
-//        if (isset($data['canonical_url'])) {
-//            $article->setCanonicalUrl($data['canonical_url']);
-//        }
-//        if (isset($data['og_title'])) {
-//            $article->setOgTitle($data['og_title']);
-//        }
-//        if (isset($data['og_description'])) {
-//            $article->setOgDescription($data['og_description']);
-//        }
-//        if (isset($data['og_image'])) {
-//            $article->setOgImage($data['og_image']);
-//        }
-//        if (isset($data['og_url'])) {
-//            $article->setOgUrl($data['og_url']);
-//        }
-//        if (isset($data['og_type'])) {
-//            $article->setOgType($data['og_type']);
-//        }
-//        if (isset($data['meta_title'])) {
-//            $article->setMetaTitle($data['meta_title']);
-//        }
-//        if (isset($data['meta_description'])) {
-//            $article->setMetaDescription($data['meta_description']);
-//        }
+        if ($article->getSeo() !== null) {
+            // TODO: seoService->updateSeo(...);
+            $seo = $article->getSeo()
+                ->setRobots($data['robots'] ?? $article->getSeo()->getRobots())
+                ->setCanonicalUrl($data['canonical_url'] ?? $article->getSeo()->getCanonicalUrl())
+                ->setOgTitle($data['og_title'] ?? $article->getSeo()->getOgTitle())
+                ->setOgDescription($data['og_description'] ?? $article->getSeo()->getOgDescription())
+                ->setOgImage($data['og_image'] ?? $article->getSeo()->getOgImage())
+                ->setOgUrl($data['og_url'] ?? $article->getSeo()->getOgUrl())
+                ->setOgType($data['og_type'] ?? $article->getSeo()->getOgType())
+                ->setMetaTitle($data['meta_title'] ?? $article->getSeo()->getMetaTitle())
+                ->setMetaDescription($data['meta_description'] ?? $article->getSeo()->getMetaDescription())
+                ->setMetaKeywords($data['meta_keywords'] ?? $article->getSeo()->getMetaKeywords());
+
+            $this->seoRepository->save($seo);
+        } else {
+            // TODO: seoService->createSeo(...);
+            $seo = $this->seoRepository->create(
+                robots: $data['robots'] ?? null,
+                canonicalUrl: $data['canonical_url'] ?? null,
+                ogTitle: $data['og_title'] ?? null,
+                ogDescription: $data['og_description'] ?? null,
+                ogImage: $data['og_image'] ?? null,
+                ogUrl: $data['og_url'] ?? null,
+                ogType: $data['og_type'] ?? null,
+                metaTitle: $data['meta_title'] ?? null,
+                metaDescription: $data['meta_description'] ?? null,
+                metaKeywords: $data['meta_keywords'] ?? null,
+            );
+
+            $article->setSeo($seo);
+        }
     }
 
     /**
