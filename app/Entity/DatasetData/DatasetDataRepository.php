@@ -6,6 +6,7 @@ namespace App\Entity\DatasetData;
 
 use App\Entity\DatasetColumn\DatasetColumn;
 use App\Entity\DatasetColumn\DatasetColumnRepositoryInterface;
+use App\Enum\Dataset\DatasetColumnType;
 use App\Enum\SortOrderEnum;
 use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
 use Doctrine\DBAL\Schema\Table;
@@ -21,13 +22,8 @@ final readonly class DatasetDataRepository implements DatasetDataRepositoryInter
 
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private DatasetColumnRepositoryInterface $columnRepository,
+        private DatasetColumnRepositoryInterface $datasetColumnRepository,
     ) {
-    }
-
-    private function getTableName(int $datasetId): string
-    {
-        return self::TABLE_NAME_PREFIX . $datasetId;
     }
 
     /**
@@ -73,7 +69,7 @@ final readonly class DatasetDataRepository implements DatasetDataRepositoryInter
         }
 
         if ($search !== null) {
-            $columns = $this->columnRepository->findByDatasetId($datasetId);
+            $columns = $this->datasetColumnRepository->findByDatasetId($datasetId);
             foreach ($columns as $column) {
                 // Assuming we only search in string-like columns or all data_ columns
                 $columnName = self::DATA_COLUMN_PREFIX . $column->getColumnId();
@@ -109,7 +105,7 @@ final readonly class DatasetDataRepository implements DatasetDataRepositoryInter
             ->from($tableName, 'd');
 
         if ($search !== null) {
-            $columns = $this->columnRepository->findByDatasetId($datasetId);
+            $columns = $this->datasetColumnRepository->findByDatasetId($datasetId);
             foreach ($columns as $column) {
                 $columnName = self::DATA_COLUMN_PREFIX . $column->getColumnId();
                 $qb->orWhere($columnName . ' LIKE :search');
@@ -187,6 +183,7 @@ final readonly class DatasetDataRepository implements DatasetDataRepositoryInter
             $columnName = self::DATA_COLUMN_PREFIX . $column->getColumnId();
             $table->addColumn($columnName, $column->getType()->getDoctrineType(), [
                 'notnull' => $column->isRequired(),
+                'length' => $column->getType() === DatasetColumnType::String ? 255 : null,
             ]);
         }
 
@@ -215,7 +212,10 @@ final readonly class DatasetDataRepository implements DatasetDataRepositoryInter
 
         foreach ($columns as $column) {
             $columnName = self::DATA_COLUMN_PREFIX . $column->getColumnId();
-            $options = ['notnull' => $column->isRequired()];
+            $options = [
+                'notnull' => $column->isRequired(),
+                'length' => $column->getType() === DatasetColumnType::String ? 255 : null,
+            ];
 
             if (!$newTable->hasColumn($columnName)) {
                 $newTable->addColumn(
@@ -236,5 +236,10 @@ final readonly class DatasetDataRepository implements DatasetDataRepositoryInter
         if (!$diff->isEmpty()) {
             $schemaManager->alterTable($diff);
         }
+    }
+
+    private function getTableName(int $datasetId): string
+    {
+        return self::TABLE_NAME_PREFIX . $datasetId;
     }
 }
