@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity\Category;
 
 use App\Entity\BaseEntity;
+use App\Entity\Seo\Seo;
 use App\Entity\Trait\HasIdTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -14,6 +15,15 @@ use Doctrine\ORM\Mapping as ORM;
 class Category extends BaseEntity
 {
     use HasIdTrait;
+
+//        #[ORM\ManyToOne(targetEntity: Language::class)]
+//        #[ORM\JoinColumn(
+//            name: 'language_code',
+//            referencedColumnName: 'code',
+//            nullable: true,
+//            onDelete: 'SET NULL',
+//        )]
+//        private ?Language $language = null,
 
     public function __construct(
         #[ORM\ManyToOne(targetEntity: Category::class)]
@@ -40,6 +50,14 @@ class Category extends BaseEntity
         private ?string $body = null,
         #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
         private bool $hidden = false,
+        #[ORM\ManyToOne(targetEntity: Seo::class)]
+        #[ORM\JoinColumn(
+            name: 'seo_id',
+            referencedColumnName: 'id',
+            nullable: true,
+            onDelete: 'SET NULL',
+        )]
+        private ?Seo $seo = null,
     ) {
     }
 
@@ -139,6 +157,17 @@ class Category extends BaseEntity
     public function setHidden(bool $hidden): self
     {
         $this->hidden = $hidden;
+        return $this;
+    }
+
+    public function getSeo(): ?Seo
+    {
+        return $this->seo;
+    }
+
+    public function setSeo(?Seo $seo): self
+    {
+        $this->seo = $seo;
         return $this;
     }
 }
