@@ -36,9 +36,10 @@ class SmsLog extends BaseEntity
         return $this->userId;
     }
 
-    public function setUserId(?int $userId): void
+    public function setUserId(?int $userId): self
     {
         $this->userId = $userId;
+        return $this;
     }
 
     public function getPhoneNumber(): string
@@ -46,9 +47,10 @@ class SmsLog extends BaseEntity
         return $this->phoneNumber;
     }
 
-    public function setPhoneNumber(string $phoneNumber): void
+    public function setPhoneNumber(string $phoneNumber): self
     {
         $this->phoneNumber = $phoneNumber;
+        return $this;
     }
 
     public function getMessage(): string
@@ -59,10 +61,11 @@ class SmsLog extends BaseEntity
     /**
      * @throws InvalidArgumentException 460 characters max
      */
-    public function setMessage(string $message): void
+    public function setMessage(string $message): self
     {
         Assert::maxLength($message, 460, 'SMS Message length must be less than 460 characters');
         $this->message = $message;
+        return $this;
     }
 
     public function getErrorCode(): ?int
@@ -70,8 +73,9 @@ class SmsLog extends BaseEntity
         return $this->errorCode;
     }
 
-    public function setErrorCode(?int $errorCode): void
+    public function setErrorCode(?int $errorCode): self
     {
         $this->errorCode = $errorCode;
+        return $this;
     }
 }

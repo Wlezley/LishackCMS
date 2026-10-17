@@ -50,9 +50,10 @@ class StorageTree extends BaseEntity
         return $this->parentId;
     }
 
-    public function setParentId(int $parentId): void
+    public function setParentId(int $parentId): self
     {
         $this->parentId = $parentId;
+        return $this;
     }
 
     public function getOwnerId(): int
@@ -60,9 +61,10 @@ class StorageTree extends BaseEntity
         return $this->ownerId;
     }
 
-    public function setOwnerId(int $ownerId): void
+    public function setOwnerId(int $ownerId): self
     {
         $this->ownerId = $ownerId;
+        return $this;
     }
 
     public function getPosition(): ?int
@@ -70,9 +72,10 @@ class StorageTree extends BaseEntity
         return $this->position;
     }
 
-    public function setPosition(?int $position): void
+    public function setPosition(?int $position): self
     {
         $this->position = $position;
+        return $this;
     }
 
     public function getName(): string
@@ -80,9 +83,10 @@ class StorageTree extends BaseEntity
         return $this->name;
     }
 
-    public function setName(string $name): void
+    public function setName(string $name): self
     {
         $this->name = $name;
+        return $this;
     }
 
     public function getNameUrl(): string
@@ -90,9 +94,10 @@ class StorageTree extends BaseEntity
         return $this->nameUrl;
     }
 
-    public function setNameUrl(string $nameUrl): void
+    public function setNameUrl(string $nameUrl): self
     {
         $this->nameUrl = $nameUrl;
+        return $this;
     }
 
     public function getCreatedAt(): \DateTimeImmutable
@@ -100,9 +105,10 @@ class StorageTree extends BaseEntity
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): void
+    public function setCreatedAt(\DateTimeImmutable $createdAt): self
     {
         $this->createdAt = $createdAt;
+        return $this;
     }
 
     public function getModifiedAt(): ?\DateTimeImmutable
@@ -110,9 +116,10 @@ class StorageTree extends BaseEntity
         return $this->modifiedAt;
     }
 
-    public function setModifiedAt(?\DateTimeImmutable $modifiedAt): void
+    public function setModifiedAt(?\DateTimeImmutable $modifiedAt): self
     {
         $this->modifiedAt = $modifiedAt;
+        return $this;
     }
 
     public function getDeletedAt(): ?\DateTimeImmutable
@@ -120,9 +127,10 @@ class StorageTree extends BaseEntity
         return $this->deletedAt;
     }
 
-    public function setDeletedAt(?\DateTimeImmutable $deletedAt): void
+    public function setDeletedAt(?\DateTimeImmutable $deletedAt): self
     {
         $this->deletedAt = $deletedAt;
+        return $this;
     }
 
     public function isDeleted(): bool
@@ -130,9 +138,10 @@ class StorageTree extends BaseEntity
         return $this->deletedAt !== null;
     }
 
-    public function setDeleted(bool $deleted): void
+    public function setDeleted(bool $deleted): self
     {
         $this->deletedAt = $deleted ? new \DateTimeImmutable() : null;
+        return $this;
     }
 
     public function isModified(): bool
@@ -140,8 +149,9 @@ class StorageTree extends BaseEntity
         return $this->modifiedAt !== null;
     }
 
-    public function setModified(bool $modified): void
+    public function setModified(bool $modified): self
     {
         $this->modifiedAt = $modified ? new \DateTimeImmutable() : null;
+        return $this;
     }
 }

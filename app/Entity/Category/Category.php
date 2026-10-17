@@ -48,9 +48,10 @@ class Category extends BaseEntity
         return $this->parent;
     }
 
-    public function setParent(?Category $parent): void
+    public function setParent(?Category $parent): self
     {
         $this->parent = $parent;
+        return $this;
     }
 
     public function getPosition(): ?int
@@ -58,9 +59,10 @@ class Category extends BaseEntity
         return $this->position;
     }
 
-    public function setPosition(?int $position): void
+    public function setPosition(?int $position): self
     {
         $this->position = $position;
+        return $this;
     }
 
     public function getLevel(): ?int
@@ -68,9 +70,10 @@ class Category extends BaseEntity
         return $this->level;
     }
 
-    public function setLevel(?int $level): void
+    public function setLevel(?int $level): self
     {
         $this->level = $level;
+        return $this;
     }
 
     public function getName(): ?string
@@ -78,9 +81,10 @@ class Category extends BaseEntity
         return $this->name;
     }
 
-    public function setName(?string $name): void
+    public function setName(?string $name): self
     {
         $this->name = $name;
+        return $this;
     }
 
     public function getNameUrl(): ?string
@@ -88,9 +92,10 @@ class Category extends BaseEntity
         return $this->nameUrl;
     }
 
-    public function setNameUrl(?string $nameUrl): void
+    public function setNameUrl(?string $nameUrl): self
     {
         $this->nameUrl = $nameUrl;
+        return $this;
     }
 
     public function getTitle(): ?string
@@ -98,9 +103,10 @@ class Category extends BaseEntity
         return $this->title;
     }
 
-    public function setTitle(?string $title): void
+    public function setTitle(?string $title): self
     {
         $this->title = $title;
+        return $this;
     }
 
     public function getDescription(): ?string
@@ -108,9 +114,10 @@ class Category extends BaseEntity
         return $this->description;
     }
 
-    public function setDescription(?string $description): void
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
+        return $this;
     }
 
     public function getBody(): ?string
@@ -118,9 +125,10 @@ class Category extends BaseEntity
         return $this->body;
     }
 
-    public function setBody(?string $body): void
+    public function setBody(?string $body): self
     {
         $this->body = $body;
+        return $this;
     }
 
     public function isHidden(): bool
@@ -128,8 +136,9 @@ class Category extends BaseEntity
         return $this->hidden;
     }
 
-    public function setHidden(bool $hidden): void
+    public function setHidden(bool $hidden): self
     {
         $this->hidden = $hidden;
+        return $this;
     }
 }

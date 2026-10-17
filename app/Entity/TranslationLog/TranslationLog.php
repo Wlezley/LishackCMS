@@ -38,9 +38,10 @@ class TranslationLog extends BaseEntity
         return $this->key;
     }
 
-    public function setKey(string $key): void
+    public function setKey(string $key): self
     {
         $this->key = $key;
+        return $this;
     }
 
     public function getLang(): string
@@ -48,9 +49,10 @@ class TranslationLog extends BaseEntity
         return $this->lang;
     }
 
-    public function setLang(string $lang): void
+    public function setLang(string $lang): self
     {
         $this->lang = $lang;
+        return $this;
     }
 
     public function getType(): TranslationLogType
@@ -58,9 +60,10 @@ class TranslationLog extends BaseEntity
         return $this->type;
     }
 
-    public function setType(TranslationLogType $type): void
+    public function setType(TranslationLogType $type): self
     {
         $this->type = $type;
+        return $this;
     }
 
     public function getMessage(): ?string
@@ -68,8 +71,9 @@ class TranslationLog extends BaseEntity
         return $this->message;
     }
 
-    public function setMessage(?string $message): void
+    public function setMessage(?string $message): self
     {
         $this->message = $message;
+        return $this;
     }
 }

@@ -33,9 +33,10 @@ class Redirect extends BaseEntity
         return $this->source;
     }
 
-    public function setSource(string $source): void
+    public function setSource(string $source): self
     {
         $this->source = $source;
+        return $this;
     }
 
     public function getTarget(): string
@@ -43,9 +44,10 @@ class Redirect extends BaseEntity
         return $this->target;
     }
 
-    public function setTarget(string $target): void
+    public function setTarget(string $target): self
     {
         $this->target = $target;
+        return $this;
     }
 
     public function getCode(): HttpRedirectCode
@@ -53,9 +55,10 @@ class Redirect extends BaseEntity
         return $this->code;
     }
 
-    public function setCode(HttpRedirectCode $code): void
+    public function setCode(HttpRedirectCode $code): self
     {
         $this->code = $code;
+        return $this;
     }
 
     public function isEnabled(): bool
@@ -63,8 +66,9 @@ class Redirect extends BaseEntity
         return $this->enabled;
     }
 
-    public function setEnabled(bool $enabled): void
+    public function setEnabled(bool $enabled): self
     {
         $this->enabled = $enabled;
+        return $this;
     }
 }

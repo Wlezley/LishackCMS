@@ -45,9 +45,10 @@ class Translation extends BaseEntity
         return $this->translationKey;
     }
 
-    public function setTranslationKey(string $translationKey): void
+    public function setTranslationKey(string $translationKey): self
     {
         $this->translationKey = $translationKey;
+        return $this;
     }
 
     public function getLanguage(): Language
@@ -55,9 +56,10 @@ class Translation extends BaseEntity
         return $this->language;
     }
 
-    public function setLanguage(Language $language): void
+    public function setLanguage(Language $language): self
     {
         $this->language = $language;
+        return $this;
     }
 
     public function getText(): ?string
@@ -65,9 +67,10 @@ class Translation extends BaseEntity
         return $this->text;
     }
 
-    public function setText(?string $text): void
+    public function setText(?string $text): self
     {
         $this->text = $text;
+        return $this;
     }
 
     public function getLanguageCode(): string

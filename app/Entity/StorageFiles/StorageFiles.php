@@ -62,9 +62,10 @@ class StorageFiles extends BaseEntity
         return $this->treeId;
     }
 
-    public function setTreeId(int $treeId): void
+    public function setTreeId(int $treeId): self
     {
         $this->treeId = $treeId;
+        return $this;
     }
 
     public function getOwnerId(): int
@@ -72,9 +73,10 @@ class StorageFiles extends BaseEntity
         return $this->ownerId;
     }
 
-    public function setOwnerId(int $ownerId): void
+    public function setOwnerId(int $ownerId): self
     {
         $this->ownerId = $ownerId;
+        return $this;
     }
 
     public function getPosition(): ?int
@@ -82,9 +84,10 @@ class StorageFiles extends BaseEntity
         return $this->position;
     }
 
-    public function setPosition(?int $position): void
+    public function setPosition(?int $position): self
     {
         $this->position = $position;
+        return $this;
     }
 
     public function getName(): string
@@ -92,9 +95,10 @@ class StorageFiles extends BaseEntity
         return $this->name;
     }
 
-    public function setName(string $name): void
+    public function setName(string $name): self
     {
         $this->name = $name;
+        return $this;
     }
 
     public function getNameUrl(): string
@@ -102,9 +106,10 @@ class StorageFiles extends BaseEntity
         return $this->nameUrl;
     }
 
-    public function setNameUrl(string $nameUrl): void
+    public function setNameUrl(string $nameUrl): self
     {
         $this->nameUrl = $nameUrl;
+        return $this;
     }
 
     public function getType(): string
@@ -112,9 +117,10 @@ class StorageFiles extends BaseEntity
         return $this->type;
     }
 
-    public function setType(string $type): void
+    public function setType(string $type): self
     {
         $this->type = $type;
+        return $this;
     }
 
     public function getIcon(): string
@@ -122,10 +128,11 @@ class StorageFiles extends BaseEntity
         return $this->icon;
     }
 
-    public function setIcon(string $icon): void
+    public function setIcon(string $icon): self
     {
         Assert::maxLength($icon, 5, 'Icon must be max 5 characters long');
         $this->icon = $icon;
+        return $this;
     }
 
     public function getSize(): int
@@ -133,9 +140,10 @@ class StorageFiles extends BaseEntity
         return $this->size;
     }
 
-    public function setSize(int $size): void
+    public function setSize(int $size): self
     {
         $this->size = $size;
+        return $this;
     }
 
     public function getChecksum(): string
@@ -143,10 +151,11 @@ class StorageFiles extends BaseEntity
         return $this->checksum;
     }
 
-    public function setChecksum(string $checksum): void
+    public function setChecksum(string $checksum): self
     {
         Assert::maxLength($checksum, 32, 'Checksum must be max 32 characters long');
         $this->checksum = $checksum;
+        return $this;
     }
 
     public function getStorageId(): string
@@ -154,10 +163,11 @@ class StorageFiles extends BaseEntity
         return $this->storageId;
     }
 
-    public function setStorageId(string $storageId): void
+    public function setStorageId(string $storageId): self
     {
         Assert::maxLength($storageId, 16, 'StorageId must be max 16 characters long');
         $this->storageId = $storageId;
+        return $this;
     }
 
     public function getDownloadId(): string
@@ -165,10 +175,11 @@ class StorageFiles extends BaseEntity
         return $this->downloadId;
     }
 
-    public function setDownloadId(string $downloadId): void
+    public function setDownloadId(string $downloadId): self
     {
         Assert::maxLength($downloadId, 16, 'DownloadId must be max 16 characters long');
         $this->downloadId = $downloadId;
+        return $this;
     }
 
     public function getUploadedAt(): \DateTimeImmutable
@@ -176,9 +187,10 @@ class StorageFiles extends BaseEntity
         return $this->uploadedAt;
     }
 
-    public function setUploadedAt(\DateTimeImmutable $uploadedAt): void
+    public function setUploadedAt(\DateTimeImmutable $uploadedAt): self
     {
         $this->uploadedAt = $uploadedAt;
+        return $this;
     }
 
     public function getModifiedAt(): ?\DateTimeImmutable
@@ -186,9 +198,10 @@ class StorageFiles extends BaseEntity
         return $this->modifiedAt;
     }
 
-    public function setModifiedAt(?\DateTimeImmutable $modifiedAt): void
+    public function setModifiedAt(?\DateTimeImmutable $modifiedAt): self
     {
         $this->modifiedAt = $modifiedAt;
+        return $this;
     }
 
     public function getDeletedAt(): ?\DateTimeImmutable
@@ -196,9 +209,10 @@ class StorageFiles extends BaseEntity
         return $this->deletedAt;
     }
 
-    public function setDeletedAt(?\DateTimeImmutable $deletedAt): void
+    public function setDeletedAt(?\DateTimeImmutable $deletedAt): self
     {
         $this->deletedAt = $deletedAt;
+        return $this;
     }
 
     public function isDeleted(): bool
@@ -206,9 +220,10 @@ class StorageFiles extends BaseEntity
         return $this->deletedAt !== null;
     }
 
-    public function setDeleted(bool $deleted): void
+    public function setDeleted(bool $deleted): self
     {
         $this->deletedAt = $deleted ? new \DateTimeImmutable() : null;
+        return $this;
     }
 
     public function isModified(): bool
@@ -216,8 +231,9 @@ class StorageFiles extends BaseEntity
         return $this->modifiedAt !== null;
     }
 
-    public function setModified(bool $modified): void
+    public function setModified(bool $modified): self
     {
         $this->modifiedAt = $modified ? new \DateTimeImmutable() : null;
+        return $this;
     }
 }

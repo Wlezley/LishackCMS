@@ -29,9 +29,10 @@ class CmsConfig extends BaseEntity
         return $this->key;
     }
 
-    public function setKey(string $key): void
+    public function setKey(string $key): self
     {
         $this->key = $key;
+        return $this;
     }
 
     public function getCategory(): CmsConfigCategoryEnum
@@ -39,9 +40,10 @@ class CmsConfig extends BaseEntity
         return $this->category;
     }
 
-    public function setCategory(CmsConfigCategoryEnum $category): void
+    public function setCategory(CmsConfigCategoryEnum $category): self
     {
         $this->category = $category;
+        return $this;
     }
 
     public function getValue(): ?string
@@ -49,8 +51,9 @@ class CmsConfig extends BaseEntity
         return $this->value;
     }
 
-    public function setValue(?string $value): void
+    public function setValue(?string $value): self
     {
         $this->value = $value;
+        return $this;
     }
 }
