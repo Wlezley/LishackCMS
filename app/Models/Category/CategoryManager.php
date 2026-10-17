@@ -84,15 +84,31 @@ class CategoryManager extends BaseModel
     /**
      * Creates a new category in the database.
      *
-     * @param array<string,string|int|null> $data Data to insert (must pass validation).
+     * @param array<string, mixed> $data Data to insert (must pass validation).
      */
     public function create(array $data): void
     {
-        $data = CategoryValidator::prepareData($data);
-        CategoryValidator::validateData($data);
+        // TODO: Use DTO for $data parameter
+        $category = new Category(
+            position: $data['position'] ?? null,
+            level: $data['level'] ?? null,
+            name: $data['name'] ?? null,
+            nameUrl: $data['name_url'] ?? null,
+            title: $data['title'] ?? null,
+            description: $data['description'] ?? null,
+            body: $data['body'] ?? null,
+            hidden: $data['hidden'] ?? false,
+            seo: null, // TODO: Impl. seoService->createSeo()
+        );
 
-        $category = new Category();
-        $this->fillCategory($category, $data);
+        if (isset($data['parent_id'])) {
+            $parent = $this->categoryRepository->findById((int)$data['parent_id']);
+
+            if ($parent) {
+                $category->setParent($parent);
+            }
+        }
+
         $this->categoryRepository->save($category);
 
         $this->invalidate();
@@ -103,7 +119,7 @@ class CategoryManager extends BaseModel
      * Updates an existing category in the database.
      *
      * @param int $id Category ID to update.
-     * @param array<string,string|int|null> $data New data (must pass validation).
+     * @param array<string, mixed> $data New data (must pass validation).
      * @throws CategoryException If the category does not exist or validation fails.
      */
     public function update(int $id, array $data): void
@@ -114,9 +130,26 @@ class CategoryManager extends BaseModel
             throw new CategoryException("Category ID '$id' not found, entry cannot be updated", 1);
         }
 
-        CategoryValidator::validateData($data);
+        if (isset($data['parent_id'])) {
+            $parent = $this->categoryRepository->findById((int)$data['parent_id']);
 
-        $this->fillCategory($category, $data);
+            if ($parent) {
+                $category->setParent($parent);
+            }
+        }
+
+        // TODO: Use DTO for $data parameter
+        $category
+            ->setPosition($data['position'] ?? $category->getPosition())
+            ->setLevel($data['level'] ?? $category->getLevel())
+            ->setName($data['name'] ?? $category->getName())
+            ->setNameUrl($data['name_url'] ?? $category->getNameUrl())
+            ->setTitle($data['title'] ?? $category->getTitle())
+            ->setDescription($data['description'] ?? $category->getDescription())
+            ->setBody($data['body'] ?? $category->getBody())
+            ->setHidden($data['hidden'] ?? $category->isHidden())
+            ->setSeo(null); // TODO: Impl. seoService->updateSeo()
+
         $this->categoryRepository->save($category);
 
         $this->invalidate();
@@ -418,42 +451,5 @@ class CategoryManager extends BaseModel
             'body' => $category->getBody(),
             'hidden' => $category->isHidden(),
         ];
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    private function fillCategory(Category $category, array $data): void
-    {
-        if (isset($data['parent_id'])) {
-            $parent = $this->categoryRepository->findById((int)$data['parent_id']);
-            if ($parent) {
-                $category->setParent($parent);
-            }
-        }
-        if (isset($data['position'])) {
-            $category->setPosition((int)$data['position']);
-        }
-        if (isset($data['level'])) {
-            $category->setLevel((int)$data['level']);
-        }
-        if (isset($data['name'])) {
-            $category->setName((string)$data['name']);
-        }
-        if (isset($data['name_url'])) {
-            $category->setNameUrl((string)$data['name_url']);
-        }
-        if (isset($data['title'])) {
-            $category->setTitle((string)$data['title']);
-        }
-        if (isset($data['description'])) {
-            $category->setDescription((string)$data['description']);
-        }
-        if (isset($data['body'])) {
-            $category->setBody((string)$data['body']);
-        }
-        if (isset($data['hidden'])) {
-            $category->setHidden((bool)$data['hidden']);
-        }
     }
 }
