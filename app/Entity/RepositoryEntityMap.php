@@ -18,6 +18,8 @@ use App\Entity\Language\Language;
 use App\Entity\Language\LanguageRepository;
 use App\Entity\Redirect\Redirect;
 use App\Entity\Redirect\RedirectRepository;
+use App\Entity\Seo\Seo;
+use App\Entity\Seo\SeoRepository;
 use App\Entity\SmsLog\SmsLog;
 use App\Entity\SmsLog\SmsLogRepository;
 use App\Entity\StorageFiles\StorageFiles;
@@ -42,8 +44,10 @@ final class RepositoryEntityMap
         CmsConfigRepository::class => CmsConfig::class,
         DatasetRepository::class => Dataset::class,
         DatasetColumnRepository::class => DatasetColumn::class,
+//        DatasetData::class => ???
         LanguageRepository::class => Language::class,
         RedirectRepository::class => Redirect::class,
+        SeoRepository::class => Seo::class,
         SmsLogRepository::class => SmsLog::class,
         StorageFilesRepository::class => StorageFiles::class,
         StorageTreeRepository::class => StorageTree::class,
