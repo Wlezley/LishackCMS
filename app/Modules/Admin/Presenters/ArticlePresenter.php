@@ -9,14 +9,14 @@ use App\Components\Admin\ArticleEditor\IArticleEditorFactory;
 use App\Components\Admin\ArticleList\ArticleList;
 use App\Components\Admin\ArticleList\IArticleListFactory;
 use App\Exception\ArticleException;
-use App\Models\Article\ArticleManager;
 use App\Models\Category\CategoryManager;
 use App\Models\UrlGenerator\UrlGenerator;
+use App\Service\Article\ArticleService;
 
 class ArticlePresenter extends SecuredPresenter
 {
-    /** @var ArticleManager @inject */
-    public ArticleManager $articleManager;
+    /** @var ArticleService @inject */
+    public ArticleService $articleManager;
 
     /** @var CategoryManager @inject */
     public CategoryManager $categoryManager;

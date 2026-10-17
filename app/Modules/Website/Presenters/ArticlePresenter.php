@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace App\Modules\Website\Presenters;
 
 use App\Exception\CategoryException;
-use App\Models\Article\ArticleManager;
-use App\Models\Article\ArticleParser;
 use App\Models\Category\CategoryManager;
 use App\Models\UrlGenerator\UrlGenerator;
+use App\Service\Article\ArticleParser;
+use App\Service\Article\ArticleService;
 use Nette;
 use Webmozart\Assert\Assert;
 use Webmozart\Assert\InvalidArgumentException;
 
 final class ArticlePresenter extends BasePresenter
 {
-    /** @var ArticleManager @inject */
-    public ArticleManager $articleManager;
+    /** @var ArticleService @inject */
+    public ArticleService $articleManager;
 
     /** @var CategoryManager @inject */
     public CategoryManager $categoryManager;

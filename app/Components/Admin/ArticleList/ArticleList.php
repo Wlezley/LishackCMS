@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Components\Admin\ArticleList;
 
 use App\Components\BaseControl;
-use App\Models\Article\ArticleManager;
 use App\Modules\Admin\Presenters\ArticlePresenter;
+use App\Service\Article\ArticleService;
 use Nette\Utils\Json;
 use Webmozart\Assert\Assert;
 
@@ -16,7 +16,7 @@ class ArticleList extends BaseControl
     private ?int $totalItems = null;
 
     public function __construct(
-        private ArticleManager $articleManager
+        private ArticleService $articleManager
     ) {
     }
 

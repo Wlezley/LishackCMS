@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Models\Article;
+namespace App\Service\Article;
 
 use App\Entity\Article\Article;
 use App\Entity\Article\ArticleRepositoryInterface;
@@ -14,7 +14,7 @@ use App\Models\BaseModel;
 use App\Models\Category\CategoryManager;
 use App\Models\Config\ConfigManager;
 
-class ArticleManager extends BaseModel
+class ArticleService extends BaseModel
 {
     public const string TABLE_NAME = 'article';
 

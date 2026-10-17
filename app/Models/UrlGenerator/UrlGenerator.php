@@ -6,12 +6,12 @@ namespace App\Models\UrlGenerator;
 
 use App\Exception\ArticleException;
 use App\Exception\CategoryException;
-use App\Models\Article\ArticleManager;
 use App\Models\Category\CategoryManager;
 use App\Models\Config\ConfigManager;
 use App\Models\Config\ConfigTrait;
 use App\Models\Helpers\ArrayHelper;
 use App\Models\Helpers\StringHelper;
+use App\Service\Article\ArticleService;
 use Nette\Database\Explorer;
 
 class UrlGenerator
@@ -96,7 +96,7 @@ class UrlGenerator
      */
     public function generateArticleUrl(int $articleId): string
     {
-        $article = $this->db->table(ArticleManager::TABLE_NAME)
+        $article = $this->db->table(ArticleService::TABLE_NAME)
             ->select('name_url, category_id')
             ->where('id', $articleId)
             ->fetch();
@@ -157,7 +157,7 @@ class UrlGenerator
     {
         $newNameUrl = $counter > 0 ? "{$baseNameUrl}-{$counter}" : $baseNameUrl;
 
-        $query = $this->db->table(ArticleManager::TABLE_NAME)
+        $query = $this->db->table(ArticleService::TABLE_NAME)
             ->where('name_url', $newNameUrl);
 
         if ($ignoreId !== null) {

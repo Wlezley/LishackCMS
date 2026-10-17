@@ -8,10 +8,10 @@ use App\Components\BaseControl;
 use App\Entity\User\UserRepositoryInterface;
 use App\Exception\ArticleException;
 use App\Exception\UserException;
-use App\Models\Article\ArticleManager;
 use App\Models\Category\CategoryManager;
 use App\Models\Helpers\StringHelper;
 use App\Models\UrlGenerator\UrlGenerator;
+use App\Service\Article\ArticleService;
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
 use Nette\Utils\DateTime;
@@ -23,7 +23,7 @@ class ArticleEditor extends BaseControl
 
     private UserRepositoryInterface $userRepository;
 
-    private ArticleManager $articleManager;
+    private ArticleService $articleManager;
 
     private CategoryManager $categoryManager;
 
@@ -37,7 +37,7 @@ class ArticleEditor extends BaseControl
 
     public function __construct(
         UserRepositoryInterface $userRepository,
-        ArticleManager $articleManager,
+        ArticleService $articleManager,
         CategoryManager $categoryManager,
         UrlGenerator $urlGenerator
     ) {
