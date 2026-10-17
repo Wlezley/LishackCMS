@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Models\SmsGate;
+namespace App\Service\Sms;
 
 use App\Entity\SmsLog\SmsLogRepository;
 use App\Exception\SmsGateException;
@@ -14,7 +14,7 @@ use Webmozart\Assert\Assert;
 /**
  * See: https://www.smsbrana.cz/dokumentace
  */
-class SmsGate
+class SmsService
 {
     public const string TABLE_NAME = 'log_sms';
     public const int SYSTEM_USER_ID = 0;
