@@ -19,6 +19,10 @@ use Doctrine\ORM\Mapping as ORM;
             name: 'dataset_slug_unique',
             columns: ['dataset', 'slug'],
         ),
+        new ORM\UniqueConstraint(
+            name: 'dataset_column_id_unique',
+            columns: ['dataset', 'column_id'],
+        ),
     ],
 )]
 class DatasetColumn extends BaseEntity
@@ -34,11 +38,11 @@ class DatasetColumn extends BaseEntity
             onDelete: 'RESTRICT',
         )]
         private Dataset $dataset,
-        #[ORM\Column(type: Types::INTEGER, unique: true)]
+        #[ORM\Column(type: Types::INTEGER)]
         private int $columnId,
         #[ORM\Column(type: Types::STRING, length: 50)]
         private string $name,
-        #[ORM\Column(type: Types::STRING, length: 50, unique: true)]
+        #[ORM\Column(type: Types::STRING, length: 50)]
         private string $slug,
         #[ORM\Column(type: Types::STRING, length: 50, enumType: DatasetColumnType::class)]
         private DatasetColumnType $type,
