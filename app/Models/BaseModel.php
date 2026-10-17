@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\Translation\TranslatorTrait;
 use App\Service\Config\ConfigService;
 use App\Trait\ConfigTrait;
+use App\Trait\TranslatorTrait;
 use Nette\SmartObject;
 
 abstract class BaseModel

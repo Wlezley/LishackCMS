@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Models\Translation;
+namespace App\Trait;
 
 use RuntimeException;
 
