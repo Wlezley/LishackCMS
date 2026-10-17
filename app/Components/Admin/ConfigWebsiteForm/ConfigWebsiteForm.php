@@ -108,13 +108,13 @@ class ConfigWebsiteForm extends BaseControl
             }
         }
 
-        $this->configManager->saveConfigValues((array)$values);
+        $this->configService->saveConfigValues((array)$values);
         call_user_func($this->onSuccess, $this->t('success.form.settings-saved'));
     }
 
     public function render(): void
     {
-        $this->template->configuration = $this->configManager->getConfigData();
+        $this->template->configuration = $this->configService->getConfigData();
 
         $this->getTemplate()->setFile(__DIR__ . '/ConfigWebsiteForm.latte');
         $this->getTemplate()->render();

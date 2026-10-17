@@ -8,7 +8,7 @@ use App\Entity\Language\Language;
 use App\Entity\Translation\Translation;
 use App\Entity\Translation\TranslationRepositoryInterface;
 use App\Exception\TranslatorException;
-use App\Models\Config\ConfigManager;
+use App\Service\Config\ConfigService;
 use ValueError;
 
 readonly class TranslationService
@@ -16,7 +16,7 @@ readonly class TranslationService
     public function __construct(
         private TranslationCache $cache,
         private LanguageService $languageService,
-        private ConfigManager $configManager,
+        private ConfigService $configService,
         private TranslatorLog $translatorLog,
         private TranslationRepositoryInterface $translationRepository,
     ) {
@@ -39,7 +39,7 @@ readonly class TranslationService
         }
 
         if ($this->translationRepository->existsByKeyAndLanguage($key, $language) === false) {
-            if ($this->configManager->get('LOG_TRANSLATION_FALLBACK') == 1) {
+            if ($this->configService->get('LOG_TRANSLATION_FALLBACK') == 1) {
                 $this->translatorLog->logMissingKey($key, $language->getCode()); // TODO: Use Language Entity
             }
 
@@ -77,7 +77,7 @@ readonly class TranslationService
         try {
             return vsprintf($format, $values);
         } catch (ValueError $e) {
-            if ($this->configManager->get('LOG_TRANSLATION_FALLBACK') == 1) {
+            if ($this->configService->get('LOG_TRANSLATION_FALLBACK') == 1) {
                 $this->translatorLog->logMissingArguments(
                     key: $key,
                     lang: $language->getCode(), // TODO: Use Language Entity

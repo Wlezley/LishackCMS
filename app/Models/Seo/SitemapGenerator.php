@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models\Seo;
 
-use App\Models\Config\ConfigManager;
 use App\Models\Config\ConfigTrait;
 use App\Models\UrlGenerator\UrlGenerator;
+use App\Service\Config\ConfigService;
 use Nette\Database\Explorer;
 use Nette\Utils\DateTime;
 use samdark\sitemap\Sitemap;
@@ -21,7 +21,7 @@ final class SitemapGenerator
 
     public function __construct(
         protected Explorer $db,
-        protected ConfigManager $configManager,
+        protected ConfigService $configService,
         protected UrlGenerator $urlGenerator
     ) {
     }

@@ -7,12 +7,12 @@ namespace App\Modules\Admin\Presenters;
 use App\Components\BaseControl;
 use App\Entity\Language\Language;
 use App\Exception\TranslatorException;
-use App\Models\Config\ConfigManager;
 use App\Models\Config\ConfigTrait;
 use App\Models\Helpers\AssetsVersionHelper;
 use App\Models\Translation\LanguageService;
 use App\Models\Translation\TranslationService;
 use App\Models\Translation\TranslatorTrait;
+use App\Service\Config\ConfigService;
 use Nette\Application\Helpers;
 use Nette\Application\UI\Presenter;
 use Nette\ComponentModel\IComponent;
@@ -44,8 +44,8 @@ abstract class BasePresenter extends Presenter
     /** @var Explorer @inject */
     public Explorer $db;
 
-    /** @var ConfigManager @inject */
-    public ConfigManager $configManager;
+    /** @var ConfigService @inject */
+    public ConfigService $configService;
 
     /** @var LanguageService @inject */
     public LanguageService $languageService;
@@ -73,7 +73,7 @@ abstract class BasePresenter extends Presenter
         parent::beforeRender();
 
         // CONFIGURATOR
-        $this->template->_C = fn($key) => $this->configManager->get($key);
+        $this->template->_C = fn($key) => $this->configService->get($key);
 
         // TRANSLATOR
         $this->template->_ = fn($key) => $this->translationService->translate($key, $this->language->getCode()); // TODO: Use Language Entity
@@ -168,7 +168,7 @@ abstract class BasePresenter extends Presenter
 
         if ($component instanceof BaseControl) {
             $component->setTranslationService($this->translationService);
-            $component->setConfigManager($this->configManager);
+            $component->setConfigService($this->configService);
         }
 
         return $component;

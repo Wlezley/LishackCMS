@@ -10,8 +10,8 @@ use App\Entity\Category\CategoryRepository;
 use App\Enum\SortOrderEnum;
 use App\Exception\CategoryException;
 use App\Models\BaseModel;
-use App\Models\Config\ConfigManager;
 use App\Models\Helpers\ArrayHelper;
+use App\Service\Config\ConfigService;
 
 class CategoryService extends BaseModel
 {
@@ -24,11 +24,11 @@ class CategoryService extends BaseModel
     protected array $categories = [];
 
     public function __construct(
-        protected ConfigManager $configManager,
+        protected ConfigService $configService,
         private CategoryRepository $categoryRepository,
         private ArticleRepository $articleRepository,
     ) {
-        parent::__construct($configManager);
+        parent::__construct($configService);
     }
 
     /**

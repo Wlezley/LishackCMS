@@ -11,22 +11,22 @@ use App\Entity\Seo\SeoRepositoryInterface;
 use App\Entity\User\UserRepositoryInterface;
 use App\Exception\ArticleException;
 use App\Models\BaseModel;
-use App\Models\Config\ConfigManager;
 use App\Service\Category\CategoryService;
+use App\Service\Config\ConfigService;
 
 class ArticleService extends BaseModel
 {
     public const string TABLE_NAME = 'article';
 
     public function __construct(
-        protected ConfigManager $configManager,
+        protected ConfigService $configService,
         public CategoryService $categoryManager,
         private ArticleRepositoryInterface $articleRepository,
         private CategoryRepositoryInterface $categoryRepository,
         private UserRepositoryInterface $userRepository,
         private SeoRepositoryInterface $seoRepository,
     ) {
-        parent::__construct($configManager);
+        parent::__construct($configService);
     }
 
     /**

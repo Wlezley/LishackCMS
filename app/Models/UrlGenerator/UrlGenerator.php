@@ -6,12 +6,12 @@ namespace App\Models\UrlGenerator;
 
 use App\Exception\ArticleException;
 use App\Exception\CategoryException;
-use App\Models\Config\ConfigManager;
 use App\Models\Config\ConfigTrait;
 use App\Models\Helpers\ArrayHelper;
 use App\Models\Helpers\StringHelper;
 use App\Service\Article\ArticleService;
 use App\Service\Category\CategoryService;
+use App\Service\Config\ConfigService;
 use Nette\Database\Explorer;
 
 class UrlGenerator
@@ -20,7 +20,7 @@ class UrlGenerator
 
     public function __construct(
         protected Explorer $db,
-        protected ConfigManager $configManager
+        protected ConfigService $configService,
     ) {
     }
 

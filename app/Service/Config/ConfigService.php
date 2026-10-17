@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Models\Config;
+namespace App\Service\Config;
 
 use App\Entity\CmsConfig\CmsConfig;
 use App\Entity\CmsConfig\CmsConfigRepository;
@@ -13,7 +13,7 @@ use Webmozart\Assert\Assert;
 /**
  * @todo Rename to Configurator
  */
-class ConfigManager
+class ConfigService
 {
     public const TABLE_NAME = 'cms_config';
 

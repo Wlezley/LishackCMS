@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\Config\ConfigManager;
 use App\Models\Config\ConfigTrait;
 use App\Models\Translation\TranslatorTrait;
+use App\Service\Config\ConfigService;
 use Nette\SmartObject;
 
 abstract class BaseModel
@@ -19,7 +19,7 @@ abstract class BaseModel
     protected mixed $data = null;
 
     public function __construct(
-        protected ConfigManager $configManager,
+        protected ConfigService $configService,
     ) {
     }
 
@@ -41,7 +41,7 @@ abstract class BaseModel
     // TODO: Implement language support
 //    public function setLang(?string $lang = null): void
 //    {
-//        $lang = $lang ?? $this->configManager->get('DEFAULT_LANG');
+//        $lang = $lang ?? $this->configService->get('DEFAULT_LANG');
 //        Assert::notNull($lang, 'Default language is not set');
 //        $this->languageService->setCurrentLanguage($lang);
 //    }

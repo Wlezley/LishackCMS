@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Components;
 
 use App\Entity\User\User;
-use App\Models\Config\ConfigManager;
 use App\Models\Config\ConfigTrait;
 use App\Models\Translation\LanguageService;
 use App\Models\Translation\TranslationService;
 use App\Models\Translation\TranslatorTrait;
 use App\Models\UrlGenerator\UrlGenerator;
+use App\Service\Config\ConfigService;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Template;
 use RuntimeException;
@@ -21,8 +21,8 @@ class BaseControl extends Control
     use ConfigTrait;
     use TranslatorTrait;
 
-    /** @var ConfigManager @inject */
-    public ConfigManager $configManager;
+    /** @var ConfigService @inject */
+    public ConfigService $configService;
 
     /** @var LanguageService @inject */
     public LanguageService $languageService;
@@ -45,19 +45,19 @@ class BaseControl extends Control
     protected ?string $templatePath = null;
 
     /**
-     * @throws RuntimeException If Translator or ConfigManager is not available.
+     * @throws RuntimeException If Translator or ConfigService is not available.
      */
     protected function createTemplate(?string $class = null): Template
     {
         $template = parent::createTemplate($class);
 
         // CONFIGURATOR
-        if (!isset($this->configManager)) {
-            throw new RuntimeException('ConfigManager is not available in ' . static::class);
+        if (!isset($this->configService)) {
+            throw new RuntimeException('ConfigService is not available in ' . static::class);
         }
 
         // phpcs:ignore
-        $template->_C = fn($key) => $this->configManager->get($key); // @phpstan-ignore property.notFound
+        $template->_C = fn($key) => $this->configService->get($key); // @phpstan-ignore property.notFound
 
         // TRANSLATOR
         if (!isset($this->translationService)) {
@@ -72,14 +72,14 @@ class BaseControl extends Control
         return $template;
     }
 
-    public function setConfigManager(ConfigManager $configManager): void
+    public function setConfigService(ConfigService $configService): void
     {
-        $this->configManager = $configManager;
+        $this->configService = $configService;
     }
 
-    public function getConfigManager(): ConfigManager
+    public function getConfigService(): ConfigService
     {
-        return $this->configManager;
+        return $this->configService;
     }
 
     public function getLanguageService(): LanguageService

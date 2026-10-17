@@ -43,13 +43,13 @@ class ConfigEditor extends BaseControl
         }
 
         $configuration = Json::decode($values['configuration'], true);
-        $this->configManager->saveConfig($configuration);
+        $this->configService->saveConfig($configuration);
         call_user_func($this->onSuccess, 'Nastavení bylo uloženo.');
     }
 
     public function render(): void
     {
-        $this->template->configuration = $this->configManager->getConfigData();
+        $this->template->configuration = $this->configService->getConfigData();
 
         $this->getTemplate()->setFile(__DIR__ . '/ConfigEditor.latte');
         $this->getTemplate()->render();
