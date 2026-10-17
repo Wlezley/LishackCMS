@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models\Seo;
 
-use App\Models\Config\ConfigTrait;
 use App\Models\UrlGenerator\UrlGenerator;
 use App\Service\Config\ConfigService;
+use App\Trait\ConfigTrait;
 use Nette\Database\Explorer;
 use Nette\Utils\DateTime;
 use samdark\sitemap\Sitemap;

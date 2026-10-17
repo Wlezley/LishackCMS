@@ -6,12 +6,12 @@ namespace App\Models\UrlGenerator;
 
 use App\Exception\ArticleException;
 use App\Exception\CategoryException;
-use App\Models\Config\ConfigTrait;
 use App\Models\Helpers\ArrayHelper;
 use App\Models\Helpers\StringHelper;
 use App\Service\Article\ArticleService;
 use App\Service\Category\CategoryService;
 use App\Service\Config\ConfigService;
+use App\Trait\ConfigTrait;
 use Nette\Database\Explorer;
 
 class UrlGenerator

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Models\Config;
+namespace App\Trait;
 
 use RuntimeException;
 use Webmozart\Assert\Assert;

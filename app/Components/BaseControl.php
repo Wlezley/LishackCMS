@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Components;
 
 use App\Entity\User\User;
-use App\Models\Config\ConfigTrait;
 use App\Models\Translation\LanguageService;
 use App\Models\Translation\TranslationService;
 use App\Models\Translation\TranslatorTrait;
 use App\Models\UrlGenerator\UrlGenerator;
 use App\Service\Config\ConfigService;
+use App\Trait\ConfigTrait;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Template;
 use RuntimeException;
