@@ -11,4 +11,16 @@ use App\Entity\BaseRepositoryInterface;
  */
 interface SeoRepositoryInterface extends BaseRepositoryInterface
 {
+    public function create(
+        ?string $robots = null,
+        ?string $canonicalUrl = null,
+        ?string $ogTitle = null,
+        ?string $ogDescription = null,
+        ?string $ogImage = null,
+        ?string $ogUrl = null,
+        ?string $ogType = null,
+        ?string $metaTitle = null,
+        ?string $metaDescription = null,
+        ?string $metaKeywords = null,
+    ): Seo;
 }
