@@ -15,8 +15,8 @@ use App\Exception\TranslatorException;
 use App\Models\Category\CategoryManager;
 use App\Models\Config\ConfigManager;
 use App\Models\Config\ConfigTrait;
-use App\Models\Helpers\AssetsVersion;
-use App\Models\Helpers\IPValidator;
+use App\Models\Helpers\AssetsVersionHelper;
+use App\Models\Helpers\IPHelper;
 use App\Models\Translation\LanguageService;
 use App\Models\Translation\TranslationService;
 use App\Models\Translation\TranslatorTrait;
@@ -143,14 +143,14 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
         $this->template->cssInject = $this->c('CSS_INJECT');
         $jsIPExceptions = $this->c('JS_IP_EXCEPTIONS');
         Assert::string($jsIPExceptions, 'JS_IP_EXCEPTIONS must be a string.');
-        if (!IPValidator::ipInList($_SERVER['REMOTE_ADDR'], explode(',', $jsIPExceptions))) {
+        if (!IPHelper::ipInList($_SERVER['REMOTE_ADDR'], explode(',', $jsIPExceptions))) {
             $this->template->jsInjectHead = $this->c('JS_INJECT_HEAD');
             $this->template->jsInjectBodyFirst = $this->c('JS_INJECT_BODY_FIRST');
             $this->template->jsInjectBodyLast = $this->c('JS_INJECT_BODY_LAST');
         }
 
         // Assets version
-        $assetsVersion = new AssetsVersion();
+        $assetsVersion = new AssetsVersionHelper();
         $assetsVersion->setTemplate($this->template)
             ->setBasePath(ASSETS_DIR)
             ->addFile('website/dist/scripts.min.js', 'js_version')

@@ -9,7 +9,7 @@ use App\Entity\Language\Language;
 use App\Exception\TranslatorException;
 use App\Models\Config\ConfigManager;
 use App\Models\Config\ConfigTrait;
-use App\Models\Helpers\AssetsVersion;
+use App\Models\Helpers\AssetsVersionHelper;
 use App\Models\Translation\LanguageService;
 use App\Models\Translation\TranslationService;
 use App\Models\Translation\TranslatorTrait;
@@ -97,7 +97,7 @@ abstract class BasePresenter extends Presenter
         $this->template->DEFAULT_LANG_TINYMCE = $this->c('DEFAULT_LANG_ADMIN');
 
         // Assets version
-        $assetsVersion = new AssetsVersion();
+        $assetsVersion = new AssetsVersionHelper();
         $assetsVersion->setTemplate($this->template)
             ->setBasePath(ASSETS_DIR)
             ->addFile('admin/dist/scripts.min.js', 'js_version')

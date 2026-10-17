@@ -6,7 +6,7 @@ namespace App\Models\Helpers;
 
 use Webmozart\Assert\Assert;
 
-class IPValidator
+class IPHelper
 {
     /**
      * Checks if an IP address or subnet is contained within a list of allowed IPs and subnets.

@@ -28,7 +28,7 @@ services:
     - App\Models\Article\ArticleManager
     - App\Models\Category\CategoryManager
     - App\Models\Config\ConfigManager
-    - App\Models\Helpers\AssetsVersion
+    - App\Models\Helpers\AssetsVersionHelper
     - App\Models\Installer\Installer
     - App\Models\Seo\SitemapGenerator
     - App\Models\SmsGate\SmsGate(%smsgate.url%, %smsgate.login%, %smsgate.password%, %smsgate.sender_id%, %smsgate.secured_login%)

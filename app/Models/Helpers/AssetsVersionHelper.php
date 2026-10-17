@@ -6,7 +6,7 @@ namespace App\Models\Helpers;
 
 use Nette\Bridges\ApplicationLatte\Template;
 
-class AssetsVersion
+class AssetsVersionHelper
 {
     private Template $template;
 
