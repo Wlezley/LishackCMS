@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Models\Seo;
+namespace App\Service\Seo;
 
 use App\Models\UrlGenerator\UrlGenerator;
 use App\Service\Config\ConfigService;
@@ -12,7 +12,7 @@ use Nette\Utils\DateTime;
 use samdark\sitemap\Sitemap;
 use Tracy\Debugger;
 
-final class SitemapGenerator
+final class SitemapService
 {
     use ConfigTrait;
 

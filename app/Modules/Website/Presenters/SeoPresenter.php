@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Modules\Website\Presenters;
 
-use App\Models\Seo\SitemapGenerator;
+use App\Service\Seo\SitemapService;
 use Nette\Application\Responses\TextResponse;
 use Tracy\Debugger;
 
 final class SeoPresenter extends BasePresenter
 {
-    /** @var SitemapGenerator @inject */
-    public SitemapGenerator $sitemapGenerator;
+    /** @var SitemapService @inject */
+    public SitemapService $sitemapGenerator;
 
     public function __construct()
     {
