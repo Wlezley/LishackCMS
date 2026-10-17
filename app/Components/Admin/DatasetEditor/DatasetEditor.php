@@ -14,6 +14,7 @@ use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
+use Webmozart\Assert\Assert;
 
 class DatasetEditor extends BaseControl
 {
@@ -49,27 +50,15 @@ class DatasetEditor extends BaseControl
             $param['id'] = $this->datasetService->getDataset()->getId();
         }
 
-        $form->addHidden('id')
-            ->setValue($param['id'] ?? null);
+        $form->addHidden('id');
+        $form->addText('name', $this->t('dataset.title'))->setRequired();
+        $form->addText('slug', $this->t('slug'));
+        $form->addText('component', $this->t('component'));
+        $form->addText('presenter', $this->t('presenter'));
+        $form->addCheckbox('active', $this->t('active'));
+        $form->addCheckbox('deleted', $this->t('deleted'));
 
-        $form->addText('name', $this->t('dataset.title'))
-            ->setValue($param['name'] ?? '')
-            ->setRequired();
-
-        $form->addText('slug', $this->t('slug'))
-            ->setValue($param['slug'] ?? '');
-
-        $form->addText('component', $this->t('component'))
-            ->setValue($param['component'] ?? '');
-
-        $form->addText('presenter', $this->t('presenter'))
-            ->setValue($param['presenter'] ?? '');
-
-        $form->addCheckbox('active', $this->t('active'))
-            ->setValue($param['active'] ?? true);
-
-        $form->addCheckbox('deleted', $this->t('deleted'))
-            ->setValue($param['deleted'] ?? false);
+        $form->setDefaults($param);
 
         $form->addHidden('columns', '');
         $form->addSubmit('save', $this->t('save.config'));
@@ -104,19 +93,22 @@ class DatasetEditor extends BaseControl
             $values['slug'],
             $values['component'],
             $values['presenter'],
-            $values['active'],
-            $values['deleted']
+            (bool)$values['active'],
+            (bool)$values['deleted'],
         );
 
         foreach ($columns as $c) {
+            $columnType = DatasetColumnType::tryFrom($c['type']);
+            Assert::notNull($columnType, "Invalid column type: {$c['type']} for column: {$c['name']} in dataset: {$values['name']}");
+
             $this->datasetCreator->addColumn(
                 $c['name'],
                 $c['slug'],
-                $c['type'],
-                $c['required'],
-                $c['listed'],
-                $c['hidden'],
-                $c['deleted'],
+                $columnType,
+                (bool)$c['required'],
+                (bool)$c['listed'],
+                (bool)$c['hidden'],
+                (bool)$c['deleted'],
                 $c['default']
             );
         }
@@ -147,20 +139,23 @@ class DatasetEditor extends BaseControl
             $values['slug'],
             $values['component'],
             $values['presenter'],
-            $values['active'],
-            $values['deleted']
+            (bool)$values['active'],
+            (bool)$values['deleted'],
         );
 
         foreach ($columns as $columnId => $c) {
+            $columnType = DatasetColumnType::tryFrom($c['type']);
+            Assert::notNull($columnType, "Invalid column type: {$c['type']} for column: {$c['name']} in dataset: {$values['name']}");
+
             $this->datasetUpdater->updateColumn(
                 $columnId,
                 $c['name'],
                 $c['slug'],
-                $c['type'],
-                $c['required'],
-                $c['listed'],
-                $c['hidden'],
-                $c['deleted'],
+                $columnType,
+                (bool)$c['required'],
+                (bool)$c['listed'],
+                (bool)$c['hidden'],
+                (bool)$c['deleted'],
                 $c['default']
             );
         }
