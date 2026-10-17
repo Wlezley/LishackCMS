@@ -34,6 +34,8 @@ class Seo extends BaseEntity
         private ?string $metaTitle = null,
         #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
         private ?string $metaDescription = null,
+        #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
+        private ?string $metaKeywords = null,
     ) {
     }
 
@@ -42,9 +44,10 @@ class Seo extends BaseEntity
         return $this->robots;
     }
 
-    public function setRobots(?string $robots): void
+    public function setRobots(?string $robots): self
     {
         $this->robots = $robots;
+        return $this;
     }
 
     public function getCanonicalUrl(): ?string
@@ -52,9 +55,10 @@ class Seo extends BaseEntity
         return $this->canonicalUrl;
     }
 
-    public function setCanonicalUrl(?string $canonicalUrl): void
+    public function setCanonicalUrl(?string $canonicalUrl): self
     {
         $this->canonicalUrl = $canonicalUrl;
+        return $this;
     }
 
     public function getOgTitle(): ?string
@@ -62,9 +66,10 @@ class Seo extends BaseEntity
         return $this->ogTitle;
     }
 
-    public function setOgTitle(?string $ogTitle): void
+    public function setOgTitle(?string $ogTitle): self
     {
         $this->ogTitle = $ogTitle;
+        return $this;
     }
 
     public function getOgDescription(): ?string
@@ -72,9 +77,10 @@ class Seo extends BaseEntity
         return $this->ogDescription;
     }
 
-    public function setOgDescription(?string $ogDescription): void
+    public function setOgDescription(?string $ogDescription): self
     {
         $this->ogDescription = $ogDescription;
+        return $this;
     }
 
     public function getOgImage(): ?string
@@ -82,9 +88,10 @@ class Seo extends BaseEntity
         return $this->ogImage;
     }
 
-    public function setOgImage(?string $ogImage): void
+    public function setOgImage(?string $ogImage): self
     {
         $this->ogImage = $ogImage;
+        return $this;
     }
 
     public function getOgUrl(): ?string
@@ -92,9 +99,10 @@ class Seo extends BaseEntity
         return $this->ogUrl;
     }
 
-    public function setOgUrl(?string $ogUrl): void
+    public function setOgUrl(?string $ogUrl): self
     {
         $this->ogUrl = $ogUrl;
+        return $this;
     }
 
     public function getOgType(): ?string
@@ -102,9 +110,10 @@ class Seo extends BaseEntity
         return $this->ogType;
     }
 
-    public function setOgType(?string $ogType): void
+    public function setOgType(?string $ogType): self
     {
         $this->ogType = $ogType;
+        return $this;
     }
 
     public function getMetaTitle(): ?string
@@ -112,9 +121,10 @@ class Seo extends BaseEntity
         return $this->metaTitle;
     }
 
-    public function setMetaTitle(?string $metaTitle): void
+    public function setMetaTitle(?string $metaTitle): self
     {
         $this->metaTitle = $metaTitle;
+        return $this;
     }
 
     public function getMetaDescription(): ?string
@@ -122,8 +132,20 @@ class Seo extends BaseEntity
         return $this->metaDescription;
     }
 
-    public function setMetaDescription(?string $metaDescription): void
+    public function setMetaDescription(?string $metaDescription): self
     {
         $this->metaDescription = $metaDescription;
+        return $this;
+    }
+
+    public function getMetaKeywords(): ?string
+    {
+        return $this->metaKeywords;
+    }
+
+    public function setMetaKeywords(?string $metaKeywords): self
+    {
+        $this->metaKeywords = $metaKeywords;
+        return $this;
     }
 }

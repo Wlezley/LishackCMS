@@ -81,7 +81,7 @@ class ArticleManager extends BaseModel
     {
         $article = $this->articleRepository->findOneBy([
             'nameUrl' => $nameUrl,
-            'categoryId' => $categoryId,
+            'category' => $categoryId,
         ]);
 
         if (!$article) {

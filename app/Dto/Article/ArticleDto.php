@@ -13,7 +13,7 @@ use App\Entity\User\User;
 class ArticleDto extends Dto
 {
     public function __construct(
-        public int $id,
+        public int $id, // TODO: Use UUID7
         public \DateTimeImmutable $createdAt,
         public ?\DateTimeImmutable $updatedAt,
         public string $title,

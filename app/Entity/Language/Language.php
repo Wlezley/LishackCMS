@@ -39,9 +39,10 @@ class Language extends BaseEntity
         return $this->name;
     }
 
-    public function setName(string $name): void
+    public function setName(string $name): self
     {
         $this->name = $name;
+        return $this;
     }
 
     public function getHtmlLang(): string
@@ -49,9 +50,10 @@ class Language extends BaseEntity
         return $this->htmlLang;
     }
 
-    public function setHtmlLang(string $htmlLang): void
+    public function setHtmlLang(string $htmlLang): self
     {
         $this->htmlLang = $htmlLang;
+        return $this;
     }
 
     public function getLocale(): string
@@ -59,9 +61,10 @@ class Language extends BaseEntity
         return $this->locale;
     }
 
-    public function setLocale(string $locale): void
+    public function setLocale(string $locale): self
     {
         $this->locale = $locale;
+        return $this;
     }
 
     public function isEnabled(): bool
@@ -69,9 +72,10 @@ class Language extends BaseEntity
         return $this->enabled;
     }
 
-    public function setEnabled(bool $enabled): void
+    public function setEnabled(bool $enabled): self
     {
         $this->enabled = $enabled;
+        return $this;
     }
 
     public function isDefault(): bool
@@ -79,8 +83,9 @@ class Language extends BaseEntity
         return $this->default;
     }
 
-    public function setDefault(bool $default): void
+    public function setDefault(bool $default): self
     {
         $this->default = $default;
+        return $this;
     }
 }

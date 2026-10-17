@@ -45,7 +45,7 @@ final class ArticlePresenter extends BasePresenter
             return;
         }
 
-        if ($articleUrl === $this->c('DEFAULT_PAGE')) {
+        if ($articleUrl === $this->c('DEFAULT_PAGE')) { // We don't want to show the default page if /home is requested
             $this->article = $this->articleManager->getByNameUrl('404');
             $this->getHttpResponse()->setCode(Nette\Http\IResponse::S404_NotFound);
             return;

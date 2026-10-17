@@ -65,9 +65,10 @@ class User extends BaseEntity
         return $this->userName;
     }
 
-    public function setUserName(string $userName): void
+    public function setUserName(string $userName): self
     {
         $this->userName = $userName;
+        return $this;
     }
 
     public function getPasswordEncrypted(): ?string
@@ -75,14 +76,16 @@ class User extends BaseEntity
         return $this->password;
     }
 
-    public function setPasswordEncrypted(string $encryptedPassword): void
+    public function setPasswordEncrypted(string $encryptedPassword): self
     {
         $this->password = $encryptedPassword;
+        return $this;
     }
 
-    public function setPasswordFromPlaintext(#[\SensitiveParameter] string $passwordToEncrypt): void
+    public function setPasswordFromPlaintext(#[\SensitiveParameter] string $passwordToEncrypt): self
     {
         $this->password = UserPasswordHelper::encrypt($passwordToEncrypt);
+        return $this;
     }
 
     public function getEmail(): string
@@ -90,9 +93,10 @@ class User extends BaseEntity
         return $this->email;
     }
 
-    public function setEmail(string $email): void
+    public function setEmail(string $email): self
     {
         $this->email = $email;
+        return $this;
     }
 
     public function getRole(): UserRoleEnum
@@ -100,9 +104,10 @@ class User extends BaseEntity
         return $this->role;
     }
 
-    public function setRole(UserRoleEnum $role): void
+    public function setRole(UserRoleEnum $role): self
     {
         $this->role = $role;
+        return $this;
     }
 
     public function getFirstName(): ?string
@@ -110,9 +115,10 @@ class User extends BaseEntity
         return $this->firstName;
     }
 
-    public function setFirstName(?string $firstName): void
+    public function setFirstName(?string $firstName): self
     {
         $this->firstName = $firstName;
+        return $this;
     }
 
     public function getLastName(): ?string
@@ -120,9 +126,10 @@ class User extends BaseEntity
         return $this->lastName;
     }
 
-    public function setLastName(?string $lastName): void
+    public function setLastName(?string $lastName): self
     {
         $this->lastName = $lastName;
+        return $this;
     }
 
     public function getFullName(): ?string
@@ -138,10 +145,11 @@ class User extends BaseEntity
         return $this->firstName . ' ' . $this->lastName;
     }
 
-    public function setFullName(string $firstName, string $lastName): void
+    public function setFullName(string $firstName, string $lastName): self
     {
         $this->firstName = $firstName;
         $this->lastName = $lastName;
+        return $this;
     }
 
     public function getSessionId(): ?string
@@ -149,9 +157,10 @@ class User extends BaseEntity
         return $this->sessionId;
     }
 
-    public function setSessionId(?string $sessionId): void
+    public function setSessionId(?string $sessionId): self
     {
         $this->sessionId = $sessionId;
+        return $this;
     }
 
     public function isDeleted(): bool
@@ -159,9 +168,10 @@ class User extends BaseEntity
         return $this->deleted;
     }
 
-    public function setDeleted(bool $deleted): void
+    public function setDeleted(bool $deleted): self
     {
         $this->deleted = $deleted;
+        return $this;
     }
 
     public function isEnabled(): bool
@@ -169,9 +179,10 @@ class User extends BaseEntity
         return $this->enabled;
     }
 
-    public function setEnabled(bool $enabled): void
+    public function setEnabled(bool $enabled): self
     {
         $this->enabled = $enabled;
+        return $this;
     }
 
     public function getLastLoginAt(): ?\DateTimeImmutable
@@ -179,8 +190,9 @@ class User extends BaseEntity
         return $this->lastLoginAt;
     }
 
-    public function setLastLoginAt(?\DateTimeImmutable $lastLoginAt): void
+    public function setLastLoginAt(?\DateTimeImmutable $lastLoginAt): self
     {
         $this->lastLoginAt = $lastLoginAt;
+        return $this;
     }
 }

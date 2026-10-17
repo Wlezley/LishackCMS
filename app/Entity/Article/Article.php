@@ -6,6 +6,7 @@ namespace App\Entity\Article;
 
 use App\Entity\BaseEntity;
 use App\Entity\Category\Category;
+use App\Entity\Language\Language;
 use App\Entity\Seo\Seo;
 use App\Entity\Trait\CreatedAtTrait;
 use App\Entity\Trait\HasIdTrait;
@@ -21,11 +22,6 @@ class Article extends BaseEntity
     use HasIdTrait;
     use CreatedAtTrait;
     use UpdatedAtTrait;
-
-//    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-//    private ?string $metaKeywords = null;
-//    #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
-//    private ?Language $language = null;
 
     public function __construct(
         #[ORM\Column(type: Types::STRING, length: 255)]
@@ -60,6 +56,14 @@ class Article extends BaseEntity
             onDelete: 'SET NULL',
         )]
         private ?Seo $seo = null,
+        #[ORM\ManyToOne(targetEntity: Language::class)]
+        #[ORM\JoinColumn(
+            name: 'language_code',
+            referencedColumnName: 'code',
+            nullable: true,
+            onDelete: 'SET NULL',
+        )]
+        private ?Language $language = null,
     ) {
     }
 
@@ -68,9 +72,10 @@ class Article extends BaseEntity
         return $this->title;
     }
 
-    public function setTitle(string $title): void
+    public function setTitle(string $title): self
     {
         $this->title = $title;
+        return $this;
     }
 
     public function getNameUrl(): string
@@ -78,9 +83,10 @@ class Article extends BaseEntity
         return $this->nameUrl;
     }
 
-    public function setNameUrl(string $nameUrl): void
+    public function setNameUrl(string $nameUrl): self
     {
         $this->nameUrl = $nameUrl;
+        return $this;
     }
 
     public function getCategory(): ?Category
@@ -88,9 +94,10 @@ class Article extends BaseEntity
         return $this->category;
     }
 
-    public function setCategory(?Category $category): void
+    public function setCategory(?Category $category): self
     {
         $this->category = $category;
+        return $this;
     }
 
     public function getContent(): ?string
@@ -98,9 +105,10 @@ class Article extends BaseEntity
         return $this->content;
     }
 
-    public function setContent(?string $content): void
+    public function setContent(?string $content): self
     {
         $this->content = $content;
+        return $this;
     }
 
     public function getPublishedAt(): ?\DateTimeImmutable
@@ -108,9 +116,10 @@ class Article extends BaseEntity
         return $this->publishedAt;
     }
 
-    public function setPublishedAt(?\DateTimeImmutable $publishedAt): void
+    public function setPublishedAt(?\DateTimeImmutable $publishedAt): self
     {
         $this->publishedAt = $publishedAt;
+        return $this;
     }
 
     public function getUser(): ?User
@@ -118,9 +127,10 @@ class Article extends BaseEntity
         return $this->user;
     }
 
-    public function setUser(?User $user): void
+    public function setUser(?User $user): self
     {
         $this->user = $user;
+        return $this;
     }
 
     public function getSeo(): ?Seo
@@ -128,8 +138,20 @@ class Article extends BaseEntity
         return $this->seo;
     }
 
-    public function setSeo(?Seo $seo): void
+    public function setSeo(?Seo $seo): self
     {
         $this->seo = $seo;
+        return $this;
+    }
+
+    public function getLanguage(): ?Language
+    {
+        return $this->language;
+    }
+
+    public function setLanguage(?Language $language): self
+    {
+        $this->language = $language;
+        return $this;
     }
 }
