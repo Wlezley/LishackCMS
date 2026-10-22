@@ -39,7 +39,7 @@
     "babel-loader": "^9.2.1",
     "clean-webpack-plugin": "^4.0.0",
     "css-loader": "^7.1.2",
-    "filemanager-webpack-plugin": "^8.0.0",
+    "filemanager-webpack-plugin": "^6.1.7",
     "mini-css-extract-plugin": "^2.9.2",
     "postcss-loader": "^8.1.1",
     "raw-loader": "^4.0.2",
