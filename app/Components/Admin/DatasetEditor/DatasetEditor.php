@@ -7,9 +7,9 @@ namespace App\Components\Admin\DatasetEditor;
 use App\Components\BaseControl;
 use App\Enum\Dataset\DatasetColumnType;
 use App\Exception\DatasetException;
+use App\Service\Dataset\DatasetCreatorService;
 use App\Service\Dataset\DatasetService;
-use App\Service\Dataset\DatasetServiceCreator;
-use App\Service\Dataset\DatasetServiceUpdater;
+use App\Service\Dataset\DatasetUpdaterService;
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
 use Nette\Utils\Json;
@@ -23,14 +23,14 @@ class DatasetEditor extends BaseControl
 
     private string $origin;
 
-    /** @var DatasetServiceCreator @inject */
-    public DatasetServiceCreator $datasetCreator;
+    /** @var DatasetCreatorService @inject */
+    public DatasetCreatorService $datasetCreator;
 
     /** @var DatasetService @inject */
     public DatasetService $datasetService;
 
-    /** @var DatasetServiceUpdater @inject */
-    public DatasetServiceUpdater $datasetUpdater;
+    /** @var DatasetUpdaterService @inject */
+    public DatasetUpdaterService $datasetUpdater;
 
     /** @var callable(string): void */
     public $onSuccess;
@@ -134,7 +134,7 @@ class DatasetEditor extends BaseControl
 
         $this->datasetUpdater->loadDatasetById((int) $values['id']);
 
-        $this->datasetUpdater->configure(
+        $this->datasetUpdater->reconfigure(
             $values['name'],
             $values['slug'],
             $values['component'],
@@ -143,20 +143,20 @@ class DatasetEditor extends BaseControl
             (bool)$values['deleted'],
         );
 
-        foreach ($columns as $columnId => $c) {
-            $columnType = DatasetColumnType::tryFrom($c['type']);
-            Assert::notNull($columnType, "Invalid column type: {$c['type']} for column: {$c['name']} in dataset: {$values['name']}");
+        foreach ($columns as $columnId => $column) {
+            $columnType = DatasetColumnType::tryFrom($column['type']);
+            Assert::notNull($columnType, "Invalid column type: {$column['type']} for column: {$column['name']} in dataset: {$values['name']}");
 
             $this->datasetUpdater->updateColumn(
-                $columnId,
-                $c['name'],
-                $c['slug'],
-                $columnType,
-                (bool)$c['required'],
-                (bool)$c['listed'],
-                (bool)$c['hidden'],
-                (bool)$c['deleted'],
-                $c['default']
+                columnId: (int)$column['id'] - 1,
+                columnName: $column['name'],
+                slug: $column['slug'],
+                type: $columnType,
+                required: (bool)$column['required'],
+                listed: (bool)$column['listed'],
+                hidden: (bool)$column['hidden'],
+                deleted: (bool)$column['deleted'],
+                defaultValue: $column['default']
             );
         }
 
@@ -201,7 +201,7 @@ class DatasetEditor extends BaseControl
         $this->origin = $origin;
     }
 
-    public function setDatasetCreator(DatasetServiceCreator $datasetCreator): void
+    public function setDatasetCreator(DatasetCreatorService $datasetCreator): void
     {
         $this->datasetCreator = $datasetCreator;
     }
@@ -211,7 +211,7 @@ class DatasetEditor extends BaseControl
         $this->datasetService = $datasetService;
     }
 
-    public function setDatasetUpdater(DatasetServiceUpdater $datasetUpdater): void
+    public function setDatasetUpdater(DatasetUpdaterService $datasetUpdater): void
     {
         $this->datasetUpdater = $datasetUpdater;
     }

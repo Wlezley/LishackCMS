@@ -8,14 +8,17 @@ use App\Components\Admin\DatasetEditor\DatasetEditor;
 use App\Components\Admin\DatasetEditor\IDatasetEditorFactory;
 use App\Components\Admin\DatasetList\DatasetList;
 use App\Components\Admin\DatasetList\IDatasetListFactory;
+use App\Service\Dataset\DatasetCreatorService;
 use App\Service\Dataset\DatasetService;
+use App\Service\Dataset\DatasetUpdaterService;
 
 class DatasetPresenter extends SecuredPresenter
 {
-    /** @var \App\Service\Dataset\DatasetServiceCreator @inject */
-    public \App\Service\Dataset\DatasetServiceCreator $datasetCreator;
-    /** @var \App\Service\Dataset\DatasetServiceUpdater @inject */
-    public \App\Service\Dataset\DatasetServiceUpdater $datasetUpdater;
+    /** @var DatasetCreatorService @inject */
+    public DatasetCreatorService $datasetCreator;
+
+    /** @var DatasetUpdaterService @inject */
+    public DatasetUpdaterService $datasetUpdater;
 
     /** @var DatasetService @inject */
     public DatasetService $datasetService;

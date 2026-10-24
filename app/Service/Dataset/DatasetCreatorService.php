@@ -13,33 +13,22 @@ use App\Enum\Dataset\DatasetColumnType;
 use App\Exception\DatasetException;
 use Webmozart\Assert\Assert;
 
-class DatasetServiceCreator
+class DatasetCreatorService
 {
+    private bool $lock = false;
+
     private ?Dataset $dataset = null;
 
     /** @var DatasetColumn[] $columns */
     private array $columns = [];
 
     public function __construct(
-        private DatasetRepositoryInterface $datasetRepository,
-        private DatasetColumnRepositoryInterface $columnRepository,
-        private DatasetDataRepositoryInterface $dataRepository,
+        readonly private DatasetRepositoryInterface $datasetRepository,
+        readonly private DatasetDataRepositoryInterface $dataRepository,
+        readonly private DatasetColumnRepositoryInterface $columnRepository,
     ) {
     }
 
-    /**
-     * Configures the base dataset metadata.
-     *
-     * This method must be called before committing the dataset.
-     *
-     * @param string $name Name of the dataset.
-     * @param string $slug Optional slug identifier.
-     * @param string $component Optional frontend component binding.
-     * @param string $presenter Optional presenter routing value.
-     * @param bool $active Whether the dataset is active.
-     * @param bool $deleted Whether the dataset is marked as deleted.
-     * @return DatasetServiceCreator
-     */
     public function configure(
         string $name,
         string $slug = '',
@@ -48,30 +37,45 @@ class DatasetServiceCreator
         bool $active = true,
         bool $deleted = false
     ): self {
-        $this->dataset = new Dataset(
-            name: $name,
-            slug: $slug,
-            component: $component,
-            presenter: $presenter,
-            active: $active,
-            deleted: $deleted,
-        );
+        if (!$this->lock) {
+            $this->dataset = new Dataset(
+                name: $name,
+                slug: $slug,
+                component: $component,
+                presenter: $presenter,
+                active: $active,
+                deleted: $deleted,
+            );
+            $this->lock = true;
+        }
 
         return $this;
     }
 
-    /**
-     * Adds a column to the dataset definition.
-     *
-     * @param string $name Column display name.
-     * @param string $slug Optional slug identifier.
-     * @param DatasetColumnType $type Column data type (e.g., 'string', 'int').
-     * @param bool $required The column is required.
-     * @param bool $listed The column is listed in the DataList.
-     * @param bool $hidden The column is editable only with a user in the admin role.
-     * @param bool $deleted The column is marked as deleted.
-     * @param string|null $default Default value of the column.
-     */
+    public function loadDataset(int $datasetId): ?Dataset
+    {
+        if ($this->lock) {
+            return null;
+        }
+
+        $this->dataset = $this->datasetRepository->findById($datasetId);
+        $this->lock = true;
+
+        return $this->dataset;
+    }
+
+    public function setDataset(Dataset $dataset): bool
+    {
+        if ($this->lock) {
+            return false;
+        }
+
+        $this->dataset = $dataset;
+        $this->lock = true;
+
+        return true;
+    }
+
     public function addColumn(
         string $name,
         string $slug = '',
@@ -103,12 +107,6 @@ class DatasetServiceCreator
     }
 
     /**
-     * Finalizes and commits the dataset to the database.
-     *
-     * This will insert dataset metadata, store column definitions,
-     * and create a dedicated table for data storage.
-     *
-     * @return int The ID of the created dataset.
      * @throws DatasetException If the dataset is not configured or has no columns.
      */
     public function commit(): int
@@ -134,40 +132,5 @@ class DatasetServiceCreator
         $this->dataRepository->createTable($datasetId, $this->columns); // TODO: We need method to create table for DATA !!!
 
         return $datasetId;
-    }
-
-    /**
-     * Resets the internal state of the creator for reuse.
-     *
-     * Clears both dataset config and column list.
-     */
-    public function reset(): void
-    {
-        $this->dataset = null;
-        $this->columns = [];
-    }
-
-    /**
-     * Returns the configured dataset object.
-     *
-     * @throws DatasetException If the dataset has not been configured yet.
-     */
-    public function getDataset(): Dataset
-    {
-        if (!$this->dataset) {
-            throw new DatasetException('Dataset is not configured yet.');
-        }
-
-        return $this->dataset;
-    }
-
-    /**
-     * Returns all columns added to the dataset.
-     *
-     * @return DatasetColumn[]
-     */
-    public function getColumns(): array
-    {
-        return $this->columns;
     }
 }

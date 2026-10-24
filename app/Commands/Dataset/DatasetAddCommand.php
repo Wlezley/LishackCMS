@@ -6,7 +6,7 @@ namespace App\Commands\Dataset;
 
 use App\Enum\Dataset\DatasetColumnType;
 use App\Exception\DatasetException;
-use App\Service\Dataset\DatasetServiceCreator;
+use App\Service\Dataset\DatasetCreatorService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -20,7 +20,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 final class DatasetAddCommand extends Command
 {
     public function __construct(
-        private readonly DatasetServiceCreator $datasetCreator
+        private readonly DatasetCreatorService $datasetCreator
     ) {
         parent::__construct();
     }

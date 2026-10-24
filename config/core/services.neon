@@ -35,13 +35,6 @@ services:
     - App\Models\UrlGenerator\UrlGenerator
 
     # Services
-#    - App\Service\Article\ArticleService
-#    - App\Service\Category\CategoryService
-#    - App\Service\Config\ConfigService
-#    - App\Service\Dataset\DatasetService
-    - App\Service\Dataset\DatasetServiceCreator
-    - App\Service\Dataset\DatasetServiceUpdater
-#    - App\Service\Seo\SitemapService
     - App\Service\Sms\SmsService(%smsgate.url%, %smsgate.login%, %smsgate.password%, %smsgate.sender_id%, %smsgate.secured_login%)
 
     # Dataset

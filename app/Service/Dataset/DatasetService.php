@@ -43,8 +43,8 @@ class DatasetService
         private DatasetRepositoryInterface $datasetRepository,
         private DatasetColumnRepositoryInterface $datasetColumnRepository,
         private DatasetDataRepositoryInterface $datasetDataRepository,
-        public DatasetServiceCreator $creator,
-        public DatasetServiceUpdater $updater,
+        public DatasetCreatorService $creator,
+        public DatasetUpdaterService $updater,
     ) {
     }
 
@@ -90,7 +90,8 @@ class DatasetService
         $columnList = [];
         foreach ($this->datasetColumns as $column) {
             $columnList[$column->getId()] = [
-                'columnId' => $column->getId(),
+                'columnId' => $column->getColumnId(),
+                'columnNameId' => $column->getColumnNameId(),
                 'name' => $column->getName(),
                 'slug' => $column->getSlug(),
                 'type' => $column->getType()->value,

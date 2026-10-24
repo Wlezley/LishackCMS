@@ -13,7 +13,7 @@
         <tbody>
             {foreach $columnList as $column}
                 {continueIf $column['deleted']}
-                {var $inputName = 'data_' . $column['columnId']}
+                {var $inputName = $column['columnNameId']}
                 <tr class="dataset-row">
                     <td class="align-middle status-col"></td>
                     <td class="align-middle col-id">{$column['columnId']}</td>

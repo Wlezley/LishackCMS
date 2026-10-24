@@ -201,10 +201,10 @@ final readonly class DatasetDataRepository implements DatasetDataRepositoryInter
         $schemaManager = $connection->createSchemaManager();
         $tableName = $this->getTableName($datasetId);
 
-        if (!$schemaManager->tablesExist([$tableName])) {
-            $this->createTable($datasetId, $columns);
-            return;
-        }
+//        if (!$schemaManager->tablesExist([$tableName])) {
+//            $this->createTable($datasetId, $columns);
+//            return;
+//        }
 
         Assert::stringNotEmpty($tableName, 'Table name must not be empty.');
         $existingTable = $schemaManager->introspectTableByUnquotedName($tableName);

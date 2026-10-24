@@ -76,20 +76,20 @@ class DataEditor extends BaseControl
         $form->addHidden('itemId')
             ->setValue($this->itemId);
 
-        foreach ($this->datasetService->getColumns() as $c) {
-            if ($c->isDeleted()) {
+        foreach ($this->datasetService->getColumns() as $column) {
+            if ($column->isDeleted()) {
                 continue;
             }
 
-            $columnName = "data_{$c->getId()}";
-            $input = match ($c->getType()->value) {
-                'int' => $form->addInteger($columnName, $c->getSlug()),
-                'string' => $form->addText($columnName, $c->getSlug()),
-                'text' => $form->addTextArea($columnName, $c->getSlug()),
-                'wysiwyg' => $form->addTextArea($columnName, $c->getSlug()),
-                'bool' => $form->addCheckbox($columnName, $c->getSlug()),
-                'json' => $form->addTextArea($columnName, $c->getSlug()),
-                'html' => $form->addTextArea($columnName, $c->getSlug()),
+            $columnName = $column->getColumnNameId();
+            $input = match ($column->getType()->value) {
+                'int' => $form->addInteger($columnName, $column->getSlug()),
+                'string' => $form->addText($columnName, $column->getSlug()),
+                'text' => $form->addTextArea($columnName, $column->getSlug()),
+                'wysiwyg' => $form->addTextArea($columnName, $column->getSlug()),
+                'bool' => $form->addCheckbox($columnName, $column->getSlug()),
+                'json' => $form->addTextArea($columnName, $column->getSlug()),
+                'html' => $form->addTextArea($columnName, $column->getSlug()),
                 default => null,
             };
 
@@ -97,14 +97,14 @@ class DataEditor extends BaseControl
                 continue;
             }
 
-            $input->setRequired($c->isRequired());
+            $input->setRequired($column->isRequired());
 
-            if ($this->origin == self::OriginEdit && isset($data['data_' . $c->getId()])) {
-                $input->setValue($data['data_' . $c->getId()]);
+            if ($this->origin == self::OriginEdit && isset($data[$column->getColumnNameId()])) {
+                $input->setValue($data[$column->getColumnNameId()]);
             }
 
-            if ($this->origin == self::OriginCreate && $c->getDefaultValue() !== null) {
-                $input->setDefaultValue($c->getDefaultValue());
+            if ($this->origin == self::OriginCreate && $column->getDefaultValue() !== null) {
+                $input->setDefaultValue($column->getDefaultValue());
             }
         }
 

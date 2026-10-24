@@ -75,6 +75,16 @@ class DatasetColumn extends BaseEntity
         return $this->columnId;
     }
 
+    /**
+     * Retrieves the unique identifier for a column name by prepending 'data_' to the column ID.
+     *
+     * @return string The formatted column name identifier.
+     */
+    public function getColumnNameId(): string
+    {
+        return 'data_' . $this->columnId;
+    }
+
     public function setColumnId(int $columnId): self
     {
         $this->columnId = $columnId;
