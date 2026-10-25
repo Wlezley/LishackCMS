@@ -9,4 +9,6 @@ RUN groupadd -g ${GROUP_ID} developer && \
 ENV APACHE_RUN_USER=developer
 ENV APACHE_RUN_GROUP=developer
 
+USER developer
+
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
