@@ -34,58 +34,41 @@ class CategoryForm extends BaseControl
 
     public function createComponentForm(): Form
     {
-        $param = $this->param;
-
         $form = new Form();
 
         $form->setHtmlAttribute('autocomplete', 'off');
 
+        $form->addSelect(
+            name: 'parent_id',
+            label: $this->t('form.category.parent_id'),
+            items: $this->categoryManager->getCategorySelectData()
+        )->setRequired();
+
+        $form->addText('name', $this->t('form.category.name'))->setRequired();
+        $form->addText('name_url', $this->t('form.category.name_url'));
+        $form->addText('title', $this->t('form.category.title'));
+        $form->addText('description', $this->t('form.category.description'));
+        $form->addTextArea('body', $this->t('form.category.body'), null, 5);
+        $form->addCheckbox('hidden', $this->t('form.category.hidden'));
+
+        $form->setDefaults($this->param);
+
         if ($this->origin == self::OriginEdit) {
-            Assert::keyExists($param, 'id', 'Category ID must be set');
-            $form->addHidden('id', $param['id']);
+            Assert::keyExists($this->param, 'id', 'Category ID must be set');
+            $form->addHidden('id', $this->param['id']);
         }
-
-        $form->addText('name', $this->t('form.category.name'))
-            ->setHtmlAttribute('placeholder', '')
-            ->setValue($param['name'] ?? '')
-            ->setRequired();
-
-        $categorySelectOptions = $this->categoryManager->getCategorySelectData();
-        $form->addSelect('parent_id', $this->t('form.category.parent_id'), $categorySelectOptions)
-            ->setValue($this->param['parent_id'] ?? CategoryService::MAIN_CATEGORY_ID)
-            ->setRequired();
-
-        $form->addText('name_url', $this->t('form.category.name_url'))
-            ->setHtmlAttribute('placeholder', '')
-            ->setValue($param['name_url'] ?? '');
-
-        $form->addText('title', $this->t('form.category.title'))
-            ->setHtmlAttribute('placeholder', '')
-            ->setValue($param['title'] ?? '');
-
-        $form->addText('description', $this->t('form.category.description'))
-            ->setHtmlAttribute('placeholder', '')
-            ->setValue($param['description'] ?? '');
-
-        $form->addTextArea('body', $this->t('form.category.body'), null, 5)
-            ->setHtmlAttribute('placeholder', '')
-            ->setValue($param['body'] ?? '');
-
-        $form->addCheckbox('hidden', $this->t('form.category.hidden'))
-            ->setValue($param['hidden'] ?? 0);
 
         $form->addSubmit('save');
 
-        $form->onSuccess[] = [$this, 'process'];
+        $form->onSuccess[] = [$this, 'processSave'];
 
         return $form;
     }
 
     /** @param ArrayHash<mixed> $values */
-    public function process(Form $form, ArrayHash $values): void
+    public function processSave(Form $form, ArrayHash $values): void
     {
         $data = (array)$values;
-        $data['hidden'] = $data['hidden'] ? '1' : '0';
 
         if (empty($data['name_url'])) {
             $data['name_url'] = StringHelper::webalize($data['name']);

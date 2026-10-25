@@ -36,11 +36,11 @@ class BaseControl extends Control
     /** @var ?User @inject */
     protected ?User $user = null;
 
-    /** @var array<string,string> $cmsConfig */
+    /** @var array<string, string> $cmsConfig */
     protected array $cmsConfig = [];
 
-    /** @var null|array<string,int|string> $param */
-    protected ?array $param = [];
+    /** @var array<string, int|string> $param */
+    protected array $param = [];
 
     protected ?string $templatePath = null;
 

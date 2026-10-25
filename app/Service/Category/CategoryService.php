@@ -388,7 +388,7 @@ class CategoryService extends BaseModel
      */
     public function updateChildLevels(int $parentId = self::MAIN_CATEGORY_ID, int $parentLevel = 0): void
     {
-        $children = $this->categoryRepository->findBy(['parentId' => $parentId]);
+        $children = $this->categoryRepository->findBy(['parent' => $parentId]);
 
         foreach ($children as $child) {
             $newLevel = $parentLevel + 1;
