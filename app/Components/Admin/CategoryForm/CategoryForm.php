@@ -40,7 +40,9 @@ class CategoryForm extends BaseControl
             name: 'parent_id',
             label: $this->t('form.category.parent_id'),
             items: $this->categoryManager->getCategorySelectData()
-        )->setRequired();
+        )
+            ->setDefaultValue(CategoryService::MAIN_CATEGORY_ID)
+            ->setRequired();
 
         $form->addText('name', $this->t('form.category.name'))->setRequired();
         $form->addText('name_url', $this->t('form.category.name_url'));
@@ -58,13 +60,13 @@ class CategoryForm extends BaseControl
 
         $form->addSubmit('save');
 
-        $form->onSuccess[] = [$this, 'processSave'];
+        $form->onSuccess[] = [$this, 'process'];
 
         return $form;
     }
 
     /** @param ArrayHash<mixed> $values */
-    public function processSave(Form $form, ArrayHash $values): void
+    public function process(Form $form, ArrayHash $values): void
     {
         $data = (array)$values;
 

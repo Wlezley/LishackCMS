@@ -37,78 +37,72 @@ class UserForm extends BaseControl
 
     public function createComponentForm(): Form
     {
-        $param = $this->param;
-
-        if (empty($param)) {
-            $param = [
-                'name' => '',
-                'full_name' => '',
-                'email' => '',
-                'role' => 'user',
-                'deleted' => false,
-                'enabled' => true,
-            ];
-        } else {
-            unset($param['password']);
-            unset($param['password2']);
-        }
-
-        $readOnly = false;
-        if ($this->formActionType->isEdit()) {
-            Assert::keyExists($param, 'id', 'User ID must be set');
-            Assert::keyExists($param, 'role', 'User role must be set');
-            Assert::string($param['role'], 'User role must be a string');
-            Assert::numeric($param['id'], 'User ID must be a number');
-            $readOnly = $this->isReadOnly($param['id'], $param['role']);
-        }
-
         $form = new Form();
 
         $form->setHtmlAttribute('autocomplete', 'off');
 
-        if (isset($param['id'])) {
-            $form->addHidden('id', $param['id']);
+        unset(
+            $this->param['password'],
+            $this->param['password2']
+        );
+
+        $readOnly = false;
+        if ($this->formActionType->isEdit()) {
+            Assert::keyExists($this->param, 'id', 'User ID must be set');
+            Assert::keyExists($this->param, 'role', 'User role must be set');
+            Assert::numeric($this->param['id'], 'User ID must be a number');
+            Assert::string($this->param['role'], 'User role must be a string');
+            $readOnly = $this->isReadOnly($this->param['id'], $this->param['role']);
         }
 
-        $form->addText('name', $this->t('login-name')) // TODO: Rename to username
+        if (isset($this->param['id'])) {
+            $form->addHidden('id', $this->param['id']);
+        }
+
+        $form->addText('username', $this->t('login-name'))
             ->setHtmlAttribute('placeholder', $this->t('login-name'))
             ->setHtmlAttribute('autocomplete', 'off')
             ->setHtmlAttribute('readonly', $readOnly)
-            ->setValue($param['name'])
             ->setRequired();
 
-        $form->addText('full_name', $this->t('full-name')) // TODO: Split to first name and last name
-            ->setHtmlAttribute('placeholder', $this->t('full-name'))
+        $form->addText('first_name', $this->t('first-name'))
+            ->setHtmlAttribute('placeholder', $this->t('first-name'))
             ->setHtmlAttribute('autocomplete', 'off')
             ->setHtmlAttribute('readonly', $readOnly)
-            ->setValue($param['full_name'])
+            ->setRequired();
+
+        $form->addText('last_name', $this->t('last-name'))
+            ->setHtmlAttribute('placeholder', $this->t('last-name'))
+            ->setHtmlAttribute('autocomplete', 'off')
+            ->setHtmlAttribute('readonly', $readOnly)
             ->setRequired();
 
         $form->addEmail('email', $this->t('e-mail'))
             ->setHtmlAttribute('placeholder', $this->t('e-mail'))
             ->setHtmlAttribute('autocomplete', 'off')
-            ->setHtmlAttribute('readonly', $readOnly)
-            ->setValue($param['email']);
+            ->setHtmlAttribute('readonly', $readOnly);
 
-        Assert::keyExists($param, 'role', 'User role must be set'); // TODO: Use role enum
-        Assert::stringNotEmpty($param['role'], 'User role must be a string');
-        $form->addSelect('role', $this->t('permissions'), $this->getRoleSelectList($param['role']))
-            ->setValue($param['role'])
-            ->setDisabled($this->readOnlyRole($param['role']))
+        $form->addSelect(
+            name: 'role',
+            label: $this->t('permissions'),
+            items: $this->getRoleSelectList((string) $this->param['role']) // TODO: Use UserRoleEnum
+        )
+            ->setDisabled($this->readOnlyRole((string) $this->param['role']))
+            ->setDefaultValue(UserRoleEnum::User->value)
             ->setRequired();
 
         $form->addCheckbox('deleted', $this->t('deleted.user'))
             ->setDisabled($readOnly)
-            ->setValue($param['deleted']);
+            ->setDefaultValue(false);
 
         $form->addCheckbox('enabled', $this->t('active.user'))
             ->setDisabled($readOnly)
-            ->setValue($param['enabled']);
+            ->setDefaultValue(true);
 
         if ($this->formActionType->isEdit()) {
             $form->addCheckbox('change_password', $this->t('password.change'))
                 ->setDisabled($readOnly)
-                ->setValue(false);
+                ->setDefaultValue(false);
         }
 
         $form->addPassword('password', $this->t('password'))
@@ -147,20 +141,19 @@ class UserForm extends BaseControl
             return;
         }
 
-        if ($this->editorRole->isLessOrEqualsThan($values['role'])) { // TODO: ACL...
+        if ($this->editorRole->isLessOrEqualsThan($values['role'])) {
             call_user_func($this->onError, $this->t('error.form.user-role-elevation'));
             return;
         }
 
         try {
-//            $userID = $this->userManager->create((array)$values);
             $user = $this->userService->create(
-                userName: $values['name'],
+                userName: $values['username'],
                 email: $values['email'],
                 password: $values['password'],
                 role: UserRoleEnum::from($values['role']),
-                firstName: $values['full_name'], // TODO: Rozdělit
-                lastName: $values['full_name'], // TODO: Rozdělit
+                firstName: $values['first_name'],
+                lastName: $values['last_name'],
                 deleted: (bool) $values['deleted'],
                 enabled: (bool) $values['enabled'],
             );

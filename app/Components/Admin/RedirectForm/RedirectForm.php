@@ -10,6 +10,7 @@ use App\Enum\HttpRedirectCode;
 use App\Exception\RedirectException;
 use App\Service\Redirect\RedirectService;
 use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
 use Webmozart\Assert\Assert;
 
 class RedirectForm extends BaseControl
@@ -32,34 +33,32 @@ class RedirectForm extends BaseControl
 
     public function createComponentForm(): Form
     {
-        $param = $this->param;
-
         $form = new Form();
 
         $form->setHtmlAttribute('autocomplete', 'off');
 
-        if ($this->origin == self::OriginEdit) {
-            Assert::keyExists($param, 'id', 'Redirect ID must be set');
-            $form->addHidden('id', $param['id']);
-            $form->addHidden('page', $param['page'] ?? 1);
-        }
-
         $form->addText('source', $this->t('source-url'))
             ->setHtmlAttribute('autocomplete', 'off')
-            ->setValue($param['source'] ?? '')
             ->setRequired();
 
         $form->addText('target', $this->t('target-url'))
             ->setHtmlAttribute('autocomplete', 'off')
-            ->setValue($param['target'] ?? '')
             ->setRequired();
 
         $form->addSelect('code', $this->t('http-code'), HttpRedirectCode::labels())
-            ->setValue($param['code'] ?? 302)
+            ->setDefaultValue(302)
             ->setRequired();
 
         $form->addCheckbox('enabled', $this->t('active'))
-            ->setValue($param['enabled'] ?? 1);
+            ->setDefaultValue(true);
+
+        $form->setDefaults($this->param);
+
+        if ($this->origin == self::OriginEdit) {
+            Assert::keyExists($this->param, 'id', 'Redirect ID must be set');
+            $form->addHidden('id', $this->param['id']);
+            $form->addHidden('page', $this->param['page'] ?? 1);
+        }
 
         $form->addSubmit('save');
 
@@ -68,8 +67,8 @@ class RedirectForm extends BaseControl
         return $form;
     }
 
-    /** @param \Nette\Utils\ArrayHash<mixed> $values */
-    public function process(Form $form, \Nette\Utils\ArrayHash $values): void
+    /** @param ArrayHash<mixed> $values */
+    public function process(Form $form, ArrayHash $values): void
     {
         $required = [
             ['name' => 'source', 'label.key' => 'source-url'],

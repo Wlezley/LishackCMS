@@ -29,23 +29,25 @@ class TranslationForm extends BaseControl
 
     public function createComponentForm(): Form
     {
-        $param = $this->param;
-
         $form = new Form();
 
         $form->setHtmlAttribute('autocomplete', 'off');
 
         $form->addText('key', $this->t('key'))
             ->setHtmlAttribute('autocomplete', 'off')
-            ->setValue($param['key'] ?? '')
             ->setRequired();
 
         foreach ($this->availableLanguages as $language) {
-            $form->addTextArea("text_{$language->getCode()}", $this->t('text') . " ({$language->getName()})", null, 1)
+            $form->addTextArea(
+                name: "text_{$language->getCode()}",
+                label: $this->t('text') . " ({$language->getName()})",
+                rows: 1
+            )
                 ->setHtmlAttribute('autocomplete', 'off')
-                ->setValue($param["text_{$language->getCode()}"] ?? '')
                 ->setRequired($language->isDefault());
         }
+
+        $form->setDefaults($this->param);
 
         $form->addSubmit('save');
 
