@@ -8,6 +8,7 @@ use App\Components\Admin\UserForm\IUserFormFactory;
 use App\Components\Admin\UserForm\UserForm;
 use App\Components\Admin\UserList\UserListGrid;
 use App\Entity\User\UserRepositoryInterface;
+use App\Enum\FormActionType;
 use App\Exception\UserException;
 use Contributte\Datagrid\Datagrid;
 use Contributte\Datagrid\Exception\DatagridColumnStatusException;
@@ -126,13 +127,13 @@ class UserPresenter extends SecuredPresenter
         if ($userId) {
             try {
                 $form->setUser($this->userRepository->getById($userId));
-                $form->setOrigin($form::OriginEdit); // TODO: Create FormOrigin enum
+                $form->setFormActionType(FormActionType::Edit);
             } catch (\Exception $e) {
                 $this->flashMessage('Chyba při čtení dat uživatele: ' . $e->getMessage(), 'danger');
             }
         } else {
             $form->setParam($this->getHttpRequest()->getPost('param'));
-            $form->setOrigin($form::OriginCreate);
+            $form->setFormActionType(FormActionType::Create);
         }
 
         $form->onSuccess = function (string $message): void {

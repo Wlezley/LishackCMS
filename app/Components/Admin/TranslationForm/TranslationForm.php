@@ -6,16 +6,14 @@ namespace App\Components\Admin\TranslationForm;
 
 use App\Components\BaseControl;
 use App\Entity\Language\Language;
+use App\Enum\FormActionType;
 use App\Exception\TranslatorException;
 use Nette\Application\UI\Form;
 use Nette\Utils\ArrayHash;
 
 class TranslationForm extends BaseControl
 {
-    public const string OriginCreate = 'Create';
-    public const string OriginEdit = 'Edit';
-
-    private string $origin;
+    private FormActionType $formActionType;
 
     /** @var array<string, Language> */
     private array $availableLanguages;
@@ -51,7 +49,13 @@ class TranslationForm extends BaseControl
 
         $form->addSubmit('save');
 
-        $form->onSuccess[] = [$this, 'process' . $this->origin]; // @phpstan-ignore-line
+        if ($this->formActionType->isCreate()) {
+            $form->onSuccess[] = [$this, 'processCreate'];
+        } elseif ($this->formActionType->isEdit()) {
+            $form->onSuccess[] = [$this, 'processEdit'];
+        } else {
+            throw new \Exception($this->t('error.form.unknown-origin'));
+        }
 
         return $form;
     }
@@ -119,9 +123,9 @@ class TranslationForm extends BaseControl
         $this->getTemplate()->render();
     }
 
-    public function setOrigin(string $origin): void
+    public function setFormActionType(FormActionType $formActionType): void
     {
-        $this->origin = $origin;
+        $this->formActionType = $formActionType;
     }
 
     /**

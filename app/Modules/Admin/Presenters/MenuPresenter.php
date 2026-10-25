@@ -6,6 +6,7 @@ namespace App\Modules\Admin\Presenters;
 
 use App\Components\Admin\CategoryForm\CategoryForm;
 use App\Components\Admin\CategoryForm\ICategoryFormFactory;
+use App\Enum\FormActionType;
 use App\Exception\CategoryException;
 use App\Service\Category\CategoryService;
 
@@ -156,7 +157,7 @@ class MenuPresenter extends SecuredPresenter
         $id = $this->getParameter('id');
 
         if ($id) {
-            $form->setOrigin($form::OriginEdit);
+            $form->setFormActionType(FormActionType::Edit);
             $param = $this->categoryManager->getById((int) $id);
 
             if ($param) {
@@ -165,7 +166,7 @@ class MenuPresenter extends SecuredPresenter
                 $this->flashMessage('Kategorie nebyla nalezena'); // TODO: Translate
             }
         } else {
-            $form->setOrigin($form::OriginCreate);
+            $form->setFormActionType(FormActionType::Create);
             $form->setParam($this->getHttpRequest()->getPost('param'));
         }
 

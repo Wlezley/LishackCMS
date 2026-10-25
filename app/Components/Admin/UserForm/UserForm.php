@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Components\Admin\UserForm;
 
 use App\Components\BaseControl;
+use App\Enum\FormActionType;
 use App\Enum\UserRoleEnum;
 use App\Exception\UserException;
 use App\Models\User\UserRole;
@@ -15,10 +16,7 @@ use Webmozart\Assert\Assert;
 
 class UserForm extends BaseControl
 {
-    public const string OriginCreate = 'Create';
-    public const string OriginEdit = 'Edit';
-
-    private string $origin;
+    private FormActionType $formActionType;
 
     private UserRole $editorRole;
 
@@ -56,7 +54,7 @@ class UserForm extends BaseControl
         }
 
         $readOnly = false;
-        if ($this->origin === self::OriginEdit) {
+        if ($this->formActionType->isEdit()) {
             Assert::keyExists($param, 'id', 'User ID must be set');
             Assert::keyExists($param, 'role', 'User role must be set');
             Assert::string($param['role'], 'User role must be a string');
@@ -107,7 +105,7 @@ class UserForm extends BaseControl
             ->setDisabled($readOnly)
             ->setValue($param['enabled']);
 
-        if ($this->origin === self::OriginEdit) {
+        if ($this->formActionType->isEdit()) {
             $form->addCheckbox('change_password', $this->t('password.change'))
                 ->setDisabled($readOnly)
                 ->setValue(false);
@@ -116,16 +114,22 @@ class UserForm extends BaseControl
         $form->addPassword('password', $this->t('password'))
             ->setHtmlAttribute('placeholder', $this->t('password'))
             ->setHtmlAttribute('autocomplete', 'new-password')
-            ->setRequired($this->origin === self::OriginCreate);
+            ->setRequired($this->formActionType->isCreate());
 
         $form->addPassword('password2', $this->t('password.again'))
             ->setHtmlAttribute('placeholder', $this->t('password.again'))
             ->setHtmlAttribute('autocomplete', 'new-password')
-            ->setRequired($this->origin === self::OriginCreate);
+            ->setRequired($this->formActionType->isCreate());
 
-        $form->addSubmit('save', $this->origin === self::OriginEdit ? $this->t('save') : $this->t('create'));
-
-        $form->onSuccess[] = [$this, 'process' . $this->origin]; // @phpstan-ignore-line
+        if ($this->formActionType->isCreate()) {
+            $form->addSubmit('save', $this->t('create'));
+            $form->onSuccess[] = [$this, 'processCreate'];
+        } elseif ($this->formActionType->isEdit()) {
+            $form->addSubmit('save', $this->t('save'));
+            $form->onSuccess[] = [$this, 'processEdit'];
+        } else {
+            throw new \Exception($this->t('error.form.unknown-origin'));
+        }
 
         return $form;
     }
@@ -203,7 +207,7 @@ class UserForm extends BaseControl
     public function render(int|string|null $id = null): void
     {
         try {
-            if ($this->origin === self::OriginEdit) {
+            if ($this->formActionType->isEdit()) {
                 if (empty($id)) {
                     throw new \Exception('User ID is missing.');
                 }
@@ -215,13 +219,13 @@ class UserForm extends BaseControl
             call_user_func($this->onError, $e->getMessage());
         }
 
-        $this->getTemplate()->setFile(__DIR__ . '/UserForm' . $this->origin . '.latte');
+        $this->getTemplate()->setFile(__DIR__ . '/UserForm' . $this->formActionType->value . '.latte');
         $this->getTemplate()->render();
     }
 
-    public function setOrigin(string $origin): void
+    public function setFormActionType(FormActionType $formActionType): void
     {
-        $this->origin = $origin;
+        $this->formActionType = $formActionType;
     }
 
     private function isReadOnly(int|string $targetId, string $targetRole): bool
@@ -252,7 +256,7 @@ class UserForm extends BaseControl
             $userRolesSelect[$roleName] = $this->t('user.role.' . $roleName);
         }
 
-        if ($this->origin === self::OriginEdit && $this->editorRole->isLessOrEqualsThan($targetRole)) {
+        if ($this->formActionType->isEdit() && $this->editorRole->isLessOrEqualsThan($targetRole)) {
             return [$targetRole => $userRolesSelect[$targetRole]];
         } else {
             $roleListSelect = [];

@@ -8,6 +8,7 @@ use App\Components\Admin\DatasetEditor\DatasetEditor;
 use App\Components\Admin\DatasetEditor\IDatasetEditorFactory;
 use App\Components\Admin\DatasetList\DatasetList;
 use App\Components\Admin\DatasetList\IDatasetListFactory;
+use App\Enum\FormActionType;
 use App\Service\Dataset\DatasetCreatorService;
 use App\Service\Dataset\DatasetService;
 use App\Service\Dataset\DatasetUpdaterService;
@@ -86,8 +87,10 @@ class DatasetPresenter extends SecuredPresenter
         $control->setDatasetService($this->datasetService);
         $control->setDatasetUpdater($this->datasetUpdater); // TODO: Load it in Manager?
 
-        $control->setOrigin(
-            $id ? $control::OriginEdit : $control::OriginCreate
+        $control->setFormActionType(
+            $id
+                ? FormActionType::Edit
+                : FormActionType::Create
         );
 
         $control->onSuccess = function (string $message): void {

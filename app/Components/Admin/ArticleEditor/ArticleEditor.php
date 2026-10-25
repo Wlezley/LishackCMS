@@ -6,6 +6,7 @@ namespace App\Components\Admin\ArticleEditor;
 
 use App\Components\BaseControl;
 use App\Entity\User\UserRepositoryInterface;
+use App\Enum\FormActionType;
 use App\Exception\ArticleException;
 use App\Exception\UserException;
 use App\Models\Helpers\StringHelper;
@@ -18,16 +19,13 @@ use Nette\Utils\DateTime;
 
 class ArticleEditor extends BaseControl
 {
-    public const string OriginCreate = 'Create';
-    public const string OriginEdit = 'Edit';
-
     private UserRepositoryInterface $userRepository;
 
     private ArticleService $articleManager;
 
     private CategoryService $categoryManager;
 
-    private string $origin;
+    private FormActionType $formActionType;
 
     /** @var callable(string, int): void */
     public $onSuccess;
@@ -155,7 +153,7 @@ class ArticleEditor extends BaseControl
         $form->addTextArea('content', $this->t('form.article.content'))
             ->setValue($this->param['content'] ?? '');
 
-        $saveBtnName = ($this->origin == self::OriginCreate)
+        $saveBtnName = ($this->formActionType->isCreate())
             ? $this->t('form.article.create')
             : $this->t('form.article.save');
 
@@ -197,7 +195,7 @@ class ArticleEditor extends BaseControl
             }
         }
 
-        if ($this->origin == self::OriginEdit) {
+        if ($this->formActionType->isEdit()) {
             $articleId = (int) $data['id'];
             $data['name_url'] = $this->urlGenerator->generateUniqueNameUrl($data['name_url'], $articleId);
 
@@ -224,7 +222,7 @@ class ArticleEditor extends BaseControl
     /** @param ArrayHash<mixed> $values */
     public function processSaveAsCopy(Form $form, ArrayHash $values): void
     {
-        $this->setOrigin(self::OriginCreate);
+        $this->setFormActionType(FormActionType::Create);
         $this->processSave($form, $values);
     }
 
@@ -234,8 +232,8 @@ class ArticleEditor extends BaseControl
         $this->getTemplate()->render();
     }
 
-    public function setOrigin(string $origin): void
+    public function setFormActionType(FormActionType $formActionType): void
     {
-        $this->origin = $origin;
+        $this->formActionType = $formActionType;
     }
 }

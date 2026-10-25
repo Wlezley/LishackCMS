@@ -6,6 +6,7 @@ namespace App\Components\Admin\DatasetEditor;
 
 use App\Components\BaseControl;
 use App\Enum\Dataset\DatasetColumnType;
+use App\Enum\FormActionType;
 use App\Exception\DatasetException;
 use App\Service\Dataset\DatasetCreatorService;
 use App\Service\Dataset\DatasetService;
@@ -18,10 +19,7 @@ use Webmozart\Assert\Assert;
 
 class DatasetEditor extends BaseControl
 {
-    public const string OriginCreate = 'Create';
-    public const string OriginEdit = 'Edit';
-
-    private string $origin;
+    private FormActionType $formActionType;
 
     /** @var DatasetCreatorService @inject */
     public DatasetCreatorService $datasetCreator;
@@ -45,7 +43,7 @@ class DatasetEditor extends BaseControl
         $form->setHtmlAttribute('autocomplete', 'off');
 
         $param = [];
-        if ($this->origin == self::OriginEdit && $this->datasetService->isReady()) {
+        if ($this->formActionType->isEdit() && $this->datasetService->isReady()) {
             $param = $this->datasetService->getDataset()->toArray(); // TODO: Move to repository, or create convertible DTO ???
             $param['id'] = $this->datasetService->getDataset()->getId();
         }
@@ -63,10 +61,10 @@ class DatasetEditor extends BaseControl
         $form->addHidden('columns', '');
         $form->addSubmit('save', $this->t('save.config'));
 
-        if ($this->origin == self::OriginCreate) {
+        if ($this->formActionType->isCreate()) {
             $form->onSuccess[] = [$this, 'processCreate'];
-        } elseif ($this->origin == self::OriginEdit) {
-            $form->onSuccess[] = [$this, 'processSave'];
+        } elseif ($this->formActionType->isEdit()) {
+            $form->onSuccess[] = [$this, 'processEdit'];
         } else {
             throw new \Exception($this->t('error.form.unknown-origin'));
         }
@@ -123,7 +121,7 @@ class DatasetEditor extends BaseControl
      * @throws JsonException
      * @throws DatasetException
      */
-    public function processSave(Form $form, ArrayHash $values): void
+    public function processEdit(Form $form, ArrayHash $values): void
     {
         if (empty($values['columns'])) {
             call_user_func($this->onError, $this->t('error.form.empty-data'));
@@ -196,9 +194,9 @@ class DatasetEditor extends BaseControl
         $this->getTemplate()->render();
     }
 
-    public function setOrigin(string $origin): void
+    public function setFormActionType(FormActionType $formActionType): void
     {
-        $this->origin = $origin;
+        $this->formActionType = $formActionType;
     }
 
     public function setDatasetCreator(DatasetCreatorService $datasetCreator): void

@@ -10,6 +10,7 @@ use App\Components\Admin\TranslationForm\ITranslationFormFactory;
 use App\Components\Admin\TranslationForm\TranslationForm;
 use App\Components\Admin\TranslationList\ITranslationListFactory;
 use App\Components\Admin\TranslationList\TranslationList;
+use App\Enum\FormActionType;
 use App\Exception\TranslatorException;
 use Nette\Application\UI\Template;
 use Nette\Bridges\ApplicationLatte\DefaultTemplate;
@@ -111,7 +112,7 @@ class TranslationPresenter extends SecuredPresenter
         $key = $this->getParameter('key');
 
         if ($key) {
-            $form->setOrigin($form::OriginEdit);
+            $form->setFormActionType(FormActionType::Edit);
 
             $param['key'] = $key;
             foreach ($this->translationService->getTextListByKey($key) as $lang => $text) {
@@ -120,7 +121,7 @@ class TranslationPresenter extends SecuredPresenter
 
             $form->setParam($param);
         } else {
-            $form->setOrigin($form::OriginCreate);
+            $form->setFormActionType(FormActionType::Create);
             $form->setQueryParams($this->getHttpRequest()->getQuery());
             $form->setParam($this->getHttpRequest()->getPost('param'));
         }

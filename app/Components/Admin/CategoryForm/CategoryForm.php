@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Components\Admin\CategoryForm;
 
 use App\Components\BaseControl;
+use App\Enum\FormActionType;
 use App\Exception\CategoryException;
 use App\Models\Helpers\StringHelper;
 use App\Service\Category\CategoryService;
@@ -14,10 +15,7 @@ use Webmozart\Assert\Assert;
 
 class CategoryForm extends BaseControl
 {
-    public const string OriginCreate = 'Create';
-    public const string OriginEdit = 'Edit';
-
-    private string $origin;
+    private FormActionType $formActionType;
 
     private CategoryService $categoryManager;
 
@@ -53,7 +51,7 @@ class CategoryForm extends BaseControl
 
         $form->setDefaults($this->param);
 
-        if ($this->origin == self::OriginEdit) {
+        if ($this->formActionType->isEdit()) {
             Assert::keyExists($this->param, 'id', 'Category ID must be set');
             $form->addHidden('id', $this->param['id']);
         }
@@ -93,11 +91,11 @@ class CategoryForm extends BaseControl
         }
 
         try {
-            if ($this->origin == self::OriginCreate) {
+            if ($this->formActionType->isCreate()) {
                 unset($data['id']);
                 $this->categoryManager->create($data);
                 call_user_func($this->onSuccess, $this->t('success.form.category-created'), 1);
-            } elseif ($this->origin == self::OriginEdit) {
+            } elseif ($this->formActionType->isEdit()) {
                 $this->categoryManager->update((int) $data['id'], $data);
                 call_user_func($this->onSuccess, $this->t('success.form.category-saved'), $values['page'] ?? 1);
             } else {
@@ -105,7 +103,7 @@ class CategoryForm extends BaseControl
                 return;
             }
         } catch (CategoryException $e) {
-            call_user_func($this->onError, $e->getMessage()); // TODO: Translation based on the error codes
+            call_user_func($this->onError, $e->getMessage()); // TODO: Translations
         }
     }
 
@@ -115,8 +113,8 @@ class CategoryForm extends BaseControl
         $this->getTemplate()->render();
     }
 
-    public function setOrigin(string $origin): void
+    public function setFormActionType(FormActionType $formActionType): void
     {
-        $this->origin = $origin;
+        $this->formActionType = $formActionType;
     }
 }

@@ -8,6 +8,7 @@ use App\Components\Admin\ArticleEditor\ArticleEditor;
 use App\Components\Admin\ArticleEditor\IArticleEditorFactory;
 use App\Components\Admin\ArticleList\ArticleList;
 use App\Components\Admin\ArticleList\IArticleListFactory;
+use App\Enum\FormActionType;
 use App\Exception\ArticleException;
 use App\Models\UrlGenerator\UrlGenerator;
 use App\Service\Article\ArticleService;
@@ -115,13 +116,13 @@ class ArticlePresenter extends SecuredPresenter
             try {
                 $articleData = $this->articleManager->getById($id);
                 $form->setParam($articleData);
-                $form->setOrigin($form::OriginEdit);
+                $form->setFormActionType(FormActionType::Edit);
             } catch (ArticleException $e) {
                 $this->flashMessage('Chyba při čtení dat článku: ' . $e->getMessage(), 'danger');
             }
         } else {
             $form->setParam($this->getHttpRequest()->getPost('param'));
-            $form->setOrigin($form::OriginCreate);
+            $form->setFormActionType(FormActionType::Create);
         }
 
         $form->onSuccess = function (string $message, $articleId): void {

@@ -8,6 +8,7 @@ use App\Components\Admin\DataEditor\DataEditor;
 use App\Components\Admin\DataEditor\IDataEditorFactory;
 use App\Components\Admin\DataList\DataList;
 use App\Components\Admin\DataList\IDataListFactory;
+use App\Enum\FormActionType;
 use App\Service\Dataset\DatasetService;
 
 class DataPresenter extends SecuredPresenter
@@ -98,8 +99,10 @@ class DataPresenter extends SecuredPresenter
 
         $control->setDatasetService($this->datasetService);
 
-        $control->setOrigin(
-            $this->getParameter('itemId') ? $control::OriginEdit : $control::OriginCreate
+        $control->setFormActionType(
+            $this->getParameter('itemId')
+                ? FormActionType::Edit
+                : FormActionType::Create
         );
 
         $control->onSuccess = function (string $message, int $datasetId): void {

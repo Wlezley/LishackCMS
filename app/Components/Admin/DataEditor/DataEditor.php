@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Components\Admin\DataEditor;
 
 use App\Components\BaseControl;
+use App\Enum\Dataset\DatasetColumnType;
+use App\Enum\FormActionType;
 use App\Exception\DatasetException;
 use App\Service\Dataset\DatasetService;
 use Nette\Application\UI\Form;
@@ -13,10 +15,7 @@ use Webmozart\Assert\Assert;
 
 class DataEditor extends BaseControl
 {
-    public const string OriginCreate = 'Create';
-    public const string OriginEdit = 'Edit';
-
-    private string $origin;
+    private FormActionType $formActionType;
     private ?int $datasetId = null;
     private ?int $itemId = null;
 
@@ -31,7 +30,7 @@ class DataEditor extends BaseControl
 
     protected function createComponentForm(): Form
     {
-        if (!isset($this->origin) || !in_array($this->origin, [self::OriginCreate, self::OriginEdit])) {
+        if (!isset($this->formActionType)) {
             throw new \Exception($this->t('error.form.unknown-origin'));
         }
 
@@ -50,7 +49,7 @@ class DataEditor extends BaseControl
         Assert::notNull($this->datasetId);
 
         $data = null;
-        if ($this->origin == self::OriginEdit) {
+        if ($this->formActionType->isEdit()) {
             $itemId = $this->getPresenter()->getParameter('itemId');
 
             if ($itemId) {
@@ -99,19 +98,19 @@ class DataEditor extends BaseControl
 
             $input->setRequired($column->isRequired());
 
-            if ($this->origin == self::OriginEdit && isset($data[$column->getColumnNameId()])) {
+            if ($this->formActionType->isEdit() && isset($data[$column->getColumnNameId()])) {
                 $input->setValue($data[$column->getColumnNameId()]);
             }
 
-            if ($this->origin == self::OriginCreate && $column->getDefaultValue() !== null) {
+            if ($this->formActionType->isCreate() && $column->getDefaultValue() !== null) {
                 $input->setDefaultValue($column->getDefaultValue());
             }
         }
 
-        if ($this->origin == self::OriginCreate) {
+        if ($this->formActionType->isCreate()) {
             $form->addSubmit('save', $this->t('create'));
             $form->onSuccess[] = [$this, 'processCreate'];
-        } elseif ($this->origin == self::OriginEdit) {
+        } elseif ($this->formActionType->isEdit()) {
             $form->addSubmit('save', $this->t('save'));
             $form->onSuccess[] = [$this, 'processSave'];
         }
@@ -210,9 +209,9 @@ class DataEditor extends BaseControl
         $this->getTemplate()->render();
     }
 
-    public function setOrigin(string $origin): void
+    public function setFormActionType(FormActionType $formActionType): void
     {
-        $this->origin = $origin;
+        $this->formActionType = $formActionType;
     }
 
     public function setDatasetService(DatasetService $datasetService): void
@@ -224,7 +223,7 @@ class DataEditor extends BaseControl
     public function getColumnTypeOptions(): array
     {
         $options = [];
-        foreach (\App\Enum\Dataset\DatasetColumnType::cases() as $type) {
+        foreach (DatasetColumnType::cases() as $type) {
             $options[$type->value] = $this->t("dataset.column.type.{$type->value}");
         }
 

@@ -11,9 +11,6 @@ use Nette\Utils\ArrayHash;
 
 class ConfigWebsiteForm extends BaseControl
 {
-    public const string OriginCreate = 'Create';
-    public const string OriginEdit = 'Edit';
-
     /** @var callable(string): void */
     public $onSuccess;
 
