@@ -25,7 +25,7 @@ interface DatasetRepositoryInterface extends BaseRepositoryInterface
     public function deleteById(int $id): bool;
 
     /**
-     * @return \App\Entity\Dataset\Dataset[]
+     * @return Dataset[]
      */
     public function findBySearch(
         ?int $limit = null,

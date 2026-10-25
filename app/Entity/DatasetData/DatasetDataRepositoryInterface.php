@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Entity\DatasetData;
 
+use App\Entity\DatasetColumn\DatasetColumn;
+
 interface DatasetDataRepositoryInterface
 {
     /**
@@ -41,13 +43,13 @@ interface DatasetDataRepositoryInterface
     public function delete(int $datasetId, int $id): void;
 
     /**
-     * @param \App\Entity\DatasetColumn\DatasetColumn[] $columns
+     * @param DatasetColumn[] $columns
      * @throws \Doctrine\DBAL\Exception
      */
     public function createTable(int $datasetId, array $columns): void;
 
     /**
-     * @param \App\Entity\DatasetColumn\DatasetColumn[] $columns
+     * @param DatasetColumn[] $columns
      * @throws \Doctrine\DBAL\Exception
      * @throws \Doctrine\DBAL\Types\Exception\TypesException
      */

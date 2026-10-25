@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace App\Entity\DatasetData;
 
-use App\Entity\DatasetColumn\DatasetColumn;
 use App\Entity\DatasetColumn\DatasetColumnRepositoryInterface;
 use App\Enum\Dataset\DatasetColumnType;
 use App\Enum\SortOrderEnum;
 use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
 use Doctrine\DBAL\Schema\Table;
-use Doctrine\DBAL\Types\Exception\TypesException;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Webmozart\Assert\Assert;
@@ -27,8 +25,7 @@ final readonly class DatasetDataRepository implements DatasetDataRepositoryInter
     }
 
     /**
-     * @return array<string, mixed>|null
-     * @throws \Doctrine\DBAL\Exception
+     * @inheritDoc
      */
     public function findById(int $datasetId, int $id): ?array
     {
@@ -47,8 +44,7 @@ final readonly class DatasetDataRepository implements DatasetDataRepositoryInter
     }
 
     /**
-     * @return array<int, array<string, mixed>>|null
-     * @throws \Doctrine\DBAL\Exception
+     * @inheritDoc
      */
     public function getList(int $datasetId, ?int $limit = 50, ?int $offset = 0, ?string $search = null): ?array
     {
@@ -93,7 +89,7 @@ final readonly class DatasetDataRepository implements DatasetDataRepositoryInter
     }
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @inheritDoc
      */
     public function getCount(int $datasetId, ?string $search = null): int
     {
@@ -117,8 +113,7 @@ final readonly class DatasetDataRepository implements DatasetDataRepositoryInter
     }
 
     /**
-     * @param array<string, mixed> $data
-     * @throws \Doctrine\DBAL\Exception
+     * @inheritDoc
      */
     public function insert(int $datasetId, array $data): int
     {
@@ -130,8 +125,7 @@ final readonly class DatasetDataRepository implements DatasetDataRepositoryInter
     }
 
     /**
-     * @param array<string, mixed> $data
-     * @throws \Doctrine\DBAL\Exception
+     * @inheritDoc
      */
     public function update(int $datasetId, int $id, array $data): void
     {
@@ -153,8 +147,7 @@ final readonly class DatasetDataRepository implements DatasetDataRepositoryInter
     }
 
     /**
-     * @param DatasetColumn[] $columns
-     * @throws \Doctrine\DBAL\Exception
+     * @inheritDoc
      */
     public function createTable(int $datasetId, array $columns): void
     {
@@ -191,9 +184,7 @@ final readonly class DatasetDataRepository implements DatasetDataRepositoryInter
     }
 
     /**
-     * @param DatasetColumn[] $columns
-     * @throws \Doctrine\DBAL\Exception
-     * @throws TypesException
+     * @inheritDoc
      */
     public function updateTable(int $datasetId, array $columns): void
     {
