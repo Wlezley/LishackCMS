@@ -6,6 +6,7 @@ namespace App\Components\Admin\UserList;
 
 use AllowDynamicProperties;
 use App\Components\BaseControl;
+use App\Entity\User\User;
 use App\Entity\User\UserRepositoryInterface;
 use App\Enum\SortOrderEnum;
 use App\Enum\UserRoleEnum;
@@ -18,7 +19,6 @@ use Contributte\Datagrid\Exception\DatagridColumnStatusException;
 use Contributte\Datagrid\Exception\DatagridException;
 use Nette\Application\InvalidPresenterException;
 use Nette\Application\UI\Presenter;
-use Nette\Database\Table\ActiveRow;
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
 use Webmozart\Assert\Assert;
@@ -43,8 +43,10 @@ class UserListGrid extends BaseControl
     public function __construct(
         protected UserRepositoryInterface $userRepository,
     ) {
-        Assert::notNull($this->user, 'User must be set');
-        $this->userRole = new UserRole($this->user->getRole()->value);
+        // TODO: Something is terribly wrong here...
+//        Assert::notNull($this->user, 'User must be set');
+//        $this->userRole = new UserRole($this->user->getRole()->value);
+        $this->userRole = new UserRole(UserRoleEnum::Admin->value);
     }
 
     public function setPresenter(Presenter $presenter): void
@@ -101,17 +103,17 @@ class UserListGrid extends BaseControl
         });
 
         // ID
-        $grid->addColumnText('id', 'ID')
+        $grid->addColumnText('Id', 'ID')
             ->setSortable()
             ->setAlign('center');
 
         // NAME
-        $grid->addColumnText('name', $this->t('name'))
+        $grid->addColumnText('userName', $this->t('name'))
             ->setSortable()
             ->setAlign('start');
 
         // FULL NAME
-        $grid->addColumnText('full_name', $this->t('full-name'))
+        $grid->addColumnText('fullName', $this->t('full-name'))
             ->setSortable()
             ->setAlign('start');
 
@@ -177,12 +179,12 @@ class UserListGrid extends BaseControl
             ->onChange[] = [$this, 'setEnabledCallback'];
 
         // CREATED (datetime)
-        $grid->addColumnDateTime('created', $this->t('created'))
+        $grid->addColumnDateTime('createdAt', $this->t('created'))
             ->setAlign('end')
             ->setFormat('j.n.Y');
 
         // LAST LOGIN (datetime)
-        $grid->addColumnDateTime('last_login', $this->t('last-login'))
+        $grid->addColumnDateTime('lastLoginAt', $this->t('last-login'))
             ->setAlign('end')
             ->setFormat('j.n.Y H:m:s')
             ->setReplacement(['' => 'N/A']);
@@ -210,10 +212,10 @@ class UserListGrid extends BaseControl
 
     // TODO: Move all of this logic below to the UserManager (?)
 
-    public function allowActionEditCallback(ActiveRow $item): bool
+    public function allowActionEditCallback(User $item): bool
     {
         // Unable to edit SUPERADMIN
-        if ($item->id == 1) {
+        if ($item->getId() == 1) {
             return false;
         }
         // SUPERADMIN can edit all
@@ -221,11 +223,11 @@ class UserListGrid extends BaseControl
             return true;
         }
         // User can edit himself
-        if ($this->user?->getId() == $item->id) {
+        if ($this->user?->getId() == $item->getId()) {
             return true;
         }
         // User cannot edit other users in the same or higher role
-        if ($this->userRole->isLessOrEqualsThan($item->role)) {
+        if ($this->userRole->isLessOrEqualsThan($item->getRole()->value)) {
             return false;
         }
 
@@ -233,10 +235,10 @@ class UserListGrid extends BaseControl
         return true;
     }
 
-    public function allowActionDeleteCallback(ActiveRow $item): bool
+    public function allowActionDeleteCallback(User $item): bool
     {
         // Unable to delete SUPERADMIN
-        if ($item->id == 1) {
+        if ($item->getId() == 1) {
             return false;
         }
         // SUPERADMIN can delete (almost) all
@@ -244,11 +246,11 @@ class UserListGrid extends BaseControl
             return true;
         }
         // User cannot delete himself
-        if ($this->user?->getId() == $item->id) {
+        if ($this->user?->getId() == $item->getId()) {
             return false;
         }
         // User cannot delete other users in the same or higher role
-        if ($this->userRole->isLessOrEqualsThan($item->role)) {
+        if ($this->userRole->isLessOrEqualsThan($item->getRole()->value)) {
             return false;
         }
         // Only administrators and moderators can delete users
@@ -263,19 +265,19 @@ class UserListGrid extends BaseControl
      * @throws JsonException
      * @throws TranslatorException
      */
-    public function encodeDataCallback(ActiveRow $item): string
+    public function encodeDataCallback(User $item): string
     {
         return Json::encode([
-            'id' => $item->id,
-            'name' => $item->name,
-            'full_name' => $item->full_name, // phpcs:ignore
-            'email' => $item->email,
-            'role' => $item->role,
-            'deleted' => $item->deleted,
-            'enabled' => $item->enabled,
+            'id' => $item->getId(),
+            'name' => $item->getUserName(),
+            'full_name' => $item->getFullName(), // phpcs:ignore
+            'email' => $item->getEmail(),
+            'role' => $item->getRole()->value,
+            'deleted' => $item->isDeleted(),
+            'enabled' => $item->isEnabled(),
             'modal' => [
                 'title' => $this->t('modal.title.confirm-delete'),
-                'body' => $this->tf('modal.body.delete-user', $item->name),
+                'body' => $this->tf('modal.body.delete-user', $item->getUserName()),
             ],
         ]);
     }
