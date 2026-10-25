@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Modules\Admin\TemplateParameters;
+namespace App\Modules\Admin\TemplateParameters\Translation;
 
 use App\Components\Admin\TranslationList\TranslationList;
 use App\Entity\Translation\Translation;
