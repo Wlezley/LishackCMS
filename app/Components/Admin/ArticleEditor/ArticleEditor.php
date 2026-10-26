@@ -107,7 +107,7 @@ class ArticleEditor extends BaseControl
             ->setRequired();
 
         $updatedAt = 'N/A';
-        if ($this->param['updated_at']) {
+        if (isset($this->param['updated_at'])) {
             $updatedAt = DateTime::from($this->param['updated_at'])->format('d.m.Y h:i');
         }
         $form->addText('updated_at', $this->t('form.article.updated_at'))
@@ -229,6 +229,7 @@ class ArticleEditor extends BaseControl
     public function render(): void
     {
         $this->getTemplate()->setFile(__DIR__ . '/ArticleEditor.latte');
+        $this->getTemplate()->formActionType = $this->formActionType;
         $this->getTemplate()->render();
     }
 

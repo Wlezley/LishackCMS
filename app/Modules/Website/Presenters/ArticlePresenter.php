@@ -123,7 +123,7 @@ final class ArticlePresenter extends BasePresenter
             $this->template->og_type = $this->article['og_type'] ?: 'website';
 
             // ARTICLE CONTENT, MENU
-            $articleParser = new ArticleParser($this->presenter);
+            $articleParser = new ArticleParser($this->getPresenter());
             // $articleContent = $this->article['content']; // DEBUG: ORIGINAL TEXT
             $articleContent = $articleParser->parseComponents($this->article['content']); // PARSED TEXT
             $this->template->article[] = $articleContent;

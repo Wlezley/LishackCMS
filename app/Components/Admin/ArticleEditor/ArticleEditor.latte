@@ -1,3 +1,5 @@
+{varType \App\Enum\FormActionType $formActionType}
+
 <style>
     .tox-tinymce {
         border-radius: var(--bs-border-radius) !important;
@@ -105,7 +107,7 @@
                 <div class="col-6">
                     {input save, class => 'btn btn-primary btn-lg float-end'}
 
-                    {if $origin == 'Edit'}
+                    {if $formActionType->isEdit()}
                         {input copy, class => 'btn btn-light btn-outline-primary btn-lg float-end me-3'}
                     {/if}
                 </div>

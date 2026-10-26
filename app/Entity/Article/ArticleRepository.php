@@ -28,7 +28,7 @@ final readonly class ArticleRepository extends BaseRepository implements Article
         }
 
         if ($categoryId !== null) {
-            $qb->andWhere('a.categoryId = :categoryId')
+            $qb->andWhere('a.category = :categoryId')
                 ->setParameter('categoryId', $categoryId);
         }
 
