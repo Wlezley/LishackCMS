@@ -14,16 +14,14 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity]
 #[ORM\Table(
     name: 'dataset_column',
-    uniqueConstraints: [
-        new ORM\UniqueConstraint(
-            name: 'dataset_column_dataset_id_slug_unique',
-            columns: ['dataset_id', 'slug'],
-        ),
-        new ORM\UniqueConstraint(
-            name: 'dataset_column_dataset_id_column_id_unique',
-            columns: ['dataset_id', 'column_id'],
-        ),
-    ],
+)]
+#[ORM\UniqueConstraint(
+    name: 'dataset_id_slug_unique',
+    columns: ['dataset_id', 'slug'],
+)]
+#[ORM\UniqueConstraint(
+    name: 'dataset_id_column_id_unique',
+    columns: ['dataset_id', 'column_id'],
 )]
 class DatasetColumn extends BaseEntity
 {

@@ -20,6 +20,10 @@ use Doctrine\ORM\Mapping as ORM;
         ),
     ],
 )]
+#[ORM\UniqueConstraint(
+    name: 'translation_key_language_unique',
+    columns: ['translation_key', 'language'],
+)]
 class Translation extends BaseEntity
 {
     use HasIdTrait;
