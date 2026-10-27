@@ -16,12 +16,12 @@ use Doctrine\ORM\Mapping as ORM;
     name: 'dataset_column',
     uniqueConstraints: [
         new ORM\UniqueConstraint(
-            name: 'dataset_slug_unique',
-            columns: ['dataset', 'slug'],
+            name: 'dataset_column_dataset_id_slug_unique',
+            columns: ['dataset_id', 'slug'],
         ),
         new ORM\UniqueConstraint(
-            name: 'dataset_column_id_unique',
-            columns: ['dataset', 'column_id'],
+            name: 'dataset_column_dataset_id_column_id_unique',
+            columns: ['dataset_id', 'column_id'],
         ),
     ],
 )]
@@ -32,10 +32,10 @@ class DatasetColumn extends BaseEntity
     public function __construct(
         #[ORM\ManyToOne(targetEntity: Dataset::class)]
         #[ORM\JoinColumn(
-            name: 'dataset',
+            name: 'dataset_id',
             referencedColumnName: 'id',
             nullable: false,
-            onDelete: 'RESTRICT',
+            onDelete: 'CASCADE',
         )]
         private Dataset $dataset,
         #[ORM\Column(type: Types::INTEGER)]
