@@ -53,6 +53,16 @@ enum DatasetColumnType: string
         };
     }
 
+    public function getDefaultLength(): ?int
+    {
+        return match ($this) {
+//            self::Int => 11,
+//            self::Bool => 1,
+            self::String => 255,
+            default => null,
+        };
+    }
+
     public function isStringable(): bool
     {
         return in_array($this, [

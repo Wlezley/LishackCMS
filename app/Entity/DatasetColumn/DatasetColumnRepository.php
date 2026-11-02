@@ -18,7 +18,7 @@ final readonly class DatasetColumnRepository extends BaseRepository implements D
     public function findByDatasetId(int $datasetId, bool $includeDeleted = false): array
     {
         if ($includeDeleted) {
-            return $this->findBy(['dataset' => $datasetId]);
+            return $this->findBy(['dataset' => $datasetId], ['columnId' => 'ASC']);
         }
 
         return $this->findBy(['dataset' => $datasetId, 'deleted' => false]);

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Entity\DatasetData;
 
 use App\Entity\DatasetColumn\DatasetColumnRepositoryInterface;
-use App\Enum\Dataset\DatasetColumnType;
 use App\Enum\SortOrderEnum;
 use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
 use Doctrine\DBAL\Schema\Table;
@@ -176,7 +175,7 @@ final readonly class DatasetDataRepository implements DatasetDataRepositoryInter
             $columnName = self::DATA_COLUMN_PREFIX . $column->getColumnId();
             $table->addColumn($columnName, $column->getType()->getDoctrineType(), [
                 'notnull' => $column->isRequired(),
-                'length' => $column->getType() === DatasetColumnType::String ? 255 : null,
+                'length' => $column->getType()->getDefaultLength(),
             ]);
         }
 
@@ -205,7 +204,7 @@ final readonly class DatasetDataRepository implements DatasetDataRepositoryInter
             $columnName = self::DATA_COLUMN_PREFIX . $column->getColumnId();
             $options = [
                 'notnull' => $column->isRequired(),
-                'length' => $column->getType() === DatasetColumnType::String ? 255 : null,
+                'length' => $column->getType()->getDefaultLength(),
             ];
 
             if (!$newTable->hasColumn($columnName)) {
@@ -218,6 +217,7 @@ final readonly class DatasetDataRepository implements DatasetDataRepositoryInter
                 $existingColumn = $newTable->getColumn($columnName);
                 $existingColumn->setType(\Doctrine\DBAL\Types\Type::getType($column->getType()->getDoctrineType()));
                 $existingColumn->setNotnull($column->isRequired());
+                $existingColumn->setLength($column->getType()->getDefaultLength());
             }
         }
 
