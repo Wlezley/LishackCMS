@@ -1,11 +1,13 @@
+{varType App\Entity\User\User $item}
+
 {block content}
 
 {if $item}
     <div class="row">
         <div class="col">
-            <h2 class="border-bottom border-light text-light mb-3">{$item[full_name]} (Login: {$item[name]}, ID: {$item[id]})</h2>
+            <h2 class="border-bottom border-light text-light mb-3">{$item->getFullName()} (Login: {$item->getUserName()}, ID: {$item->getId()})</h2>
 
-            {control userForm, $item[id]}
+            {control userForm, $item->getId()}
 
             <hr class="my-3">
 
@@ -59,7 +61,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{$_('cancel')}</button>
-                    <a n:href="User:delete $item['id']" class="btn btn-danger" title="{$_('delete')}" aria-label="{$_('delete')}">{$_('btn.delete')}</a>
+                    <a n:href="User:delete $item->getId()" class="btn btn-danger" title="{$_('delete')}" aria-label="{$_('delete')}">{$_('btn.delete')}</a>
                 </div>
             </div>
         </div>

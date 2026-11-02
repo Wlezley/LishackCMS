@@ -112,8 +112,13 @@ class UserListGrid extends BaseControl
             ->setSortable()
             ->setAlign('start');
 
-        // FULL NAME
-        $grid->addColumnText('fullName', $this->t('full-name'))
+        // FIRST NAME
+        $grid->addColumnText('firstName', $this->t('first-name'))
+            ->setSortable()
+            ->setAlign('start');
+
+        // LAST NAME
+        $grid->addColumnText('lastName', $this->t('last-name'))
             ->setSortable()
             ->setAlign('start');
 
@@ -218,14 +223,15 @@ class UserListGrid extends BaseControl
         if ($item->getId() == 1) {
             return false;
         }
-        // SUPERADMIN can edit all
-        if ($this->user?->getId() === 1) {
-            return true;
-        }
-        // User can edit himself
-        if ($this->user?->getId() == $item->getId()) {
-            return true;
-        }
+        // TODO: Fix (current) User data
+//        // SUPERADMIN can edit all
+//        if ($this->user?->getId() === 1) {
+//            return true;
+//        }
+//        // User can edit himself
+//        if ($this->user?->getId() == $item->getId()) {
+//            return true;
+//        }
         // User cannot edit other users in the same or higher role
         if ($this->userRole->isLessOrEqualsThan($item->getRole()->value)) {
             return false;
@@ -241,14 +247,15 @@ class UserListGrid extends BaseControl
         if ($item->getId() == 1) {
             return false;
         }
-        // SUPERADMIN can delete (almost) all
-        if ($this->user?->getId() === 1) {
-            return true;
-        }
-        // User cannot delete himself
-        if ($this->user?->getId() == $item->getId()) {
-            return false;
-        }
+        // TODO: Fix (current) User data
+//        // SUPERADMIN can delete (almost) all
+//        if ($this->user?->getId() === 1) {
+//            return true;
+//        }
+//        // User cannot delete himself
+//        if ($this->user?->getId() == $item->getId()) {
+//            return false;
+//        }
         // User cannot delete other users in the same or higher role
         if ($this->userRole->isLessOrEqualsThan($item->getRole()->value)) {
             return false;
@@ -299,8 +306,9 @@ class UserListGrid extends BaseControl
 
             if ($user->getRole()->value == $role) {
                 return;
-            } elseif ($this->user?->getId() == (int) $id) {
-                $this->presenter->flashMessage($this->t('user.role-callback.himself'), 'danger');
+            // TODO: Fix (current) User data
+//            } elseif ($this->user?->getId() == (int) $id) {
+//                $this->presenter->flashMessage($this->t('user.role-callback.himself'), 'danger');
             } elseif ($id == 1) {
                 $this->presenter->flashMessage($this->t('user.role-callback.admin'), 'danger');
             } elseif ($this->userRole->isLessOrEqualsThan($user->getRole()->value) && $this->userRole->isNot('admin')) {
@@ -339,8 +347,9 @@ class UserListGrid extends BaseControl
 
             if ($user->isEnabled() == $enabled) {
                 return;
-            } elseif ($this->user?->getId() == (int) $id) {
-                $this->presenter->flashMessage($this->tf('user.enabled-callback.himself', $actionName), 'danger');
+            // TODO: Fix (current) User data
+//            } elseif ($this->user?->getId() == (int) $id) {
+//                $this->presenter->flashMessage($this->tf('user.enabled-callback.himself', $actionName), 'danger');
             } elseif ($id == 1) {
                 $this->presenter->flashMessage($this->tf('user.enabled-callback.admin', $actionName), 'danger');
             } elseif ($this->userRole->isLessOrEqualsThan($user->getRole()->value) && $this->userRole->isNot('admin')) {
@@ -377,8 +386,9 @@ class UserListGrid extends BaseControl
 
             if ($user->isDeleted() == $deleted) {
                 return;
-            } elseif ($this->user?->getId() == (int) $id) {
-                $this->presenter->flashMessage($this->tf('user.deleted-callback.himself', $actionName), 'danger');
+            // TODO: Fix (current) User data
+//            } elseif ($this->user?->getId() == (int) $id) {
+//                $this->presenter->flashMessage($this->tf('user.deleted-callback.himself', $actionName), 'danger');
             } elseif ($id == 1) {
                 $this->presenter->flashMessage($this->tf('user.deleted-callback.admin', $actionName), 'danger');
             } elseif ($this->userRole->isLessOrEqualsThan($user->getRole()->value) && $this->userRole->isNot('admin')) {

@@ -31,6 +31,7 @@ class User extends BaseEntity
         #[Sortable]
         private string $email,
         #[ORM\Column(type: Types::STRING, length: 255, nullable: true, options: ['default' => null])]
+        #[\SensitiveParameter]
         private ?string $password = null,
         #[ORM\Column(
             type: Types::STRING,

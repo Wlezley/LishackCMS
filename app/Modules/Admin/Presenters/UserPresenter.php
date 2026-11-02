@@ -46,10 +46,10 @@ class UserPresenter extends SecuredPresenter
             $user = $this->userRepository->getById($id);
             Assert::notNull($user);
 
-            $this->template->title .= " ID: $id";
-            $this->template->item = $user;
+            $this->getTemplate()->title .= " ID: $id";
+            $this->getTemplate()->item = $user;
 
-            $this->template->jsonData = Json::encode([
+            $this->getTemplate()->jsonData = Json::encode([
                 'id' => $user->getId(),
                 'name' => $user->getUserName(),
                 'modal' => [
@@ -58,7 +58,7 @@ class UserPresenter extends SecuredPresenter
                 ],
             ]);
         } catch (\Exception $e) {
-            $this->flashMessage('Chyba: ' . $e->getMessage(), 'danger');
+            $this->flashMessage('Chyba: ' . $e->getMessage(), 'danger'); // TODO: TRANSLATE FLASH MESSAGES !!!
         }
     }
 
@@ -76,9 +76,9 @@ class UserPresenter extends SecuredPresenter
             $user->setDeleted(true);
             $this->userRepository->save($user);
 
-            $this->flashMessage("Uživatel ID: $userId byl odstraněn.", 'info');
+            $this->flashMessage("Uživatel ID: $userId byl odstraněn.", 'info'); // TODO: TRANSLATE FLASH MESSAGES !!!
         } else {
-            $this->flashMessage('K odstranění uživatele nemáte oprávnění.', 'danger');
+            $this->flashMessage('K odstranění uživatele nemáte oprávnění.', 'danger'); // TODO: TRANSLATE FLASH MESSAGES !!!
         }
 
         $this->redirect('User:');
@@ -113,26 +113,30 @@ class UserPresenter extends SecuredPresenter
     protected function createComponentUserList(): Datagrid
     {
         // $this->userListGrid->setPresenter($this);
-        $this->userListGrid->setUser($this->userRepository->getById(1));
+//        $this->userListGrid->setUser($this->userRepository->getById(1));
         $this->userListGrid->setTranslationService($this->translationService);
         $this->userListGrid->setConfigService($this->configService);
         return $this->userListGrid->createGrid();
     }
 
+    // TODO: Cleanup...
     protected function createComponentUserForm(): UserForm
     {
         $form = $this->userForm->create();
-        $userId = $this->getParameter('id');
+        $userId = (int) $this->getParameter('id');
+//        $form->setNetteUser($this->getUser());
 
-        // TODO: TRANSLATE FLASH MESSAGES !!!
         if ($userId) {
             try {
-                $form->setUser($this->userRepository->getById($userId));
+//                $form->setUser($this->userRepository->getById($userId));
+//                $form->setNetteUser($this->getUser());
+                $form->setUserId($userId);
                 $form->setFormActionType(FormActionType::Edit);
             } catch (\Exception $e) {
-                $this->flashMessage('Chyba při čtení dat uživatele: ' . $e->getMessage(), 'danger');
+                $this->flashMessage('Chyba při čtení dat uživatele: ' . $e->getMessage(), 'danger'); // TODO: TRANSLATE FLASH MESSAGES !!!
             }
         } else {
+//            $form->setUser($this->userRepository->getById(8));
             $form->setParam($this->getHttpRequest()->getPost('param'));
             $form->setFormActionType(FormActionType::Create);
         }

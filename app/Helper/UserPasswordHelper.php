@@ -13,12 +13,12 @@ class UserPasswordHelper
         'cost' => 12,
     ];
 
-    public static function encrypt(string $password): string
+    public static function encrypt(#[\SensitiveParameter] string $password): string
     {
         return new Passwords(self::Algo, self::Options)->hash($password);
     }
 
-    public static function tryEncrypt(?string $password): ?string
+    public static function tryEncrypt(#[\SensitiveParameter] ?string $password): ?string
     {
         if ($password === null) {
             return null;
@@ -27,7 +27,7 @@ class UserPasswordHelper
         return new Passwords(self::Algo, self::Options)->hash($password);
     }
 
-    public static function verify(string $password, string $hash): bool
+    public static function verify(#[\SensitiveParameter] string $password, string $hash): bool
     {
         return new Passwords(self::Algo, self::Options)->verify($password, $hash);
     }

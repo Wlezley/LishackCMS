@@ -6,8 +6,8 @@ namespace App\Enum;
 
 enum FormActionType: string
 {
-    case Create = 'create';
-    case Edit = 'edit';
+    case Create = 'Create';
+    case Edit = 'Edit';
 
     public function isCreate(): bool
     {

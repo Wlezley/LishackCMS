@@ -129,10 +129,6 @@ class DatasetUpdaterService
             $slug = StringHelper::slugize($columnName);
         }
 
-        // TODO: DEBUG ONLY !!!
-        bdump($columnId, 'COLUMN ID');
-        bdump($this->columns, 'COLUMNS');
-
         $this->columns[$columnId]
             ->setName($columnName)
             ->setSlug($slug)

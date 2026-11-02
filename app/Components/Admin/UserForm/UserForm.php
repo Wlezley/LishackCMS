@@ -5,34 +5,34 @@ declare(strict_types=1);
 namespace App\Components\Admin\UserForm;
 
 use App\Components\BaseControl;
+use App\Dto\User\UserDTO;
 use App\Enum\FormActionType;
 use App\Enum\UserRoleEnum;
 use App\Exception\UserException;
 use App\Models\User\UserRole;
 use App\Service\User\UserService;
 use Nette\Application\UI\Form;
+use Nette\Security\User as NetteUser;
 use Nette\Utils\ArrayHash;
 use Webmozart\Assert\Assert;
 
 class UserForm extends BaseControl
 {
     private FormActionType $formActionType;
-
     private UserRole $editorRole;
+    private int $userId;
+    private bool $readOnly = true;
 
     /** @var callable(string): void */
     public $onSuccess;
-
     /** @var callable(string): void */
     public $onError;
 
     public function __construct(
         private readonly UserService $userService,
+        private readonly NetteUser $editorUser,
     ) {
-        $this->param = [];
-
-        Assert::notNull($this->user, 'User must be set');
-        $this->editorRole = new UserRole($this->user->getRole()->value);
+        $this->editorRole = new UserRole($this->editorUser);
     }
 
     public function createComponentForm(): Form
@@ -41,68 +41,59 @@ class UserForm extends BaseControl
 
         $form->setHtmlAttribute('autocomplete', 'off');
 
-        unset(
-            $this->param['password'],
-            $this->param['password2']
-        );
+        $this->fillParams();
 
-        $readOnly = false;
-        if ($this->formActionType->isEdit()) {
-            Assert::keyExists($this->param, 'id', 'User ID must be set');
-            Assert::keyExists($this->param, 'role', 'User role must be set');
-            Assert::numeric($this->param['id'], 'User ID must be a number');
-            Assert::string($this->param['role'], 'User role must be a string');
-            $readOnly = $this->isReadOnly($this->param['id'], $this->param['role']);
-        }
-
-        if (isset($this->param['id'])) {
-            $form->addHidden('id', $this->param['id']);
-        }
-
-        $form->addText('username', $this->t('login-name'))
+        $form->addText('userName', $this->t('login-name'))
             ->setHtmlAttribute('placeholder', $this->t('login-name'))
             ->setHtmlAttribute('autocomplete', 'off')
-            ->setHtmlAttribute('readonly', $readOnly)
+            ->setHtmlAttribute('readonly', $this->readOnly)
             ->setRequired();
 
-        $form->addText('first_name', $this->t('first-name'))
+        $form->addText('firstName', $this->t('first-name'))
             ->setHtmlAttribute('placeholder', $this->t('first-name'))
             ->setHtmlAttribute('autocomplete', 'off')
-            ->setHtmlAttribute('readonly', $readOnly)
+            ->setHtmlAttribute('readonly', $this->readOnly)
             ->setRequired();
 
-        $form->addText('last_name', $this->t('last-name'))
+        $form->addText('lastName', $this->t('last-name'))
             ->setHtmlAttribute('placeholder', $this->t('last-name'))
             ->setHtmlAttribute('autocomplete', 'off')
-            ->setHtmlAttribute('readonly', $readOnly)
+            ->setHtmlAttribute('readonly', $this->readOnly)
             ->setRequired();
 
         $form->addEmail('email', $this->t('e-mail'))
             ->setHtmlAttribute('placeholder', $this->t('e-mail'))
             ->setHtmlAttribute('autocomplete', 'off')
-            ->setHtmlAttribute('readonly', $readOnly);
+            ->setHtmlAttribute('readonly', $this->readOnly);
+
+        // TODO: Remove - Debug ONLY !!!
+        bdump($this->param, 'PARAM');
+        bdump($this->editorRole, 'EDITOR ROLE');
+        bdump($this->editorUser, 'EDITOR USER');
 
         $form->addSelect(
             name: 'role',
             label: $this->t('permissions'),
-            items: $this->getRoleSelectList((string) $this->param['role']) // TODO: Use UserRoleEnum
+            items: $this->getRoleSelectList(),
         )
-            ->setDisabled($this->readOnlyRole((string) $this->param['role']))
-            ->setDefaultValue(UserRoleEnum::User->value)
+//            ->setDisabled($this->readOnlyRole((string) $this->param['role']))
+//            ->setDefaultValue(UserRoleEnum::User->value)
             ->setRequired();
 
         $form->addCheckbox('deleted', $this->t('deleted.user'))
-            ->setDisabled($readOnly)
+            ->setDisabled($this->readOnly)
             ->setDefaultValue(false);
 
         $form->addCheckbox('enabled', $this->t('active.user'))
-            ->setDisabled($readOnly)
+            ->setDisabled($this->readOnly)
             ->setDefaultValue(true);
 
         if ($this->formActionType->isEdit()) {
             $form->addCheckbox('change_password', $this->t('password.change'))
-                ->setDisabled($readOnly)
+                ->setDisabled($this->readOnly)
                 ->setDefaultValue(false);
+
+            $form->setDefaults($this->param);
         }
 
         $form->addPassword('password', $this->t('password'))
@@ -115,6 +106,10 @@ class UserForm extends BaseControl
             ->setHtmlAttribute('autocomplete', 'new-password')
             ->setRequired($this->formActionType->isCreate());
 
+        if (isset($this->param['id'])) {
+            $form->addHidden('id', $this->param['id']);
+        }
+
         if ($this->formActionType->isCreate()) {
             $form->addSubmit('save', $this->t('create'));
             $form->onSuccess[] = [$this, 'processCreate'];
@@ -126,6 +121,12 @@ class UserForm extends BaseControl
         }
 
         return $form;
+    }
+
+    // TODO: Check and Rework...
+    public function buildFormItem(): void
+    {
+        $this->template->readOnly = $this->readOnly;
     }
 
     /**
@@ -148,12 +149,12 @@ class UserForm extends BaseControl
 
         try {
             $user = $this->userService->create(
-                userName: $values['username'],
+                userName: $values['userName'],
                 email: $values['email'],
                 password: $values['password'],
                 role: UserRoleEnum::from($values['role']),
-                firstName: $values['first_name'],
-                lastName: $values['last_name'],
+                firstName: $values['firstName'],
+                lastName: $values['lastName'],
                 deleted: (bool) $values['deleted'],
                 enabled: (bool) $values['enabled'],
             );
@@ -176,15 +177,14 @@ class UserForm extends BaseControl
         }
 
         // TODO: Check user permissions for role settings, check if not READ-ONLY, etc...
-
-        // if ($this->isReadOnly($values['id'], $values['role'])) {
-        //     call_user_func($this->onError, $this->t('error.form.no-permissions.user-edit'));
-        //     return;
-        // }
-        // if ($this->editorRole->isLessOrEqualsThan($values['role'])) {
-        //     call_user_func($this->onError, $this->t('error.form.user-role-elevation'));
-        //     return;
-        // }
+        if ($this->isReadOnly((int) $values['id'], UserRoleEnum::tryFromOrDefault($values['role']))) {
+            call_user_func($this->onError, $this->t('error.form.no-permissions.user-edit'));
+            return;
+        }
+        if ($this->editorRole->isLessOrEqualsThan($values['role'])) {
+            call_user_func($this->onError, $this->t('error.form.user-role-elevation'));
+            return;
+        }
 
         try {
 //            $userData = UserValidator::prepareData((array)$values);
@@ -221,43 +221,68 @@ class UserForm extends BaseControl
         $this->formActionType = $formActionType;
     }
 
-    private function isReadOnly(int|string $targetId, string $targetRole): bool
+    public function setUserId(int $userId): void
     {
-        if ($this->user?->getId() == $targetId) {
+        $this->userId = $userId;
+    }
+
+    private function fillParams(): void
+    {
+        unset(
+            $this->param['password'],
+            $this->param['password2']
+        );
+
+
+        $this->readOnly = false;
+        if ($this->formActionType->isEdit()) {
+            $user = $this->userService->findByUserId($this->userId);
+            Assert::notNull($user, 'User not found'); // TODO: Use translated message
+
+            $userDto = UserDTO::fromEntity($user);
+            $this->param = $userDto->toArray();
+
+            $this->readOnly = $this->isReadOnly(
+                $user->getId(),
+                $user->getRole(),
+            );
+        }
+    }
+
+    private function isReadOnly(int $targetId, UserRoleEnum $targetRole): bool
+    {
+        if ($this->editorUser->getId() === $targetId) {
             return false;
         }
 
-        return $this->editorRole->isLessOrEqualsThan($targetRole);
+        return $this->editorRole->isLessOrEqualsThan($targetRole->value);
     }
 
-    private function readOnlyRole(?string $targetRole): bool
-    {
-        if (isset($targetRole) && $this->editorRole->isLessOrEqualsThan($targetRole)) {
-            return true;
-        }
-
-        return false;
-    }
+    // TODO: Remove or rework
+//    private function readOnlyRole(?string $targetRole): bool
+//    {
+////        if (isset($targetRole) && $this->editorRole->isLessOrEqualsThan($targetRole)) {
+////            return true;
+////        }
+//
+//        return false;
+//    }
 
     /**
      * @return array<string,string>
+     * @todo: Move to RoleService?
      */
-    private function getRoleSelectList(string $targetRole): array
+    private function getRoleSelectList(): array
     {
-        $userRolesSelect = [];
-        foreach (UserRole::USER_ROLES as $roleName) {
-            $userRolesSelect[$roleName] = $this->t('user.role.' . $roleName);
+        $roleListSelect = [];
+        foreach ($this->editorRole->getLowerList() as $roleName) {
+            $roleListSelect[$roleName] = $this->t('user.role.' . $roleName);
         }
 
-        if ($this->formActionType->isEdit() && $this->editorRole->isLessOrEqualsThan($targetRole)) {
-            return [$targetRole => $userRolesSelect[$targetRole]];
-        } else {
-            $roleListSelect = [];
-
-            foreach ($this->editorRole->getLowerList() as $roleName) {
-                $roleListSelect[$roleName] = $userRolesSelect[$roleName];
-            }
-            return $roleListSelect;
+        if ($this->editorRole->is(UserRoleEnum::Admin->value)) {
+            $roleListSelect[UserRoleEnum::Admin->value] = $this->t('user.role.' . UserRoleEnum::Admin->value);
         }
+
+        return $roleListSelect;
     }
 }

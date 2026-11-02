@@ -55,6 +55,23 @@ readonly class UserService
         );
     }
 
+    public function findByUserId(int $userId): ?User
+    {
+        return $this->userRepository->findOneBy(['id' => $userId]);
+    }
+
+    public function findByUserIdFilter(
+        int $userId,
+        ?bool $includeDisabled = null,
+        ?bool $includeDeleted = null,
+    ): ?User {
+        return $this->userRepository->findOneBy([
+            'id' => $userId,
+            'filterDisabled' => $includeDisabled,
+            'filterDeleted' => $includeDeleted,
+        ]);
+    }
+
     /**
      * @throws InvalidArgumentException If the user is not found.
      */

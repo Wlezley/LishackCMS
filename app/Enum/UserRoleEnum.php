@@ -41,6 +41,16 @@ enum UserRoleEnum: string
         );
     }
 
+    public static function getDefault(): self
+    {
+        return self::Guest;
+    }
+
+    public static function tryFromOrDefault(string $value): self
+    {
+        return self::tryFrom($value) ?? self::getDefault();
+    }
+
     /**
      * @return array<int, string> Array of roles, indexed by their level
      */
