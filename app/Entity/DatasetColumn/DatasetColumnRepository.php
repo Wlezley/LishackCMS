@@ -6,6 +6,7 @@ namespace App\Entity\DatasetColumn;
 
 use App\Entity\BaseRepository;
 use App\Enum\Dataset\DatasetColumnType;
+use Webmozart\Assert\Assert;
 
 /**
  * @extends BaseRepository<DatasetColumn>
@@ -17,6 +18,8 @@ final readonly class DatasetColumnRepository extends BaseRepository implements D
      */
     public function findByDatasetId(int $datasetId, bool $includeDeleted = false): array
     {
+        Assert::positiveInteger($datasetId, 'Dataset ID must be a positive integer');
+
         if ($includeDeleted) {
             return $this->findBy(['dataset' => $datasetId], ['columnId' => 'ASC']);
         }
@@ -35,6 +38,8 @@ final readonly class DatasetColumnRepository extends BaseRepository implements D
         ?bool $filterHidden = null,
         ?bool $filterDeleted = null,
     ): array {
+        Assert::positiveInteger($datasetId, 'Dataset ID must be a positive integer');
+
         /** @var array<string, mixed> $criteria */
         $criteria = ['dataset' => $datasetId];
 

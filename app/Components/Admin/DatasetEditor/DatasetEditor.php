@@ -146,14 +146,14 @@ class DatasetEditor extends BaseControl
             Assert::notNull($columnType, "Invalid column type: {$column['type']} for column: {$column['name']} in dataset: {$values['name']}");
 
             $this->datasetUpdater->updateColumn(
-                columnId: (int)$column['id'] - 1,
+                columnId: (int) $column['id'], // - 1, TODO: WTF???
                 columnName: $column['name'],
                 slug: $column['slug'],
                 type: $columnType,
-                required: (bool)$column['required'],
-                listed: (bool)$column['listed'],
-                hidden: (bool)$column['hidden'],
-                deleted: (bool)$column['deleted'],
+                required: (bool) $column['required'],
+                listed: (bool) $column['listed'],
+                hidden: (bool) $column['hidden'],
+                deleted: (bool) $column['deleted'],
                 defaultValue: $column['default']
             );
         }
