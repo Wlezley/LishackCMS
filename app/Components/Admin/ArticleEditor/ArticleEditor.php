@@ -157,17 +157,21 @@ class ArticleEditor extends BaseControl
             ? $this->t('form.article.create')
             : $this->t('form.article.save');
 
-        $form->addSubmit('save', $saveBtnName) // @phpstan-ignore-line
-            ->onClick[] = [$this, 'processSave'];
+        $form->addSubmit('save', $saveBtnName)
+            ->onClick[] = function () use ($form): void {
+                $this->processSave($form->getValues());
+            };
 
-        $form->addSubmit('copy', $this->t('form.article.save-copy')) // @phpstan-ignore-line
-            ->onClick[] = [$this, 'processSaveAsCopy'];
+        $form->addSubmit('copy', $this->t('form.article.save-copy'))
+            ->onClick[] = function () use ($form): void {
+                $this->processSaveAsCopy($form->getValues());
+            };
 
         return $form;
     }
 
     /** @param ArrayHash<mixed> $values */
-    public function processSave(Form $form, ArrayHash $values): void
+    public function processSave(ArrayHash $values): void
     {
         $data = (array)$values;
         unset($data['user_name'], $data['updated_at']);
@@ -220,10 +224,10 @@ class ArticleEditor extends BaseControl
     }
 
     /** @param ArrayHash<mixed> $values */
-    public function processSaveAsCopy(Form $form, ArrayHash $values): void
+    public function processSaveAsCopy(ArrayHash $values): void
     {
         $this->setFormActionType(FormActionType::Create);
-        $this->processSave($form, $values);
+        $this->processSave($values);
     }
 
     public function render(): void
